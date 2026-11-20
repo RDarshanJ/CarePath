@@ -38,7 +38,7 @@ export function AIDraftBlock({
     <section
       aria-label={labels[state]}
       className={cx(
-        "border-l-[3px] bg-surface-sunken py-3 pr-4 pl-4",
+        "border-l-[3px] bg-ai-bg py-3 pr-4 pl-4",
         state === "approved" ? "border-solid border-primary" : "border-dashed border-ai-rule",
         className,
       )}

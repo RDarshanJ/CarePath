@@ -8,14 +8,36 @@ import {
   contrastPairs,
   density,
   elevation,
+  fonts,
   radius,
   renderTokensCss,
+  scrim,
+  type ColourTokens,
   type ThemeName,
 } from "./tokens";
 
 const themes: ThemeName[] = ["patient", "clinician"];
 const threshold = { text: 4.5, ui: 3 } as const;
 const srcDir = fileURLToPath(new URL("..", import.meta.url));
+const finalJsonPath = fileURLToPath(
+  new URL("../../../../docs/design/tokens-final.json", import.meta.url),
+);
+
+/** HSL hue (degrees) and saturation (0 to 1) of a 6-digit hex colour. */
+function hsl(hex: string): { h: number; s: number } {
+  const n = parseInt(hex.slice(1), 16);
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => v / 255) as [
+    number,
+    number,
+    number,
+  ];
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  if (d === 0) return { h: 0, s: 0 };
+  const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return { h: (h * 60 + 360) % 360, s: d / (1 - Math.abs(max + min - 1)) };
+}
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -44,25 +66,55 @@ describe("WCAG contrast for every foreground/background token pair", () => {
     for (const s of ["success", "warning", "error", "info", "neutral"]) {
       expect(contrastPairs.some((p) => p.fg === `${s}-ink` && p.bg === `${s}-bg`)).toBe(true);
     }
+    expect(
+      contrastPairs.some((p) => p.fg === "critical-subtle-ink" && p.bg === "critical-subtle-bg"),
+    ).toBe(true);
+    expect(contrastPairs.some((p) => p.fg === "ai-ink" && p.bg === "ai-bg")).toBe(true);
+    expect(contrastPairs.some((p) => p.fg === "selected-ink" && p.bg === "selected-bg")).toBe(true);
   });
 
-  it("matches the advisor plan section 4 values", () => {
-    expect(colours.patient.bg).toBe("#F5F2EA");
-    expect(colours.clinician.bg).toBe("#F6F7F6");
-    expect(colours.patient.ink).toBe("#1B2622");
-    expect(colours.clinician.ink).toBe("#17201D");
-    expect(colours.patient["ink-muted"]).toBe("#55615C");
-    expect(colours.clinician["ink-muted"]).toBe("#56625E");
+  it("uses link, not primary, as a text colour (DR-001 section 8)", () => {
+    expect(contrastPairs.some((p) => p.fg === "primary" && p.rule === "text")).toBe(false);
+  });
+
+  it("matches the DR-001 values", () => {
     for (const t of themes) {
-      expect(colours[t].primary).toBe("#1E4D40");
-      expect(colours[t]["border-control"]).toBe("#76817C");
-      expect(colours[t].focus).toBe("#0B5FA5");
-      expect(colours[t].surface).toBe("#FFFFFF");
-      expect([colours[t]["success-ink"], colours[t]["success-bg"]]).toEqual(["#1E5A3A", "#E5F1E8"]);
-      expect([colours[t]["warning-ink"], colours[t]["warning-bg"]]).toEqual(["#7A4A00", "#FBF0D9"]);
-      expect([colours[t]["error-ink"], colours[t]["error-bg"]]).toEqual(["#8E2A1E", "#FBE9E5"]);
-      expect([colours[t]["info-ink"], colours[t]["info-bg"]]).toEqual(["#1F4E6B", "#E6F0F5"]);
+      const c = colours[t];
+      expect(c.bg).toBe("#F5F7FA");
+      expect(c.surface).toBe("#FFFFFF");
+      expect(c.ink).toBe("#172B4D");
+      expect(c["ink-muted"]).toBe("#42526E");
+      expect(c.primary).toBe("#175CD3");
+      expect(c["border-control"]).toBe("#697A93");
+      expect(c.focus).toBe("#172B4D");
+      expect([c["success-ink"], c["success-bg"]]).toEqual(["#05603A", "#ECFDF3"]);
+      expect([c["warning-ink"], c["warning-bg"]]).toEqual(["#93370D", "#FEF7C3"]);
+      expect([c["error-ink"], c["error-bg"]]).toEqual(["#B42318", "#FEF3F2"]);
+      expect([c["info-ink"], c["info-bg"]]).toEqual(["#065986", "#F0F9FF"]);
     }
+  });
+
+  it("uses one colour map for both themes", () => {
+    expect(colours.clinician).toEqual(colours.patient);
+  });
+
+  it("equals docs/design/tokens-final.json (colours, density, fonts, overlay)", () => {
+    const final = JSON.parse(readFileSync(finalJsonPath, "utf8")) as {
+      colours: Record<ThemeName, Record<string, string>>;
+      density: Record<ThemeName, Record<string, unknown>>;
+      textExtra: Record<ThemeName, Record<string, [number, number]>>;
+      fonts: Record<string, string>;
+      overlay: Record<string, string>;
+    };
+    for (const t of themes) {
+      expect({ ...colours[t] }).toEqual(final.colours[t]);
+      const { textExtra, ...rest } = density[t];
+      expect(rest).toEqual(final.density[t]);
+      expect(textExtra).toEqual(final.textExtra[t]);
+    }
+    expect({ ...fonts }).toEqual(final.fonts);
+    expect(scrim).toBe(final.overlay["scrim"]);
+    expect(elevation.overlay).toBe(final.overlay["shadow-overlay"]);
   });
 });
 
@@ -74,8 +126,8 @@ describe("shape, type and target rules", () => {
   });
 
   it("uses the plan's type scales and body sizes", () => {
-    expect(density.patient.scale).toEqual([15, 17, 20, 24, 30, 38]);
-    expect(density.clinician.scale).toEqual([12, 13, 14, 16, 20, 24]);
+    expect(density.patient.scale).toEqual([15, 17, 20, 24, 32, 40]);
+    expect(density.clinician.scale).toEqual([12, 13, 14, 15, 18, 24]);
     expect(density.patient.text.body).toEqual([17, 26]);
     expect(density.clinician.text.table).toEqual([13, 18]);
     expect(density.clinician.text.body).toEqual([14, 20]);
@@ -83,7 +135,10 @@ describe("shape, type and target rules", () => {
 
   it("keeps every text role on its theme's scale", () => {
     for (const t of themes) {
-      for (const [role, [size]] of Object.entries(density[t].text)) {
+      for (const [role, [size]] of Object.entries({
+        ...density[t].text,
+        ...density[t].textExtra,
+      })) {
         expect(density[t].scale, `${t} ${role}`).toContain(size);
       }
     }
@@ -97,47 +152,94 @@ describe("shape, type and target rules", () => {
     expect(density.patient.measure).toBe("60ch");
   });
 
-  it("uses serif headings for patients only", () => {
-    expect(density.patient["font-heading"]).toContain("Source Serif 4");
-    expect(density.clinician["font-heading"]).toContain("IBM Plex Sans");
+  it("uses IBM Plex Sans headings in both themes and no serif anywhere", () => {
+    for (const t of themes) expect(density[t]["font-heading"]).toContain("IBM Plex Sans");
+    const css = renderTokensCss();
+    expect(css).not.toMatch(/Serif/);
+    for (const value of [
+      ...Object.values(fonts),
+      ...themes.map((t) => density[t]["font-heading"]),
+    ]) {
+      expect(value).not.toMatch(/Serif/);
+    }
+  });
+
+  it("loads only the DR-001 faces (Plex Sans 400, 400 italic, 500, 600; Plex Mono 400)", () => {
+    const src = readFileSync(join(srcDir, "fonts.ts"), "utf8");
+    const imports = [...src.matchAll(/^import "([^"]+)";/gm)].map((m) => m[1]).sort();
+    expect(imports).toEqual([
+      "@fontsource/ibm-plex-mono/latin-400.css",
+      "@fontsource/ibm-plex-sans/latin-400-italic.css",
+      "@fontsource/ibm-plex-sans/latin-400.css",
+      "@fontsource/ibm-plex-sans/latin-500.css",
+      "@fontsource/ibm-plex-sans/latin-600.css",
+    ]);
   });
 });
 
 describe("palette restrictions", () => {
-  function hue(hex: string): { h: number; s: number } {
-    const n = parseInt(hex.slice(1), 16);
-    const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => v / 255) as [
-      number,
-      number,
-      number,
-    ];
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const d = max - min;
-    if (d === 0) return { h: 0, s: 0 };
-    const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-    return { h: (h * 60 + 360) % 360, s: d / (1 - Math.abs(max + min - 1)) };
-  }
+  const entries = (t: ThemeName) => Object.entries(colours[t]) as [keyof ColourTokens, string][];
 
   it("contains no purple or magenta", () => {
     for (const t of themes) {
-      for (const [name, value] of Object.entries(colours[t])) {
-        const { h, s } = hue(value);
+      for (const [name, value] of entries(t)) {
+        const { h, s } = hsl(value);
         const purple = s > 0.15 && h >= 255 && h <= 335;
         expect(purple, `${t} ${name} ${value}`).toBe(false);
       }
     }
   });
 
-  it("limits blue to focus and info", () => {
+  it("status tokens are not brand blue", () => {
     for (const t of themes) {
-      for (const [name, value] of Object.entries(colours[t])) {
-        const { h, s } = hue(value);
-        if (s > 0.3 && h >= 195 && h < 255) {
-          expect(["focus", "info-ink", "info-bg"], `${t} ${name} ${value}`).toContain(name);
-        }
+      for (const [name, value] of entries(t)) {
+        if (!/^(success|warning|error|critical)-/.test(name)) continue;
+        const { h, s } = hsl(value);
+        expect(s > 0.3 && h >= 195 && h <= 255, `${t} ${name} ${value}`).toBe(false);
+      }
+      expect(colours[t]["info-ink"]).not.toBe(colours[t].primary);
+    }
+  });
+
+  it("keeps ai-* tokens at low saturation so generated content stays neutral", () => {
+    for (const t of themes) {
+      const ai = entries(t).filter(([name]) => name.startsWith("ai-"));
+      expect(ai.map(([n]) => n).sort()).toEqual(["ai-bg", "ai-ink", "ai-rule"]);
+      for (const [name, value] of ai) {
+        expect(hsl(value).s, `${t} ${name} ${value}`).toBeLessThanOrEqual(0.35);
       }
     }
+  });
+
+  // Acceptance test for DESIGN-BRIEF section 19: no cream, paper, beige or tan neutral anywhere.
+  it("contains no warm neutral", () => {
+    const neutrals = [
+      "bg",
+      "surface",
+      "surface-sunken",
+      "surface-elevated",
+      "border",
+      "neutral-bg",
+      "disabled-bg",
+      "ai-bg",
+    ] as const;
+    for (const t of themes) {
+      for (const name of neutrals) {
+        const value = colours[t][name];
+        const { h, s } = hsl(value);
+        expect(
+          s === 0 || (h >= 190 && h <= 240),
+          `${t} ${name} ${value} (hue ${h.toFixed(0)})`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("derives the scrim and overlay shadow from ink", () => {
+    const n = parseInt(colours.patient.ink.slice(1), 16);
+    const rgb = `rgb(${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+    expect(scrim.startsWith(rgb)).toBe(true);
+    expect(elevation.overlay.split(rgb).length - 1).toBe(2);
   });
 });
 

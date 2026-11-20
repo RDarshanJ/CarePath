@@ -15,7 +15,7 @@ export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p";
 }
 
-/** Patient theme: Source Serif 4, 600. Clinician theme: IBM Plex Sans, 600. The font comes from the token. */
+/** IBM Plex Sans 600 in both themes (DR-001); size comes from the theme scale. */
 export function Heading({ level, as, className, ...rest }: HeadingProps) {
   const Tag = (as ?? `h${level}`) as ElementType;
   return (
