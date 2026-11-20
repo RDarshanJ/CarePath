@@ -20,9 +20,16 @@ export async function createConversation(
     },
     select: { id: true },
   });
-  for (const userId of input.userIds) {
+  // One millisecond apart, in the order given: participants are listed by joinedAt, and equal
+  // times made that order depend on the heap (a flaky role-order assertion, fixed in WP 4.1).
+  for (const [i, userId] of input.userIds.entries()) {
     await db.conversationParticipant.create({
-      data: { organizationId: org.orgId, conversationId: c.id, userId, joinedAt: at },
+      data: {
+        organizationId: org.orgId,
+        conversationId: c.id,
+        userId,
+        joinedAt: new Date(at.getTime() + i),
+      },
     });
   }
   return c.id;

@@ -27,7 +27,7 @@ const conversationSelect = {
   lastMessageAt: true,
   patient: { select: { id: true, givenName: true, familyName: true } },
   participants: {
-    orderBy: { joinedAt: "asc" },
+    orderBy: [{ joinedAt: "asc" }, { id: "asc" }],
     select: { userId: true, ...personSelect },
   },
 } as const;
