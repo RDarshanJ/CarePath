@@ -162,3 +162,183 @@ export async function rulesLastRunAt(
   });
   return row?.completedAt ?? null;
 }
+
+// ---- task actions and rules (delivery step 5) -------------------------------------------------
+
+export async function setTaskAssignee(
+  db: DbClient,
+  ctx: Scope,
+  patientId: string,
+  taskId: string,
+  practitionerId: string | null,
+  at: Date,
+): Promise<boolean> {
+  const res = await db.reviewTask.updateMany({
+    where: {
+      id: taskId,
+      organizationId: ctx.orgId,
+      patientId,
+      status: { in: [...activeTaskStatuses] },
+    },
+    data: {
+      assignedPractitionerId: practitionerId,
+      status: practitionerId ? "in_review" : "open",
+      updatedAt: at,
+    },
+  });
+  return res.count === 1;
+}
+
+/** Closes an open or in-review task with a note. Returns false when it was already closed. */
+export async function closeTask(
+  db: DbClient,
+  ctx: Scope,
+  patientId: string,
+  taskId: string,
+  input: { status: "resolved" | "dismissed"; userId: string; note: string; at: Date },
+): Promise<boolean> {
+  const res = await db.reviewTask.updateMany({
+    where: {
+      id: taskId,
+      organizationId: ctx.orgId,
+      patientId,
+      status: { in: [...activeTaskStatuses] },
+    },
+    data: {
+      status: input.status,
+      resolvedAt: input.at,
+      resolvedByUserId: input.userId,
+      resolutionNote: input.note,
+      updatedAt: input.at,
+    },
+  });
+  return res.count === 1;
+}
+
+export async function activePractitioner(db: DbClient, ctx: Scope, practitionerId: string) {
+  return db.practitioner.findFirst({
+    where: { id: practitionerId, organizationId: ctx.orgId, active: true },
+    select: { id: true },
+  });
+}
+
+const ruleSelect = {
+  id: true,
+  key: true,
+  name: true,
+  description: true,
+  enabled: true,
+  priority: true,
+  params: true,
+  updatedAt: true,
+} as const;
+
+export async function listRules(db: DbClient, ctx: Scope) {
+  return db.reviewRule.findMany({
+    where: { organizationId: ctx.orgId },
+    orderBy: [{ priority: "desc" }, { key: "asc" }],
+    select: ruleSelect,
+  });
+}
+
+export async function findRule(db: DbClient, ctx: Scope, ruleId: string) {
+  return db.reviewRule.findFirst({
+    where: { id: ruleId, organizationId: ctx.orgId },
+    select: ruleSelect,
+  });
+}
+
+export async function updateRule(
+  db: DbClient,
+  ctx: Scope,
+  ruleId: string,
+  data: { enabled: boolean; params: Prisma.InputJsonValue; at: Date },
+): Promise<void> {
+  const res = await db.reviewRule.updateMany({
+    where: { id: ruleId, organizationId: ctx.orgId },
+    data: { enabled: data.enabled, params: data.params, updatedAt: data.at },
+  });
+  if (res.count !== 1) throw new Error("rule update matched no row in scope");
+}
+
+// ---- time-based rule inputs (job handlers, scoped by job.organizationId) ----------------------
+
+/** Unreviewed check-ins of patients with an active care team, submitted before `before`. */
+export async function staleUnreviewedCheckIns(db: DbClient, ctx: Scope, before: Date) {
+  return db.patientCheckIn.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      reviewedAt: null,
+      submittedAt: { lte: before },
+      patient: { careTeam: { status: "active" } },
+    },
+    select: { id: true, patientId: true, submittedAt: true },
+  });
+}
+
+export async function upcomingFollowUps(db: DbClient, ctx: Scope, from: Date, to: Date) {
+  return db.appointment.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      type: { in: ["follow_up", "video_follow_up"] },
+      status: "booked",
+      startsAt: { gt: from, lte: to },
+    },
+    select: { id: true, patientId: true, startsAt: true },
+  });
+}
+
+export async function staleIntakes(db: DbClient, ctx: Scope, createdBefore: Date) {
+  return db.intakeAssessment.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      status: "in_progress",
+      patient: { status: "intake_incomplete", createdAt: { lte: createdBefore } },
+    },
+    select: {
+      id: true,
+      patientId: true,
+      answers: true,
+      patient: { select: { createdAt: true } },
+    },
+  });
+}
+
+/** Active patients with an active plan, and their current version id. */
+export async function activePlanPatients(db: DbClient, ctx: Scope) {
+  return db.carePlan.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      status: "active",
+      currentVersionId: { not: null },
+      patient: { status: "active" },
+    },
+    select: { patientId: true, currentVersionId: true },
+  });
+}
+
+export async function hasActiveTask(db: DbClient, ctx: Scope, ruleId: string, patientId: string) {
+  const row = await db.reviewTask.findFirst({
+    where: {
+      organizationId: ctx.orgId,
+      ruleId,
+      patientId,
+      status: { in: [...activeTaskStatuses] },
+    },
+    select: { id: true },
+  });
+  return row !== null;
+}
+
+export async function activeConsentPatients(db: DbClient, ctx: Scope, patientIds: string[]) {
+  const rows = await db.consent.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      patientId: { in: patientIds },
+      type: "treatment_and_data_use",
+      status: "active",
+    },
+    select: { patientId: true },
+  });
+  return new Set(rows.map((r) => r.patientId));
+}

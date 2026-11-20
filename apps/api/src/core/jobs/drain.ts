@@ -3,13 +3,15 @@
  * Exit code 1 when any job was dead-lettered in this run.
  */
 import { loadConfig } from "../../config.js";
-import { jobHandlers } from "../../jobs/handlers.js";
+import { createJobHandlers } from "../../jobs/handlers.js";
+import { clockFromEnv } from "../clock.js";
 import { createDb } from "../db/repo.js";
 import { JobRunner } from "./runner.js";
 
 const db = createDb(loadConfig().databaseUrl);
+const { now } = clockFromEnv(process.env);
 try {
-  const stats = await new JobRunner({ db, handlers: jobHandlers }).drain();
+  const stats = await new JobRunner({ db, handlers: createJobHandlers({ db, now }), now }).drain();
   console.log(
     `jobs:drain claimed=${stats.claimed} succeeded=${stats.succeeded} retried=${stats.retried} dead=${stats.dead}`,
   );

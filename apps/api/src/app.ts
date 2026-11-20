@@ -25,6 +25,7 @@ import { clinicRoutes } from "./modules/clinic/routes.js";
 import { exerciseRoutes } from "./modules/exercises/routes.js";
 import { overviewRoutes } from "./modules/overview/routes.js";
 import { recordRoutes } from "./modules/records/routes.js";
+import { reviewActionRoutes } from "./modules/review/action-routes.js";
 import { reviewRoutes } from "./modules/review/routes.js";
 import { patientRoutes } from "./modules/patients/routes.js";
 import { progressRoutes } from "./modules/progress/routes.js";
@@ -105,6 +106,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(reviewRoutes);
   // Step 4: plan draft autosave, preview and publish.
   await app.register(carePlanDraftRoutes);
+  // Step 5: review task actions, check-in reviewed, review rules.
+  await app.register(reviewActionRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();

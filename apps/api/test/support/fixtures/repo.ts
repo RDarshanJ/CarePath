@@ -286,3 +286,24 @@ export async function tryEditVersion(db: Db, versionId: string) {
 export async function goalsOfPlan(db: Db, carePlanId: string) {
   return db.goal.findMany({ where: { carePlanId }, orderBy: { createdAt: "asc" } });
 }
+
+export async function createIntake(
+  db: Db,
+  orgId: string,
+  patientId: string,
+  answers: Record<string, unknown>,
+  currentStep = "personal_information",
+) {
+  return db.intakeAssessment.create({
+    data: { organizationId: orgId, patientId, currentStep, answers: answers as never },
+    select: { id: true },
+  });
+}
+
+export async function setPatientCreatedAt(db: Db, patientId: string, at: Date) {
+  await db.patient.update({ where: { id: patientId }, data: { createdAt: at } });
+}
+
+export async function checkInRow(db: Db, id: string) {
+  return db.patientCheckIn.findUniqueOrThrow({ where: { id } });
+}
