@@ -17,6 +17,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 3.2b Patient experience: onboarding (account, code, nine steps, consent, review), Today, guided session with persistence and stop flow, Progress with SVG charts and table alternatives, Sharing and consent, care plan (gate output below).
 - Checkpoint C2 (`docs/decisions/checkpoint-c2.md`): the slice is real; go for Phase 4 after WP 3.4.
 - WP 3.4a (branch `wp/3.4a`): S1 shared data root for every worktree, F3 session-keyed rate limit with forwarded client address, F4 contracts (CR-2 `onCareTeam`, CR-3 `total`, draft `{ draft: null }`, `mediaAlt`, corrected descriptions), F5 gate fails when a run changes `docs/` (gate output below).
+- WP 3.4c (branch `wp/3.4c`): clinician fixes from C2 (F2 intake on the record and in the builder, 1.6.1 to 1.6.7, CR-2 and CR-3 consumed, flaky axe test fixed); gate output below.
 
 ## Outstanding
 
@@ -511,3 +512,44 @@ Notes:
 - One end-to-end flake seen in seven runs of the suite: `clinician-screens.spec.ts`, axe `document-title` on the review queue at 1024 with the task drawer open. The rerun passed. Owned by WP 3.4c (clinician specs).
 - `CLAUDE.md` still says the cluster data is in `.data/pg`; with S1 it is `$CAREPATH_DATA_ROOT/pg`. Not edited here.
 
+### WP 3.4c (checkpoint C2: clinician fixes)
+
+Worktree `/home/claude/wt/3.4c`, branch `wp/3.4c`. Gate: `scripts/gate-wp-3.4c.sh` (API 4036, web 3036; new in this package, modelled on the 3.3 gate; screenshots to `docs/screenshots/3.4c/` through `SCREENSHOT_DIR`). Then `pnpm verify` in the same worktree after the code commit, with `docs/` unchanged by the run.
+
+Done:
+
+- F2. Overview tab section "What the patient told us at intake" from `GET /patients/:patientId/intake`: goal, body area and side, the three pain numbers labelled patient-reported, limitations, therapist preferences, availability, submitted time (or what is still unanswered). "See intake" in the plan builder header opens the same content in a drawer. A patient with no intake shows "No intake on file".
+- 1.6.1. The four-card row on the Overview tab is one summary strip.
+- 1.6.2. Review queue is a table with 36 px rows (asserted in the spec) and a sticky detail pane at 1280 and wider; below that the task opens in a drawer as before. Status appears only when a task is not open, in the queue, the detail and the overview list.
+- CR-3. Directory footer reads "Patients 1 to 25 of N" from `total`; the queue heading count is `total`, with "Showing x of N" when more pages exist.
+- CR-2. With `onCareTeam` false the queue disables assign, mark check-in reviewed, and (for clinical tasks) resolve and dismiss, and says why beside them. The patient record disables "Open care plan builder" with the reason, the builder shows an explanation instead of an editor, and the check-ins tab disables "Mark reviewed". The 403 handling stays as the backstop.
+- Wording. Overview lists are called caseload ("Your review tasks"); the queue description says it is the whole clinic. Filtered empty states in the queue and directory say "No tasks match these filters" and offer "Clear filters". The raw `resolved` and `in_review` enums on the timeline are words. "Visits today" is "Next visits today" until WP 4.1. Publishing an empty plan is disabled with a visible reason.
+- Flaky axe `document-title` failure (clinician-screens at 1024 with the task drawer open): the cause is the document title updating after client navigation, so axe could run before it. The spec now waits for the task to appear in the address and for the title before every axe call, so the order is deterministic.
+
+TODO (illustration): the "nothing-to-review" illustration at `apps/web/public/assets/illustrations/moment-nothing-to-review*.webp` comes with WP 3.4b. The queue empty state does not depend on it; use it there once 3.4b has merged.
+
+Gate (`GATE_SKIP_VERIFY=1 scripts/gate-wp-3.4c.sh`, exit 0):
+
+```
+==> pnpm --filter @carepath/web typecheck
+==> pnpm exec eslint (clinician paths)
+==> pnpm exec prettier --check (clinician paths)
+==> scripts/with-web-lock.sh scripts/e2e.sh
+  6 passed (1.3m)
+WP 3.4c gate: PASSED
+```
+
+`pnpm verify` (exit 0):
+
+```
+packages/ui test:       Tests  106 passed (106)
+packages/db test:       Tests  63 passed (63)
+apps/api test:       Tests  165 passed (165)
+==> end-to-end (API + next start + Playwright + axe)
+  12 skipped
+  42 passed (3.9m)
+==> docs/ unchanged by the run
+verify: PASSED
+```
+
+Screenshots: `docs/screenshots/3.4c/` (1440 and 1024), including `review-queue-task-1440.png`, `review-queue-1024.png`, `record-overview-1440.png`, `plan-builder-intake-1440.png`.
