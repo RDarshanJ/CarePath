@@ -59,5 +59,6 @@ Copy this block to the end of the file and fill every line.
 - Endpoint and contract: `ExerciseSessionDetail.activities[].exercise.mediaPath`
 - What is missing: `mediaPath` is null for every seeded exercise and there is no route that serves exercise images or video.
 - Why: REQ-SES asks for a picture or short clip beside the written steps. The session shows the written steps only, with no empty image box. Not a blocker.
-- Status: open
+- Status: done
 - Answer: accepted at checkpoint C2 (ruling 3.4). Contract part delivered by WP 3.4a: `mediaAlt: string | null` beside `mediaPath` on every exercise shape (`Exercise`, plan items, session activities) and an `Exercise.mediaAlt` column with a check that path and description are set together. Both stay null in the seed until WP 3.5 assets pass review and WP 3.4b wires them; no API route serves media.
+  Delivered by WP 3.4b: 19 accepted illustrations wired into the patient session, session overview, care plan and onboarding, with the mandatory caption; the seed sets both fields for every exercise (own picture or body-area picture). The clinician plan builder preview and the queue empty state are not wired yet.

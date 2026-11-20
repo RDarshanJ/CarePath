@@ -17,11 +17,12 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 3.2b Patient experience: onboarding (account, code, nine steps, consent, review), Today, guided session with persistence and stop flow, Progress with SVG charts and table alternatives, Sharing and consent, care plan (gate output below).
 - Checkpoint C2 (`docs/decisions/checkpoint-c2.md`): the slice is real; go for Phase 4 after WP 3.4.
 - WP 3.4a (branch `wp/3.4a`): S1 shared data root for every worktree, F3 session-keyed rate limit with forwarded client address, F4 contracts (CR-2 `onCareTeam`, CR-3 `total`, draft `{ draft: null }`, `mediaAlt`, corrected descriptions), F5 gate fails when a run changes `docs/` (gate output below).
+- WP 3.4b (branch `wp/3.4b`): F1 `/admin/patients` with Assign therapist, onboarding link, sticky staff rail, `PatientShell` removed, C2 patient fixes (1.5.1 to 1.5.4), `e2e/slice.spec.ts`, CR-4 illustrations wired (gate output below).
 - WP 3.4c (branch `wp/3.4c`): clinician fixes from C2 (F2 intake on the record and in the builder, 1.6.1 to 1.6.7, CR-2 and CR-3 consumed, flaky axe test fixed); gate output below.
 
 ## Outstanding
 
-- WP 3.4b and 3.4c (wave 1, in their own worktrees) consume the 3.4a contracts. 3.4b sets `mediaPath` and `mediaAlt` in the seed only for accepted WP 3.5 assets.
+- CR-4 follow-ups: `moment-nothing-to-review` is in `public/assets/illustrations` but not yet shown (the queue empty state is `Empty` in `(clinician)/_components/common.tsx`, more than a one-line change; use `MomentImage` from `apps/web/components/illustration.tsx`). The plan builder preview in `(clinician)/_components/plan-view.tsx` does not yet show exercise pictures; use `IllustrationFigure` and `exerciseIllustration`. The patient `/plan`, session overview and session player do.
 - WP 3.3 is committed by its own worker; WP 3.2b is listed above. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
@@ -553,3 +554,27 @@ verify: PASSED
 ```
 
 Screenshots: `docs/screenshots/3.4c/` (1440 and 1024), including `review-queue-task-1440.png`, `review-queue-1024.png`, `record-overview-1440.png`, `plan-builder-intake-1440.png`.
+
+### WP 3.4b (checkpoint C2: F1, 1.4.2 to 1.4.5, 1.5.1 to 1.5.4, slice test, CR-4 wiring)
+
+Worktree `/home/claude/wt/3.4b`, branch `wp/3.4b`, rebased onto master at `bcf9f25` (3.4c merged) before the final run. `scripts/gate-wp-3.4b.sh` (ports 4035 and 3035, includes `pnpm verify`) exit 0; `git status --porcelain` empty afterwards.
+
+```
+integrity checks: 72 passed
+content-hash: 3d64c8b5500f1437d10e1c486620c88f6772306910d102a886e8c5e254eafaed
+packages/db test:  Tests  63 passed (63)
+gate e2e (slice patient auth, both widths):  7 skipped, 37 passed (3.2m)
+pnpm verify: packages/ui 106, packages/db 63, apps/api 165 tests passed
+  e2e: 13 skipped, 43 passed (4.2m)
+==> docs/ unchanged by the run
+verify: PASSED
+WP 3.4b gate: PASSED
+```
+
+- F1: `/admin/patients` (coordinator and administrator home). Administrative directory, default status "Awaiting assignment", search, status filter, cursor paging with the API total. Patients with unsubmitted intake say what is missing and have no action. "Assign therapist" opens a dialog listing `/practitioners` with caseload and posts the assignment. No clinical field is shown. Nav has one item, "Patients". `/admin` redirects there; sign-in cards no longer say screens arrive later (administrator card says settings, metrics and audit still do).
+- 1.4.2 to 1.4.5: "New patient with an eligibility code? Start here." on sign-in; staff rail sticky (aside stretches and carries the border, inner rail sticks and is capped at window height); `PatientShell` deleted; clinician screenshots written only when `SCREENSHOT_DIR` is set; 93 duplicate PNGs removed from `docs/screenshots/3.3`.
+- 1.5.1 to 1.5.4: version 1 reads "Your plan is ready" with no change list; Sessions at 390 are stacked rows (table from 640); charts never draw wider than their 360 px viewBox so text stays caption size; "planned so far this week" on Today and Progress. Added `scroll-padding-bottom` in the patient app layout so a focused control is not hidden by the tab bar.
+- `e2e/slice.spec.ts` (desktop project, code `CAREPATH-1-START-2`): onboarding at 390, coordinator assignment in the UI, therapist builds and publishes version 1, patient sees "Your plan is ready", completes the session and reports pain 8, therapist finds exactly one open "Reported pain" task (API) and sees it in the queue.
+- CR-4 delivered. 19 accepted WebP files (960 and 480) in `apps/web/public/assets/illustrations`, trimmed manifest `docs/design-system/asset-manifest.json` (prompts, model, dimensions, bytes, licensing "not verified"). Seed sets `mediaPath` and `mediaAlt` for all 50 exercises: own picture for six (knee-to-chest, pelvic-tilt, standing-trunk-rotation, deep-breathing, mini-squat, marching-in-place), body-area picture for the rest. Shown in the session player, session overview, care plan and the onboarding body-area step, each with the caption "Illustration only. Follow the written steps from your care team." `moment-done-for-today` and `moment-details-with-clinic` are on Today (decorative, empty alt). Content hash changed to the value above. Generated illustrations, not medically reviewed.
+- Seed touch outside ownership: `packages/db/seed/careplans.ts` (two lines) and new `packages/db/seed/data/exercise-media.ts`.
+- Screenshots: `docs/screenshots/3.4b/` (390 and 1440): `slice-01` to `slice-09`, `admin-*`, `a05-body-area`, `a13-today-awaiting`, `c01-today-due`, `c03-exercise`, `c10-today-done`, `c11-progress`, `c12-progress-tables`.
