@@ -32,7 +32,7 @@ const clinicianNav: Omit<NavItem, "current">[] = [
   { href: "/overview", label: "Overview", icon: "home" },
   { href: "/patients", label: "Patients", icon: "users" },
   { href: "/schedule", label: "Schedule", icon: "calendar" },
-  { href: "/messages", label: "Messages", icon: "message" },
+  { href: "/inbox", label: "Messages", icon: "message" },
   { href: "/review-queue", label: "Review queue", icon: "clipboard" },
 ];
 
@@ -98,7 +98,7 @@ function StaffShell({
 export function ClinicianShell(props: { session: SessionInfo; children: ReactNode }) {
   const unread = useUnreadTotal();
   const items = clinicianNav.map((it) =>
-    it.href === "/messages" && unread ? { ...it, count: unread } : it,
+    it.href === "/inbox" && unread ? { ...it, count: unread } : it,
   );
   return <StaffShell {...props} items={items} navLabel="Clinician" />;
 }

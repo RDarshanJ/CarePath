@@ -127,7 +127,7 @@ function ConversationRow({
   const name = fullName(c.patient);
   return (
     <NextLink
-      href={`/messages?c=${c.id}`}
+      href={`/inbox?c=${c.id}`}
       scroll={false}
       aria-current={current ? "true" : undefined}
       className={cx(
@@ -242,7 +242,7 @@ function Thread({ conversationId }: { conversationId: string }) {
     return (
       <Section id="thread" title="Thread">
         <div className="flex flex-col gap-3 p-4">
-          <AppLink href="/messages" className="text-small xl:hidden">
+          <AppLink href="/inbox" className="text-small xl:hidden">
             Back to conversations
           </AppLink>
           <QueryError error={thread.error} onRetry={() => void thread.refetch()} />
@@ -272,7 +272,7 @@ function Thread({ conversationId }: { conversationId: string }) {
       className="flex flex-col rounded-container border border-border bg-surface"
     >
       <div className="flex flex-col gap-1 border-b border-border px-4 py-3">
-        <AppLink href="/messages" className="w-fit text-small xl:hidden">
+        <AppLink href="/inbox" className="w-fit text-small xl:hidden">
           Back to conversations
         </AppLink>
         <h2 id="thread-heading" className="font-heading text-h4 font-semibold text-ink">

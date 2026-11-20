@@ -303,7 +303,7 @@ function UnreadMessages({ data }: { data: ClinicianOverview }) {
       title="Unread messages"
       count={m.unreadCount}
       description="Messages from patients and the care team in your own conversations."
-      actions={<AppLink href="/messages">Open messages</AppLink>}
+      actions={<AppLink href="/inbox">Open messages</AppLink>}
     >
       {m.unreadCount === 0 ? (
         <Empty icon="message" title="No unread messages">

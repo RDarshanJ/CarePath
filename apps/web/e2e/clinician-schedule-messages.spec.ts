@@ -166,7 +166,7 @@ test.describe("messages", () => {
     page,
   }) => {
     await signInClinician(page);
-    await page.goto("/messages");
+    await page.goto("/inbox");
     await expect(page.getByRole("heading", { level: 1, name: "Messages" })).toBeVisible();
     const list = page.getByRole("region", { name: /^Conversations/ });
     const rows = list.getByRole("link");
@@ -175,16 +175,16 @@ test.describe("messages", () => {
 
     for (const width of [1440, 1024] as const) {
       await page.setViewportSize({ width, height: width === 1440 ? 900 : 768 });
-      await page.goto("/messages");
+      await page.goto("/inbox");
       await expect(rows.first()).toBeVisible();
       await expectNoSeriousViolations(page, `messages list at ${width}`);
       await screenshot(page, "messages-list", width);
     }
 
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/messages");
+    await page.goto("/inbox");
     await rows.first().click();
-    await expect(page).toHaveURL(/\/messages\?c=/);
+    await expect(page).toHaveURL(/\/inbox\?c=/);
     const thread = page.getByRole("log", { name: /^Messages with / });
     await expect(thread).toBeVisible();
     // Every message names its sender and role; the composer carries the reply time and the emergency notice.
@@ -228,14 +228,14 @@ test.describe("messages", () => {
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/date=2026-11-20/);
 
-    await page.goto("/messages");
+    await page.goto("/inbox");
     const first = page
       .getByRole("region", { name: /^Conversations/ })
       .getByRole("link")
       .first();
     await tabTo(page, first);
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/\/messages\?c=/);
+    await expect(page).toHaveURL(/\/inbox\?c=/);
     const box = page.getByLabel(/^Message to /);
     await tabTo(page, box);
     const text = "Keyboard reply from the end-to-end run";
@@ -299,7 +299,7 @@ test.describe("failed delivery", () => {
 
   test("a message that cannot be delivered says so and offers a retry", async ({ page }) => {
     await signInClinician(page);
-    await page.goto("/messages");
+    await page.goto("/inbox");
     await page
       .getByRole("region", { name: /^Conversations/ })
       .getByRole("link")
