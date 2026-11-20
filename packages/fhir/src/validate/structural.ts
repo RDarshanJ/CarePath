@@ -9,17 +9,30 @@ import {
   OperationOutcomeError,
   validateResource,
 } from "@medplum/core";
-import { readJson } from "@medplum/definitions";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import path from "node:path";
 import type { Bundle, Resource } from "@medplum/fhirtypes";
 import { issue, type FhirIssue, type IssueCode } from "../issues.js";
 
 let loaded = false;
 
+/**
+ * The R4 definition files of @medplum/definitions, found from the package entry point. Its own
+ * readJson() locates them from `__dirname` when that global exists, which picks the wrong folder
+ * under some test runners, so the path is resolved here instead.
+ */
+function definitionFile(name: string): Bundle {
+  const entry = createRequire(import.meta.url).resolve("@medplum/definitions");
+  const file = path.join(path.dirname(entry), "..", "fhir", "r4", name);
+  return JSON.parse(readFileSync(file, "utf8")) as Bundle;
+}
+
 /** Indexes the R4 type and resource definitions once per process (about half a second). */
 export function loadDefinitions(): void {
   if (loaded) return;
-  indexStructureDefinitionBundle(readJson("fhir/r4/profiles-types.json") as Bundle);
-  indexStructureDefinitionBundle(readJson("fhir/r4/profiles-resources.json") as Bundle);
+  indexStructureDefinitionBundle(definitionFile("profiles-types.json"));
+  indexStructureDefinitionBundle(definitionFile("profiles-resources.json"));
   loaded = true;
 }
 

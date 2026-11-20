@@ -37,9 +37,10 @@ export function naturalKey<T extends MappedType>(type: T, r: RecordByType[T]): s
     }
     case "Observation": {
       const o = r as RecordByType["Observation"];
+      // Values are compared at the database's precision (Decimal(10, 2)).
       const value =
         o.valueQuantity !== null
-          ? String(Number(o.valueQuantity))
+          ? Number(o.valueQuantity).toFixed(2)
           : (o.valueString ?? `absent:${o.dataAbsentReason ?? ""}`);
       return `observation|${o.patientId}|${o.codeSystem}|${o.code}|${o.effectiveAt}|${norm(value)}`;
     }

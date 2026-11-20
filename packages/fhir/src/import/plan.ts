@@ -617,10 +617,11 @@ async function groupCarePlans(
       continue;
     }
     const open = latest.status === "active" || latest.status === "on_hold";
+    // Stored plans are written as a draft first (database rule: one open plan per patient), so
+    // no plan can be added for a patient who already has an open plan stored.
     if (
-      open &&
-      (openPlanned.has(latest.patientId) ||
-        (await options.lookup.hasOpenCarePlan(latest.patientId)))
+      (open && openPlanned.has(latest.patientId)) ||
+      (await options.lookup.hasOpenCarePlan(latest.patientId))
     ) {
       skip(
         members,
