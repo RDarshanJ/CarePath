@@ -14,6 +14,15 @@ import {
   cx,
 } from "@carepath/ui";
 import type { IconName } from "@carepath/ui";
+import {
+  PATIENT_REPORTED,
+  type PatientStatus,
+  checkInReviewLabels,
+  ofTotal,
+  patientStatusLabels,
+  planStageText as sharedPlanStageText,
+  reviewTaskStatusLabels,
+} from "@carepath/shared";
 import type { PlanStage } from "@carepath/shared/contracts";
 import { MomentImage } from "../../../components/illustration";
 import { ApiError } from "../../../lib/api/errors";
@@ -208,46 +217,30 @@ export function Empty({
   );
 }
 
-const patientStatusLabel: Record<string, string> = {
-  active: "Active",
-  inactive: "Inactive",
-  discharged: "Discharged",
-  intake_incomplete: "Intake incomplete",
-  awaiting_assignment: "Awaiting assignment",
-};
-
-/** Patient status is administrative, so it is an outlined tag. */
-export function PatientStatusTag({ status }: { status: string }) {
-  const tone =
-    status === "active"
-      ? "success"
-      : status === "intake_incomplete" || status === "awaiting_assignment"
-        ? "warning"
-        : "neutral";
-  return <Tag tone={tone}>{patientStatusLabel[status] ?? status}</Tag>;
+/** Patient status is administrative, so it is an outlined tag. One shared map and tone (CD-231). */
+export function PatientStatusTag({ status }: { status: PatientStatus }) {
+  const entry = patientStatusLabels[status];
+  return <Tag tone={entry.tone}>{entry.label}</Tag>;
 }
 
-export function planStageText(stage: PlanStage, version: number | null): string {
-  if (stage === "none") return "No plan";
-  if (stage === "draft") return version ? `Version ${version}, draft changes` : "Draft only";
-  return version ? `Version ${version} published` : "Published";
-}
+export const planStageText: (stage: PlanStage, version: number | null) => string =
+  sharedPlanStageText;
 
 /** Patient-reported pain. Always worded as reported, never as a judgement. */
 export function PainText({ score }: { score: number }) {
   return (
     <span className="tabular-nums">
-      Pain {score} of 10 <span className="text-ink-muted">(patient-reported)</span>
+      Pain {ofTotal(score, 10)} <span className="text-ink-muted">({PATIENT_REPORTED})</span>
     </span>
   );
 }
 
 export function ReviewedChip({ reviewedAt }: { reviewedAt: string | null }) {
   return reviewedAt ? (
-    <StatusChip tone="success">Reviewed</StatusChip>
+    <StatusChip tone="success">{checkInReviewLabels.reviewed.label}</StatusChip>
   ) : (
     <StatusChip tone="warning" icon="clock">
-      Not yet reviewed
+      {checkInReviewLabels.notReviewed.label}
     </StatusChip>
   );
 }
@@ -275,12 +268,9 @@ export function EmptyDirectory({ filtered, onClear }: { filtered: boolean; onCle
 }
 
 /** Review task status in words. The API enum never reaches the screen. */
-export const taskStatusText: Record<string, string> = {
-  open: "Open",
-  in_review: "In review",
-  resolved: "Resolved",
-  dismissed: "Dismissed",
-};
+export const taskStatusText: Record<string, string> = Object.fromEntries(
+  Object.entries(reviewTaskStatusLabels).map(([k, v]) => [k, v.label]),
+);
 
 /** Why an action is unavailable to a clinician who is not on the patient's care team (CR-2). */
 export const NOT_ON_CARE_TEAM_REASON =

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
-import { EXERCISE_CONTENT_NOTICE } from "@carepath/shared";
+import { EXERCISE_CONTENT_NOTICE, doseText } from "@carepath/shared";
 import { bodyAreas, exerciseCategories, type Exercise } from "@carepath/shared/contracts";
 import { Button, Select, Tag, TextInput } from "@carepath/ui";
 import { Empty, ListSkeleton, QueryError } from "../../../_components/common";
@@ -18,14 +18,8 @@ const categoryOptions = [
 ];
 
 function suggestion(e: Exercise): string {
-  const d = e.defaults;
-  const parts: string[] = [];
-  if (d.sets && d.reps) parts.push(`${d.sets} x ${d.reps}`);
-  else if (d.sets && d.durationSeconds) parts.push(`${d.sets} x ${d.durationSeconds} s`);
-  else if (d.reps) parts.push(`${d.reps} reps`);
-  else if (d.durationSeconds) parts.push(`${d.durationSeconds} s`);
-  if (d.holdSeconds) parts.push(`hold ${d.holdSeconds} s`);
-  return parts.length ? `Suggested ${parts.join(", ")}` : "No suggested dose";
+  const text = doseText({ ...e.defaults, restSeconds: 0 });
+  return text ? `Suggested ${text}` : "No suggested dose";
 }
 
 /** Exercise library search and filter. Adding puts the exercise at the end of the plan. */

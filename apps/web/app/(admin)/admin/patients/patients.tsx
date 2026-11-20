@@ -20,6 +20,12 @@ import {
   TextInput,
   Tr,
 } from "@carepath/ui";
+import {
+  formatDate,
+  intakeStatusLabels,
+  patientStatusLabel,
+  patientStatusTone,
+} from "@carepath/shared";
 import type { PatientDirectoryPage } from "@carepath/shared/contracts";
 import { ApiError } from "../../../../lib/api/errors";
 import { keys, qs, reads } from "../../_lib/queries";
@@ -28,11 +34,9 @@ import { AssignDialog } from "./assign-dialog";
 type Row = Extract<PatientDirectoryPage["items"][number], { view: "administrative" }>;
 
 const statusOptions = [
-  { value: "awaiting_assignment", label: "Awaiting assignment" },
-  { value: "intake_incomplete", label: "Intake incomplete" },
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-  { value: "discharged", label: "Discharged" },
+  ...(
+    ["awaiting_assignment", "intake_incomplete", "active", "inactive", "discharged"] as const
+  ).map((value) => ({ value, label: patientStatusLabel(value) })),
   { value: "any", label: "Any status" },
 ];
 const statusLabel: Record<string, string> = Object.fromEntries(
@@ -45,12 +49,7 @@ const limitOptions = [
 
 /** "Nov 18, 2026" from an instant, as the UTC calendar day (this screen has no clinic zone). */
 function utcDate(iso: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: "UTC",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(iso));
+  return formatDate(iso, "UTC");
 }
 
 function fullName(r: Row): string {
@@ -59,18 +58,8 @@ function fullName(r: Row): string {
 
 /** What is missing, in words (AC-A4). Only for patients who have not submitted intake. */
 function intakeText(r: Row): { text: string; missing: boolean } {
-  if (r.intakeStatus === "not_started")
-    return { text: "Missing: intake not started", missing: true };
-  if (r.intakeStatus === "in_progress")
-    return { text: "Missing: intake started, not submitted", missing: true };
-  if (r.intakeStatus === "reviewed") return { text: "Submitted and reviewed", missing: false };
-  return { text: "Submitted", missing: false };
-}
-
-function statusTone(status: string): "success" | "warning" | "neutral" {
-  if (status === "active") return "success";
-  if (status === "awaiting_assignment" || status === "intake_incomplete") return "warning";
-  return "neutral";
+  const entry = intakeStatusLabels[r.intakeStatus];
+  return { text: entry.label, missing: !entry.complete };
 }
 
 export function AdminPatients() {
@@ -264,7 +253,9 @@ export function AdminPatients() {
                         {r.mrn}
                       </Td>
                       <Td>
-                        <Tag tone={statusTone(r.status)}>{statusLabel[r.status] ?? r.status}</Tag>
+                        <Tag tone={patientStatusTone(r.status)}>
+                          {statusLabel[r.status] ?? r.status}
+                        </Tag>
                       </Td>
                       <Td className={intake.missing ? undefined : "text-ink-muted"}>
                         {intake.text}

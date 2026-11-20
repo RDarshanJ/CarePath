@@ -1,28 +1,26 @@
 "use client";
 
-import type { Appointment, AppointmentStatus, AppointmentType } from "@carepath/shared/contracts";
+import {
+  appointmentStatusLabel,
+  appointmentTypeLabels,
+  isCancelledAppointment,
+} from "@carepath/shared";
+import {
+  appointmentStatuses,
+  type Appointment,
+  type AppointmentStatus,
+  type AppointmentType,
+} from "@carepath/shared/contracts";
 import { Icon, Tag } from "@carepath/ui";
 
-/** Words for every appointment type and status. The API enum never reaches the screen. */
-export const appointmentTypeText: Record<AppointmentType, string> = {
-  initial_evaluation: "Initial evaluation",
-  follow_up: "Follow-up visit",
-  video_follow_up: "Video follow-up",
-};
+/** Words for every appointment type and status (shared maps, CD-233). The API enum never reaches the screen. */
+export const appointmentTypeText: Record<AppointmentType, string> = appointmentTypeLabels;
 
-export const appointmentStatusText: Record<AppointmentStatus, string> = {
-  requested: "Requested",
-  booked: "Booked",
-  checked_in: "Checked in",
-  in_progress: "In progress",
-  completed: "Completed",
-  cancelled_by_patient: "Cancelled by the patient",
-  cancelled_by_clinic: "Cancelled by the clinic",
-  no_show: "Did not attend",
-};
+export const appointmentStatusText = Object.fromEntries(
+  appointmentStatuses.map((s) => [s, appointmentStatusLabel(s, "staff")]),
+) as Record<AppointmentStatus, string>;
 
-export const isCancelled = (s: AppointmentStatus) =>
-  s === "cancelled_by_patient" || s === "cancelled_by_clinic";
+export const isCancelled = isCancelledAppointment;
 
 /** The visit type, with an icon for video so the difference is not colour or position alone. */
 export function VisitType({ type }: { type: AppointmentType }) {

@@ -6,6 +6,30 @@
 /** Shown in the message composer, the assistant and the pain notice. */
 export const EMERGENCY_NOTICE = "Not monitored for emergencies. If this is an emergency, call 911.";
 
+/**
+ * Urgent but not an emergency (DR-002 G, R3, CD-513). A separate constant: `EMERGENCY_NOTICE` is
+ * never reworded. `URGENT_NOTICE` is the template with a clinic phone; `urgentNoticeMessage`
+ * resolves it and falls back to `URGENT_NOTICE_NO_PHONE` when the organization has no phone.
+ * Patient composer only.
+ */
+export const URGENT_NOTICE = "For something urgent that is not an emergency, call {phone}.";
+export const URGENT_NOTICE_NO_PHONE = "Urgent? Contact your clinic.";
+
+export function urgentNoticeMessage(clinicPhone: string | null): string {
+  return clinicPhone ? URGENT_NOTICE.replace("{phone}", clinicPhone) : URGENT_NOTICE_NO_PHONE;
+}
+
+/** Pain scale anchors (DR-002 D, LOINC 72514-3 wording). Open sign-off S1: not clinically reviewed. */
+export const PAIN_ANCHOR_LOW = "0 No pain";
+export const PAIN_ANCHOR_HIGH = "10 Worst pain imaginable";
+/** Live line under the pain scale. No band word. */
+export function painChosenLine(score: number): string {
+  return `You chose ${score} of 10.`;
+}
+
+/** Shown to staff beside any threshold or band no clinic chose (DR-002 R5). */
+export const DEMO_DEFAULT_LABEL = "Demo default. Not clinically reviewed.";
+
 /** Pain notice when the organization has no clinic phone (Organization.phone is null). */
 export const CONTACT_CLINIC_FALLBACK = "contact your clinic";
 

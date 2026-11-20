@@ -10,6 +10,12 @@ import {
   useQueryClient,
   type UseQueryResult,
 } from "@tanstack/react-query";
+import {
+  MESSAGE_RETRYING_LABEL,
+  actionLabels,
+  messageStatusLabels,
+  messagesNotSentText,
+} from "@carepath/shared";
 import type { ConversationPage, ConversationSummary, Message } from "@carepath/shared/contracts";
 import { MESSAGE_BODY_MAX } from "@carepath/shared/contracts";
 import { Banner, Button, Icon, StatusChip, Textarea, cx, useToast } from "@carepath/ui";
@@ -162,9 +168,7 @@ function ConversationRow({
             </StatusChip>
           ) : null}
           {c.failedCount > 0 ? (
-            <StatusChip tone="error">
-              {c.failedCount === 1 ? "1 message not sent" : `${c.failedCount} messages not sent`}
-            </StatusChip>
+            <StatusChip tone="error">{messagesNotSentText(c.failedCount)}</StatusChip>
           ) : null}
         </span>
       ) : null}
@@ -375,30 +379,32 @@ function MessageItem({
         m.status === "queued" ? (
           <p className="flex items-center gap-1.5 text-small text-ink-muted">
             <Icon name="clock" size={14} />
-            Sending
+            {messageStatusLabels.queued.label}
           </p>
         ) : m.status === "failed" ? (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <p className="flex items-center gap-1.5 text-small font-medium text-error-ink">
               <Icon name="alert-circle" size={14} />
-              <span>Not sent. {m.failureReason ?? "Delivery failed."}</span>
+              <span>
+                {messageStatusLabels.failed.label}. {m.failureReason ?? "Delivery failed."}
+              </span>
             </p>
             {m.canRetry ? (
               <Button
                 size="sm"
                 variant="secondary"
                 loading={retrying}
-                loadingLabel="Retrying"
+                loadingLabel={MESSAGE_RETRYING_LABEL}
                 onClick={onRetry}
               >
-                Try again
+                {actionLabels.retrySendingMessage}
               </Button>
             ) : null}
           </div>
         ) : (
           <p className="flex items-center gap-1.5 text-small text-ink-muted">
             <Icon name="check" size={14} />
-            Sent
+            {messageStatusLabels.sent.label}
           </p>
         )
       ) : null}

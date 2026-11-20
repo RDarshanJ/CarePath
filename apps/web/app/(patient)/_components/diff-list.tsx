@@ -1,11 +1,8 @@
+import { doseFieldLabels } from "@carepath/shared";
 import type { CarePlanDiff } from "@carepath/shared/contracts";
 
 const fieldNames: Record<string, string> = {
-  reps: "repetitions",
-  sets: "sets",
-  holdSeconds: "hold time",
-  durationSeconds: "duration",
-  restSeconds: "rest time",
+  ...doseFieldLabels,
   daysOfWeek: "days",
   timesPerDay: "times per day",
   instructions: "your therapist's note",

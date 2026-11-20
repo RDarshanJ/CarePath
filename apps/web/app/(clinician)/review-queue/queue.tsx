@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatAgeCompact } from "@carepath/shared";
 import {
   REVIEW_RULE_DEFAULTS_NOTICE,
   reviewRuleKeys,
@@ -74,10 +75,7 @@ const ruleOptions = [
 ];
 
 /** "5 h" or "3 d" for a table cell; the full words are in the cell's title. */
-function compactAge(hours: number): string {
-  if (hours < 1) return "<1 h";
-  return hours < 48 ? `${hours} h` : `${Math.floor(hours / 24)} d`;
-}
+const compactAge = formatAgeCompact;
 
 /** Status is shown only when the task is not open; an open task is the default and needs no label. */
 function TaskStatus({ task }: { task: ReviewTask }) {
@@ -612,7 +610,9 @@ function TaskDetail({
         ) : (
           <section aria-labelledby="outcome-heading" className="flex flex-col gap-1">
             <h3 id="outcome-heading" className="text-label font-semibold text-ink">
-              {task.status === "resolved" ? "Resolved" : "Dismissed"}
+              {task.status === "resolved"
+                ? taskStatusText["resolved"]
+                : taskStatusText["dismissed"]}
             </h3>
             <p className="text-body">
               {task.resolvedBy?.name ?? "Someone on the care team"}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { painStaffText } from "@carepath/shared";
 import type { ClinicianOverview } from "@carepath/shared/contracts";
 import { Button, StatusChip, Tag, useToast } from "@carepath/ui";
 import {
@@ -12,6 +13,7 @@ import {
   PageHeader,
   QueryError,
   Section,
+  taskStatusText,
 } from "../_components/common";
 import { useClinician } from "../_lib/context";
 import {
@@ -151,7 +153,7 @@ function OpenTasks({ data }: { data: ClinicianOverview }) {
                 {t.kind === "administrative" ? <Tag>Administrative</Tag> : null}
                 {t.status === "in_review" ? (
                   <StatusChip tone="info" icon="clock">
-                    In review
+                    {taskStatusText["in_review"]}
                   </StatusChip>
                 ) : null}
                 <span className="tabular-nums">{formatAgeHours(t.ageHours)} old</span>
@@ -207,8 +209,7 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
                   </AppLink>
                 </p>
                 <p className="text-small text-ink-muted tabular-nums">
-                  Pain {c.painScore} of 10 (patient-reported), submitted{" "}
-                  {formatDateTime(c.submittedAt, timezone)}
+                  {painStaffText(c.painScore)}, submitted {formatDateTime(c.submittedAt, timezone)}
                 </p>
               </div>
               {canReview ? (

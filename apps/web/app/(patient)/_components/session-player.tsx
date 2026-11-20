@@ -24,6 +24,7 @@ import {
   RadioGroup,
   Textarea,
 } from "@carepath/ui";
+import { SESSION_ACTIVITY_CURRENT_LABEL, sessionActivityStatusLabels } from "@carepath/shared";
 import { api } from "../../../lib/api/client";
 import { ApiError } from "../../../lib/api/errors";
 import { IllustrationFigure } from "../../../components/illustration";
@@ -66,9 +67,9 @@ const skipReasons = [
 const OTHER = "Other";
 
 function statusWord(a: SessionActivity, isCurrent: boolean): string {
-  if (a.status === "completed") return "Done";
-  if (a.status === "skipped") return "Skipped";
-  return isCurrent ? "Now" : "Up next";
+  if (a.status === "completed") return sessionActivityStatusLabels.completed.patient;
+  if (a.status === "skipped") return sessionActivityStatusLabels.skipped.patient;
+  return isCurrent ? SESSION_ACTIVITY_CURRENT_LABEL : sessionActivityStatusLabels.pending.patient;
 }
 
 function ExerciseList({

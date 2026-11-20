@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Button, Select, Table, TBody, Td, Th, THead, TextInput, Tr } from "@carepath/ui";
+import { patientStatusLabel, planStageLabels } from "@carepath/shared";
 import { patientStatusSchema } from "@carepath/shared/contracts";
 import {
   AppLink,
@@ -24,20 +25,14 @@ const statusOptions = [
   { value: "any", label: "Any status" },
   ...patientStatusSchema.options.map((s) => ({
     value: s,
-    label: {
-      intake_incomplete: "Intake incomplete",
-      awaiting_assignment: "Awaiting assignment",
-      active: "Active",
-      inactive: "Inactive",
-      discharged: "Discharged",
-    }[s],
+    label: patientStatusLabel(s),
   })),
 ];
 const planOptions = [
   { value: "any", label: "Any plan stage" },
-  { value: "published", label: "Published" },
-  { value: "draft", label: "Draft only" },
-  { value: "none", label: "No plan" },
+  { value: "published", label: planStageLabels.published },
+  { value: "draft", label: planStageLabels.draft },
+  { value: "none", label: planStageLabels.none },
 ];
 const activityOptions = [
   { value: "any", label: "Any time" },

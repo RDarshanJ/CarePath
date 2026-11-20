@@ -780,3 +780,33 @@ Worktree `/home/claude/wt/d0`, branch `wp/d0` from main (which already contains 
 - `docs/decisions/contract-requests.md`: CR-6 to CR-17 filed as open, each with owner work package and blocking status. Blocking: CR-7 and CR-8 (WP 5.3), CR-13, CR-14 (availability), CR-15 (WP 6.2). All others non-blocking.
 - `CLAUDE.md` "Design principles": cites DR-001 and `docs/design/design-tokens.md`; records no cream or warm surfaces, IBM Plex Sans only (Plex Mono for identifiers), and browser storage rule R1 with R2.
 - Gate: `pnpm install --frozen-lockfile --offline` and `pnpm lint`; see the commit message for the result. `docs` is in `.prettierignore`; `CLAUDE.md` is not under `docs`.
+
+### D-WP-3 (shared vocabulary and formatters)
+
+Worktree `/home/claude/wt/d3`, branch `wp/d3`. Dependency commit first (own commit): `vitest` 4.1.12 added to `@carepath/shared`, a version already in the lockfile. No contract file, no `packages/ui` file and no `packages/db` file was touched.
+
+- Label maps in `packages/shared/src/labels/` (exhaustive `Record<Enum, ...>`, tone and form per CD-230): enrollment and intake (`patientStatusLabels`, `intakeStatusLabels`, `ACTIVE_STATUS_DEFINITION`), care plan (`planStageLabels`, `planStageText`, `carePlanStatusLabels`, `versionMarkerLabels`, `versionText`), appointment (`appointmentStatusLabels` with staff and patient wording, `appointmentTypeLabels`), review (`reviewTaskStatusLabels`, `checkInReviewLabels`), priority (`priorityLevelLabels`, the two order lines), AI (`aiDraftStateLabels` for six derived states, `aiDraftState()`, `AI_GENERATED_NAME`, `AI_CONSENT_NAME`), clinical note (`clinicalNoteStatusLabels`, `noteVersionSourceLabels`), message delivery (`messageStatusLabels`, `messagesNotSentText`), session (`sessionStatusLabels`, `sessionActivityStatusLabels`), and the action label table (`actionLabels`, `actionLabelFor`, `GENERIC_ACTION_LABELS`, CD-428).
+- `copy.ts`: `URGENT_NOTICE` (template with `{phone}`), `URGENT_NOTICE_NO_PHONE`, `urgentNoticeMessage()`, `PAIN_ANCHOR_LOW`, `PAIN_ANCHOR_HIGH`, `painChosenLine()`, `DEMO_DEFAULT_LABEL`. `EMERGENCY_NOTICE` unchanged.
+- Formatters in `packages/shared/src/format/`: dates and times (clinic zone, `formatCalendarDay`, `formatVisitTime` for CD-314 with patient "Mountain Time" and staff "MT" naming and the viewer time for video visits, zone names that hold across daylight saving), durations and ages (prose and compact), numbers (`plural`, `formatCount`, `ofTotal`), dose and schedule text (CD-301, one formatter for both apps, `doseFieldLabels` for diffs), pain value text (CD-220).
+- Tests (70 in `packages/shared`): the DB enums are read from `packages/db/prisma/schema.prisma` (no package dependency, so no workspace cycle) and the contract enums from `contracts/`; each map must cover its enum exactly, so a new value without a label fails. Banned-word and diagnostic-term checks run over every new string. `formatVisitTime` has daylight-saving (spring and autumn offsets), other-zone, no-daylight-saving-zone and next-day cases.
+- `apps/web`: the clinician and patient `format.ts` and `scheduling.ts` files now re-export or wrap the shared functions under their old names; appointment, patient, intake, review task, session, plan version and message wording and the pain, dose, schedule and age text come from the shared maps. No layout change.
+
+Gate: `pnpm verify` exit 0 on this branch (`packages/shared` 70, `packages/ui` 106, `packages/db` 71, `apps/api` 219 tests; end-to-end 53 passed, 25 skipped as before). Tail:
+
+```
+  25 skipped
+  53 passed (6.3m)
+
+==> docs/ unchanged by the run
+
+verify: PASSED
+db: lease 5717 released
+```
+
+Deviations and open points:
+- Wording follows CD-231 to CD-240 as amended by DR-002 where `microcopy-guidelines.md` section 6 disagrees (that section predates the decisions): patient no-show is "You did not attend" (not "Missed"), video visits read "Video follow-up" in both apps, admin intake reads Not started, In progress, Submitted, Reviewed, unsent messages read "{n} of your messages were not sent" in both apps.
+- One dose formatter replaces two that disagreed: sets with a timed duration now read "3 sets, 30 seconds each" in the clinician app too (was "3 sets of 30 seconds"); a sets-only dose now prints "3 sets" for patients (was empty). The exercise library suggestion uses it instead of "3 x 10" and "s".
+- `isLocalDate` now rejects impossible days such as 2026-02-30 (the old check accepted them).
+- Admin patients still shows registration as a UTC calendar date; the clinic-zone or date-only decision belongs to WP 6.2.
+- Not applied to screens, because each changes a control or a component and belongs to the slice that rebuilds it: the CD-428 action labels (except the message retry button, now "Retry sending message" in both apps), Tag in place of chip for review task and plan version (CD-232, CD-234), the "Set by your care team" line shown to clinicians in `PlanView` (G10, which also serves the patient preview), `URGENT_NOTICE` in the composer (D-WP-12), the pain anchors (D-WP-10), and the AI consent wording (D-WP-8, open sign-off S6).
+- The end-to-end retry test in `clinician-schedule-messages.spec.ts` was updated to the new button name but was among the skipped tests in this run, so it has not been exercised here.

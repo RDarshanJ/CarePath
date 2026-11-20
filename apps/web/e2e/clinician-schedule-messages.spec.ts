@@ -315,7 +315,7 @@ test.describe("failed delivery", () => {
     await expect(
       page
         .getByRole("region", { name: /^Conversations/ })
-        .getByText("1 message not sent")
+        .getByText("1 of your messages was not sent")
         .first(),
     ).toBeVisible();
     await expectNoSeriousViolations(page, "failed message");
@@ -326,7 +326,7 @@ test.describe("failed delivery", () => {
     const retried = page.waitForResponse(
       (r) => /\/messages\/[^/]+\/retry$/.test(r.url()) && r.request().method() === "POST",
     );
-    await item.getByRole("button", { name: "Try again" }).click();
+    await item.getByRole("button", { name: "Retry sending message" }).click();
     expect((await retried).status()).toBe(200);
     await expect(item).toContainText("Not sent", { timeout: 20_000 });
   });
