@@ -40,7 +40,7 @@ run pnpm db:seed --check
 run pnpm --filter @carepath/api exec vitest run test/phase5/ai.test.ts --reporter=verbose
 run pnpm --filter @carepath/api exec vitest run test/phase3/m8-enumeration.test.ts
 run pnpm exec eslint "${OWNED[@]}"
-run pnpm exec prettier --check "${OWNED[@]}" scripts/gate-wp-5.2.sh
+run pnpm exec prettier --check "${OWNED[@]}"
 run pnpm --filter @carepath/shared typecheck
 run pnpm --filter @carepath/db typecheck
 run pnpm --filter @carepath/api typecheck
