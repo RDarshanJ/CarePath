@@ -1,7 +1,7 @@
 import type { FastifyRequest } from "fastify";
 import type { RequestAuditInput } from "../audit/audit.js";
 import type { RequestCtx } from "../context.js";
-import { inTransaction, type DbTx } from "./repo.js";
+import { inTransaction, type DbTx, type TxOptions } from "./repo.js";
 
 export interface TxScope {
   /** Pass this to every repository call inside the callback. */
@@ -23,13 +23,20 @@ export interface TxScope {
  *     return row;
  *   });
  */
-export function withTx<T>(request: FastifyRequest, fn: (scope: TxScope) => Promise<T>): Promise<T> {
+export function withTx<T>(
+  request: FastifyRequest,
+  fn: (scope: TxScope) => Promise<T>,
+  options?: TxOptions,
+): Promise<T> {
   const { db, audit } = request.server.deps;
-  return inTransaction(db, (tx) =>
-    fn({
-      tx,
-      ctx: request.ctx,
-      audit: (input) => audit.fromRequest(request, input, tx),
-    }),
+  return inTransaction(
+    db,
+    (tx) =>
+      fn({
+        tx,
+        ctx: request.ctx,
+        audit: (input) => audit.fromRequest(request, input, tx),
+      }),
+    options,
   );
 }

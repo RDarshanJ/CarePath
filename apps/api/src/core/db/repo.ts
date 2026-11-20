@@ -14,8 +14,19 @@ export type DbClient = Db | DbTx;
  * Runs `fn` in one interactive transaction. Anything it throws rolls the whole transaction back.
  * Route handlers use withTx() (core/db/tx.ts), which adds the audit writer.
  */
-export function inTransaction<T>(db: Db, fn: (tx: DbTx) => Promise<T>): Promise<T> {
-  return db.$transaction(fn);
+export interface TxOptions {
+  /** Longest wait for a connection to start the transaction (Prisma default 2 s). */
+  maxWait?: number;
+  /** Longest the transaction may run (Prisma default 5 s). */
+  timeout?: number;
+}
+
+export function inTransaction<T>(
+  db: Db,
+  fn: (tx: DbTx) => Promise<T>,
+  options?: TxOptions,
+): Promise<T> {
+  return options ? db.$transaction(fn, options) : db.$transaction(fn);
 }
 
 export function createDb(databaseUrl: string): Db {

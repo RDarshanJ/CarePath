@@ -7,6 +7,7 @@ import {
   childExists,
   findScopedPatientId,
   isOnCareTeam,
+  practitionerInOrg,
   ruleInOrg,
   type PatientChild,
 } from "./repo.js";
@@ -126,6 +127,28 @@ export async function requireRule(request: FastifyRequest, ruleId: string): Prom
   if (!(await ruleInOrg(request.server.deps.db, ctx, ruleId))) {
     await denyOutOfScope(request, "ReviewRule", ruleId, null);
   }
+  return ctx;
+}
+
+/**
+ * A practitioner path id (slots). Staff see every practitioner of their organization; a patient
+ * sees only the practitioners on their own active care team, because those are the only ones
+ * they may book with (WP 4.1). Anything else answers like a missing id.
+ */
+export async function requirePractitioner(
+  request: FastifyRequest,
+  practitionerId: string,
+): Promise<RequestCtx> {
+  const ctx = requireCtx(request.ctx);
+  const { db } = request.server.deps;
+  const found = await practitionerInOrg(db, ctx, practitionerId);
+  const visible =
+    found !== null &&
+    (ctx.role !== "patient" ||
+      (found.userId !== null &&
+        ctx.patientId !== null &&
+        (await isOnCareTeam(db, { orgId: ctx.orgId, userId: found.userId }, ctx.patientId))));
+  if (!visible) await denyOutOfScope(request, "Practitioner", practitionerId, null);
   return ctx;
 }
 

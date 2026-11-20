@@ -15,6 +15,7 @@ import { findClinic } from "../clinic/repo.js";
 import { assignedOn, weeklyProgress, windowStart } from "../progress/compute.js";
 import { scheduleVersions, sessionsSince } from "../progress/repo.js";
 import { unreadSummary } from "../messaging/repo.js";
+import { findNextAppointment } from "../scheduling/repo.js";
 import { findLastEndedSession, findOpenSession } from "../sessions/repo.js";
 import { findPatientBasics } from "./repo.js";
 
@@ -33,7 +34,7 @@ export const todayRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "getToday",
         tags: ["today"],
         summary:
-          "Today's session state, check-in due, unacknowledged plan change and this week's progress.",
+          "Today's session state, check-in due, unacknowledged plan change, this week's progress and the next appointment.",
         params: patientIdParamsSchema,
         response: { 200: todayViewSchema, ...errorResponses(400, 401, 403, 404, 429) },
       },
@@ -113,6 +114,7 @@ export const todayRoutes: FastifyPluginAsyncZod = async (app) => {
             : null,
         week: weeklyProgress(today, 1, tz, versions, sessions)[0]!,
         messages: await unreadSummary(db, ctx),
+        nextAppointment: await findNextAppointment(db, ctx, patientId, at, tz),
       };
     },
   );

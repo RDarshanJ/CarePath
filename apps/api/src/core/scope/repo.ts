@@ -75,7 +75,12 @@ export async function careTeamPatientIds(
 
 /** Child resources of a patient, keyed by the resource type recorded in audit events. */
 export type PatientChild =
-  "ExerciseSession" | "PatientCheckIn" | "ReviewTask" | "CarePlanVersion" | "Consent";
+  | "ExerciseSession"
+  | "PatientCheckIn"
+  | "ReviewTask"
+  | "CarePlanVersion"
+  | "Consent"
+  | "Appointment";
 
 /**
  * One scoped finder per child resource. `patientId` must already be in scope
@@ -103,6 +108,8 @@ export async function childExists(
       return (await db.reviewTask.findFirst({ where: { ...scope, patientId }, select })) !== null;
     case "Consent":
       return (await db.consent.findFirst({ where: { ...scope, patientId }, select })) !== null;
+    case "Appointment":
+      return (await db.appointment.findFirst({ where: { ...scope, patientId }, select })) !== null;
     case "CarePlanVersion":
       return (
         (await db.carePlanVersion.findFirst({
@@ -138,4 +145,16 @@ export async function ruleInOrg(
     select: { id: true },
   });
   return row !== null;
+}
+
+/** A practitioner of the caller's organization (slots, day agenda). */
+export async function practitionerInOrg(
+  db: DbClient,
+  ctx: Pick<RequestCtx, "orgId">,
+  practitionerId: string,
+): Promise<{ id: string; userId: string | null } | null> {
+  return db.practitioner.findFirst({
+    where: { id: practitionerId, organizationId: ctx.orgId },
+    select: { id: true, userId: true },
+  });
 }

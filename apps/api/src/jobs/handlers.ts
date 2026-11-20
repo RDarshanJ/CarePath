@@ -3,6 +3,10 @@ import { JobError, type JobHandler } from "../core/jobs/runner.js";
 import { MESSAGE_DELIVER_QUEUE, messageDeliveryHandler } from "../modules/messaging/delivery.js";
 import { ABANDON_SESSIONS_QUEUE, TIME_RULES_QUEUE } from "../modules/review/queues.js";
 import { abandonSessions, runTimeRules, type SystemScope } from "../modules/review/time-rules.js";
+import {
+  APPOINTMENT_REMINDERS_QUEUE,
+  sendAppointmentReminders,
+} from "../modules/scheduling/reminders.js";
 
 /**
  * Queue name to handler. The runner claims only queues listed here.
@@ -36,8 +40,15 @@ export function createJobHandlers(deps: JobDeps): Record<string, JobHandler> {
       now: deps.now,
       ...(deps.forceMessageFailure ? { forceFailure: deps.forceMessageFailure } : {}),
     }),
+    [APPOINTMENT_REMINDERS_QUEUE]: async (job) => {
+      await sendAppointmentReminders(deps.db, scopeOf(job), deps.now());
+    },
   };
 }
 
 /** Queues the scheduler enqueues for every active organization. */
-export const recurringQueues = [TIME_RULES_QUEUE, ABANDON_SESSIONS_QUEUE] as const;
+export const recurringQueues = [
+  TIME_RULES_QUEUE,
+  ABANDON_SESSIONS_QUEUE,
+  APPOINTMENT_REMINDERS_QUEUE,
+] as const;

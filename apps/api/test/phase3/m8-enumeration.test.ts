@@ -11,6 +11,7 @@ import {
 } from "../support/repo.js";
 import { createClinicalFixture, type ClinicalFixture } from "../support/fixtures/repo.js";
 import { createConversation } from "../support/fixtures/messaging.js";
+import { createSlots } from "../support/scheduling/repo.js";
 
 /**
  * Checkpoint C1, M8 (hard gate for WP 3.1), AC-I1, AC-I2.
@@ -21,7 +22,8 @@ import { createConversation } from "../support/fixtures/messaging.js";
  *      `forbidden` when the role lacks the route permission); at least one B role must reach the
  *      scope check, so every route is scope-tested;
  *   2. as patient 2 with patient 1's ids, same organization: 404 or 403 `forbidden`, never 2xx;
- *   3. with patient 1's id and child ids (session, activity, check-in, task, version, consent)
+ *   3. with patient 1's id and child ids (session, activity, check-in, task, version, consent,
+ *      appointment)
  *      that belong to patient 2: 404 with a security event for at least one role, never 2xx.
  * A path parameter without a fixture, or a request body without one, fails the test, so a new
  * route cannot slip through unenumerated. Routes without path ids are checked to leak no
@@ -102,6 +104,12 @@ function bodyFor(ids: Ids): Record<string, unknown> {
     "POST /patients/{patientId}/care-team/assignments": {
       practitionerId: orgA.therapist.practitionerId,
     },
+    // WP 4.1 scheduling.
+    "POST /patients/{patientId}/appointments": { slotId: ids["slotId"], type: "follow_up" },
+    "POST /patients/{patientId}/appointments/{appointmentId}/cancel": { reason: "probe" },
+    "POST /patients/{patientId}/appointments/{appointmentId}/reschedule": {
+      slotId: ids["slotId"],
+    },
   };
 }
 
@@ -177,6 +185,15 @@ beforeAll(async () => {
   // The byte-identical body of a missing record (AC-I6).
   notFoundBody = JSON.stringify(envelope("not_found"));
 
+  // Open slots of orgA.therapist: one booked per patient below, one left open for body fixtures.
+  const day = 86_400_000;
+  const slotIds = await createSlots(db, orgA.orgId, orgA.therapist.practitionerId, [
+    new Date(NOW.getTime() + 3 * day),
+    new Date(NOW.getTime() + 4 * day),
+    new Date(NOW.getTime() + 5 * day),
+  ]);
+  let nextSlot = 0;
+
   // Real child rows for both patients, made through the API.
   async function children(
     patientEmail: string,
@@ -184,6 +201,17 @@ beforeAll(async () => {
     userIds: string[],
   ): Promise<Ids> {
     const s = as(app, await login(app, patientEmail));
+    // Patient 1 books with their care-team therapist; patient 2 has no care team, so the
+    // coordinator books for them.
+    const booker =
+      patientId === orgA.patient.patientId ? s : as(app, await login(app, orgA.coordinator.email));
+    const appointment = (
+      await booker({
+        method: "POST",
+        url: `/patients/${patientId}/appointments`,
+        payload: { slotId: slotIds[nextSlot++], type: "follow_up" },
+      })
+    ).json();
     const base = `/patients/${patientId}`;
     const session = (await s({ method: "POST", url: `${base}/sessions`, payload: {} })).json();
     const checkIn = (
@@ -224,6 +252,9 @@ beforeAll(async () => {
       consentId: consent.id,
       ruleId: fxA.ruleIds["reported_pain"]!,
       step: "primary_goal",
+      appointmentId: appointment.id,
+      practitionerId: orgA.therapist.practitionerId,
+      slotId: slotIds[2]!,
     };
     for (const [k, v] of Object.entries(ids)) {
       if (!v) throw new Error(`fixture ${k} missing for ${patientEmail}`);
@@ -298,6 +329,7 @@ describe("M8: OpenAPI enumeration of tenant-scoped routes", () => {
       "taskId",
       "versionId",
       "consentId",
+      "appointmentId",
     ];
     // Patient 1's path with patient 2's child ids.
     const mixed: Ids = { ...p2, patientId: p1.patientId! };

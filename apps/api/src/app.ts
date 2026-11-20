@@ -30,6 +30,7 @@ import { clinicRoutes } from "./modules/clinic/routes.js";
 import { exerciseRoutes } from "./modules/exercises/routes.js";
 import { overviewRoutes } from "./modules/overview/routes.js";
 import { recordRoutes } from "./modules/records/routes.js";
+import { schedulingRoutes } from "./modules/scheduling/routes.js";
 import { reviewActionRoutes } from "./modules/review/action-routes.js";
 import { reviewRoutes } from "./modules/review/routes.js";
 import { patientRoutes } from "./modules/patients/routes.js";
@@ -120,6 +121,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(careTeamRoutes);
   // WP 4.2: messaging.
   await app.register(messagingRoutes);
+  await app.register(schedulingRoutes); // WP 4.1
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();
