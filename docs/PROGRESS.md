@@ -710,7 +710,29 @@ WP 4.3b gate: PASSED
 
 ### WP 5.1 (AI pipeline, deterministic provider, evidence verifier, redaction)
 
-Worktree `/home/claude/wt/5.1`, branch `wp/5.1`, with `wp/5.5` merged (25 cases). Gate `scripts/gate-wp-5.1.sh`: GATE_OUTPUT_PLACEHOLDER
+Worktree `/home/claude/wt/5.1`, branch `wp/5.1`, with `wp/5.5` merged (25 cases). Gate `scripts/gate-wp-5.1.sh`: exit 0 (second run; the first failed once in `pnpm verify` on `e2e/slice.spec.ts`, see the note below, and a standalone `pnpm verify` then passed):
+
+```
+==> schema validity (output schemas, eval case schema)      Tests  7 passed (7)
+==> timeout, bounded retry, backoff, consent, rate limit, cost record   Tests  16 passed (16)
+==> prompt-injection set                                     Tests  48 passed (48)
+==> redaction and outbound canary                            Tests  9 passed (9)
+==> evidence verifier                                        Tests  4 passed (4)
+==> all packages/ai tests                                    Tests  104 passed (104)
+==> eval cases match EvalCase v1                             25 valid, 0 invalid
+==> eval smoke run (scratch output)
+25 cases, 25 schema-valid, 0/181 unsupported, 146/195 facts recalled, injection followed 0/4
+==> pnpm verify
+packages/ui 106, packages/ai 104, packages/db 71, apps/api 204 tests passed
+  25 skipped
+  53 passed (5.0m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status clean
+WP 5.1 gate: PASSED
+```
+
+- Flaky test outside this package (not changed here): `apps/web/e2e/slice.spec.ts:188` waits for an `h1` "Care plan builder", but `(clinician)/patients/[patientId]/plan/builder.tsx` shows that heading only while loading or on error and "Care plan for <name>" once loaded, so the test passes only when it catches the loading state. Suggested fix for the web owner: match `/Care plan (builder|for)/`, or wait for "Care plan for".
 
 - Module (`@carepath/ai`): `generate({kind, input, provider, consent, requester, rateLimit?, resolver?, timeoutMs=20000, maxRetries=2, backoffMs=500})` returns a `GenerationRecord` (provider, label, model, prompt key and version, input refs, output or null, error, per-call records, token and cost totals, redaction counts, verification, unsupported count). Refusals throw `AIError` before any provider call: `consent_required`, `rate_limited`, `invalid_input`, `redaction_failed`. Failures after the last retry return `status: "failed"` with no output (AC-F2).
 - Schemas: `ProgressSummaryOutput` {summary, reportedChanges, engagementObservations, itemsForReview: Statement[]; missingInformation: {item, label}[]; notices} and `SoapNoteDraftOutput` {subjective, objective, assessment, plan: Statement[]; missingInformation: {section, item, label}[]; notices}. `Statement` = {id `sN`, text, sourceRefs [{type, id, field}]}; transcript turns are cited as field `transcript.turn.<n>`. All objects strict; duplicate statement ids are invalid output.
