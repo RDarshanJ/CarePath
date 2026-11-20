@@ -9,6 +9,9 @@ if [ "$#" -lt 2 ]; then
   echo "usage: source scripts/gate-env.sh <name> <api_port> [web_port]" >&2
   return 2 2>/dev/null || exit 2
 fi
+# One cluster, lease directory and web lock for every git worktree (checkpoint C2, S1).
+# shellcheck source=scripts/data-root.sh
+source scripts/data-root.sh
 export DB_LEASE_PID=$$
 export CAREPATH_DB="carepath_${1}_$$"
 export DATABASE_URL="postgresql://carepath:carepath@127.0.0.1:${DB_PORT:-54329}/${CAREPATH_DB}"

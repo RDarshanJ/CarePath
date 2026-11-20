@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 # Native PostgreSQL 16 cluster for local dev/CI-less environments (no Docker daemon needed).
 # Usage: scripts/db.sh start|stop [--force]|reset [--force]|status|acquire|release|drop
-# Cluster lives in <repo>/.data/pg (gitignored), port 54329, loopback only, trust auth (dev only).
+# Cluster lives in $CAREPATH_DATA_ROOT/pg, port 54329, loopback only, trust auth (dev only).
+# CAREPATH_DATA_ROOT defaults to .data beside the main checkout, so every git worktree shares one
+# cluster, one lease directory and one lock (checkpoint C2, S1; see scripts/data-root.sh).
 #
 # Many workers share one cluster (checkpoint C1, section 4):
 #   - Gates never call stop or reset. They source scripts/gate-env.sh, which calls `acquire`
 #     with DB_LEASE_PID and CAREPATH_DB set, and `drop` plus `release` on exit.
-#   - A lease is a file .data/pg-leases/<pid>; it is live while that process is alive.
+#   - A lease is a file $CAREPATH_DATA_ROOT/pg-leases/<pid>; it is live while that process is alive.
 #   - `release` stops the cluster only when no live lease remains and a lease started it.
 #     A cluster started by hand with `start` is never stopped by `release`.
 #   - `stop` and `reset` refuse (exit 3) while live leases exist, unless --force is given.
-# All state changes happen under an exclusive flock on .data/pg.lock.
+# All state changes happen under an exclusive flock on $CAREPATH_DATA_ROOT/pg.lock.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PGBIN="${PGBIN:-/usr/lib/postgresql/16/bin}"
 PORT="${DB_PORT:-54329}"
-DATA_ROOT="$ROOT/.data"
+# shellcheck source=scripts/data-root.sh
+source "$ROOT/scripts/data-root.sh"
+DATA_ROOT="$CAREPATH_DATA_ROOT"
 PGDATA="$DATA_ROOT/pg"
 LOG="$DATA_ROOT/pg.log"
 # Default Debian socket dir so a bare `pg_isready -p 54329` works.
