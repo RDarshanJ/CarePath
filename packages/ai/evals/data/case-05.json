@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "id": "case-05",
+  "title": "Video follow-up, neck, desk work",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000005",
+    "patientId": "5a0c0000-0000-4000-8000-200000000005",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "video_follow_up",
+    "bodyRegion": "neck"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Priya, can you see me okay? Let's start with your neck."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Yes, good. The neck is about 3 out of 10 today, better than last week's 6."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "The headaches are gone since I changed my monitor height."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "That's great. Any arm symptoms?"
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "My right hand felt numb once on Monday when I was typing. Only once."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Thanks for telling me. Did it come back?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "No."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Are you doing the chin tucks and the doorway stretch?"
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "Chin tucks every morning. Doorway stretch maybe twice a week."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "I'll ask you to turn your head to each side while I watch on camera. The left looks about like last week. The right looks a bit more limited."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "I can't measure it accurately over video, so I'll check it in person."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Okay. I'm also getting back to the gym. Is that fine?"
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Light gym work is fine. Avoid heavy overhead pressing for now."
+    },
+    {
+      "turn": 14,
+      "speaker": "clinician",
+      "text": "Plan: keep the morning chin tucks, add a wall stretch, and come in for an in-person visit next Thursday."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Neck pain about 3 out of 10, down from 6",
+      "mustMention": [
+        "3 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Headaches gone after monitor height change",
+      "mustMention": [
+        "headaches are gone"
+      ],
+      "sourceTurns": [
+        3
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Right hand went numb once on Monday",
+      "mustMention": [
+        "numb once"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Right rotation looks more limited on video",
+      "mustMention": [
+        "more limited"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Chin tucks every morning",
+      "mustMention": [
+        "every morning"
+      ],
+      "sourceTurns": [
+        9
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Avoid heavy overhead pressing for now",
+      "mustMention": [
+        "heavy overhead pressing"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "In-person visit next Thursday",
+      "mustMention": [
+        "next Thursday"
+      ],
+      "sourceTurns": [
+        14
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "range_of_motion",
+    "strength",
+    "goals"
+  ],
+  "injection": null
+}

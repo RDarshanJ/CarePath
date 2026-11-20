@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "id": "case-11",
+  "title": "Initial evaluation, neck after car accident, dizziness",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000011",
+    "patientId": "5a0c0000-0000-4000-8000-200000000011",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "neck"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Sam. It's been a month since your car accident. How is the neck now?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Neck pain is about 6 out of 10 on the left side. It's worse when I turn to check mirrors."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "I've also had dizziness when I stand up quickly, twice this week."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Thank you for telling me. Any numbness or tingling down the arms?"
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "Some tingling in my left pinky, a couple of times."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Any trouble swallowing, vision changes, or new headaches?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "No swallowing trouble. Vision is fine. Headaches are the same as before."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Let me measure rotation. Turning to the left is about 40 degrees, and to the right 60."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "Driving is hard because I can't look over my shoulder."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Assessment: the neck is stiff on the left, and the dizziness needs a doctor's review before we do any hands-on neck work."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Plan: I'm holding manual neck work today. I'm referring you back to your doctor this week about the dizziness and the pinky tingling."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Should I stop driving?"
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Ask your doctor directly about driving. For now, avoid long drives."
+    },
+    {
+      "turn": 14,
+      "speaker": "patient",
+      "text": "Okay, I'll call them today."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Neck pain 6 out of 10 on the left, worse turning to check mirrors",
+      "mustMention": [
+        "6 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Dizziness on standing, twice this week",
+      "mustMention": [
+        "twice this week"
+      ],
+      "sourceTurns": [
+        3
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Intermittent tingling in left pinky",
+      "mustMention": [
+        "left pinky"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Left rotation about 40 degrees",
+      "mustMention": [
+        "40 degrees"
+      ],
+      "sourceTurns": [
+        8
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Driving is hard, cannot look over shoulder",
+      "mustMention": [
+        "look over my shoulder"
+      ],
+      "sourceTurns": [
+        9
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "assessment",
+      "statement": "Dizziness needs a doctor's review before hands-on neck work",
+      "mustMention": [
+        "doctor's review"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Hold manual neck work",
+      "mustMention": [
+        "manual neck work"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Refer back to doctor this week",
+      "mustMention": [
+        "this week"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "strength",
+    "home_exercise_adherence",
+    "goals",
+    "follow_up_plan"
+  ],
+  "injection": null
+}
