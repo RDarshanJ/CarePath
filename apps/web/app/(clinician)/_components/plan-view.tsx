@@ -3,6 +3,8 @@
 import type { CarePlanView } from "@carepath/shared/contracts";
 import { Muted, StatusChip, Tag } from "@carepath/ui";
 import { doseText, formatDate, formatLocalDate, plural, scheduleText } from "../_lib/format";
+import { IllustrationFigure } from "../../../components/illustration";
+import { exerciseIllustration } from "../../../lib/illustrations";
 import { useClinician } from "../_lib/context";
 
 /**
@@ -88,32 +90,48 @@ export function PlanView({ plan }: { plan: CarePlanView }) {
           </span>
         </h4>
         <ol className="mt-2 flex flex-col divide-y divide-border rounded-container border border-border">
-          {plan.items.map((item, i) => (
-            <li key={`${item.exercise.id}`} className="flex flex-col gap-1 p-3">
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="text-label font-semibold text-ink">
-                  {i + 1}. {item.exercise.name}
-                </span>
-                <Muted className="text-small">
-                  {item.exercise.bodyArea}, {item.exercise.category}
-                </Muted>
-              </div>
-              <p className="text-body text-ink">
-                <span className="font-medium">Set by your care team:</span> {doseText(item.dose)}
-              </p>
-              <p className="text-body text-ink">
-                <span className="font-medium">Set by your care team:</span>{" "}
-                {scheduleText(item.schedule.daysOfWeek, item.schedule.timesPerDay)}
-              </p>
-              {item.clinicianInstructions ? (
-                <p className="text-body text-ink">
-                  <span className="font-medium">From your therapist:</span>{" "}
-                  {item.clinicianInstructions}
-                </p>
-              ) : null}
-              <p className="max-w-3xl text-small text-ink-muted">{item.exercise.description}</p>
-            </li>
-          ))}
+          {plan.items.map((item, i) => {
+            const picture = exerciseIllustration(item.exercise);
+            return (
+              <li
+                key={`${item.exercise.id}`}
+                className="flex flex-col gap-3 p-3 sm:flex-row sm:items-start"
+              >
+                {picture ? (
+                  <IllustrationFigure
+                    illustration={picture}
+                    priority={i === 0}
+                    className="sm:w-48 sm:shrink-0"
+                  />
+                ) : null}
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="text-label font-semibold text-ink">
+                      {i + 1}. {item.exercise.name}
+                    </span>
+                    <Muted className="text-small">
+                      {item.exercise.bodyArea}, {item.exercise.category}
+                    </Muted>
+                  </div>
+                  <p className="text-body text-ink">
+                    <span className="font-medium">Set by your care team:</span>{" "}
+                    {doseText(item.dose)}
+                  </p>
+                  <p className="text-body text-ink">
+                    <span className="font-medium">Set by your care team:</span>{" "}
+                    {scheduleText(item.schedule.daysOfWeek, item.schedule.timesPerDay)}
+                  </p>
+                  {item.clinicianInstructions ? (
+                    <p className="text-body text-ink">
+                      <span className="font-medium">From your therapist:</span>{" "}
+                      {item.clinicianInstructions}
+                    </p>
+                  ) : null}
+                  <p className="max-w-3xl text-small text-ink-muted">{item.exercise.description}</p>
+                </div>
+              </li>
+            );
+          })}
         </ol>
       </div>
 

@@ -18,12 +18,14 @@ import {
 import { useClinician } from "../../_lib/context";
 import { formatLocalDate, fullName } from "../../_lib/format";
 import { keys, reads } from "../../_lib/queries";
+import { AppointmentsTab } from "./appointments-tab";
 import { ActivityTab, CheckInsTab, HistoryTab, OverviewTab, PlanTab } from "./tabs";
 
 const tabs = [
   { value: "overview", label: "Overview" },
   { value: "plan", label: "Plan" },
   { value: "activity", label: "Activity" },
+  { value: "appointments", label: "Appointments" },
   { value: "check-ins", label: "Check-ins" },
   { value: "history", label: "History" },
 ] as const;
@@ -118,6 +120,9 @@ export function PatientRecord({ patientId }: { patientId: string }) {
         </TabsContent>
         <TabsContent value="activity">
           <ActivityTab patientId={patient.id} />
+        </TabsContent>
+        <TabsContent value="appointments">
+          <AppointmentsTab patientId={patient.id} />
         </TabsContent>
         <TabsContent value="check-ins">
           <CheckInsTab patientId={patient.id} highlight={params.get("checkIn")} />

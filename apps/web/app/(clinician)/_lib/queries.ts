@@ -19,6 +19,11 @@ import {
   reviewTaskPageSchema,
   reviewTaskSchema,
   careTeamCardSchema,
+  appointmentListSchema,
+  appointmentPageSchema,
+  conversationPageSchema,
+  messagePageSchema,
+  messageSchema,
   timelinePageSchema,
   type CarePlanDraftSave,
   type CarePlanPublishRequest,
@@ -51,6 +56,12 @@ export const keys = {
   exercises: (params: string) => ["clinician", "exercises", params] as const,
   tasks: (params: string) => ["clinician", "tasks", params] as const,
   rules: ["clinician", "rules"] as const,
+  agenda: (date: string, practitionerId: string) =>
+    ["clinician", "agenda", practitionerId, date] as const,
+  appointments: (id: string, when: string) =>
+    ["clinician", "patient", id, "appointments", when] as const,
+  conversations: ["clinician", "conversations"] as const,
+  thread: (conversationId: string) => ["clinician", "thread", conversationId] as const,
 };
 
 /** Build `?a=1&b=2` from defined values only. */
@@ -95,9 +106,25 @@ export const reads = {
   exercises: (query: string) => api.get(`/exercises${query}`, exerciseLibraryPageSchema),
   tasks: (query: string) => api.get(`/review-tasks${query}`, reviewTaskPageSchema),
   rules: () => api.get("/review-rules", reviewRuleListSchema),
+  /** One practitioner's clinic-zone day, cancelled visits included (CR-1). */
+  agenda: (date: string, practitionerId: string) =>
+    api.get(`/appointments${qs({ date, practitionerId })}`, appointmentListSchema),
+  appointments: (id: string, when: "upcoming" | "past", cursor?: string) =>
+    api.get(`${pid(id)}/appointments${qs({ when, limit: 25, cursor })}`, appointmentPageSchema),
+  conversations: () => api.get(`/conversations${qs({ limit: 50 })}`, conversationPageSchema),
+  thread: (conversationId: string, cursor?: string) =>
+    api.get(
+      `/conversations/${conversationId}/messages${qs({ limit: 30, cursor })}`,
+      messagePageSchema,
+    ),
 };
 
 export const writes = {
+  sendMessage: (conversationId: string, body: string) =>
+    api.post(`/conversations/${conversationId}/messages`, messageSchema, { body }),
+  markRead: (conversationId: string) => api.post(`/conversations/${conversationId}/read`, null, {}),
+  retryMessage: (conversationId: string, messageId: string) =>
+    api.post(`/conversations/${conversationId}/messages/${messageId}/retry`, messageSchema, {}),
   saveDraft: (id: string, body: CarePlanDraftSave) =>
     api.put(`${pid(id)}/care-plan/draft`, carePlanDraftSchema, body),
   publish: (id: string, body: CarePlanPublishRequest) =>

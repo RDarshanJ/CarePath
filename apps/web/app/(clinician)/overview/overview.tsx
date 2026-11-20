@@ -20,11 +20,15 @@ import {
   formatLocalDate,
   formatTime,
   fullName,
-  localDayOf,
   plural,
   tzAbbreviation,
 } from "../_lib/format";
-import { keys, qs, reads, writes } from "../_lib/queries";
+import { keys, reads, writes } from "../_lib/queries";
+import {
+  AppointmentStatusTag,
+  appointmentTypeText,
+  isCancelled,
+} from "../_components/appointments";
 
 const COLLAPSED_ROWS = 6;
 
@@ -105,6 +109,7 @@ export function Overview() {
         </div>
         <div className="flex min-w-0 flex-col gap-5 xl:col-span-2">
           <VisitsToday today={data.today} />
+          <UnreadMessages data={data} />
           <MissedActivity data={data} />
           <PlanUpdates data={data} />
         </div>
@@ -229,59 +234,86 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
   );
 }
 
-/** Next visits today (CR-1, until WP 4.1) come from the patient directory (next visit on today's date in the clinic zone). */
+/** Visits today (CR-1): the practitioner's clinic-zone day from the scheduling API, the same rows as the schedule. */
 function VisitsToday({ today }: { today: string }) {
   const { timezone, session } = useClinician();
-  const query = qs({
-    clinicianId: session.practitionerId,
-    hasUpcomingAppointment: "true",
-    sort: "name",
-    limit: 100,
+  const practitionerId = session.practitionerId;
+  const agenda = useQuery({
+    queryKey: keys.agenda(today, practitionerId ?? ""),
+    queryFn: () => reads.agenda(today, practitionerId!),
+    enabled: !!practitionerId,
   });
-  const visits = useQuery({
-    queryKey: keys.directory(`visits-today${query}`),
-    queryFn: () => reads.directory(query),
-  });
-  const rows = (visits.data?.items ?? []).flatMap((r) =>
-    r.view === "clinical" &&
-    r.nextAppointmentAt &&
-    localDayOf(r.nextAppointmentAt, timezone) === today
-      ? [{ ...r, at: r.nextAppointmentAt }]
-      : [],
-  );
-  rows.sort((a, b) => a.at.localeCompare(b.at));
+  const items = agenda.data?.items ?? [];
+  const rows = items.filter((a) => !isCancelled(a.status));
+  const cancelled = items.length - rows.length;
   return (
     <Section
       id="visits"
-      title="Next visits today"
-      description="Each caseload patient's next booked visit, when it falls today."
-      {...(visits.data ? { count: rows.length } : {})}
+      title="Visits today"
+      description={`Your booked visits on ${formatLocalDate(today)}, in clinic time${cancelled > 0 ? `. ${plural(cancelled, "cancelled visit")} not listed` : ""}.`}
+      actions={<AppLink href="/schedule">Open the schedule</AppLink>}
+      {...(agenda.data ? { count: rows.length } : {})}
     >
-      {visits.isError ? (
+      {!practitionerId ? (
+        <Empty icon="calendar" title="No schedule for this account">
+          Your account is not linked to a practitioner profile.
+        </Empty>
+      ) : agenda.isError ? (
         <div className="p-4">
-          <QueryError error={visits.error} onRetry={() => void visits.refetch()} />
+          <QueryError error={agenda.error} onRetry={() => void agenda.refetch()} />
         </div>
-      ) : !visits.data ? (
+      ) : !agenda.data ? (
         <div className="p-4">
           <ListSkeleton rows={2} label="Loading visits" />
         </div>
       ) : rows.length === 0 ? (
-        <Empty icon="calendar" title="No next visits today">
-          None of your patients has a next visit on {formatLocalDate(today)}.
+        <Empty icon="calendar" title="No visits today">
+          Nothing is booked with you on {formatLocalDate(today)}.
         </Empty>
       ) : (
         <ul className="divide-y divide-border">
-          {rows.map((r) => (
-            <li key={r.id} className="flex items-center justify-between gap-3 px-4 py-2.5">
-              <AppLink href={patientHref(r.id)} className="text-label font-medium">
-                {fullName(r)}
-              </AppLink>
-              <span className="text-small text-ink-muted tabular-nums">
-                {formatTime(r.at, timezone)}
+          {rows.map((a) => (
+            <li key={a.id} className="flex items-center gap-3 px-4 py-2.5">
+              <span className="w-20 shrink-0 text-small text-ink-muted tabular-nums">
+                {formatTime(a.startsAt, timezone)}
               </span>
+              <div className="min-w-0 flex-1">
+                <AppLink
+                  href={patientHref(a.patient.id, "?tab=appointments")}
+                  className="text-label font-medium"
+                >
+                  {a.patient.name}
+                </AppLink>
+                <p className="text-small text-ink-muted">{appointmentTypeText[a.type]}</p>
+              </div>
+              <AppointmentStatusTag appointment={a} />
             </li>
           ))}
         </ul>
+      )}
+    </Section>
+  );
+}
+
+function UnreadMessages({ data }: { data: ClinicianOverview }) {
+  const m = data.messages;
+  return (
+    <Section
+      id="messages"
+      title="Unread messages"
+      count={m.unreadCount}
+      description="Messages from patients and the care team in your own conversations."
+      actions={<AppLink href="/messages">Open messages</AppLink>}
+    >
+      {m.unreadCount === 0 ? (
+        <Empty icon="message" title="No unread messages">
+          You have read every message in your conversations.
+        </Empty>
+      ) : (
+        <p className="px-4 py-3 text-body">
+          {plural(m.unreadCount, "unread message")} in{" "}
+          {plural(m.unreadConversations, "conversation")}.
+        </p>
       )}
     </Section>
   );

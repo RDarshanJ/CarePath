@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { SessionInfo } from "@carepath/shared/contracts";
 import { Avatar, Muted, SideNav, type NavItem } from "@carepath/ui";
 import { roleLabel } from "../lib/auth/roles";
+import { useUnreadTotal } from "../app/(clinician)/_lib/unread";
 import { SignOutButton } from "./sign-out-button";
 
 function SkipLink() {
@@ -26,10 +27,12 @@ function withCurrent(items: Omit<NavItem, "current">[], pathname: string): NavIt
   }));
 }
 
-/** Clinician destinations that work in this phase (checkpoint C1, section 5.6). */
+/** Clinician destinations that work in this phase (checkpoint C1, section 5.6; Schedule and Messages from WP 4.3b). */
 const clinicianNav: Omit<NavItem, "current">[] = [
   { href: "/overview", label: "Overview", icon: "home" },
   { href: "/patients", label: "Patients", icon: "users" },
+  { href: "/schedule", label: "Schedule", icon: "calendar" },
+  { href: "/messages", label: "Messages", icon: "message" },
   { href: "/review-queue", label: "Review queue", icon: "clipboard" },
 ];
 
@@ -93,7 +96,11 @@ function StaffShell({
 }
 
 export function ClinicianShell(props: { session: SessionInfo; children: ReactNode }) {
-  return <StaffShell {...props} items={clinicianNav} navLabel="Clinician" />;
+  const unread = useUnreadTotal();
+  const items = clinicianNav.map((it) =>
+    it.href === "/messages" && unread ? { ...it, count: unread } : it,
+  );
+  return <StaffShell {...props} items={items} navLabel="Clinician" />;
 }
 
 export function AdminShell(props: { session: SessionInfo; children: ReactNode }) {

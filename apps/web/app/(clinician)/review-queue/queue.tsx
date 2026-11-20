@@ -38,6 +38,7 @@ import {
   errorText,
   taskStatusText,
 } from "../_components/common";
+import { moments } from "../../../lib/illustrations";
 import { useClinician } from "../_lib/context";
 import {
   formatAgeHours,
@@ -233,6 +234,7 @@ export function ReviewQueue() {
         <Section id="queue-empty" title="Review tasks">
           <Empty
             icon="check-circle"
+            {...(!filtersActive && status !== "closed" ? { image: moments.nothingToReview } : {})}
             title={
               filtersActive
                 ? "No tasks match these filters"

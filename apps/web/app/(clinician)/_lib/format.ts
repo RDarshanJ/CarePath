@@ -107,3 +107,31 @@ export function doseText(d: {
   if (d.restSeconds) parts.push(`rest ${d.restSeconds} seconds`);
   return parts.join(", ");
 }
+
+/** `2026-11-19` plus `n` calendar days, with no zone involved. */
+export function addDays(day: string, n: number): string {
+  const [y, m, d] = day.split("-").map(Number);
+  if (!y || !m || !d) return day;
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+}
+
+/** "Thursday, Nov 19, 2026" from `2026-11-19`. */
+export function formatLongDay(day: string): string {
+  const [y, m, d] = day.split("-").map(Number);
+  if (!y || !m || !d) return day;
+  return formatter("UTC", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(Date.UTC(y, m - 1, d)));
+}
+
+/** "Thu, Nov 19" for an instant, in the organization's zone. */
+export function formatDayShort(iso: string, tz: string): string {
+  return formatter(tz, { weekday: "short", month: "short", day: "numeric" }).format(new Date(iso));
+}
+
+/** `YYYY-MM-DD` as typed into a date field and accepted by the API. */
+export const isLocalDate = (s: string | null | undefined): s is string =>
+  !!s && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(`${s}T00:00:00Z`));

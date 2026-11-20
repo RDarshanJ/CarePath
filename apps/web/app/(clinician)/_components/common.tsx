@@ -15,6 +15,7 @@ import {
 } from "@carepath/ui";
 import type { IconName } from "@carepath/ui";
 import type { PlanStage } from "@carepath/shared/contracts";
+import { MomentImage } from "../../../components/illustration";
 import { ApiError } from "../../../lib/api/errors";
 
 /** In-app link with the design system's link styling. */
@@ -174,17 +175,35 @@ export function Empty({
   title,
   children,
   action,
+  image,
 }: {
   icon?: IconName;
   title: string;
   children: ReactNode;
   action?: ReactNode;
+  /** Public path of a decorative picture beside the text (a `moments` entry). */
+  image?: string;
 }) {
+  const state = (
+    <EmptyState
+      icon={icon ?? "list"}
+      title={title}
+      {...(image ? { className: "min-w-0 flex-1" } : {})}
+      {...(action ? { action } : {})}
+    >
+      {children}
+    </EmptyState>
+  );
   return (
     <div className="p-4">
-      <EmptyState icon={icon ?? "list"} title={title} {...(action ? { action } : {})}>
-        {children}
-      </EmptyState>
+      {image ? (
+        <div className="flex flex-wrap items-center gap-4">
+          {state}
+          <MomentImage path={image} className="max-w-48" />
+        </div>
+      ) : (
+        state
+      )}
     </div>
   );
 }
