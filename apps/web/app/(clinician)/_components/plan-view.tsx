@@ -1,5 +1,6 @@
 "use client";
 
+import { versionMarkerLabels } from "@carepath/shared";
 import type { CarePlanView } from "@carepath/shared/contracts";
 import { Muted, StatusChip, Tag } from "@carepath/ui";
 import { doseText, formatDate, formatLocalDate, plural, scheduleText } from "../_lib/format";
@@ -25,12 +26,12 @@ export function PlanView({ plan }: { plan: CarePlanView }) {
           <h3 className="font-heading text-h3 font-semibold text-ink">{plan.title}</h3>
           {plan.preview ? (
             <StatusChip tone="info" icon="info">
-              Preview, not published
+              {versionMarkerLabels.preview.label}
             </StatusChip>
           ) : plan.version.isCurrent ? (
-            <StatusChip tone="success">Current version</StatusChip>
+            <StatusChip tone="success">{versionMarkerLabels.current.label}</StatusChip>
           ) : (
-            <Tag>Earlier version</Tag>
+            <Tag>{versionMarkerLabels.earlier.label}</Tag>
           )}
         </div>
         <p className="text-small text-ink-muted">

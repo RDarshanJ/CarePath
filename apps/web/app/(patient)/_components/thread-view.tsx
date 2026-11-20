@@ -10,6 +10,7 @@ import {
   type Message,
   type MessagePage,
 } from "@carepath/shared/contracts";
+import { MESSAGE_RETRYING_LABEL, actionLabels, messageStatusLabels } from "@carepath/shared";
 import { Banner, Button, Field, Heading, Icon, Textarea, cx } from "@carepath/ui";
 import { api } from "../../../lib/api/client";
 import { TextLink } from "./text-link";
@@ -323,14 +324,15 @@ function MessageItem({
         m.status === "queued" ? (
           <p className="flex items-center gap-1.5 text-small text-ink-muted">
             <Icon name="clock" size={14} />
-            Sending
+            {messageStatusLabels.queued.label}
           </p>
         ) : m.status === "failed" ? (
           <div className="flex flex-col items-start gap-2">
             <p className="flex items-start gap-1.5 text-small font-semibold text-error-ink">
               <Icon name="alert-circle" size={16} className="mt-0.5 shrink-0" />
               <span>
-                Not sent. {m.failureReason ?? "Delivery failed."} Your message is saved here.
+                {messageStatusLabels.failed.label}. {m.failureReason ?? "Delivery failed."} Your
+                message is saved here.
               </span>
             </p>
             {m.canRetry ? (
@@ -339,16 +341,16 @@ function MessageItem({
                 size="sm"
                 onClick={onRetry}
                 loading={retrying}
-                loadingLabel="Retrying"
+                loadingLabel={MESSAGE_RETRYING_LABEL}
               >
-                Retry sending
+                {actionLabels.retrySendingMessage}
               </Button>
             ) : null}
           </div>
         ) : (
           <p className="flex items-center gap-1.5 text-small text-ink-muted">
             <Icon name="check" size={14} />
-            Sent
+            {messageStatusLabels.sent.label}
           </p>
         )
       ) : null}

@@ -1,12 +1,25 @@
-import type { AppointmentStatus, AppointmentType, IntakeState } from "@carepath/shared/contracts";
+import {
+  addDays,
+  appointmentStatusLabel,
+  appointmentTypeLabels,
+  daysBetween,
+  hourOf,
+  formatTime,
+  formatTimeRange,
+  listWords as sharedListWords,
+  localDayOf,
+  zoneName as sharedZoneName,
+} from "@carepath/shared";
+import {
+  appointmentStatuses,
+  type AppointmentStatus,
+  type AppointmentType,
+  type IntakeState,
+} from "@carepath/shared/contracts";
 import { weekdayNames, weekdayOrder } from "./format";
 
 /** Plain words for the stored visit types and statuses. No raw enum reaches the screen. */
-export const typeLabels: Record<AppointmentType, string> = {
-  initial_evaluation: "Initial evaluation",
-  follow_up: "Follow-up visit",
-  video_follow_up: "Follow-up by video",
-};
+export const typeLabels: Record<AppointmentType, string> = appointmentTypeLabels;
 
 export const typeHints: Record<AppointmentType, string> = {
   initial_evaluation: "A first visit with your therapist to go over your goals and your plan.",
@@ -14,16 +27,10 @@ export const typeHints: Record<AppointmentType, string> = {
   video_follow_up: "The same follow-up, held over video instead of in the clinic.",
 };
 
-export const statusLabels: Record<AppointmentStatus, string> = {
-  requested: "Requested",
-  booked: "Booked",
-  checked_in: "Checked in",
-  in_progress: "In progress",
-  completed: "Completed",
-  cancelled_by_patient: "Cancelled by you",
-  cancelled_by_clinic: "Cancelled by the clinic",
-  no_show: "Missed",
-};
+/** Patient wording of every status (shared map, CD-233). */
+export const statusLabels = Object.fromEntries(
+  appointmentStatuses.map((s) => [s, appointmentStatusLabel(s, "patient")]),
+) as Record<AppointmentStatus, string>;
 
 /** Weekday names in the order the filter shows them, Monday first. */
 export const filterDays = weekdayOrder.map((d) => ({ value: d, label: weekdayNames[d]! }));
@@ -41,14 +48,7 @@ export const timeOfDayHints: Record<TimeOfDay, string> = {
 };
 
 /** The hour of an instant in the clinic's zone (0 to 23). */
-export function clinicHour(instant: string, timezone: string): number {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    hourCycle: "h23",
-    timeZone: timezone,
-  }).formatToParts(new Date(instant));
-  return Number(parts.find((p) => p.type === "hour")?.value ?? "0");
-}
+export const clinicHour = hourOf;
 
 export function timeOfDay(instant: string, timezone: string): TimeOfDay {
   const h = clinicHour(instant, timezone);
@@ -56,51 +56,26 @@ export function timeOfDay(instant: string, timezone: string): TimeOfDay {
 }
 
 /** "8:00 AM" in the clinic's zone. */
-export function formatClock(instant: string, timezone: string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: timezone,
-  }).format(new Date(instant));
-}
+export const formatClock = formatTime;
 
 /** "Mountain Standard Time" for the zone at that instant, so the zone is named in words. */
-export function zoneName(timezone: string, instant?: string): string {
-  const at = instant ? new Date(instant) : new Date("2026-01-15T12:00:00Z");
-  const part = new Intl.DateTimeFormat("en-US", { timeZoneName: "long", timeZone: timezone })
-    .formatToParts(at)
-    .find((p) => p.type === "timeZoneName");
-  return part?.value ?? timezone;
-}
+export const zoneName = sharedZoneName;
 
 export function minutesBetween(startsAt: string, endsAt: string): number {
   return Math.round((new Date(endsAt).getTime() - new Date(startsAt).getTime()) / 60_000);
 }
 
-/** "8:00 to 8:45 AM" style range in the clinic's zone. */
-export function formatRange(startsAt: string, endsAt: string, timezone: string): string {
-  return `${formatClock(startsAt, timezone)} to ${formatClock(endsAt, timezone)}`;
-}
+/** "8:00 AM to 8:45 AM" range in the clinic's zone. */
+export const formatRange = formatTimeRange;
 
 /** Add days to a `YYYY-MM-DD` calendar date. */
-export function addLocalDays(date: string, days: number): string {
-  const d = new Date(`${date}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
+export const addLocalDays = addDays;
 
 /** Calendar days from one `YYYY-MM-DD` to another (to minus from). */
-export function daysBetweenLocal(from: string, to: string): number {
-  return Math.round(
-    (new Date(`${to}T12:00:00Z`).getTime() - new Date(`${from}T12:00:00Z`).getTime()) / 86_400_000,
-  );
-}
+export const daysBetweenLocal = daysBetween;
 
 /** "Monday, Wednesday and Friday" style list. */
-export function listWords(items: string[]): string {
-  if (items.length <= 1) return items.join("");
-  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
-}
+export const listWords = sharedListWords;
 
 /** The therapist's name without the credentials the API appends in appointment rows. */
 export function firstPart(name: string): string {
@@ -108,14 +83,7 @@ export function firstPart(name: string): string {
 }
 
 /** The calendar day (`YYYY-MM-DD`) of an instant in the clinic's zone. */
-export function clinicDate(instant: string, timezone: string): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: timezone,
-  }).format(new Date(instant));
-}
+export const clinicDate = localDayOf;
 
 /** The patient's stored intake availability, or null when it is missing or unreadable. Never asked again. */
 export function availabilityFromIntake(

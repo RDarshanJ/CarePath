@@ -9,6 +9,7 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
+import { checkInReviewLabel, ofTotal, sessionStatusLabels } from "@carepath/shared";
 import type { CheckIn, ReviewTask, TimelineItem } from "@carepath/shared/contracts";
 import {
   Button,
@@ -168,7 +169,7 @@ export function OverviewTab({ patientId }: { patientId: string }) {
               </p>
               <p className="text-small text-ink-muted">
                 Submitted {formatDateTime(latest.submittedAt, timezone)}.{" "}
-                {latest.reviewedAt ? "Reviewed." : "Not yet reviewed."}
+                {checkInReviewLabel(latest.reviewedAt)}.
               </p>
               <AppLink
                 href={`/patients/${patientId}?tab=check-ins&checkIn=${latest.id}`}
@@ -269,13 +270,9 @@ function Fact({
   );
 }
 
-const sessionStatusText: Record<string, string> = {
-  completed: "Completed",
-  in_progress: "In progress",
-  paused: "Paused",
-  abandoned: "Ended without finishing",
-  stopped_discomfort: "Stopped for discomfort",
-};
+const sessionStatusText: Record<string, string> = Object.fromEntries(
+  Object.entries(sessionStatusLabels).map(([k, v]) => [k, v.label]),
+);
 
 function TimelineRow({ item, patientId }: { item: TimelineItem; patientId: string }) {
   const { timezone } = useClinician();
@@ -311,7 +308,7 @@ function TimelineRow({ item, patientId }: { item: TimelineItem; patientId: strin
         </>
       );
       chip = item.stoppedForDiscomfort ? (
-        <StatusChip tone="warning">Stopped for discomfort</StatusChip>
+        <StatusChip tone="warning">{sessionStatusLabels.stopped_discomfort.label}</StatusChip>
       ) : (
         <Tag>{sessionStatusText[item.status] ?? item.status}</Tag>
       );
@@ -550,7 +547,7 @@ export function ActivityTab({ patientId }: { patientId: string }) {
                 <Th>Week of</Th>
                 <Th numeric>Assigned</Th>
                 <Th numeric>Completed</Th>
-                <Th numeric>Stopped for discomfort</Th>
+                <Th numeric>{sessionStatusLabels.stopped_discomfort.label}</Th>
                 <Th numeric>Exercises done</Th>
                 <Th numeric>Exercises skipped</Th>
               </tr>
@@ -597,7 +594,9 @@ export function ActivityTab({ patientId }: { patientId: string }) {
                       <Td>{formatDateTime(s.startedAt, timezone)}</Td>
                       <Td>
                         {s.status === "stopped_discomfort" ? (
-                          <StatusChip tone="warning">Stopped for discomfort</StatusChip>
+                          <StatusChip tone="warning">
+                            {sessionStatusLabels.stopped_discomfort.label}
+                          </StatusChip>
                         ) : (
                           <Tag>{sessionStatusText[s.status] ?? s.status}</Tag>
                         )}
@@ -765,7 +764,7 @@ export function CheckInsTab({
                   id={`check-in-${c.id}`}
                 >
                   <Td>{formatDateTime(c.submittedAt, timezone)}</Td>
-                  <Td numeric>{c.painScore} of 10</Td>
+                  <Td numeric>{ofTotal(c.painScore, 10)}</Td>
                   <Td>
                     {c.difficulty ? (
                       difficultyText[c.difficulty]

@@ -1,3 +1,4 @@
+import { versionText } from "@carepath/shared";
 import { Heading, EmptyState, Prose, Tag } from "@carepath/ui";
 import { IllustrationFigure } from "../../../../components/illustration";
 import { exerciseIllustration } from "../../../../lib/illustrations";
@@ -125,10 +126,7 @@ export default async function PlanPage() {
         <ol className="flex flex-col gap-4">
           {versions.items.map((v) => (
             <li key={v.id} className="flex flex-col gap-1">
-              <p className="text-body font-medium">
-                Version {v.number}
-                {v.isCurrent ? " (current)" : ""}
-              </p>
+              <p className="text-body font-medium">{versionText(v.number, v.isCurrent)}</p>
               <p className="text-small text-ink-muted">
                 Published {formatInstantDate(v.publishedAt, today.timezone)} by {v.publishedBy.name}
               </p>

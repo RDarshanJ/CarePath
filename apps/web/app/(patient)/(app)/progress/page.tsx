@@ -1,3 +1,4 @@
+import { sessionStatusLabels } from "@carepath/shared";
 import { EmptyState, Heading, Table, TBody, Td, Th, THead, Tr } from "@carepath/ui";
 import { BarsLegend, PainLine, WeeklyBars } from "../../_components/charts";
 import { TableToggle } from "../../_components/table-toggle";
@@ -7,9 +8,9 @@ import { formatInstantDate, formatLocalDate, plural } from "../../_lib/format";
 export const metadata = { title: "Progress | CarePath" };
 
 const statusText = {
-  completed: "Completed",
-  stopped_discomfort: "Stopped for discomfort",
-  abandoned: "Not finished",
+  completed: sessionStatusLabels.completed.label,
+  stopped_discomfort: sessionStatusLabels.stopped_discomfort.label,
+  abandoned: sessionStatusLabels.abandoned.label,
 } as const;
 
 export default async function ProgressPage() {

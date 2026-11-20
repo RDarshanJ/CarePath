@@ -1,6 +1,7 @@
 "use client";
 
 import NextLink from "next/link";
+import { messagesNotSentText } from "@carepath/shared";
 import type { ConversationPage } from "@carepath/shared/contracts";
 import { EmptyState, Icon } from "@carepath/ui";
 import { useConversations } from "../_lib/use-conversations";
@@ -80,9 +81,7 @@ export function ConversationList({
                 {c.failedCount > 0 ? (
                   <span className="flex items-center gap-1.5 text-small font-semibold text-error-ink">
                     <Icon name="alert-circle" size={14} />
-                    {c.failedCount === 1
-                      ? "1 of your messages was not sent"
-                      : `${c.failedCount} of your messages were not sent`}
+                    {messagesNotSentText(c.failedCount)}
                   </span>
                 ) : null}
               </span>
