@@ -187,3 +187,66 @@ export async function patientPhone(db: Db, patientId: string): Promise<string | 
   });
   return row.phone;
 }
+
+/**
+ * Statements that violate one database rule each, for the M5 error-mapping tests. Each runs
+ * through the typed client, exactly as a service would hit it.
+ */
+export async function violate(
+  db: Db,
+  org: OrgFixture,
+  kind: "overlap" | "duplicate" | "transition" | "domain_rule",
+): Promise<void> {
+  switch (kind) {
+    case "overlap": {
+      const startsAt = new Date(Date.UTC(2031, 0, 1 + Math.floor(Math.random() * 3000), 15));
+      const endsAt = new Date(startsAt.getTime() + 45 * 60_000);
+      const appointment = {
+        organizationId: org.orgId,
+        patientId: org.patient.patientId,
+        practitionerId: org.therapist.practitionerId,
+        type: "follow_up" as const,
+        startsAt,
+        endsAt,
+        bookedTimezone: "America/Phoenix",
+      };
+      await db.appointment.create({ data: appointment });
+      await db.appointment.create({
+        data: { ...appointment, patientId: org.otherPatient.patientId },
+      });
+      return;
+    }
+    case "duplicate": {
+      const mrn = `MRN-dup-${randomUUID().slice(0, 8)}`;
+      const patient = {
+        organizationId: org.orgId,
+        mrn,
+        givenName: "Avery",
+        familyName: "Synthetic",
+        birthDate: new Date("1980-04-02"),
+      };
+      await db.patient.create({ data: patient });
+      await db.patient.create({ data: patient });
+      return;
+    }
+    case "transition":
+      // intake_incomplete -> discharged is not in StatusTransition.
+      await db.patient.update({
+        where: { id: org.otherPatient.patientId },
+        data: { status: "discharged" },
+      });
+      return;
+    case "domain_rule":
+      // A user is a patient or a practitioner, never both (CP003).
+      await db.practitioner.create({
+        data: {
+          organizationId: org.orgId,
+          userId: org.patient.userId,
+          staffId: `PT-dual-${randomUUID().slice(0, 8)}`,
+          givenName: "Dual",
+          familyName: "Profile",
+        },
+      });
+      return;
+  }
+}

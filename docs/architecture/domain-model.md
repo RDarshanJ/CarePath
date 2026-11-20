@@ -127,7 +127,7 @@ In `packages/db/prisma/migrations/*_constraints/migration.sql` and the hand-writ
 | Trigger | status transitions (CP001), append-only (CP002), single profile per user, gapless version numbers, note-version rules, frozen signed notes, encounter needs a visit that took place (CP003) |
 | Trigger (phase3_alignment) | `enforce_same_parent` (CP003), one generic function: a session's plan version, a check-in's session, an observation's check-in and session, a goal's care plan and a note's encounter must belong to the row's patient, and a session activity's assignment must belong to the session's plan version. `reject_reparent` (CP003) fixes `patientId` on `CarePlan`, `ExerciseSession`, `PatientCheckIn`, `Encounter` and `carePlanVersionId` on `ExerciseSession` once written, so those checks cannot be undone from the parent side. Appointment and slot consistency is open (WP 4.1, C2) |
 
-Error codes are exported from `packages/db/src/errors.ts` (`DbErrorCode`, `dbErrorInfo`, `isDbError`), which reads the SQLSTATE from both `pg` errors and Prisma driver-adapter errors. WP 4.1 maps `23P01` to HTTP 409.
+Error codes are exported from `packages/db/src/errors.ts` (`DbErrorCode`, `dbErrorInfo`, `isDbError`), which reads the SQLSTATE from both `pg` errors and Prisma driver-adapter errors. The API error handler maps `23P01`, `23505`, `CP001` and `CP003` to HTTP 409 with the codes `booking_conflict`, `already_exists`, `invalid_transition` and `rule_violation` (WP 3.0, M5). Other SQLSTATEs stay 500.
 
 ## 7. Timestamps
 

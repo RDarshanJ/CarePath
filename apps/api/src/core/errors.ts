@@ -4,6 +4,7 @@ import {
   isResponseSerializationError,
 } from "fastify-type-provider-zod";
 
+import { DbErrorCode, dbErrorInfo } from "@carepath/db";
 import {
   envelope,
   errorCodes,
@@ -35,6 +36,23 @@ export function errorResponses<const S extends readonly number[]>(...statuses: S
   return Object.fromEntries(statuses.map((s) => [s, errorEnvelopeSchema])) as {
     [K in S[number]]: typeof errorEnvelopeSchema;
   };
+}
+
+/**
+ * Database outcomes that are the caller's conflict, not a server fault (checkpoint C1, M5).
+ * Other SQLSTATEs (foreign key, check, append-only) mean the service let bad input through and
+ * stay 500. The constraint name and database message never reach the response.
+ */
+const dbConflicts: Record<string, ErrorCode> = {
+  [DbErrorCode.exclusionViolation]: "booking_conflict",
+  [DbErrorCode.uniqueViolation]: "already_exists",
+  [DbErrorCode.illegalStatusTransition]: "invalid_transition",
+  [DbErrorCode.domainRule]: "rule_violation",
+};
+
+export function dbErrorToCode(err: unknown): ErrorCode | undefined {
+  const info = dbErrorInfo(err);
+  return info ? dbConflicts[info.code] : undefined;
 }
 
 function fastifyCodeToError(err: FastifyError): ErrorCode | undefined {
@@ -92,6 +110,11 @@ export function registerErrorHandling(app: FastifyInstance): void {
     if (isResponseSerializationError(err)) {
       request.log.error({ err }, "response failed its schema");
       return sendError(reply, "internal_error");
+    }
+    const conflict = dbErrorToCode(err);
+    if (conflict) {
+      request.log.warn({ err }, "database conflict");
+      return sendError(reply, conflict);
     }
     const mapped = fastifyCodeToError(err);
     if (mapped) return sendError(reply, mapped);

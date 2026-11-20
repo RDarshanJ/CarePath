@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { requireCtx } from "../../src/core/context.js";
 import { withTx } from "../../src/core/db/tx.js";
 import { requirePatientWrite } from "../../src/core/scope/patient-scope.js";
-import { setPatientPhone } from "./repo.js";
+import { createOrgFixture, setPatientPhone, violate } from "./repo.js";
 
 /**
  * Routes that exist only in tests. They exercise core plumbing (care-team write scope,
@@ -51,6 +51,22 @@ export function fixtureRoutes(app: FastifyInstance): void {
           patientId: request.body.failAudit ? randomUUID() : patientId,
         });
       });
+      return { ok: true };
+    },
+  );
+
+  // M5: each kind runs one statement the database rejects, then lets the error propagate.
+  r.post(
+    "/test/db-error/:kind",
+    {
+      config: { access: { auth: "public" } },
+      schema: {
+        params: z.object({ kind: z.enum(["overlap", "duplicate", "transition", "domain_rule"]) }),
+      },
+    },
+    async (request) => {
+      const org = await createOrgFixture(app.deps.db);
+      await violate(app.deps.db, org, request.params.kind);
       return { ok: true };
     },
   );

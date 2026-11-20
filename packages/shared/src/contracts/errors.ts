@@ -26,6 +26,17 @@ export const errorCodes = {
   },
   not_found: { status: 404, message: "Not found." },
   conflict: { status: 409, message: "The request conflicts with the current state." },
+  // Database constraint outcomes (checkpoint C1, M5). Stable codes the web can branch on.
+  booking_conflict: {
+    status: 409,
+    message: "That time overlaps another booking. Choose a different time.",
+  },
+  already_exists: { status: 409, message: "A matching record already exists." },
+  invalid_transition: {
+    status: 409,
+    message: "This change is not allowed from the record's current status.",
+  },
+  rule_violation: { status: 409, message: "The change breaks a rule for this record." },
   payload_too_large: { status: 413, message: "The request body is too large." },
   unsupported_media_type: { status: 415, message: "Unsupported content type." },
   rate_limited: { status: 429, message: "Too many requests. Try again later." },
