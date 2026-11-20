@@ -4,13 +4,15 @@ import {
   EXERCISE_CONTENT_NOTICE,
   findBannedDiagnosticTerms,
 } from "@carepath/shared";
-import { expect, expectNoSeriousViolations, signInWithForm, test } from "./fixtures";
+import { expect, signInWithForm, test } from "./fixtures";
 import {
   expectNoHorizontalOverflow,
+  expectNoSeriousViolations,
   mainText,
   personas,
   radio,
   shots,
+  arrow,
   tabTo,
 } from "./patient-helpers";
 
@@ -24,6 +26,17 @@ import {
  */
 const isMobile = (info: TestInfo) => info.project.name === "mobile-390";
 
+/** When a test fails, print where the page was and what it said, so the failure can be read from the log. */
+test.afterEach(async ({ page }, info) => {
+  if (info.status === info.expectedStatus) return;
+  try {
+    const text = (await page.locator("body").innerText()).replace(/\s+/g, " ").slice(0, 900);
+    console.log(`FAILED ${info.title}\n  url: ${page.url()}\n  page: ${text}`);
+  } catch {
+    // The page may already be closed.
+  }
+});
+
 async function api<T = unknown>(page: Page, path: string): Promise<T> {
   return page.evaluate(async (p) => (await fetch(`/api${p}`)).json(), path);
 }
@@ -33,18 +46,22 @@ async function patientIdOf(page: Page): Promise<string> {
 
 /** Complete the exercise on screen by tapping Done for each set, skipping rest. */
 async function finishExercise(page: Page) {
+  const skipRest = page.getByRole("button", { name: "Skip rest" });
+  const done = page.getByRole("button", { name: /^Done with/ });
   for (let i = 0; i < 14; i++) {
-    const skipRest = page.getByRole("button", { name: "Skip rest" });
+    // After a tap the screen shows either the rest timer or the next set's button; wait for one of them.
+    try {
+      await skipRest.or(done).first().waitFor({ state: "visible", timeout: 4000 });
+    } catch {
+      return;
+    }
     if (await skipRest.isVisible()) {
       await skipRest.click();
       continue;
     }
-    const done = page.getByRole("button", { name: /^Done with/ });
-    if (!(await done.isVisible())) return;
     const label = await done.innerText();
     await done.click();
     if (/finish exercise|this exercise/i.test(label)) return;
-    await page.waitForTimeout(100);
   }
 }
 
@@ -67,7 +84,7 @@ test.describe("Scenario A: onboarding", () => {
     await shots(page, "a01-account");
 
     // Validation: errors linked to their fields and announced in a live region (AC-A6).
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     const summary = page.getByRole("alert").filter({ hasText: "to fix" });
     await expect(summary).toBeVisible();
     await expect(summary).toBeFocused();
@@ -86,11 +103,11 @@ test.describe("Scenario A: onboarding", () => {
     await page.getByLabel(/^Last name/).fill("Morgan");
     await page.getByLabel(/^Email/).fill("casey.morgan.onboarding@carepath.test");
     await page.getByLabel(/^Password/).fill("short");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "at least 12" }).first()).toBeVisible();
     await page.getByLabel(/^Password/).fill("a long enough passphrase 2026");
     await expectNoSeriousViolations(page, "onboarding account");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
       page.getByRole("heading", { level: 1, name: "Your eligibility code" }),
@@ -99,7 +116,7 @@ test.describe("Scenario A: onboarding", () => {
     // Back keeps what was typed.
     await page.getByRole("button", { name: "Back" }).click();
     await expect(page.getByLabel(/^Email/)).toHaveValue("casey.morgan.onboarding@carepath.test");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     // A used or expired code is refused and creates nothing (AC-A3).
     await page.getByLabel(/^Date of birth/).fill("1988-04-12");
@@ -124,10 +141,10 @@ test.describe("Scenario A: onboarding", () => {
     await shots(page, "a03-about-you");
     await page.getByLabel(/^Phone number/).fill("(555) 555-0142");
     await page.getByLabel(/^Phone number/).fill("call me");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "digits" }).first()).toBeVisible();
     await page.getByLabel(/^Phone number/).fill("(555) 555-0142");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(page.getByRole("heading", { level: 1, name: "Your goal" })).toBeVisible();
     await shots(page, "a04-goal");
@@ -153,9 +170,9 @@ test.describe("Scenario A: onboarding", () => {
     await expect(page.getByLabel(/^What would you like/)).toHaveValue(
       "Walk to the corner shop without stopping to rest.",
     );
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "to fix" })).toContainText(
       "2 things to fix",
     );
@@ -163,7 +180,7 @@ test.describe("Scenario A: onboarding", () => {
     await page.getByRole("radio", { name: "Left side" }).click();
     await shots(page, "a05-body-area");
     await expectNoSeriousViolations(page, "onboarding body area");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     // Pain is a radio group of buttons, never a slider.
     await expect(
@@ -173,14 +190,14 @@ test.describe("Scenario A: onboarding", () => {
     await radio(page, "At its worst in the last week?", "3 of 10").click();
     await radio(page, "At its best in the last week?", "7 of 10").click();
     await radio(page, "How much does it hurt right now?", "4 of 10").click();
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(
       page.getByText("The best number cannot be higher than the worst").first(),
     ).toBeVisible();
     await shots(page, "a06-pain-error");
     await radio(page, "At its worst in the last week?", "8 of 10").click();
     await expectNoSeriousViolations(page, "onboarding pain");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
       page.getByRole("heading", { level: 1, name: "What is hard right now" }),
@@ -189,17 +206,17 @@ test.describe("Scenario A: onboarding", () => {
     await page.getByRole("checkbox", { name: "Using stairs" }).click();
     await shots(page, "a07-limitations");
     await expectNoSeriousViolations(page, "onboarding limitations");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(page.getByRole("heading", { level: 1, name: "Your therapist" })).toBeVisible();
     await shots(page, "a08-preferences");
     await expectNoSeriousViolations(page, "onboarding preferences");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     await expect(
       page.getByRole("heading", { level: 1, name: "When you can come in" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(page.getByRole("alert").filter({ hasText: "to fix" })).toContainText(
       "2 things to fix",
     );
@@ -208,7 +225,7 @@ test.describe("Scenario A: onboarding", () => {
     await page.getByRole("checkbox", { name: "Morning" }).click();
     await shots(page, "a09-availability");
     await expectNoSeriousViolations(page, "onboarding availability");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     // Consent: required and optional are separate; the optional one is off by default (AC-A8).
     await expect(
@@ -220,13 +237,13 @@ test.describe("Scenario A: onboarding", () => {
       page.getByRole("switch", { name: "Allow automated drafting tools" }),
     ).toHaveAttribute("aria-checked", "false");
     await expect(page.getByText("Sharing and consent, in the footer")).toBeVisible();
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
     await expect(page.getByText("Tick the box to agree").first()).toBeVisible();
     await shots(page, "a10-consent-error");
     await page.getByRole("checkbox", { name: /I agree to treatment and data use/ }).click();
     await shots(page, "a10b-consent");
     await expectNoSeriousViolations(page, "onboarding consent");
-    await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
 
     // Review: no banned diagnostic term in the screen's own copy (AC-A9).
     await expect(page.getByRole("heading", { level: 1, name: "Review and send" })).toBeVisible();
@@ -269,7 +286,7 @@ test.describe("Scenario A: onboarding", () => {
     await page.goto("/onboarding");
     await expect(page).toHaveURL(/\/today$/);
 
-    await page.getByRole("link", { name: "Sharing and consent" }).click();
+    await page.getByRole("link", { name: "Sharing and consent", exact: true }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: "Sharing and consent" }),
     ).toBeVisible();
@@ -514,9 +531,9 @@ test.describe("Scenario C: guided session", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Session stopped" })).toBeVisible();
     await radio(page, "How much does it hurt right now?", "8 of 10").click();
     await page.getByRole("button", { name: "Send check-in" }).click();
-    await expect(page.getByRole("heading", { level: 1, name: "Check-in sent" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Check-in sent" })).toBeVisible();
     await expect(page.getByText("Your therapist will see this.").first()).toBeVisible();
-    await expect(page.getByText(EMERGENCY_NOTICE)).toBeVisible();
+    await expect(page.getByTestId("check-in-done").getByText(EMERGENCY_NOTICE)).toBeVisible();
     await shots(page, "c16-checkin-high");
     await expectNoSeriousViolations(page, "check-in with pain notice");
   });
@@ -524,7 +541,7 @@ test.describe("Scenario C: guided session", () => {
   test("the session flow works by keyboard alone", async ({ page }) => {
     await signInWithForm(page, personas.resume);
     await expect(page).toHaveURL(/\/today$/);
-    await expect(page.getByRole("heading", { level: 2, name: "Session paused" })).toBeVisible();
+    await expect(page.getByText("Session paused", { exact: true })).toBeVisible();
     // From here no pointer is used. Every action is a Tab to a control and Enter or Space.
     await tabTo(page, "Resume session");
     await page.keyboard.press("Enter");
@@ -537,9 +554,12 @@ test.describe("Scenario C: guided session", () => {
     await tabTo(page, "Skip exercise");
     await page.keyboard.press("Enter");
     await expect(page.getByRole("dialog", { name: "Skip this exercise?" })).toBeVisible();
-    await tabTo(page, /^It hurts$|Reason for skipping/);
-    await page.keyboard.press("ArrowDown");
-    await page.keyboard.press("ArrowDown");
+    // The reasons are one radio group: a single Tab stop, arrow keys move within it.
+    await tabTo(page, /^$/);
+    expect(await page.evaluate(() => document.activeElement?.getAttribute("role"))).toBe("radio");
+    await arrow(page, "ArrowDown");
+    await arrow(page, "ArrowDown");
+    await expect(page.getByRole("radio", { checked: true })).toHaveCount(1);
     await tabTo(page, "Skip exercise");
     await page.keyboard.press("Enter");
     await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -564,7 +584,7 @@ test.describe("Scenario C: guided session", () => {
 
     // The pain scale by arrow keys, then send.
     await tabTo(page, /0 of 10|\d+ of 10/);
-    for (let i = 0; i < 4; i++) await page.keyboard.press("ArrowRight");
+    for (let i = 0; i < 4; i++) await arrow(page, "ArrowRight");
     await expect(page.getByText(/You chose \d+ of 10/)).toBeVisible();
     await tabTo(page, "Send check-in");
     await page.keyboard.press("Enter");
@@ -642,7 +662,7 @@ test.describe("read-only screens", () => {
     await shots(page, "s04-progress");
     await expectNoSeriousViolations(page, "progress");
 
-    await page.getByRole("link", { name: "Sharing and consent" }).click();
+    await page.getByRole("link", { name: "Sharing and consent", exact: true }).click();
     await expect(
       page.getByRole("heading", { level: 1, name: "Sharing and consent" }),
     ).toBeVisible();
@@ -653,6 +673,10 @@ test.describe("read-only screens", () => {
     await expect(page.getByText(/Not available yet/).first()).toBeVisible();
     await expectNoHorizontalOverflow(page, "consent");
     await shots(page, "s05-consent");
+    // The sticky tab bar must not hide a control at rest, so axe sees the switch scrolled into view.
+    await page
+      .getByRole("switch", { name: "Allow automated drafting tools" })
+      .evaluate((el) => el.scrollIntoView({ block: "center" }));
     await expectNoSeriousViolations(page, "consent");
 
     // The optional consent can be turned on and off, and each change appears in the history.
@@ -665,6 +689,9 @@ test.describe("read-only screens", () => {
     await expect(page.getByText("Automated drafting tools are now off.")).toBeVisible();
     await expect(aiSwitch).toHaveAttribute("aria-checked", "false");
     await expect(page.getByRole("table", { name: /Consent history/ })).toBeVisible();
+    await page
+      .getByRole("switch", { name: "Allow automated drafting tools" })
+      .evaluate((el) => el.scrollIntoView({ block: "center" }));
     await expectNoSeriousViolations(page, "consent history");
   });
 

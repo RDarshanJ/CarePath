@@ -140,7 +140,10 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   const firstRender = useRef(true);
 
   useEffect(() => {
-    if (!firstRender.current) headingRef.current?.focus();
+    if (!firstRender.current) {
+      headingRef.current?.focus();
+      setSaveState("idle");
+    }
     firstRender.current = false;
   }, [stage]);
 
@@ -149,8 +152,11 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
   }, [errors]);
 
   const errorFor = (field: string) => errors.find((e) => e.field === field)?.message;
-  const patch = <K extends keyof OnboardingForm>(key: K, value: OnboardingForm[K]) =>
+  const patch = <K extends keyof OnboardingForm>(key: K, value: OnboardingForm[K]) => {
+    // "Saved" only ever describes what is on screen: an edit makes it stale until the next save.
+    setSaveState("idle");
     setForm((f) => ({ ...f, [key]: value }));
+  };
 
   const saveStep = useCallback(
     async (step: IntakeStep, current: OnboardingForm): Promise<boolean> => {
@@ -1125,11 +1131,11 @@ function ReviewStep({
   ];
   return (
     <div className="flex flex-col gap-5">
-      <dl className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface">
+      <ul className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface">
         {rows.map((r) => (
-          <div key={r.step} className="flex flex-col gap-1 p-4">
+          <li key={r.step} className="flex flex-col gap-1 p-4">
             <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-small font-medium text-ink-muted">{r.label}</dt>
+              <p className="text-small font-medium text-ink-muted">{r.label}</p>
               <Button
                 variant="quiet"
                 size="sm"
@@ -1139,10 +1145,10 @@ function ReviewStep({
                 Change
               </Button>
             </div>
-            <dd className="text-body">{r.value}</dd>
-          </div>
+            <p className="text-body">{r.value}</p>
+          </li>
         ))}
-      </dl>
+      </ul>
       <p className="max-w-measure text-body text-ink-muted">
         These are your own answers, in your own words. Your therapist will go through them with you
         at your first visit.

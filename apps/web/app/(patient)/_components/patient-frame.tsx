@@ -46,7 +46,7 @@ export function ContactCareTeam({ clinic }: { clinic: ClinicCard }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm" iconLeft="phone">
+        <Button variant="secondary" size="sm">
           Contact care team
         </Button>
       </DialogTrigger>
@@ -105,7 +105,7 @@ export function PatientFrame({ organizationName, clinic, variant, children }: Pa
     <div className="flex min-h-0 flex-1 flex-col bg-bg">
       <SkipLink />
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-gutter py-3">
+        <div className="mx-auto flex w-full max-w-2xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 sm:px-gutter">
           {variant === "focus" ? (
             <NextLink
               href="/today"
@@ -123,12 +123,16 @@ export function PatientFrame({ organizationName, clinic, variant, children }: Pa
           </div>
         </div>
       </header>
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-2xl flex-1 px-gutter py-6">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 sm:px-gutter"
+      >
         {children}
       </main>
       {variant === "app" ? (
         <>
-          <footer className="mx-auto w-full max-w-2xl px-gutter pb-6 text-small text-ink-muted">
+          <footer className="mx-auto w-full max-w-2xl px-4 pb-6 sm:px-gutter text-small text-ink-muted">
             <p>
               {organizationName}.{" "}
               <NextLink
