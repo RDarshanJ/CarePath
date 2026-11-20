@@ -135,11 +135,11 @@ function request(op: Op, ids: Ids) {
     if (!value) throw new Error(`${op.key}: no fixture for path parameter {${p}}`);
     url = url.replace(`{${p}}`, value);
   }
-  let payload: unknown;
+  let payload: Record<string, unknown> | undefined;
   if (op.hasBody) {
     const bodies = bodyFor(ids);
     if (!(op.key in bodies)) throw new Error(`${op.key}: no request body fixture`);
-    payload = bodies[op.key];
+    payload = bodies[op.key] as Record<string, unknown>;
   }
   return { method: op.method.toUpperCase() as "GET", url, payload };
 }
