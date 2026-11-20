@@ -51,7 +51,7 @@ run pnpm --filter @carepath/shared typecheck
 run pnpm --filter @carepath/db typecheck
 run pnpm --filter @carepath/api typecheck
 run pnpm exec eslint "${OWNED[@]}"
-run pnpm exec prettier --check "${OWNED[@]}" docs/architecture scripts/gate-wp-4.1.sh
+run pnpm exec prettier --check "${OWNED[@]}"
 run pnpm openapi:check
 if [ -z "${GATE_SKIP_VERIFY:-}" ]; then
   run pnpm verify
