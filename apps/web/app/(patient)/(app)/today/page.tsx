@@ -15,6 +15,14 @@ import {
 } from "../../_lib/data";
 import { formatInstantDate, formatLocalDate, plural } from "../../_lib/format";
 import { nextScheduledDay, todaysItems } from "../../_lib/plan";
+import {
+  daysBetweenLocal,
+  firstPart,
+  formatClock,
+  formatRange,
+  typeLabels,
+  zoneName,
+} from "../../_lib/scheduling";
 import { ContactCareTeam } from "../../_components/patient-frame";
 
 export const metadata = { title: "Today | CarePath" };
@@ -63,6 +71,12 @@ export default async function TodayPage() {
   const checkInDue = today.checkIn.due;
   const awaiting = today.patient.status === "awaiting_assignment";
   const week = today.week;
+  const visitAndMessages = (
+    <>
+      <NextVisit today={today} />
+      <MessagesNote today={today} />
+    </>
+  );
   const weekTarget = Math.max(week.assignedSessions, week.completedSessions, 1);
 
   return (
@@ -83,6 +97,8 @@ export default async function TodayPage() {
       />
 
       {changeView}
+
+      {today.plan ? null : visitAndMessages}
 
       {today.plan ? (
         <>
@@ -121,6 +137,8 @@ export default async function TodayPage() {
             )}
           </Section>
 
+          {visitAndMessages}
+
           <Section id="week-heading" title="This week">
             <Progress
               label={`Sessions, week of ${formatLocalDate(week.weekStart, "short")}`}
@@ -157,10 +175,10 @@ export default async function TodayPage() {
               <TextLink href="/plan">View full care plan</TextLink>
             </p>
           </Section>
-
-          <Reminders today={today} plan={plan} />
         </>
       ) : null}
+
+      <Reminders today={today} plan={plan} />
     </div>
   );
 }
@@ -312,12 +330,79 @@ function Hero({
   );
 }
 
+function NextVisit({ today }: { today: TodayView }) {
+  const next = today.nextAppointment;
+  if (!next) {
+    return (
+      <Section id="visit-heading" title="Next appointment">
+        <p className="text-body text-ink-muted">No visit is booked.</p>
+        <p>
+          <TextLink href="/appointments/book">Book a visit</TextLink>
+        </p>
+      </Section>
+    );
+  }
+  const timezone = today.timezone;
+  const diff = daysBetweenLocal(today.date, next.date);
+  return (
+    <Section id="visit-heading" title="Next appointment">
+      <div className="flex flex-col gap-1 text-body">
+        <p className="font-medium">
+          {diff === 0 ? "Today" : diff === 1 ? "Tomorrow" : formatLocalDate(next.date)},{" "}
+          {formatRange(next.startsAt, next.endsAt, timezone)}
+        </p>
+        <p className="text-ink-muted">
+          {typeLabels[next.type]} with {firstPart(next.practitioner.name)}. Times are in{" "}
+          {zoneName(timezone, next.startsAt)}.
+        </p>
+      </div>
+      <p>
+        <TextLink href="/appointments">See appointments</TextLink>
+      </p>
+    </Section>
+  );
+}
+
+function MessagesNote({ today }: { today: TodayView }) {
+  const { unreadCount } = today.messages;
+  return (
+    <Section id="messages-heading" title="Messages">
+      <p className="flex items-start gap-2 text-body">
+        {unreadCount > 0 ? (
+          <>
+            <Icon name="message" size={20} className="mt-0.5 shrink-0 text-primary" />
+            <span className="font-medium">
+              {unreadCount === 1
+                ? "1 unread message from your care team."
+                : `${unreadCount} unread messages from your care team.`}
+            </span>
+          </>
+        ) : (
+          <span className="text-ink-muted">No new messages from your care team.</span>
+        )}
+      </p>
+      <p>
+        <TextLink href="/messages">{unreadCount > 0 ? "Read messages" : "Open messages"}</TextLink>
+      </p>
+    </Section>
+  );
+}
+
 function Reminders({ today, plan }: { today: TodayView; plan: CarePlanView | null }) {
   const state = today.session.state;
   const items: string[] = [];
   if (plan && (state === "done" || state === "not_scheduled")) {
     const next = nextScheduledDay(plan, today.date);
     if (next) items.push(`Next scheduled session: ${next}.`);
+  }
+  const next = today.nextAppointment;
+  if (next && next.status === "booked") {
+    const diff = daysBetweenLocal(today.date, next.date);
+    if (diff === 0 || diff === 1) {
+      items.push(
+        `Appointment reminder: your visit is ${diff === 0 ? "today" : "tomorrow"} at ${formatClock(next.startsAt, today.timezone)}.`,
+      );
+    }
   }
   if (today.checkIn.due && today.checkIn.sessionId === null && state === "due") {
     items.push("A check-in is waiting. You can add it before or after your session.");

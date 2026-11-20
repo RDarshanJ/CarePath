@@ -1,7 +1,11 @@
 import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
 import {
+  appointmentPageSchema,
+  careTeamCardSchema,
   carePlanVersionDetailSchema,
+  conversationPageSchema,
+  messagePageSchema,
   carePlanVersionListSchema,
   clinicCardSchema,
   consentListSchema,
@@ -75,4 +79,24 @@ export const getVersionDetail = cache((patientId: string, versionId: string) =>
 
 export const getVersionList = cache((patientId: string) =>
   serverGet(`/patients/${patientId}/care-plan/versions`, carePlanVersionListSchema),
+);
+
+/** Phase 4: appointments, care team and conversations, again straight from the API. */
+export const getCareTeam = cache((patientId: string) =>
+  serverGet(`/patients/${patientId}/care-team`, careTeamCardSchema),
+);
+
+export const getAppointments = cache((patientId: string, when: "upcoming" | "past") =>
+  serverGet(
+    `/patients/${patientId}/appointments?when=${when}&limit=${when === "past" ? 50 : 25}`,
+    appointmentPageSchema,
+  ),
+);
+
+export const getConversations = cache(() =>
+  serverGet("/conversations?limit=25", conversationPageSchema),
+);
+
+export const getMessages = cache((conversationId: string, limit: number) =>
+  serverGet(`/conversations/${conversationId}/messages?limit=${limit}`, messagePageSchema),
 );

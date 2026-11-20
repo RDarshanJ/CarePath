@@ -85,10 +85,15 @@ for (const role of roles) {
     await expectNoSeriousViolations(page, `${role} home ${account.home}`);
     await shot(page, `${account.shell}-${role}`, width);
 
-    // Navigation shows only what works in this phase.
+    // Navigation: the four patient destinations.
     if (account.shell === "patient") {
       const nav = page.getByRole("navigation", { name: "Patient" });
-      await expect(nav.getByRole("link")).toHaveText(["Today", "Progress"]);
+      await expect(nav.getByRole("link")).toHaveText([
+        "Today",
+        "Progress",
+        "Appointments",
+        /^Messages/,
+      ]);
       await nav.getByRole("link", { name: "Progress" }).click();
       await expect(page).toHaveURL(/\/progress$/);
       await expect(nav.getByRole("link", { name: "Progress" })).toHaveAttribute(

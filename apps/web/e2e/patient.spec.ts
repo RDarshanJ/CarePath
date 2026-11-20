@@ -612,7 +612,12 @@ test.describe("read-only screens", () => {
       page.getByText("Demonstration product. Synthetic data. Not for clinical use."),
     ).toBeVisible();
     const nav = page.getByRole("navigation", { name: "Patient" });
-    await expect(nav.getByRole("link")).toHaveText(["Today", "Progress"]);
+    await expect(nav.getByRole("link")).toHaveText([
+      "Today",
+      "Progress",
+      "Appointments",
+      /^Messages/,
+    ]);
     await expectNoHorizontalOverflow(page, "today");
     if (wide) await shots(page, "s01-today");
     await expectNoSeriousViolations(page, "today");
