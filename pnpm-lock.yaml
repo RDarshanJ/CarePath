@@ -38,6 +38,9 @@ importers:
       '@carepath/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@carepath/fhir':
+        specifier: workspace:*
+        version: link:../../packages/fhir
       '@carepath/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -205,6 +208,16 @@ importers:
         version: 4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   packages/fhir:
+    dependencies:
+      '@medplum/core':
+        specifier: 5.2.18
+        version: 5.2.18
+      '@medplum/definitions':
+        specifier: 5.2.18
+        version: 5.2.18
+      '@medplum/fhirtypes':
+        specifier: 5.2.18
+        version: 5.2.18
     devDependencies:
       '@carepath/config':
         specifier: workspace:*
@@ -215,6 +228,9 @@ importers:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   packages/shared:
     dependencies:
@@ -804,6 +820,23 @@ packages:
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
+
+  '@medplum/core@5.2.18':
+    resolution: {integrity: sha512-O1pOnBmgAPIM7v1xB9Wl2Lc9ssnLrUapQRmPQ2DQYngvWtfA9kSZ9chHDj1/u6XvIwsuGdq+xSwMogqgJtQHiw==}
+    engines: {node: ^22.18.0 || >=24.2.0}
+    peerDependencies:
+      pdfmake: ^0.2.5
+    peerDependenciesMeta:
+      pdfmake:
+        optional: true
+
+  '@medplum/definitions@5.2.18':
+    resolution: {integrity: sha512-zwF7m9hu5y2tCgE3N5uZJiMc/HL3Kwy0SZPwVMd3VEiyF1UdlzTTi91ZLls1aAMfHpzwulqEpix5jYlSvIoaCw==}
+    engines: {node: ^22.18.0 || >=24.2.0}
+
+  '@medplum/fhirtypes@5.2.18':
+    resolution: {integrity: sha512-BqCFQ59JlUEmb3wi3ERbrr6mSwRUlI1iQ9mbGtGLEs9aUWDWWfAnkFjfqoDeIktA0uPS5S4B2CEgoduFHOTWKQ==}
+    engines: {node: ^22.18.0 || >=24.2.0}
 
   '@napi-rs/wasm-runtime@1.2.6':
     resolution: {integrity: sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==}
@@ -3505,6 +3538,12 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.6.0
 
   '@lukeed/ms@2.0.2': {}
+
+  '@medplum/core@5.2.18': {}
+
+  '@medplum/definitions@5.2.18': {}
+
+  '@medplum/fhirtypes@5.2.18': {}
 
   '@napi-rs/wasm-runtime@1.2.6(@emnapi/core@2.0.0-beta.2)(@emnapi/runtime@2.0.0-beta.2)':
     dependencies:
