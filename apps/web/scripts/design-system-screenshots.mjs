@@ -78,7 +78,7 @@ try {
         .filter((f) => f.status === "loaded")
         .map((f) => `${f.family} ${f.weight}`),
     );
-    for (const need of ["IBM Plex Sans 400", "IBM Plex Mono 400", "Source Serif 4 600"]) {
+    for (const need of ["IBM Plex Sans 400", "IBM Plex Sans 600", "IBM Plex Mono 400"]) {
       if (!fonts.includes(need)) problems.push(`font not loaded: ${need}`);
     }
 

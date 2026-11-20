@@ -88,9 +88,13 @@ const swatchOrder = [
   "surface-sunken",
   "ink",
   "ink-muted",
+  "ink-subtle",
   "primary",
   "primary-hover",
   "primary-subtle",
+  "link",
+  "selected-bg",
+  "selected-ink",
   "border",
   "border-control",
   "focus",
@@ -100,9 +104,25 @@ const swatchOrder = [
   "warning-bg",
   "error-ink",
   "error-bg",
+  "critical-solid",
+  "critical-subtle-bg",
   "info-ink",
   "info-bg",
+  "neutral-ink",
+  "neutral-bg",
+  "ai-bg",
+  "ai-ink",
   "ai-rule",
+  "accent",
+  "accent-subtle",
+  "chart-1",
+  "chart-2",
+  "chart-3",
+  "chart-4",
+  "chart-5",
+  "chart-6",
+  "chart-7",
+  "chart-8",
 ] as const;
 
 function Swatches({ theme }: { theme: ThemeName }) {
@@ -217,7 +237,7 @@ export default function DesignSystemPage() {
         <Section
           id="colour"
           title="Colour"
-          intro="Semantic roles, not raw values. Forest is used only for the primary action and selection. Blue is reserved for focus and information. No gradients, no purple."
+          intro="Semantic roles, not raw values. Cobalt is for actions, links and selection. Status colours are never cobalt. Generated content is graphite. No purple or magenta, no warm neutrals, no gradients."
         >
           <Specimen title="Roles">{(t) => <Swatches theme={t} />}</Specimen>
           <Specimen title="Contrast, computed from the tokens by the unit test">
@@ -228,7 +248,7 @@ export default function DesignSystemPage() {
         <Section
           id="type"
           title="Type"
-          intro="IBM Plex Sans for interface text, IBM Plex Mono for IDs, timestamps and dosage-like figures, Source Serif 4 for patient headings only. Numerals are tabular in tables and charts."
+          intro="IBM Plex Sans 400, 500 and 600, with 400 italic, for all text and headings in both themes. IBM Plex Mono 400 for identifiers. The themes differ in size and density, not typeface. Numerals are tabular in tables and charts."
         >
           <Specimen>
             <div className="flex flex-col gap-3">

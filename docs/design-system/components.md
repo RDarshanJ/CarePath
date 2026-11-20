@@ -5,7 +5,7 @@ All components are exported from `@carepath/ui`, live in `packages/ui/src/compon
 ## Button, IconButton
 
 - Anatomy: optional left icon, label, optional right icon. Loading replaces content with a spinner and the loading label and keeps the width.
-- Variants: `primary` (forest fill), `secondary` (surface with control border), `quiet` (text only, subtle fill on hover), `danger` (solid error colour; use for the confirming action of a destructive dialog). Sizes `md` (theme control height) and `sm` (24 px clinician, 48 px patient).
+- Variants: `primary` (cobalt fill), `secondary` (surface with control border), `quiet` (text only, subtle fill on hover), `danger` (solid error colour; use for the confirming action of a destructive dialog). Sizes `md` (theme control height) and `sm` (24 px clinician, 48 px patient).
 - States: default, hover, focus-visible (2 px ring, 2 px offset), pressed, disabled, loading (`aria-busy`, presses ignored).
 - A11y: native `button`, default `type="button"`. `IconButton` requires `label`, which becomes `aria-label`. Targets are at least the theme minimum.
 - Usage: one primary per screen. Prefer a word over an icon. Do not use danger for navigation.
@@ -33,7 +33,7 @@ All components are exported from `@carepath/ui`, live in `packages/ui/src/compon
 
 ## Tabs
 
-- Anatomy: tab list with a bottom rule, triggers, panels. Selected: 2 px forest bar, semibold, ink text.
+- Anatomy: tab list with a bottom rule, triggers, panels. Selected: 2 px primary bar, semibold, ink text.
 - States: default, hover, selected, focus, disabled. A11y: Radix Tabs (roving tabindex, arrow keys, `aria-selected`).
 
 ## BottomTabBar, SideNav, CountBadge
@@ -67,13 +67,13 @@ All components are exported from `@carepath/ui`, live in `packages/ui/src/compon
 
 ## AIDraftBlock, EvidenceRef
 
-- Anatomy: left rule, label, provider name in mono, content, actions. Draft: dashed 3 px rule, "Draft, generated, not reviewed". Approved: solid forest rule, "Generated, reviewed and approved by {reviewer}", provider kept. Rejected: "Draft rejected, not used", struck-through content.
+- Anatomy: left rule, label, provider name in mono, content, actions. Draft: `ai-bg` graphite tint, dashed 3 px `ai-rule`, "Draft, generated, not reviewed". Approved: solid primary rule, "Generated, reviewed and approved by {reviewer}", provider kept. Rejected: "Draft rejected, not used", struck-through content.
 - A11y: a `section` labelled with the state. EvidenceRef is a 24 px button named "Open evidence N"; the panel it opens is a `DrawerContent`.
 - Usage: provider text is the stored provider name, for example "Demo provider, rule-based". No sparkle or glow. A rule-based provider is never described as a live model.
 
 ## Dialog, DrawerContent, Popover, Tooltip, DropdownMenu, Toast
 
-- The only elements with a shadow. All render through a portal wrapped in `ThemeWrap`, scrim `rgb(23 32 29 / 0.5)`. Motion is 120 to 200 ms and removed under reduced motion.
+- The only elements with a shadow. All render through a portal wrapped in `ThemeWrap`, scrim `rgb(23 43 77 / 0.5)`. Motion is 120 to 200 ms and removed under reduced motion.
 - Dialog: title, optional description, body, right-aligned footer with the primary action last. Radix Dialog traps focus, restores it on close, and closes on Escape.
 - Drawer: `side="right"` for the clinician evidence panel and filters, `side="bottom"` for patient sheets such as "Stop this session?".
 - Popover: short optional explanation ("Why we ask"). Tooltip: supplementary only, never the sole carrier of information, and must not be the only label of an icon button (use `IconButton label`). DropdownMenu: items at the theme target height, checkbox items, danger item, disabled item with a reason in its label.

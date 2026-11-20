@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Heading, Mono, ThemeScope, density, type ThemeName } from "@carepath/ui";
 
 const meta: Record<ThemeName, string> = {
-  patient: `Patient theme. Body ${density.patient.text.body.join("/")}, targets ${density.patient["target-min"]} px, Source Serif 4 headings.`,
+  patient: `Patient theme. Body ${density.patient.text.body.join("/")}, targets ${density.patient["target-min"]} px, IBM Plex Sans headings.`,
   clinician: `Clinician and admin theme. Body ${density.clinician.text.body.join("/")}, tables ${density.clinician.text.table.join("/")}, targets ${density.clinician["target-min"]} px, rows ${density.clinician["row-h"]} px.`,
 };
 
