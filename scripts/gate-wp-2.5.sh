@@ -8,6 +8,6 @@ pnpm --filter @carepath/ui typecheck
 pnpm --filter @carepath/web typecheck
 pnpm exec eslint packages/ui apps/web
 pnpm exec prettier --check packages/ui apps/web docs/design-system
-pnpm --filter @carepath/web build
-pnpm --filter @carepath/web screenshots
+# The web build and `next start` share apps/web/.next, so they run under the web lock (C1, section 4).
+scripts/with-web-lock.sh sh -c 'pnpm --filter @carepath/web build && pnpm --filter @carepath/web screenshots'
 echo "WP 2.5 gate: PASSED"

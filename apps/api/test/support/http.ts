@@ -10,6 +10,8 @@ export function testApp(db: Db, options: BuildAppOptions = {}): Promise<FastifyI
     db,
     ...options,
     config: {
+      // Pinned so a gate's CORS_ORIGINS (scripts/gate-env.sh) does not change test behaviour.
+      allowedOrigins: [ORIGIN],
       rateLimit: { globalPerMinute: 10_000, loginPerMinute: 10 },
       ...options.config,
     },
