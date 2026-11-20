@@ -14,10 +14,11 @@ Date: 2026-11-19. Synthetic data only; not for clinical use.
 - WP 3.0 C1 must-fixes M1 to M7 plus the fixed-clock hook (gate output below).
 - WP 3.1 API for Scenarios A to D: 51 operations (39 with an id in the path), contracts in `@carepath/shared/contracts`, job handlers for time-based rules and session abandonment, M8 enumeration test as the hard gate (gate output below).
 - WP 3.2a Web foundation: `/api` rewrite, typed API helpers, TanStack Query provider, sign-in with demo mode, sign-out, role-guarded patient/clinician/admin shells, apps/web ESLint style ban, end-to-end stage in `pnpm verify` (gate output below).
+- WP 3.2b Patient experience: onboarding (account, code, nine steps, consent, review), Today, guided session with persistence and stop flow, Progress with SVG charts and table alternatives, Sharing and consent, care plan (gate output below).
 
 ## Outstanding
 
-- WP 3.2b and 3.3, per C1 section 5. Route table: `docs/architecture/api-phase3.md`.
+- WP 3.3 is committed by its own worker; WP 3.2b is listed above. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
 - PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
@@ -416,3 +417,30 @@ Deviations and notes:
 - Below 1280px the exercise library and the review task detail open as drawers.
 - The shell's left rail (`components/shells.tsx`, owned by 3.2a) is not sticky and scrolls away on long pages. Not edited.
 - The cross-role test changes only Noel Noaipatient's data. Scenario D adds one check-in for Noel. Other tests choose patients by rule, because seed names vary between runs.
+
+### WP 3.2b
+
+Command: `scripts/gate-wp-3.2b.sh` (exit 0). Output tail:
+
+```
+  ✓   7 [mobile-390] › e2e/patient.spec.ts:627:3 › read-only screens › progress, plan, consent and the contact card, with axe (10.3s)
+  ✓   8 [mobile-390] › e2e/patient.spec.ts:698:3 › read-only screens › a signed-out visitor can open onboarding and nothing else in the patient app (1.7s)
+  -   9 [desktop-1440] › e2e/patient.spec.ts:74:3 › Scenario A: onboarding › a new patient completes onboarding with a code, with resume, validation and consent
+  -  10 [desktop-1440] › e2e/patient.spec.ts:299:3 › Scenario A: onboarding › a returning patient resumes at the first open step with earlier steps intact
+  -  11 [desktop-1440] › e2e/patient.spec.ts:329:3 › Scenario C: guided session › Today leads with one action; the session completes, resumes after reload and ends with a check-in
+  -  12 [desktop-1440] › e2e/patient.spec.ts:483:3 › Scenario C: guided session › Stop, this hurts ends the session, shows the clinic notice and asks for a pain report
+  -  13 [desktop-1440] › e2e/patient.spec.ts:541:3 › Scenario C: guided session › the session flow works by keyboard alone
+  -  14 [desktop-1440] › e2e/patient.spec.ts:600:3 › read-only screens › Today at 200 percent zoom keeps its action and does not scroll sideways
+  ✓  15 [desktop-1440] › e2e/patient.spec.ts:627:3 › read-only screens › progress, plan, consent and the contact card, with axe (10.8s)
+  ✓  16 [desktop-1440] › e2e/patient.spec.ts:698:3 › read-only screens › a signed-out visitor can open onboarding and nothing else in the patient app (1.6s)
+
+  6 skipped
+  10 passed (1.5m)
+
+WP 3.2b gate: PASSED
+db: stopped
+db: lease 14915 released
+exit=0
+```
+
+Screenshots: `docs/screenshots/3.2b/` (390 and 1440). Open item: CR-4 in `docs/decisions/contract-requests.md`.

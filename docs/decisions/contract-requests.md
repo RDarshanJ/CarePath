@@ -51,3 +51,13 @@ Copy this block to the end of the file and fill every line.
 - Why: REQ-DIR-01 and interaction principle 11 ask for a visible count. Cursor pages cannot say "21 to 40 of 312", so the footer says "Page 2, 25 patients shown, more on the next page". Not a blocker.
 - Status: open
 - Answer:
+
+### CR-4: Exercise illustrations for the patient session
+
+- Requested by: WP 3.2b, 2026-11-20
+- Screen or test: `(patient)/session/[sessionId]`, `(patient)/plan`
+- Endpoint and contract: `ExerciseSessionDetail.activities[].exercise.mediaPath`
+- What is missing: `mediaPath` is null for every seeded exercise and there is no route that serves exercise images or video.
+- Why: REQ-SES asks for a picture or short clip beside the written steps. The session shows the written steps only, with no empty image box. Not a blocker.
+- Status: open
+- Answer:
