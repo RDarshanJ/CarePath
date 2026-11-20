@@ -31,14 +31,14 @@ Envelope: `ErrorEnvelope` (`{ "error": { "code", "message", "details"? } }`). Th
 | `already_exists` | 409 | Unique key taken (23505), for example a second open session or a concurrent publish | exists (M5) |
 | `invalid_transition` | 409 | Status change not allowed (CP001) | exists (M5) |
 | `rule_violation` | 409 | Domain rule enforced by trigger (CP003), for example a parent of another patient | exists (M5) |
-| `eligibility_code_invalid` | 400 | Code unknown, used or expired. One code for all three, so codes cannot be probed | add in WP 3.1 |
-| `account_exists` | 409 | Email already registered | add in WP 3.1 |
-| `intake_incomplete` | 409 | Submit with required answers or the required consent missing; `details` list the missing steps | add in WP 3.1 |
-| `consent_required_type` | 409 | A patient tried to revoke the required consent (Q4: withdrawn through the clinic) | add in WP 3.1 |
-| `draft_stale` | 409 | Publish or autosave against an older draft than the stored one | add in WP 3.1 |
-| `session_open` | 409 | Start while another session is in progress or paused; `details` carry no id, the client re-reads Today | add in WP 3.1 |
-| `session_closed` | 409 | Action on a completed, abandoned or stopped session | add in WP 3.1 |
-| `plan_not_published` | 409 | Session start for a patient with no published plan version | add in WP 3.1 |
+| `eligibility_code_invalid` | 400 | Code unknown, used or expired. One code for all three, so codes cannot be probed | exists (WP 3.1) |
+| `account_exists` | 409 | Email already registered | exists (WP 3.1) |
+| `intake_incomplete` | 409 | Submit with required answers or the required consent missing; `details` list the missing steps | exists (WP 3.1) |
+| `consent_required_type` | 409 | A patient tried to revoke the required consent (Q4: withdrawn through the clinic) | exists (WP 3.1) |
+| `draft_stale` | 409 | Publish or autosave against an older draft than the stored one | exists (WP 3.1) |
+| `session_open` | 409 | Start while another session is in progress or paused; `details` carry no id, the client re-reads Today | exists (WP 3.1) |
+| `session_closed` | 409 | Action on a completed, abandoned or stopped session | exists (WP 3.1) |
+| `plan_not_published` | 409 | Session start for a patient with no published plan version | exists (WP 3.1) |
 
 ## 3. Existing routes (WP 2.4)
 
@@ -139,6 +139,11 @@ All request and response names above become Zod schemas in `packages/shared/src/
 - Review tasks carry `value`, `threshold`, `unit`, `sources[]` (type, id, field, `apiPath`) next to the explanation sentence.
 - Cursors are opaque strings. Clients pass `nextCursor` back unchanged and never build one.
 - Plan-change acknowledgement is stored as the read time of the patient's `care_plan_published` notification for that version.
+- Review task assign sets `in_review` when a practitioner is given and `open` when unassigned (the PRD's "assigned" state, C1 ruling 3.7).
+- `GET /review-tasks` and `ReviewTaskPage` carry `lastCheckedAt` (when the queue was read) and `rulesLastRunAt` (last successful time-rule job for the organization, or null).
+- Body ids that do not belong to the caller's scope (`sessionId` in a check-in, `activityId` in a stop, exercise and goal ids in a draft, `practitionerId` in assign) answer 400 `validation_error` on that path; path ids answer 404 (rule 5).
+- Time-based rules and abandonment run every 15 minutes per organization (queues `review.time_rules`, `sessions.abandon_idle`), enqueued by the API process with a dedupe key per slot; `pnpm jobs:drain` runs them by hand.
+- Implemented in WP 3.1: every route in sections 4 to 6 (51 operations in `apps/api/openapi.json`, 39 with an id in the path, all enumerated by the M8 test).
 
 ## 9. Gate ports (C1 section 4)
 

@@ -12,11 +12,12 @@ Date: 2026-11-19. Synthetic data only; not for clinical use.
 - WP 2.2 Tooling probe (`docs/decisions/tooling-probe.md`). Accepted at checkpoint C1. Failures are recorded there as failures: the Playwright browser download and the HL7 packages are blocked; system Chrome 153 with Playwright 1.65.1 is an unverified version pairing.
 - Checkpoint C1 (`docs/decisions/checkpoint-c1.md`): go for Phase 3, conditional on WP 3.0.
 - WP 3.0 C1 must-fixes M1 to M7 plus the fixed-clock hook (gate output below).
+- WP 3.1 API for Scenarios A to D: 51 operations (39 with an id in the path), contracts in `@carepath/shared/contracts`, job handlers for time-based rules and session abandonment, M8 enumeration test as the hard gate (gate output below).
 - WP 3.2a Web foundation: `/api` rewrite, typed API helpers, TanStack Query provider, sign-in with demo mode, sign-out, role-guarded patient/clinician/admin shells, apps/web ESLint style ban, end-to-end stage in `pnpm verify` (gate output below).
 
 ## Outstanding
 
-- WP 3.1 (API for Scenarios A to D, with the M8 enumeration test as a hard gate), WP 3.2a, 3.2b and 3.3, per C1 section 5. Route table: `docs/architecture/api-phase3.md`.
+- WP 3.2b and 3.3, per C1 section 5. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
 - PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
@@ -142,7 +143,7 @@ Notes and deviations:
 - The small profile has 2 coordinators and 2 administrators (one each per organization) in addition to the 6 therapists. Besides the four required accounts in organization 1 and the one in organization 2, the seed adds four scenario personas (resume, intake, noai, flare) so Scenarios A, C, D and F have a fixed account each.
 - Clinic time zones are chosen without daylight saving (Phoenix, Honolulu, Regina, Puerto Rico) so local-hour arithmetic is a fixed offset.
 - The "seeded now" is fixed, so as real time moves on, bookings after the anchor are in the past. Re-run `pnpm db:seed` (or pass `--anchor`) for a different fixed instant.
-- Provisional shapes: `AIGeneration.output` and `input` JSON for note drafts and progress summaries, `IntakeAssessment.answers` and `ReviewRule.params` are plausible shapes, not the Zod contracts of WP 3.1 and 5.1. Regenerate the seed when those contracts land. `CarePlan.draftContent` is left null for the same reason.
+- Provisional shapes: `AIGeneration.output` and `input` JSON for note drafts and progress summaries, `IntakeAssessment.answers` and `ReviewRule.params` are plausible shapes, not the Zod contracts of WP 3.1 and 5.1. Regenerate the seed when those contracts land. `CarePlan.draftContent` is left null for the same reason. (WP 3.1: `IntakeAssessment.answers` and review task evidence now follow the contracts and `ReviewRule.params` already matched them; the AI shapes wait for WP 5.1.)
 - Edge-case minimums (one dead job, a failed message, a patient without AI consent, and so on) are asserted by the integrity checks. Most hold structurally for any seed; a few (for example cancellations by the clinic) hold for the default seed and nearly every other seed tried.
 - `scripts/gate-wp-2.6.sh` seeds a scratch database, not the shared development database, and stops the cluster only if it started it, because other work packages may be using it. `pnpm verify` seeds the shared database as the plan requires.
 
@@ -271,6 +272,91 @@ Notes and deviations:
 - API tests pin `allowedOrigins` so a gate's `CORS_ORIGINS` does not change them.
 - Prisma interactive transactions over `@prisma/adapter-pg` 7.10.1 print a `pg` deprecation warning ("client.query() when the client is already executing a query") from inside Prisma's query interpreter. Queries are still queued in order under `pg` 8; `pg` 9 removes that queueing, so a `pg` upgrade needs a Prisma adapter that awaits each query.
 - Not done: no Next.js rewrite or web code (owned by WP 3.2a); no Phase 3 endpoints or their contracts beyond the names in the route table (WP 3.1); CI still never run.
+
+### WP 3.1 (API for Scenarios A to D)
+
+Scope: `packages/shared/src/contracts/**` (all Phase 3 contracts, error codes), `packages/shared/src/copy.ts` (exercise notice, pain notice), `packages/db/src/status.ts` (`initialStatus`), `packages/db/seed` (intake answers and task evidence in contract shapes), `packages/db/test/initial-status.test.ts`, `apps/api/**` (modules today, care-plans, sessions, check-ins, progress, clinic, overview, records, exercises, review, onboarding, intake, consents, care-team; core time, pagination, people, scope helpers, auth `openSession`; job handlers and scheduler), `apps/api/openapi.json`, `scripts/gate-wp-3.1.sh`, `docs/architecture/api-phase3.md`. Commands: `scripts/gate-wp-3.1.sh` (exit 0) and `pnpm verify` (exit 0).
+
+Endpoints, in delivery order (commits f73b0a7 contracts, 2579ef4, 1879658, 637a6fd, 793c95a, dfb31de, cd901ef, dfceaf7):
+
+1. Patient reads: `GET /patients/:id/today`, `/care-plan`, `/care-plan/versions`, `/care-plan/versions/:versionId`, `POST .../versions/:versionId/acknowledge`, `GET /sessions`, `/sessions/:sessionId`, `/check-ins`, `/check-ins/:checkInId`, `/progress`, `/clinic`.
+2. Session and check-in writes: `POST /sessions` (start), `/sessions/:id/pause`, `/resume`, `PUT /sessions/:id/activities/:activityId` (complete or skip with reason), `POST /sessions/:id/stop` (stopped for discomfort), `/complete`, `POST /check-ins` (pain Observation and the pain rule in one transaction).
+3. Clinician reads: `GET /overview`, `/patients` (directory), `/patients/:id/timeline`, `/record-history`, `/exercises`, `/review-tasks`, `/patients/:id/review-tasks`.
+4. Plan builder: `GET|PUT /patients/:id/care-plan/draft`, `GET .../draft/preview`, `POST .../publish`.
+5. Review: `POST /patients/:id/review-tasks/:taskId/assign|resolve|dismiss`, `POST /patients/:id/check-ins/:checkInId/review`, `GET /review-rules`, `PUT /review-rules/:ruleId`; job queues `review.time_rules`, `sessions.abandon_idle`.
+6. Onboarding: `POST /onboarding/accounts`, `GET /patients/:id/intake`, `PUT .../intake/steps/:step`, `POST .../intake/submit`, `GET|POST /patients/:id/consents`, `POST .../consents/:consentId/revoke`, `GET /practitioners`, `GET /patients/:id/care-team`, `POST .../care-team/assignments`.
+
+`scripts/gate-wp-3.1.sh` (exit 0). Tail:
+
+```
+==> seed (small profile)
+integrity checks: 72 passed
+content-hash: 1efaec778240da9c9f4a9aa3379b5e8c40dec9cf2b5b47cf1271257952c9f407
+==> typecheck (shared, db, api)
+==> lint (paths owned by WP 3.1)
+==> format (paths owned by WP 3.1)
+All matched files use Prettier code style!
+==> db tests
+ Test Files  6 passed (6)
+      Tests  61 passed (61)
+==> API tests
+ Test Files  22 passed (22)
+      Tests  160 passed (160)
+==> OpenAPI check
+openapi: valid OpenAPI 3.1.0, 51 operations, house rules pass
+WP 3.1 gate: PASSED
+db: lease 12103 released
+```
+
+`pnpm verify` (exit 0), run on a clean worktree of commit d531739 because WP 3.2b and 3.3 had uncommitted edits in the shared checkout (one of them failed lint there). Tail:
+
+```
+packages/ui test:       Tests  106 passed (106)
+packages/db test:       Tests  61 passed (61)
+apps/api test:       Tests  160 passed (160)
+==> build
+==> end-to-end (API + next start + Playwright + axe)
+  26 passed (41.2s)
+verify: PASSED
+db: lease 13986 released
+```
+
+API tests added (99 of the 160): `test/phase3/patient-reads` 11, `sessions` 13, `clinician-reads` 11, `care-plan` 13, `review` 11, `onboarding` 10, `m8-enumeration` 5 (each enumerating 39 operations under three passes and 4 roles). Covered: AC-A1 to A5, A8 (API side), B1 to B7, C1 to C4, C6, C2 (patient and clinician progress responses are equal), D1 to D7, H1, I1, I2, I6; concurrent session start and concurrent publish (one wins, one 409); job handlers scoped by `job.organizationId` (another organization's rows untouched, a job without an organization refused).
+
+**M8 hard gate.** `apps/api/test/phase3/m8-enumeration.test.ts` reads the real app's OpenAPI document and calls every operation with an id in its path (39): (1) as each organization B role with organization A ids, expecting 404 with the byte-identical body and a `security.access_denied` event, or 403 `forbidden`, with at least one role reaching the scope check; (2) as patient 2 with patient 1's ids; (3) with patient 1's id over patient 2's child ids (session, activity, check-in, task, version, consent). A path parameter or request body without a fixture fails the test. GET routes without path ids are checked for leaked organization A ids.
+
+Proof that it fails on unscoped routes. Three routes were added to `apps/api/src/modules/sessions/routes.ts` for one run and then removed (the file was restored from a copy; the test passes 5 of 5 again): `GET /patients/:patientId/sessions/:sessionId/unscoped` (patient checked, session by bare id), `GET /proof/sessions/:sessionId` (no scope) and `GET /patients/:patientId/notes/:noteId` (no fixture). First run, all three present: 4 of 5 failed, starting with `Error: GET /patients/{patientId}/notes/{noteId}: no fixture for path parameter {noteId}`. Second run, without the no-fixture route: 2 of 5 failed:
+
+```
+× answers 404 with a security event to organization B for every organization A id (AC-I1)
++   "GET /proof/sessions/{sessionId} as B patient: 200 {\"id\":\"2e99974f-...\"}",
++   "GET /proof/sessions/{sessionId} as B therapist: 200 {\"id\":\"2e99974f-...\"}",
++   "GET /proof/sessions/{sessionId}: no organization B role reached the scope check",
+× finds child ids only under their own patient
++   "GET /patients/{patientId}/sessions/{sessionId}/unscoped as A patient: 200 {...\"status\":\"in_progress\"}",
++   "GET /patients/{patientId}/sessions/{sessionId}/unscoped as A therapist: 200 {...}",
++   "GET /patients/{patientId}/sessions/{sessionId}/unscoped: no role reached the child scope check",
+      Tests  2 failed | 3 passed (5)
+```
+
+Seed after WP 3.1 (small profile, default seed and anchor): intake answers keyed by the contract steps (`personal_information` ... `review`; the intake persona stops at `pain_levels`), review task evidence carries value, threshold and unit. 72 integrity checks; content hash `1efaec778240da9c9f4a9aa3379b5e8c40dec9cf2b5b47cf1271257952c9f407` (was `b804588a…f241f`). Smoke run against the seeded database with the fixed clock: `patient.demo` Today is `due` with version 3 and an unacknowledged plan change; `patient.resume` Today is `paused`; `therapist.demo` overview has 8 caseload patients, 9 open tasks, 11 unreviewed check-ins, 3 with missed activity; all 18 open tasks carry a value and threshold.
+
+Notes and deviations:
+
+- Cursors are opaque offsets over a total order (every ORDER BY ends with the id), not keysets. Clients never build them, so the encoding can change without a contract change.
+- Query schemas carry no `.meta({ id })`: `@fastify/swagger` cannot expand a named query schema into parameters. The names stay in TypeScript.
+- Two contract domains beyond the route table's list: `overview` and `records`, plus `common`. One route beyond it: `GET /patients/:id/check-ins/:checkInId` (the pain task's source link, AC-D1). One error code beyond it: `plan_not_published` (409, session start with no published version).
+- Plan-change acknowledgement uses the `care_plan_published` notification's `readAt`; publish creates that notification. No schema change.
+- The plan draft is stored as `{ content, editedByPractitionerId }`, so the draft has an author without a new column.
+- Assigning a task moves it to `in_review`, unassigning to `open`. Resolving clinical-rule tasks needs `review_task.resolve` and the care team; administrative-rule tasks need `review_task.resolve_admin`.
+- The contact notice is shown at the clinic threshold even when the pain rule is disabled; only the task depends on `enabled`.
+- A session start covers the exercises scheduled for today in the organization's zone, or the whole plan on an unscheduled day.
+- Session, check-in and intake writes have no audit event of their own: PRD section 13 lists the event names and none fits. They still run in one transaction through `withTx`. Every event the route table lists (`account.create`, `consent.grant`, `consent.revoke`, `careplan.publish`, `review_task.resolve`, `review_rule.update`, `assignment.create`) commits with its change.
+- Body ids outside the caller's scope (a check-in's `sessionId`, a stop's `activityId`, draft exercise and goal ids, an assignee) answer 400 on that path; path ids answer 404.
+- Account creation audits failures as `account.create` with `minor_failure`, an anonymous actor and a detail code.
+- `account_exists` tells a holder of a valid eligibility code that an email is registered. Accepted from the route table; the code check runs first and the route is rate limited like login.
+- Jobs: a 15-minute scheduler in the API process enqueues one job per organization and queue with a dedupe key per slot. `apps/api/src/jobs/repo.ts` lists organization ids, the only cross-organization read, and reads no tenant content.
+- Not done: Turbopack resolution of `.js` imports inside `@carepath/shared` (WP 3.2a builds with webpack). Switching the contracts to extensionless imports is possible but not done here.
 
 ### WP 3.2a
 
