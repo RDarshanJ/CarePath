@@ -1,6 +1,6 @@
 # Colour exploration: three directions for CarePath
 
-Status: research and token candidates for the advisor's rendered comparison. Provisional. This document does **not** pick the final direction.
+Status: research and token candidates for the advisor's rendered comparison. This document does **not** pick the final direction; the decision is recorded in section 7 and in `decision-records/DR-001-visual-identity.md`.
 Brief: `docs/DESIGN-BRIEF.md` sections 2, 3, 4 and 10. Access date for all web sources: 2026-11-20.
 Reproduce every number here: `node docs/design/tools/contrast.mjs` (script in `docs/design/tools/contrast.mjs`, reads `docs/design/tokens-candidates/{A,B,C}.json`).
 
@@ -298,3 +298,12 @@ Criteria in the brief that can be **measured without rendering** are scored here
 
 Cheap hybrid the advisor may want to render: A's blue primary and ink with B's graphite AI treatment (neutral `ai-*`), which would give A the AI separation that C lacks.
 
+## 7. Decision
+
+Decided 2026-11-20 by the advisor after the rendered comparison (`design-alternatives/visual-identity/`): **A+G, refined**. Direction A's palette with B's graphite AI treatment, plus four hex refinements (`selected-bg #E0EAFF`, `warning-bg #FEF7C3`, `chart-3 #2A9D66`, `seq-4 #5F8EE1`).
+
+- Record and reasoning: `decision-records/DR-001-visual-identity.md`
+- Final tokens and contrast table: `design-tokens.md`
+- Machine-readable: `tokens-final.json`
+
+The candidate files in `tokens-candidates/` are kept as exploration evidence and are no longer a source of truth. Sections 1 to 6 above are unchanged research.
