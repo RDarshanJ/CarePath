@@ -388,3 +388,31 @@ Notes and deviations:
 - Not exercised end to end: the client-side `session_expired` redirect (no page issues a client query yet; the fixed API clock cannot idle out a session). The server-side guard, the expired notice and the sign-out-with-dead-session path are tested.
 - Interim pages are empty states, not stubs with fake data; they exist because the shells must show their nav items.
 - No contract requests were needed.
+
+### WP 3.3
+
+Command: `scripts/gate-wp-3.3.sh` (ports 4033 and 3033, own database via gate-env). Stages: migrate, seed (72 integrity checks), typecheck, eslint and prettier on the owned paths, web build, then the clinician Playwright specs at desktop-1440 (1440x900) with axe, then `pnpm verify` (see the note below). Tail of the end-to-end stage:
+
+```
+Running 5 tests using 1 worker
+  ✓  1 [desktop-1440] › e2e/clinician-cross-role.spec.ts › a plan published by the clinician reaches the patient with its change note (4.8s)
+  ✓  2 [desktop-1440] › e2e/clinician-keyboard.spec.ts › plan builder works by keyboard alone, with visible focus and Escape closing overlays (6.5s)
+  ✓  3 [desktop-1440] › e2e/clinician-scenario-b.spec.ts › Scenario B: draft, autosave, reorder, preview, publish version 2 with a note, history (8.1s)
+  ✓  4 [desktop-1440] › e2e/clinician-scenario-d.spec.ts › Scenario D: a threshold check-in becomes one task the clinician reviews and resolves (5.8s)
+  ✓  5 [desktop-1440] › e2e/clinician-screens.spec.ts › clinician screens: content, axe and screenshots at 1440 and 1024 (24.6s)
+  5 passed (50.8s)
+WP 3.3 gate: PASSED
+```
+
+`pnpm verify` in the working tree (which also holds WP 3.2b's uncommitted patient work): migrate, seed, ui 106, db 61, api 160 tests passed, build, then end-to-end 39 passed and 2 failed. Both failures are in `apps/web/e2e/patient.spec.ts` (WP 3.2b, in flight): the mobile-390 "session flow works by keyboard alone" and the desktop-1440 axe check on consent. Every clinician spec passed inside that run. The verify exit code is therefore owned by 3.2b until those two are fixed.
+
+Screens: overview, patients directory, patient record (overview, plan, activity, check-ins, history tabs), care plan builder, review queue. Screenshots at 1440 and 1024: `docs/screenshots/3.3/`.
+
+Deviations and notes:
+
+- `scripts/e2e.sh` takes an optional `E2E_ARGS` passthrough so a gate can run a subset of specs; without it behaviour is unchanged.
+- "Visits today" is derived from the directory (`hasUpcomingAppointment`), because there is no appointments endpoint (CR-1). The queue is clinic-wide, so assign and resolve can return 403 `not_on_care_team` (CR-2). The directory has no total count, so pagination shows page position only (CR-3). See `docs/decisions/contract-requests.md`.
+- The clinician filter uses `/practitioners`, falling back to Me and Anyone.
+- Below 1280px the exercise library and the review task detail open as drawers.
+- The shell's left rail (`components/shells.tsx`, owned by 3.2a) is not sticky and scrolls away on long pages. Not edited.
+- The cross-role test changes only Noel Noaipatient's data. Scenario D adds one check-in for Noel. Other tests choose patients by rule, because seed names vary between runs.

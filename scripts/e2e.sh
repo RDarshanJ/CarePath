@@ -52,7 +52,13 @@ setsid bash -c 'cd apps/web && exec node node_modules/next/dist/bin/next start -
 PIDS+=("$!")
 wait_for "http://127.0.0.1:${WEB_PORT}/login" "web" "$LOGS/web.log" || exit 1
 
-pnpm --filter @carepath/web e2e
+# E2E_ARGS narrows the run (for example a work package gate): `E2E_ARGS="clinician- --project=desktop-1440"`.
+if [ -n "${E2E_ARGS:-}" ]; then
+  # shellcheck disable=SC2086
+  pnpm --filter @carepath/web exec playwright test --config e2e/playwright.config.ts $E2E_ARGS
+else
+  pnpm --filter @carepath/web e2e
+fi
 status=$?
 if [ "$status" -ne 0 ]; then
   echo "e2e: Playwright failed; API log tail:" >&2; tail -n 15 "$LOGS/api.log" >&2
