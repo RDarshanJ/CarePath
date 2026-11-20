@@ -58,6 +58,11 @@ export const errorCodes = {
   session_open: { status: 409, message: "A session is already in progress." },
   session_closed: { status: 409, message: "This session has already ended." },
   plan_not_published: { status: 409, message: "There is no published care plan yet." },
+  // Phase 4 scheduling (WP 4.1). A slot taken by someone else is booking_conflict.
+  slot_unavailable: {
+    status: 409,
+    message: "That time can no longer be booked. Choose another time.",
+  },
   payload_too_large: { status: 413, message: "The request body is too large." },
   unsupported_media_type: { status: 415, message: "Unsupported content type." },
   rate_limited: { status: 429, message: "Too many requests. Try again later." },

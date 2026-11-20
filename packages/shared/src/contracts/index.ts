@@ -25,5 +25,6 @@ export * from "./progress.js";
 export * from "./records.js";
 export * from "./review.js";
 export * from "./roles.js";
+export * from "./scheduling.js";
 export * from "./sessions.js";
 export * from "./today.js";

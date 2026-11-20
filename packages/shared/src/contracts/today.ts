@@ -2,11 +2,12 @@ import { z } from "zod";
 import { instantSchema, localDateSchema, personRefSchema } from "./common.js";
 import { unreadMessagesSchema } from "./messaging.js";
 import { weeklyProgressSchema } from "./progress.js";
+import { nextAppointmentSchema } from "./scheduling.js";
 
 /**
  * Patient Today (REQ-TOD-01). Dates and due states are computed by the API in the organization's
  * time zone; the web never derives them from the browser clock (C1 ruling 3.8). Appointment and
- * message fields arrive in Phase 4.
+ * message fields arrive in Phase 4; `nextAppointment` is WP 4.1.
  *
  * session.state:
  * - due: today is a scheduled day and no session has been completed today
@@ -68,6 +69,8 @@ export const todayViewSchema = z
     week: weeklyProgressSchema,
     /** Unread messages from the care team, from the participant read marker (WP 4.2). */
     messages: unreadMessagesSchema,
+    /** The next booked or checked-in visit that has not ended (WP 4.1), or null. */
+    nextAppointment: nextAppointmentSchema.nullable(),
   })
   .meta({ id: "TodayView" });
 export type TodayView = z.infer<typeof todayViewSchema>;
