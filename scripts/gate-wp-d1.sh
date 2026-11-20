@@ -12,18 +12,20 @@ set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 mkdir -p .data
 run() { echo; echo "==> $*"; "$@" || { echo "FAILED: $*" >&2; exit 1; }; }
-OWNED=(
+# ESLint covers the code paths; Prettier also covers the stylesheets and the README.
+LINTED=(
   packages/ui/src/tokens
-  packages/ui/src/styles
   packages/ui/src/fonts.ts
   packages/ui/src/components/ai-draft.tsx
-  apps/web/app/globals.css
   apps/web/app/layout.tsx
   "apps/web/app/(public)/design-system"
   apps/web/scripts
+)
+FORMATTED=(
+  "${LINTED[@]}"
+  packages/ui/src/styles
+  apps/web/app/globals.css
   docs/design-system/README.md
-  scripts/design-capture.sh
-  scripts/gate-wp-d1.sh
 )
 
 run pnpm --filter @carepath/ui exec vitest run src/tokens --reporter=verbose
@@ -40,8 +42,8 @@ echo "contrast.mjs --strict: exit 0"
 
 run pnpm --filter @carepath/ui typecheck
 run pnpm --filter @carepath/web typecheck
-run pnpm exec eslint "${OWNED[@]}"
-run pnpm exec prettier --check "${OWNED[@]}"
+run pnpm exec eslint "${LINTED[@]}"
+run pnpm exec prettier --check "${FORMATTED[@]}"
 
 export CAPTURE_DIR="${CAPTURE_DIR:-$PWD/.data/capture-d-wp-1}"
 export PROBE_FAIL_ON="${PROBE_FAIL_ON:-warm}"
