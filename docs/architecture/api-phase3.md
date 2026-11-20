@@ -39,6 +39,7 @@ Envelope: `ErrorEnvelope` (`{ "error": { "code", "message", "details"? } }`). Th
 | `session_open` | 409 | Start while another session is in progress or paused; `details` carry no id, the client re-reads Today | exists (WP 3.1) |
 | `session_closed` | 409 | Action on a completed, abandoned or stopped session | exists (WP 3.1) |
 | `plan_not_published` | 409 | Session start for a patient with no published plan version | exists (WP 3.1) |
+| `slot_unavailable` | 409 | Booking a slot that is in the past or blocked. A slot someone else took is `booking_conflict` | exists (WP 4.1) |
 
 ## 3. Existing routes (WP 2.4)
 
@@ -155,3 +156,25 @@ All request and response names above become Zod schemas in `packages/shared/src/
 | WP 3.3 | 4033 | 3033 | `carepath_wp33_<pid>` |
 
 Ports 4000 and 3000 are for hand use only. Every gate sources `scripts/gate-env.sh <name> <api_port> [web_port]`; the web build, `next start` and Playwright run under `scripts/with-web-lock.sh`.
+
+## 10. Phase 4 scheduling (WP 4.1)
+
+Basis: checkpoint C2 section 2 (appointment and slot ruling), ruling 3.1 (CR-1) and section 6.4; PRD Scenario E. Contracts in `packages/shared/src/contracts/scheduling.ts`; module `apps/api/src/modules/scheduling`. Every rule in section 1 applies. Calendar days are clinic-zone days and every response names the zone in `timezone`.
+
+| Method | Path | Access | Request | Response | Route-specific errors | Audit |
+|---|---|---|---|---|---|---|
+| GET | `/practitioners/:practitionerId/slots` | `appointment.manage_own`, `appointment.read` | `SlotQuery` (from, to: clinic-zone days, default today and 13 days on, at most 31 days; type) | `SlotList` (practitioner, timezone, from, to, `days[]` of `{ date, slots: OpenSlot[] }`). Open slots starting after the API clock only | 400 `validation_error` on `to` for a bad range. A patient asking for a practitioner off their care team gets 404 | `security.access_denied` on 404 |
+| GET | `/patients/:patientId/appointments` | `appointment.manage_own`, `appointment.read` | `PatientAppointmentQuery` (`when`: upcoming or past; cursor, limit) | `AppointmentPage` (timezone, items, nextCursor). Upcoming: not cancelled and not ended, soonest first. Past: ended or cancelled, newest first | | `phi.read` for staff |
+| POST | `/patients/:patientId/appointments` | `appointment.manage_own` (patient, own record, care-team therapist only), `appointment.manage` (coordinator, any patient in the organization) | `AppointmentBook` (slotId, type, reason) | 201 `Appointment` | 409 `booking_conflict` (slot already booked, or the patient or practitioner is busy then), 409 `slot_unavailable` (past or blocked slot), 400 `validation_error` on `body.slotId` (`unknown_slot`, `not_care_team_practitioner`) or `body.type` (`type_not_offered`) | `appointment.book` |
+| POST | `/patients/:patientId/appointments/:appointmentId/cancel` | as booking | `AppointmentCancel` (reason, optional) | `Appointment` with `cancelled_by_patient` (patient) or `cancelled_by_clinic` (staff); the slot is `open` again | 409 `invalid_transition` (already cancelled, started or past) | `appointment.cancel` |
+| POST | `/patients/:patientId/appointments/:appointmentId/reschedule` | as booking | `AppointmentReschedule` (slotId) | 201 `Appointment`: the new booking, `rescheduledFromId` set; the old one is cancelled with reason "Rescheduled" and `rescheduledToId` set | as booking and cancel; 400 `same_slot`. On any failure the original booking is unchanged (AC-E7) | `appointment.cancel` and `appointment.book` |
+| GET | `/appointments` | `appointment.read` | `AppointmentDayQuery` (date, practitionerId; both required) | `AppointmentList` (date, timezone, practitioner, items of every status by start time). CR-1: `ClinicianOverview` does not grow; the overview makes this second call | 400 `validation_error` on `querystring.practitionerId` for a practitioner outside the organization | |
+
+`GET /patients/:patientId/today` gains `nextAppointment` (`NextAppointment` or null): the next `booked` or `checked_in` visit that has not ended.
+
+Booking transaction (C2 section 2): lock the slot with `SELECT ... FOR UPDATE`, check it, move it `open -> booked`, insert the appointment in `initialStatus.Appointment` and write `appointment.book`, all in one transaction. Concurrent requests for one slot queue on the row lock; each one after the first sees `booked` and answers 409 `booking_conflict`. The exclusion constraints and `Appointment_slot_live_key` stay the last line of defence and map to the same 409. Cancel locks the slot, then the appointment. Reschedule locks both slots in id order, then the appointment, cancels and books in one transaction. Booking transactions wait up to 15 s for a connection and may run 20 s, so a burst of 50 requests for one slot does not time out (`docs/evaluation/booking-concurrency.md`).
+
+The appointment always takes the whole slot (`startsAt` and `endsAt` copied from it). Therapists and admins read appointments but do not book or cancel (`appointment.read` only).
+
+Reminder job: queue `scheduling.appointment_reminders`, enqueued every 15 minutes per active organization like the review rules, handler scoped by `job.organizationId`. For each `booked` visit starting within the next 24 hours whose patient has a login and no reminder yet, it sets `reminderSentAt` and writes one `appointment_reminder` notification ("Visit coming up", the visit type, practitioner and local time with the clinic zone named, link `/appointments`) in one transaction, so a rerun writes nothing twice.
+
