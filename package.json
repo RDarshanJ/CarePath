@@ -1,0 +1,31 @@
+{
+  "name": "carepath",
+  "version": "0.0.0",
+  "private": true,
+  "description": "CarePath: demonstration digital physical-therapy platform. Synthetic data only. Not for clinical use.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build",
+    "db:start": "scripts/db.sh start",
+    "db:stop": "scripts/db.sh stop",
+    "db:reset": "scripts/db.sh reset",
+    "verify": "scripts/verify.sh"
+  },
+  "devDependencies": {
+    "@carepath/config": "workspace:*",
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.73.0"
+  }
+}

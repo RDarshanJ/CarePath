@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+.next
+dist
+coverage
+.data
+docs/research
+docs/decisions/advisor-plan.md
+docs/BRIEF.md
+docs

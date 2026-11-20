@@ -1,0 +1,22 @@
+# UNVERIFIED: written for other developers. No Docker daemon was available in the
+# environment where this repo was built, so this file has never been run.
+# Local development in that environment uses scripts/db.sh instead.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: carepath
+      POSTGRES_PASSWORD: carepath
+      POSTGRES_DB: carepath
+    ports:
+      - "54329:5432"
+    volumes:
+      - carepath-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carepath -d carepath"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  carepath-pgdata:
