@@ -20,7 +20,8 @@
     "verify": "scripts/verify.sh",
     "db:seed": "pnpm --filter @carepath/db seed",
     "openapi:check": "pnpm --filter @carepath/api openapi:check",
-    "jobs:drain": "pnpm --filter @carepath/api jobs:drain"
+    "jobs:drain": "pnpm --filter @carepath/api jobs:drain",
+    "synthea:demo": "scripts/synthea-demo.sh"
   },
   "devDependencies": {
     "@carepath/config": "workspace:*",
