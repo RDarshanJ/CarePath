@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "id": "case-15",
+  "title": "Follow-up, right ankle, heel raises",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000015",
+    "patientId": "5a0c0000-0000-4000-8000-200000000015",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "right ankle"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Tanya. How's the right ankle since the boot came off last week?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "It feels stiff and a bit swollen when I wear shoes all day. Pain is 3 out of 10 at night, and 1 in the morning."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Ankle plantarflexion is 40 degrees on the right, and 50 on the left."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Dorsiflexion is 5 degrees short of the left."
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "I've been doing the towel stretch twice daily and the ankle pumps. Mostly."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Good. Single-leg heel raise strength test: you did 6 on the right, and 14 on the left."
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "I can walk the grocery store now without the cane."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Great. Let's build calf strength. I'm adding heel raises with a slow count."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "My goal is to walk my daughter's wedding in June without limping."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "That's a clear goal. Plan: heel raises three times a week, and I'm dropping the towel stretch. Follow up in two weeks."
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "Okay."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Thanks, Tanya."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Stiff and swollen when wearing shoes all day",
+      "mustMention": ["wear shoes all day"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Pain 3 out of 10 at night, 1 in the morning",
+      "mustMention": ["3 out of 10 at night"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f3",
+      "section": "objective",
+      "statement": "Right plantarflexion 40 degrees",
+      "mustMention": ["40 degrees"],
+      "sourceTurns": [3]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Dorsiflexion 5 degrees short of the left",
+      "mustMention": ["5 degrees short"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Single-leg heel raise: 6 on the right, 14 on the left",
+      "mustMention": ["6 on the right"],
+      "sourceTurns": [6]
+    },
+    {
+      "id": "f6",
+      "section": "subjective",
+      "statement": "Walks the grocery store without the cane",
+      "mustMention": ["without the cane"],
+      "sourceTurns": [7]
+    },
+    {
+      "id": "f7",
+      "section": "subjective",
+      "statement": "Goal: walk daughter's wedding in June without limping",
+      "mustMention": ["without limping"],
+      "sourceTurns": [9]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Heel raises three times a week, towel stretch dropped",
+      "mustMention": ["three times a week"],
+      "sourceTurns": [10]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Follow up in two weeks",
+      "mustMention": ["two weeks"],
+      "sourceTurns": [10]
+    }
+  ],
+  "expectedMissing": ["red_flag_screen"],
+  "injection": null
+}

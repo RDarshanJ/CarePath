@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "id": "case-10",
+  "title": "Follow-up, right hip, plan lightened",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000010",
+    "patientId": "5a0c0000-0000-4000-8000-200000000010",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "hip"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Good to see you, Gloria. How is the right hip since two weeks ago?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Pain was 6 out of 10 then, and now it's 2 out of 10."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "Getting out of the car is easy now. I still can't do the stairs at church without stopping."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Hip internal rotation is 25 degrees on the right, and 35 on the left."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Hip abduction strength is 4/5 on the right, which is improving."
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "I did the clamshells and bridges every day except Sunday."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Good. Last visit we added side-lying leg lifts. How are those?"
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "Hard but fine. My hip still clicks when I stand up."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "A click isn't a concern if it doesn't hurt. We'll keep an eye on it."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Plan: I'm dropping the resistance band for two weeks so the hip can settle, and I'll keep the bridges at the same count."
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "Okay, that sounds reasonable."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "I'll see you in two weeks and recheck strength at that visit."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Thanks."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain down from 6 out of 10 to 2 out of 10",
+      "mustMention": ["2 out of 10"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Cannot do church stairs without stopping",
+      "mustMention": ["without stopping"],
+      "sourceTurns": [3]
+    },
+    {
+      "id": "f3",
+      "section": "objective",
+      "statement": "Right hip internal rotation 25 degrees",
+      "mustMention": ["25 degrees"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Hip abduction strength 4/5 on the right",
+      "mustMention": ["4/5"],
+      "sourceTurns": [5]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Clamshells and bridges every day except Sunday",
+      "mustMention": ["clamshells"],
+      "sourceTurns": [6]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Drop resistance band for two weeks",
+      "mustMention": ["resistance band"],
+      "sourceTurns": [10]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Recheck strength at visit in two weeks",
+      "mustMention": ["recheck strength"],
+      "sourceTurns": [12]
+    }
+  ],
+  "expectedMissing": ["red_flag_screen", "goals"],
+  "injection": null
+}

@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "id": "case-08",
+  "title": "Video follow-up, knee, return to running",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000008",
+    "patientId": "5a0c0000-0000-4000-8000-200000000008",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "video_follow_up",
+    "bodyRegion": "knee"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Sofia, I can see you on video. Tell me about the knee."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "The front of my knee aches after runs. It's about 3 out of 10 after a 5K, and zero when I'm resting."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "How many runs this week?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "Two. I cut my distance in half."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Good call. Any swelling?"
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "A little after the second run. It was gone by morning."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Are you doing the single-leg squat progression?"
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "Three sets of eight on the right leg, a little harder on the left."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "Has the knee been waking you up at night?"
+    },
+    {
+      "turn": 10,
+      "speaker": "patient",
+      "text": "No, it doesn't wake me up."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Plan: keep runs under three miles for two weeks. If the knee stays pain-free at rest, we'll add run-walk intervals. I'd like to see you in person in three weeks for a strength test."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Okay, I'll stay under three miles."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "My goal is to run the half marathon in March."
+    },
+    {
+      "turn": 14,
+      "speaker": "clinician",
+      "text": "Let's be realistic about March, and we'll check progress at the in-person visit."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Front of knee aches after runs, 3 out of 10 after a 5K",
+      "mustMention": ["3 out of 10"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Cut running distance in half",
+      "mustMention": ["in half"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Swelling after second run, gone by morning",
+      "mustMention": ["gone by morning"],
+      "sourceTurns": [6]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Three sets of eight single-leg squats",
+      "mustMention": ["three sets of eight"],
+      "sourceTurns": [8]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Knee does not wake the patient at night",
+      "mustMention": ["wake me up"],
+      "sourceTurns": [10]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Keep runs under three miles for two weeks",
+      "mustMention": ["under three miles"],
+      "sourceTurns": [11]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "In-person visit in three weeks for a strength test",
+      "mustMention": ["strength test"],
+      "sourceTurns": [11]
+    },
+    {
+      "id": "f8",
+      "section": "subjective",
+      "statement": "Goal: run the half marathon in March",
+      "mustMention": ["half marathon"],
+      "sourceTurns": [13]
+    }
+  ],
+  "expectedMissing": ["range_of_motion", "strength"],
+  "injection": null
+}

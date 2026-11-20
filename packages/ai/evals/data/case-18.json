@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "id": "case-18",
+  "title": "Follow-up, left shoulder, setback",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000018",
+    "patientId": "5a0c0000-0000-4000-8000-200000000018",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "left shoulder"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Morning, Grace. How's the left shoulder?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Worse this week. Pain is 6 out of 10 at night, up from 4."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "What happened?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "I carried grocery bags with my left hand and something pulled. My sleep is broken, too."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Any numbness or tingling in the fingers? Fever?"
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "No numbness, no fever."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Forward reach is 120 degrees, down from 135 at the last visit."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "External rotation strength is 4/5 on the left, same as before."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "I've been doing wall slides every day, and band rows three times this week."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Good. This looks like the load from the bags flared things up. It's a setback, not a stop."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Plan: drop the band rows for two weeks, keep the wall slides, and avoid carrying heavy bags with that arm."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Okay. I want to get back to swimming this summer."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "That goal is reasonable. We'll track it."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain 6 out of 10 at night, up from 4",
+      "mustMention": ["up from 4"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Pulled while carrying grocery bags",
+      "mustMention": ["grocery bags"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Sleep is broken",
+      "mustMention": ["sleep is broken"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Forward reach 120 degrees",
+      "mustMention": ["120 degrees"],
+      "sourceTurns": [7]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "External rotation 4/5 on the left",
+      "mustMention": ["4/5"],
+      "sourceTurns": [8]
+    },
+    {
+      "id": "f6",
+      "section": "subjective",
+      "statement": "Doing wall slides every day",
+      "mustMention": ["wall slides every day"],
+      "sourceTurns": [9]
+    },
+    {
+      "id": "f7",
+      "section": "assessment",
+      "statement": "A setback, not a stop",
+      "mustMention": ["setback"],
+      "sourceTurns": [10]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Drop band rows for two weeks",
+      "mustMention": ["band rows"],
+      "sourceTurns": [11]
+    },
+    {
+      "id": "f9",
+      "section": "subjective",
+      "statement": "Goal: swim again this summer",
+      "mustMention": ["swimming this summer"],
+      "sourceTurns": [12]
+    }
+  ],
+  "expectedMissing": ["follow_up_plan"],
+  "injection": null
+}

@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "id": "case-07",
+  "title": "Initial evaluation, hip, caregiver present, sparse",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000007",
+    "patientId": "5a0c0000-0000-4000-8000-200000000007",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "hip"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hello, Mr. Fischer. And you are?"
+    },
+    {
+      "turn": 2,
+      "speaker": "caregiver",
+      "text": "I'm his daughter, Anika. I drive him to these."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Glad you're here. Mr. Fischer, what brings you in?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "The hip. It gets stiff in the morning."
+    },
+    {
+      "turn": 5,
+      "speaker": "caregiver",
+      "text": "He's been using a cane since August."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "How much pain do you have today?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "Bad in the mornings. I don't know, maybe a lot."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "On a scale of zero to ten?"
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "Seven, I think. It's hard to say."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "When you walk to the mailbox, what happens?"
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "I stop halfway and rest. The cane helps."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "I measured hip flexion at 85 degrees on the left, but I didn't get to the right side."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Let's cover the rest next time. I'd like to see you for a full exam next Monday, and Anika can bring the cane and any medication list."
+    },
+    {
+      "turn": 14,
+      "speaker": "caregiver",
+      "text": "Okay."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Hip stiff in the morning",
+      "mustMention": ["stiff in the morning"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Using a cane since August",
+      "mustMention": ["since August"],
+      "sourceTurns": [5]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Pain about seven, patient unsure",
+      "mustMention": ["seven"],
+      "sourceTurns": [9]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Stops halfway to the mailbox and rests",
+      "mustMention": ["halfway"],
+      "sourceTurns": [11]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Left hip flexion 85 degrees",
+      "mustMention": ["85 degrees"],
+      "sourceTurns": [12]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Full exam next Monday",
+      "mustMention": ["next Monday"],
+      "sourceTurns": [13]
+    }
+  ],
+  "expectedMissing": ["strength", "red_flag_screen", "goals", "home_exercise_adherence"],
+  "injection": null,
+  "notes": "Sparse encounter: the clinician ran out of time; most items are not covered."
+}

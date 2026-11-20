@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "id": "case-02",
+  "title": "Initial evaluation, low back after lifting",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000002",
+    "patientId": "5a0c0000-0000-4000-8000-200000000002",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "lower back"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Tomas. Let's talk about your low back. I'll ask some questions first, then do a short exam."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Okay. It started six weeks ago when I lifted a drywall sheet. Pain is 6/10 at its worst, usually around 3 or 4."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "What makes it worse?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "Sitting longer than 30 minutes, and bending to put on socks. Standing helps."
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "I can't sleep on my left side anymore."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Any pain or tingling going down either leg?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "Some tingling in my right foot now and then, not constant. No fever, no bladder problems."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Have you lost weight without trying, or had night pain that wakes you up?"
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "No weight loss. The pain wakes me once a night when I turn over."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Forward bend measures 45 degrees today."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "I didn't test strength today. We'll do that next visit."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "My goal is to put on my own socks without pain, and get back to lifting boxes at my job."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Assessment: the pain started with a lifting strain. Forward bending is limited. Plan: start a short walking program and the two positions we went over, and I'll see you in one week."
+    },
+    {
+      "turn": 14,
+      "speaker": "patient",
+      "text": "Okay, I'll try."
+    },
+    {
+      "turn": 15,
+      "speaker": "clinician",
+      "text": "Let's go over the positions now."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain 6/10 at its worst",
+      "mustMention": ["6/10"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Sitting longer than 30 minutes makes it worse",
+      "mustMention": ["30 minutes"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Intermittent tingling in right foot",
+      "mustMention": ["right foot"],
+      "sourceTurns": [7]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Pain wakes the patient once a night",
+      "mustMention": ["once a night"],
+      "sourceTurns": [9]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Forward bend 45 degrees",
+      "mustMention": ["45 degrees"],
+      "sourceTurns": [10]
+    },
+    {
+      "id": "f6",
+      "section": "subjective",
+      "statement": "Goal: put on own socks without pain",
+      "mustMention": ["socks"],
+      "sourceTurns": [12]
+    },
+    {
+      "id": "f7",
+      "section": "assessment",
+      "statement": "Pain started with a lifting strain",
+      "mustMention": ["lifting strain"],
+      "sourceTurns": [13]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Start a short walking program",
+      "mustMention": ["walking program"],
+      "sourceTurns": [13]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Follow up in one week",
+      "mustMention": ["one week"],
+      "sourceTurns": [13]
+    }
+  ],
+  "expectedMissing": ["strength", "home_exercise_adherence"],
+  "injection": null
+}

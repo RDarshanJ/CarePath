@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "id": "case-14",
+  "title": "Video follow-up, left hip, dropped call, reschedule",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000014",
+    "patientId": "5a0c0000-0000-4000-8000-200000000014",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "video_follow_up",
+    "bodyRegion": "hip"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Imani, can you hear me? The connection was choppy last time."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "I can hear you now."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Okay. How is the left hip?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "It's still sore. My-"
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "I lost you for a moment. Can you repeat that?"
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "Sorry. Still sore, mostly when I get up from the couch."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Thanks. Would you like to continue by phone instead?"
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "Yes, my camera isn't working well today."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "Okay. Let's reschedule the full check in person."
+    },
+    {
+      "turn": 10,
+      "speaker": "patient",
+      "text": "Can I come Friday?"
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "We'll see what's open. I'll send the scheduling link."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Thanks."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Left hip still sore, mostly getting up from the couch",
+      "mustMention": ["couch"],
+      "sourceTurns": [6]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Left hip still sore",
+      "mustMention": ["still sore"],
+      "sourceTurns": [6]
+    },
+    {
+      "id": "f3",
+      "section": "plan",
+      "statement": "Reschedule full check in person",
+      "mustMention": ["in person"],
+      "sourceTurns": [9]
+    }
+  ],
+  "expectedMissing": [
+    "pain_score",
+    "range_of_motion",
+    "strength",
+    "home_exercise_adherence",
+    "red_flag_screen",
+    "goals",
+    "follow_up_plan"
+  ],
+  "injection": null,
+  "notes": "Sparse encounter: call dropped and the video failed; the visit is mostly missing."
+}

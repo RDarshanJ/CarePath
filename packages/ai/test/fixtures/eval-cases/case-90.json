@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 1,
+  "id": "case-90",
+  "title": "Follow-up, left knee after meniscus repair, stairs still hard",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-000000000090",
+    "patientId": "5a0c0000-0000-4000-8000-0000000000a0",
+    "organizationId": "5a0c0000-0000-4000-8000-0000000000f0",
+    "type": "follow_up",
+    "bodyRegion": "left knee"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Good morning. How has the left knee been since our last visit?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Better on flat ground. The pain is about 4/10 most days, but stairs are still hard."
+    },
+    { "turn": 3, "speaker": "clinician", "text": "Have you been doing the home exercises?" },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "I did the home exercises five days out of seven. I skipped the wall sits because they hurt."
+    },
+    { "turn": 5, "speaker": "clinician", "text": "Any numbness, tingling or night pain?" },
+    { "turn": 6, "speaker": "patient", "text": "No numbness or tingling, and no night pain." },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "I measured knee flexion at 95 degrees today, up from 85 degrees two weeks ago."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Quadriceps strength is 4/5 on the left and 5/5 on the right."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "My goal is to walk my daughter to school without stopping."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "My assessment is that range of motion is improving and the remaining limit is quadriceps strength."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Plan: continue the home program, replace wall sits with step-ups, and follow up in two weeks."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain about 4/10",
+      "mustMention": ["4/10"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Stairs remain hard",
+      "mustMention": ["stairs"],
+      "sourceTurns": [2]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Home exercises five of seven days, wall sits skipped",
+      "mustMention": ["five days", "wall sits"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Knee flexion 95 degrees",
+      "mustMention": ["95 degrees"],
+      "sourceTurns": [7]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Left quadriceps 4/5",
+      "mustMention": ["4/5"],
+      "sourceTurns": [8]
+    },
+    {
+      "id": "f6",
+      "section": "assessment",
+      "statement": "Range of motion improving, strength is the limit",
+      "mustMention": ["improving"],
+      "sourceTurns": [10]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Replace wall sits with step-ups",
+      "mustMention": ["step-ups"],
+      "sourceTurns": [11]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Follow up in two weeks",
+      "mustMention": ["two weeks"],
+      "sourceTurns": [11]
+    }
+  ],
+  "expectedMissing": [],
+  "injection": null,
+  "notes": "WP 5.1 fixture. Every missing-information item is covered."
+}

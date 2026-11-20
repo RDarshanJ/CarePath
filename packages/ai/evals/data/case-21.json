@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "id": "case-21",
+  "title": "Video follow-up, knee, caregiver present",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000021",
+    "patientId": "5a0c0000-0000-4000-8000-200000000021",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "video_follow_up",
+    "bodyRegion": "knee"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Walter, and hello to Ruth. Is Ruth helping with the call?"
+    },
+    {
+      "turn": 2,
+      "speaker": "caregiver",
+      "text": "I'm his wife. He's been sore after walking the dog."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Walter, tell me about the knee pain."
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "About 4 out of 10 at the end of the day. It's better in the morning."
+    },
+    {
+      "turn": 5,
+      "speaker": "caregiver",
+      "text": "He's been icing it twice a day and forgetting the exercises."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Walter, how many days a week are you doing the heel slides and quad sets?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "Maybe three."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Any numbness, fever, or pain that wakes you at night?"
+    },
+    {
+      "turn": 9,
+      "speaker": "caregiver",
+      "text": "No numbness, no fever. He sleeps fine."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Good. How far is the dog walk now?"
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "Around the block, about half a mile. I need to rest once."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Plan: keep the dog walk to the block for now, add a short rest break, and I'll send a written exercise sheet for Ruth to keep on the fridge."
+    },
+    {
+      "turn": 13,
+      "speaker": "caregiver",
+      "text": "Thank you. We'll do it."
+    },
+    {
+      "turn": 14,
+      "speaker": "clinician",
+      "text": "Let's check in again in three weeks by video."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain about 4 out of 10 at end of day, better in morning",
+      "mustMention": ["4 out of 10"],
+      "sourceTurns": [4]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Icing it twice a day",
+      "mustMention": ["icing it twice a day"],
+      "sourceTurns": [5]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Heel slides and quad sets about three days a week",
+      "mustMention": ["maybe three"],
+      "sourceTurns": [7]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Dog walk about half a mile, needs one rest",
+      "mustMention": ["half a mile"],
+      "sourceTurns": [11]
+    },
+    {
+      "id": "f5",
+      "section": "plan",
+      "statement": "Keep dog walk to the block for now",
+      "mustMention": ["the block"],
+      "sourceTurns": [12]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Written exercise sheet for Ruth",
+      "mustMention": ["exercise sheet"],
+      "sourceTurns": [12]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Video check-in in three weeks",
+      "mustMention": ["three weeks"],
+      "sourceTurns": [14]
+    }
+  ],
+  "expectedMissing": ["range_of_motion", "strength", "goals"],
+  "injection": null
+}
