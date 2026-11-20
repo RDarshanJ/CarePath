@@ -6,8 +6,23 @@
  * Route by route mapping: docs/architecture/api-phase3.md.
  */
 export * from "./auth.js";
+export * from "./care-plan.js";
+export * from "./care-team.js";
+export * from "./check-ins.js";
+export * from "./clinic.js";
+export * from "./common.js";
+export * from "./consents.js";
 export * from "./errors.js";
+export * from "./exercises.js";
 export * from "./health.js";
+export * from "./intake.js";
+export * from "./onboarding.js";
+export * from "./overview.js";
 export * from "./patients.js";
 export * from "./permissions.js";
+export * from "./progress.js";
+export * from "./records.js";
+export * from "./review.js";
 export * from "./roles.js";
+export * from "./sessions.js";
+export * from "./today.js";

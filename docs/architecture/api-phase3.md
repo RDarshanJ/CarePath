@@ -38,6 +38,7 @@ Envelope: `ErrorEnvelope` (`{ "error": { "code", "message", "details"? } }`). Th
 | `draft_stale` | 409 | Publish or autosave against an older draft than the stored one | add in WP 3.1 |
 | `session_open` | 409 | Start while another session is in progress or paused; `details` carry no id, the client re-reads Today | add in WP 3.1 |
 | `session_closed` | 409 | Action on a completed, abandoned or stopped session | add in WP 3.1 |
+| `plan_not_published` | 409 | Session start for a patient with no published plan version | add in WP 3.1 |
 
 ## 3. Existing routes (WP 2.4)
 
@@ -100,6 +101,7 @@ Reordering is part of `CarePlanDraftSave` (positions), driven by move up and mov
 | POST | `/patients/:patientId/sessions/:sessionId/complete` | `session.write_own` | `SessionProgress` | `ExerciseSessionDetail` | 409 `session_closed`, 409 `invalid_transition` | |
 | POST | `/patients/:patientId/check-ins` | `checkin.write_own` | `CheckInCreate` (sessionId or null, painScore 0 to 10, difficulty, notes) | 201 `CheckInResult`: the check-in, `seenBy: "care_team"` (AC-C6) and `painNotice` (null below the threshold, else clinic phone or null, `EMERGENCY_NOTICE`; AC-D7). The pain rule runs in the same transaction and writes at most one open task (AC-D1, D2) | 409 `session_closed` when the session belongs to a finished day | |
 | GET | `/patients/:patientId/check-ins` | `checkin.write_own`, `clinical.read` | `CursorQuery` | `CheckInPage` | | |
+| GET | `/patients/:patientId/check-ins/:checkInId` | `checkin.write_own`, `clinical.read` | | `CheckIn`. The target of a pain task's source link (AC-D1) | | |
 | POST | `/patients/:patientId/check-ins/:checkInId/review` | `clinical.write`, care team only | `CheckInReviewRequest` (empty object) | `CheckIn` with reviewedAt and reviewer | 409 `already_exists` when already reviewed | |
 | GET | `/patients/:patientId/progress` | `careplan.read_own`, `clinical.read` | `ProgressQuery` (weeks, 1 to 12) | `ProgressView`: weekly assigned versus completed, completed sessions, patient-reported pain series with a table form, goals. Read from the same rows as the clinician activity history (AC-C2) | | |
 | GET | `/overview` | `clinical.read` | | `ClinicianOverview`: work lists with counts (open tasks, unreviewed check-ins, missed activity, recent publishes); each count equals its list length (REQ-OVR-01). Appointment, message and AI lists arrive in Phases 4 and 5 | | |
@@ -127,6 +129,16 @@ Time-based rules (missed sessions, unreviewed check-in, upcoming follow-up, miss
 ## 8. Contract names
 
 All request and response names above become Zod schemas in `packages/shared/src/contracts/<domain>.ts`, exported from `@carepath/shared/contracts`, with `.meta({ id })` equal to the name so `apps/api/openapi.json` uses the same name. Domains: `auth`, `errors`, `health`, `patients`, `roles`, `permissions` (exist now); `onboarding`, `intake`, `consents`, `care-team`, `care-plan`, `exercises`, `sessions`, `check-ins`, `progress`, `today`, `clinic`, `review` (added by WP 3.1 in the delivery order above). Names that exist today: `LoginRequest`, `SessionInfo`, `ErrorEnvelope`, `Health`, `RoleMatrix`, `PatientIdParams` (unnamed path schema `patientIdParamsSchema`), `PatientHeader`. Fixed copy shared by both apps: `EMERGENCY_NOTICE`, `CONTACT_CLINIC_FALLBACK`, `BANNED_DIAGNOSTIC_TERMS` in `@carepath/shared`.
+
+### 8.1 Contract notes from WP 3.1
+
+- Contracts are committed in `packages/shared/src/contracts/` before the endpoints, so UI work can start. Added domains beyond the list above: `common` (cursor query, page shape, person reference, body areas), `overview` (`ClinicianOverview`), `records` (`TimelinePage`, `RecordHistoryPage`).
+- `CarePlanVersionDetail` is the one patient-facing plan shape (`carePlanViewSchema`); `PatientCarePlan` is `{ plan: CarePlanVersionDetail | null }`. The draft preview returns `PatientCarePlan` with `plan.preview = true` and `version.id = null`.
+- Draft items carry `position` equal to their index; reordering sends the list in the new order with positions renumbered.
+- Intake answers per step are `intakeAnswerSchemas[step]`; the PUT body is `{ "answers": { ... } }`. Saving the `consent` step writes the Consent rows in the same transaction.
+- Review tasks carry `value`, `threshold`, `unit`, `sources[]` (type, id, field, `apiPath`) next to the explanation sentence.
+- Cursors are opaque strings. Clients pass `nextCursor` back unchanged and never build one.
+- Plan-change acknowledgement is stored as the read time of the patient's `care_plan_published` notification for that version.
 
 ## 9. Gate ports (C1 section 4)
 

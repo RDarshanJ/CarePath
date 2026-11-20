@@ -37,6 +37,27 @@ export const errorCodes = {
     message: "This change is not allowed from the record's current status.",
   },
   rule_violation: { status: 409, message: "The change breaks a rule for this record." },
+  // Phase 3 route-specific codes (docs/architecture/api-phase3.md section 2).
+  eligibility_code_invalid: {
+    status: 400,
+    message: "That eligibility code is not valid. Check it with your clinic.",
+  },
+  account_exists: { status: 409, message: "An account with this email already exists." },
+  intake_incomplete: {
+    status: 409,
+    message: "Some onboarding steps are not complete yet.",
+  },
+  consent_required_type: {
+    status: 409,
+    message: "This consent is required for care. Contact your clinic to withdraw it.",
+  },
+  draft_stale: {
+    status: 409,
+    message: "The draft changed since you opened it. Reload it and try again.",
+  },
+  session_open: { status: 409, message: "A session is already in progress." },
+  session_closed: { status: 409, message: "This session has already ended." },
+  plan_not_published: { status: 409, message: "There is no published care plan yet." },
   payload_too_large: { status: 413, message: "The request body is too large." },
   unsupported_media_type: { status: 415, message: "Unsupported content type." },
   rate_limited: { status: 429, message: "Too many requests. Try again later." },

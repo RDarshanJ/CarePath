@@ -154,3 +154,32 @@ export function transitionRows(): Array<{
     ),
   );
 }
+
+/**
+ * The only status an API service may insert, per table (checkpoint C1, ruling 3.4). The status
+ * trigger checks changes only, so INSERT could write any status; seeds and imports need that to
+ * write history, services do not. Every create path in apps/api takes its status from here, and
+ * C2 reads the repositories for it. Later states are reached by UPDATE through the trigger.
+ *
+ * Appointment starts at `booked`: no workflow creates `requested` (C1 ruling 3.3).
+ */
+export const initialStatus = {
+  Patient: "intake_incomplete",
+  OrganizationMembership: "active",
+  CareTeam: "active",
+  Consent: "active",
+  IntakeAssessment: "in_progress",
+  Goal: "proposed",
+  CarePlan: "draft",
+  ExerciseSession: "in_progress",
+  SessionActivity: "pending",
+  Observation: "final",
+  AvailabilitySlot: "open",
+  Appointment: "booked",
+  Encounter: "in_progress",
+  ClinicalNote: "draft",
+  Message: "queued",
+  ReviewTask: "open",
+  AIGeneration: "pending",
+  Job: "queued",
+} as const satisfies { [T in StatusTable]: keyof (typeof statusTransitions)[T]["allowed"] };

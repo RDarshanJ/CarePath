@@ -29,3 +29,16 @@ export const BANNED_DIAGNOSTIC_TERMS = [
 export function findBannedDiagnosticTerms(text: string): string[] {
   return BANNED_DIAGNOSTIC_TERMS.filter((term) => new RegExp(`\\b${term}\\b`, "i").test(text));
 }
+
+/** Exercise library, session overview and plan preview (PRD section 16). */
+export const EXERCISE_CONTENT_NOTICE =
+  "These exercises are fictional and have not been medically reviewed. Do not use them as treatment instructions.";
+
+/**
+ * Pain contact notice (PRD section 16, AC-D7), shown above EMERGENCY_NOTICE. With no clinic phone
+ * it reads "contact your clinic" (C1 ruling 3.7).
+ */
+export function painNoticeMessage(painScore: number, clinicPhone: string | null): string {
+  const contact = clinicPhone ? `contact your clinic at ${clinicPhone}` : CONTACT_CLINIC_FALLBACK;
+  return `You reported pain of ${painScore} out of 10. If you are worried, ${contact}.`;
+}
