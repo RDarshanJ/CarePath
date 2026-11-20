@@ -56,9 +56,9 @@ function BottomNav({ unread }: { unread: number }) {
       aria-label="Patient"
       className="sticky bottom-0 z-10 border-t border-border bg-surface md:hidden"
     >
-      <ul className="mx-auto grid w-full max-w-3xl grid-cols-4">
+      <ul className="mx-auto flex w-full max-w-3xl flex-wrap">
         {items.map((it) => (
-          <li key={it.href}>
+          <li key={it.href} className="min-w-20 flex-1">
             <NextLink
               href={it.href}
               aria-current={it.current ? "page" : undefined}

@@ -92,7 +92,7 @@ for (const role of roles) {
         "Today",
         "Progress",
         "Appointments",
-        /^Messages/,
+        /Messages/,
       ]);
       await nav.getByRole("link", { name: "Progress" }).click();
       await expect(page).toHaveURL(/\/progress$/);

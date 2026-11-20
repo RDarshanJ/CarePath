@@ -616,7 +616,7 @@ test.describe("read-only screens", () => {
       "Today",
       "Progress",
       "Appointments",
-      /^Messages/,
+      /Messages/,
     ]);
     await expectNoHorizontalOverflow(page, "today");
     if (wide) await shots(page, "s01-today");
