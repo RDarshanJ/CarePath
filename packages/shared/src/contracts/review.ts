@@ -155,6 +155,11 @@ export const reviewTaskSchema = z
     resolvedAt: instantSchema.nullable(),
     resolvedBy: personRefSchema.nullable(),
     resolutionNote: z.string().nullable(),
+    /**
+     * Whether the signed-in user is an active member of the patient's active care team (CR-2).
+     * Assigning a task, and resolving or dismissing a clinical one, need it (403 `not_on_care_team`).
+     */
+    onCareTeam: z.boolean(),
   })
   .meta({ id: "ReviewTask" });
 export type ReviewTask = z.infer<typeof reviewTaskSchema>;
@@ -178,6 +183,8 @@ export const reviewTaskPageSchema = pageOf(reviewTaskSchema)
     lastCheckedAt: instantSchema,
     /** When the time-based rules last ran for this organization, or null if never. */
     rulesLastRunAt: instantSchema.nullable(),
+    /** Tasks matching the query in the same scope, ignoring the cursor (CR-3). */
+    total: z.number().int().min(0),
   })
   .meta({ id: "ReviewTaskPage" });
 export type ReviewTaskPage = z.infer<typeof reviewTaskPageSchema>;

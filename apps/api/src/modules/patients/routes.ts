@@ -11,7 +11,8 @@ import { decodeCursor, pageFrom } from "../../core/pagination.js";
 import { practitionerRef } from "../../core/people.js";
 import { recordPhiRead, requirePatientRead } from "../../core/scope/patient-scope.js";
 import { AppError, errorResponses } from "../../core/errors.js";
-import { findPatientHeader, listDirectory } from "./repo.js";
+import { isOnCareTeam } from "../../core/scope/repo.js";
+import { countDirectory, findPatientHeader, listDirectory } from "./repo.js";
 
 export const patientRoutes: FastifyPluginAsyncZod = async (app) => {
   const { db, now } = app.deps;
@@ -33,11 +34,13 @@ export const patientRoutes: FastifyPluginAsyncZod = async (app) => {
       const ctx = requireCtx(request.ctx);
       const { cursor, limit, ...filter } = request.query;
       const offset = decodeCursor(cursor);
-      const rows = await listDirectory(db, ctx, filter, now(), offset, limit + 1);
+      const at = now();
+      const rows = await listDirectory(db, ctx, filter, at, offset, limit + 1);
       const page = pageFrom(rows, offset, limit);
       const clinical = ctx.permissions.has("clinical.read");
       return {
         nextCursor: page.nextCursor,
+        total: await countDirectory(db, ctx, filter, at),
         items: page.items.map((p) => {
           const primary = p.careTeam?.status === "active" ? p.careTeam.members[0] : undefined;
           const pr = primary?.membership.practitioner;
@@ -104,7 +107,11 @@ export const patientRoutes: FastifyPluginAsyncZod = async (app) => {
       if (!row) throw new AppError("not_found");
       // PRD section 13 and advisor plan revision 1: every record open is audited.
       await recordPhiRead(request, row.id, "Patient", row.id, { includePatient: true });
-      return { ...row, birthDate: row.birthDate.toISOString().slice(0, 10) };
+      // CR-2: only the clinical view says whether the caller is on the care team.
+      const onCareTeam = ctx.permissions.has("clinical.read")
+        ? await isOnCareTeam(db, ctx, patientId)
+        : null;
+      return { ...row, birthDate: row.birthDate.toISOString().slice(0, 10), onCareTeam };
     },
   );
 };

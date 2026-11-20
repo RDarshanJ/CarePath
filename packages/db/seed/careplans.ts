@@ -42,7 +42,9 @@ export function buildExercises(ctx: Ctx): void {
         category: def.category,
         description: `${def.description} ${EXERCISE_DISCLAIMER}`,
         instructions: def.instructions,
+        // Set together by WP 3.4b once illustrations pass review (checkpoint C2, ruling 3.4).
         mediaPath: null,
+        mediaAlt: null,
         defaultSets: def.sets,
         defaultReps: def.reps ?? null,
         defaultHoldSeconds: def.holdSeconds ?? null,

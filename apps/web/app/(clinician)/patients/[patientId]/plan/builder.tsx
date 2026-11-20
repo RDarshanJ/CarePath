@@ -73,11 +73,12 @@ export function PlanBuilder({ patientId }: { patientId: string }) {
     staleTime: Infinity,
     refetchOnMount: "always",
   });
-  const noDraft = draft.error instanceof ApiError && draft.error.code === "not_found";
+  // GET draft answers { draft: null } when there is none (checkpoint C2, F4).
+  const noDraft = draft.isSuccess && draft.data === null;
   const preview = useQuery({
     queryKey: keys.preview(patientId),
     queryFn: () => reads.preview(patientId),
-    enabled: draft.isSuccess,
+    enabled: !!draft.data,
     staleTime: Infinity,
     refetchOnMount: "always",
   });
@@ -102,7 +103,7 @@ export function PlanBuilder({ patientId }: { patientId: string }) {
       </div>
     );
   }
-  if (draft.isError && !noDraft) {
+  if (draft.isError) {
     return (
       <div className="flex flex-col gap-4">
         <PageHeader title="Care plan builder" eyebrow={crumbs} />
@@ -118,7 +119,7 @@ export function PlanBuilder({ patientId }: { patientId: string }) {
       </div>
     );
   }
-  const ready = header.data && plan.data && (draft.isSuccess ? !!preview.data : noDraft);
+  const ready = header.data && plan.data && (draft.data ? !!preview.data : noDraft);
   if (!initialRef.current && ready) {
     initialRef.current = draft.data
       ? {

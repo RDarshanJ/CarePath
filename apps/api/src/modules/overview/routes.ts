@@ -83,7 +83,8 @@ export const overviewRoutes: FastifyPluginAsyncZod = async (app) => {
         today,
         timezone: tz,
         caseloadSize: patients.length,
-        openTasks: list(tasks.map((t) => toReviewTask(t, at))),
+        // Every task here belongs to the caller's caseload, so the caller is on each care team.
+        openTasks: list(tasks.map((t) => toReviewTask(t, at, true))),
         unreviewedCheckIns: list(
           checkIns.map((c) => ({
             id: c.id,

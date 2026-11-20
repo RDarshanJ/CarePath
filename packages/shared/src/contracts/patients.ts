@@ -22,6 +22,12 @@ export const patientHeaderSchema = z
     status: patientStatusSchema,
     timezone: z.string(),
     preferredLanguage: z.string(),
+    /**
+     * Callers with clinical.read: whether they are an active member of this patient's active care
+     * team (CR-2). Plan saves, publishing and clinical task actions need it (403 `not_on_care_team`).
+     * Null for the patient and for roles without clinical.read.
+     */
+    onCareTeam: z.boolean().nullable(),
   })
   .meta({ id: "PatientHeader" });
 
@@ -96,6 +102,8 @@ export const patientDirectoryPageSchema = z
       z.discriminatedUnion("view", [patientDirectoryRowSchema, patientAdminRowSchema]),
     ),
     nextCursor: z.string().nullable(),
+    /** Patients matching the query in the same scope, ignoring the cursor (CR-3). */
+    total: z.number().int().min(0),
   })
   .meta({ id: "PatientDirectoryPage" });
 export type PatientDirectoryPage = z.infer<typeof patientDirectoryPageSchema>;

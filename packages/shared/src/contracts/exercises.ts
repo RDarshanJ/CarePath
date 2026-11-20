@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { bodyAreaSchema, pageOf } from "./common.js";
+import { bodyAreaSchema, exerciseMediaShape, pageOf } from "./common.js";
 
 export const exerciseCategories = [
   "mobility",
@@ -20,7 +20,7 @@ export const exerciseSchema = z
     category: z.string(),
     description: z.string(),
     instructions: z.string(),
-    mediaPath: z.string().nullable(),
+    ...exerciseMediaShape,
     defaults: z.object({
       sets: z.number().int().nullable(),
       reps: z.number().int().nullable(),

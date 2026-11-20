@@ -3,6 +3,7 @@ import type { FastifyRequest } from "fastify";
 import {
   carePlanDraftContentSchema,
   carePlanDraftSaveSchema,
+  carePlanDraftResultSchema,
   carePlanDraftSchema,
   carePlanPublishRequestSchema,
   carePlanVersionDetailSchema,
@@ -166,9 +167,10 @@ export const carePlanDraftRoutes: FastifyPluginAsyncZod = async (app) => {
       schema: {
         operationId: "getCarePlanDraft",
         tags: ["care-plan"],
-        summary: "The plan draft with its author and update time; 404 when there is no draft.",
+        summary:
+          "The plan draft with its author and update time, or `{ draft: null }` when the plan has no draft.",
         params: patientIdParamsSchema,
-        response: { 200: carePlanDraftSchema, ...errorResponses(400, 401, 403, 404, 429) },
+        response: { 200: carePlanDraftResultSchema, ...errorResponses(400, 401, 403, 404, 429) },
       },
     },
     async (request) => {
@@ -176,9 +178,12 @@ export const carePlanDraftRoutes: FastifyPluginAsyncZod = async (app) => {
       const ctx = await requirePatientRead(request, patientId);
       const plan = await findOpenPlan(db, ctx, patientId);
       const draft = plan ? readDraft(plan.draftContent) : null;
-      if (!plan || !draft) throw new AppError("not_found");
+      // No draft is a normal state (the builder asks on every open): 200, not 404 (checkpoint C2, F4).
+      if (!plan || !draft) return { draft: null };
       await recordPhiRead(request, patientId, "CarePlan", plan.id);
-      return draftView(db, ctx, plan, draft, await nextVersionNumber(db, ctx, plan.id));
+      return {
+        draft: await draftView(db, ctx, plan, draft, await nextVersionNumber(db, ctx, plan.id)),
+      };
     },
   );
 

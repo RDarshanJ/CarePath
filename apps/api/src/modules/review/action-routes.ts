@@ -38,6 +38,7 @@ import {
   setTaskAssignee,
   updateRule,
 } from "./repo.js";
+import { isOnCareTeam } from "../../core/scope/repo.js";
 import { isReviewRuleKey } from "./rules.js";
 import { ruleKind, toReviewTask } from "./view.js";
 
@@ -135,7 +136,7 @@ export const reviewActionRoutes: FastifyPluginAsyncZod = async (app) => {
           throw new AppError("invalid_transition");
         }
         const row = await findTask(tx, ctx, patientId, taskId);
-        return toReviewTask(row!, at);
+        return toReviewTask(row!, at, await isOnCareTeam(tx, ctx, patientId));
       });
     },
   );
@@ -181,7 +182,7 @@ export const reviewActionRoutes: FastifyPluginAsyncZod = async (app) => {
             metadata: { status, ruleKey: task.rule.key },
           });
           const row = await findTask(tx, ctx, patientId, taskId);
-          return toReviewTask(row!, at);
+          return toReviewTask(row!, at, await isOnCareTeam(tx, ctx, patientId));
         });
       },
     );

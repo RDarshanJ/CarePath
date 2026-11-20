@@ -45,6 +45,7 @@ export const exerciseRoutes: FastifyPluginAsyncZod = async (app) => {
           description: e.description,
           instructions: e.instructions,
           mediaPath: e.mediaPath,
+          mediaAlt: e.mediaAlt,
           defaults: {
             sets: e.defaultSets,
             reps: e.defaultReps,

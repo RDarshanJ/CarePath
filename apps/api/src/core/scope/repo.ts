@@ -47,6 +47,32 @@ export async function isOnCareTeam(
   return row !== null;
 }
 
+/**
+ * Of the given patients, those whose active care team has the caller as an active member (CR-2).
+ * One query for a whole page; the same condition as isOnCareTeam.
+ */
+export async function careTeamPatientIds(
+  db: DbClient,
+  ctx: Pick<RequestCtx, "orgId" | "userId">,
+  patientIds: readonly string[],
+): Promise<Set<string>> {
+  if (patientIds.length === 0) return new Set();
+  const rows = await db.careTeamMember.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      userId: ctx.userId,
+      endedAt: null,
+      careTeam: {
+        patientId: { in: [...new Set(patientIds)] },
+        organizationId: ctx.orgId,
+        status: "active",
+      },
+    },
+    select: { careTeam: { select: { patientId: true } } },
+  });
+  return new Set(rows.map((r) => r.careTeam.patientId));
+}
+
 /** Child resources of a patient, keyed by the resource type recorded in audit events. */
 export type PatientChild =
   "ExerciseSession" | "PatientCheckIn" | "ReviewTask" | "CarePlanVersion" | "Consent";

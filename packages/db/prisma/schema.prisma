@@ -702,7 +702,10 @@ model Exercise {
   category               String
   description            String
   instructions           String
+  /// Public path of a static illustration under apps/web/public/assets (checkpoint C2, ruling 3.4).
   mediaPath              String?
+  /// Plain description of the illustration, never an instruction. Null when mediaPath is null.
+  mediaAlt               String?
   defaultSets            Int?
   defaultReps            Int?
   defaultHoldSeconds     Int?

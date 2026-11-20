@@ -347,14 +347,13 @@ export function PlanTab({ patientId }: { patientId: string }) {
     queryFn: () => reads.versions(patientId),
   });
   const [openVersion, setOpenVersion] = useState<string | null>(null);
-  const hasDraft = draft.isSuccess;
 
   if (plan.isError) return <QueryError error={plan.error} onRetry={() => void plan.refetch()} />;
   if (!plan.data) return <ListSkeleton rows={6} label="Loading care plan" />;
 
   return (
     <div className="flex flex-col gap-5">
-      {hasDraft ? (
+      {draft.data ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-container border border-border bg-info-bg p-3 text-info-ink">
           <p className="text-body">
             An unpublished draft was saved {formatDateTime(draft.data.updatedAt, timezone)} by{" "}

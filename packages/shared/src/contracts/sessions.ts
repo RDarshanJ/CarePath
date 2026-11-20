@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { doseSchema } from "./care-plan.js";
-import { instantSchema, pageOf } from "./common.js";
+import { exerciseMediaShape, instantSchema, pageOf } from "./common.js";
 
 /**
  * Guided exercise sessions (Scenario C). A session runs against one immutable plan version and
@@ -59,7 +59,7 @@ export const sessionActivitySchema = z.object({
     category: z.string(),
     description: z.string(),
     instructions: z.string(),
-    mediaPath: z.string().nullable(),
+    ...exerciseMediaShape,
   }),
   dose: doseSchema,
   clinicianInstructions: z.string().nullable(),

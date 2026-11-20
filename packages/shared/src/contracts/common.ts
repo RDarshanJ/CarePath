@@ -37,6 +37,16 @@ export const personRefSchema = z.object({
 });
 export type PersonRef = z.infer<typeof personRefSchema>;
 
+/**
+ * Exercise illustration (checkpoint C2, ruling 3.4). `mediaPath` is a public path to a static file
+ * under apps/web/public/assets, served by the web app; no API route serves media. `mediaAlt` is a
+ * plain description of the picture, never an instruction. Both are null, or both are set.
+ */
+export const exerciseMediaShape = {
+  mediaPath: z.string().nullable(),
+  mediaAlt: z.string().nullable(),
+};
+
 /** Empty JSON object body for action endpoints (`.strict()`: unknown keys are a 400). */
 export const emptyBodySchema = z.object({}).strict();
 

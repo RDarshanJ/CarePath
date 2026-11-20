@@ -256,3 +256,49 @@ describe("review queue reads (Scenario D)", () => {
     expect(a.json().weeks.at(-1)).toMatchObject({ stoppedSessions: 1, completedSessions: 0 });
   });
 });
+
+describe("care-team flag and totals (CR-2, CR-3; checkpoint C2, F4)", () => {
+  it("directory total counts the whole query, ignoring the cursor", async () => {
+    const call = as(app, therapist);
+    const p1 = await call({ method: "GET", url: "/patients?limit=1&sort=name" });
+    expect(p1.json()).toMatchObject({ total: 2 });
+    const p2 = await call({
+      method: "GET",
+      url: `/patients?limit=1&sort=name&cursor=${p1.json().nextCursor}`,
+    });
+    expect(p2.json()).toMatchObject({ total: 2 });
+    const filtered = await call({ method: "GET", url: "/patients?hasOpenReview=true" });
+    expect(filtered.json()).toMatchObject({ total: 1 });
+    const admin = await as(app, coordinator)({ method: "GET", url: "/patients?status=active" });
+    expect(admin.json().total).toBe(admin.json().items.length);
+  });
+
+  it("review tasks say whether the caller is on the patient's care team", async () => {
+    const other = as(app, await login(app, org.otherTherapist.email));
+    const mine = (await as(app, therapist)({ method: "GET", url: "/review-tasks" })).json();
+    const theirs = (await other({ method: "GET", url: "/review-tasks" })).json();
+    expect(mine).toMatchObject({ total: 1, items: [{ onCareTeam: true }] });
+    expect(theirs).toMatchObject({
+      total: 1,
+      items: [{ id: mine.items[0].id, onCareTeam: false }],
+    });
+    const perPatient = await other({
+      method: "GET",
+      url: `/patients/${org.patient.patientId}/review-tasks?limit=1`,
+    });
+    expect(perPatient.json()).toMatchObject({ total: 1, items: [{ onCareTeam: false }] });
+    const resolved = await other({ method: "GET", url: "/review-tasks?status=resolved" });
+    expect(resolved.json()).toMatchObject({ total: 0, items: [] });
+  });
+
+  it("the patient header carries onCareTeam for clinical callers only", async () => {
+    const url = `/patients/${org.patient.patientId}`;
+    const header = async (s: Session) => (await as(app, s)({ method: "GET", url })).json();
+    expect(await header(therapist)).toMatchObject({ onCareTeam: true });
+    expect(await header(await login(app, org.otherTherapist.email))).toMatchObject({
+      onCareTeam: false,
+    });
+    expect(await header(coordinator)).toMatchObject({ onCareTeam: null });
+    expect(await header(await login(app, org.patient.email))).toMatchObject({ onCareTeam: null });
+  });
+});

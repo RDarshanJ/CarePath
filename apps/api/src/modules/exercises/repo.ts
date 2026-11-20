@@ -35,6 +35,7 @@ export async function listExercises(
       description: true,
       instructions: true,
       mediaPath: true,
+      mediaAlt: true,
       defaultSets: true,
       defaultReps: true,
       defaultHoldSeconds: true,
@@ -67,6 +68,7 @@ export async function exercisesByIds(db: DbClient, ctx: Pick<RequestCtx, "orgId"
       description: true,
       instructions: true,
       mediaPath: true,
+      mediaAlt: true,
     },
   });
 }

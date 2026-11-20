@@ -1,4 +1,5 @@
 import {
+  carePlanDraftResultSchema,
   carePlanDraftSchema,
   carePlanVersionDetailSchema,
   carePlanVersionListSchema,
@@ -72,7 +73,9 @@ export const reads = {
   versions: (id: string) => api.get(`${pid(id)}/care-plan/versions`, carePlanVersionListSchema),
   version: (id: string, versionId: string) =>
     api.get(`${pid(id)}/care-plan/versions/${versionId}`, carePlanVersionDetailSchema),
-  draft: (id: string) => api.get(`${pid(id)}/care-plan/draft`, carePlanDraftSchema),
+  /** The draft, or null when the plan has none. */
+  draft: (id: string) =>
+    api.get(`${pid(id)}/care-plan/draft`, carePlanDraftResultSchema).then((r) => r.draft),
   preview: (id: string) => api.get(`${pid(id)}/care-plan/draft/preview`, patientCarePlanSchema),
   progress: (id: string, weeks = 8) =>
     api.get(`${pid(id)}/progress${qs({ weeks })}`, progressViewSchema),

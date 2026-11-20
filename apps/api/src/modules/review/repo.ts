@@ -100,6 +100,18 @@ export interface TaskListFilter {
   patientIds?: string[];
 }
 
+function taskWhere(ctx: Scope, filter: TaskListFilter): Prisma.ReviewTaskWhereInput {
+  return {
+    organizationId: ctx.orgId,
+    status: { in: [...(statusFilter[filter.status] ?? activeTaskStatuses)] },
+    ...(filter.assignedPractitionerId !== undefined
+      ? { assignedPractitionerId: filter.assignedPractitionerId }
+      : {}),
+    ...(filter.ruleKey ? { rule: { key: filter.ruleKey } } : {}),
+    ...(filter.patientIds ? { patientId: { in: filter.patientIds } } : {}),
+  };
+}
+
 /** Highest priority first, then oldest. */
 export async function listTasks(
   db: DbClient,
@@ -109,20 +121,30 @@ export async function listTasks(
   take: number,
 ): Promise<TaskRow[]> {
   return db.reviewTask.findMany({
-    where: {
-      organizationId: ctx.orgId,
-      status: { in: [...(statusFilter[filter.status] ?? activeTaskStatuses)] },
-      ...(filter.assignedPractitionerId !== undefined
-        ? { assignedPractitionerId: filter.assignedPractitionerId }
-        : {}),
-      ...(filter.ruleKey ? { rule: { key: filter.ruleKey } } : {}),
-      ...(filter.patientIds ? { patientId: { in: filter.patientIds } } : {}),
-    },
+    where: taskWhere(ctx, filter),
     orderBy: [{ priority: "desc" }, { createdAt: "asc" }, { id: "asc" }],
     skip: offset,
     take,
     select: taskSelect,
   });
+}
+
+/** Count for listTasks: same WHERE and scope, cursor ignored (CR-3). */
+export async function countTasks(
+  db: DbClient,
+  ctx: Scope,
+  filter: TaskListFilter,
+): Promise<number> {
+  return db.reviewTask.count({ where: taskWhere(ctx, filter) });
+}
+
+/** Count for listPatientTasks: same WHERE and scope, cursor ignored (CR-3). */
+export async function countPatientTasks(
+  db: DbClient,
+  ctx: Scope,
+  patientId: string,
+): Promise<number> {
+  return db.reviewTask.count({ where: { organizationId: ctx.orgId, patientId } });
 }
 
 /** Every task of one patient, newest first. */

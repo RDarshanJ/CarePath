@@ -97,6 +97,16 @@ function directoryOrder(sort: DirectoryFilter["sort"]): Prisma.PatientOrderByWit
   return [{ familyName: dir }, { givenName: dir }, { id: "asc" }];
 }
 
+/** Count for the directory: same WHERE and scope, cursor ignored (CR-3). */
+export async function countDirectory(
+  db: DbClient,
+  ctx: RequestCtx,
+  filter: DirectoryFilter,
+  now: Date,
+): Promise<number> {
+  return db.patient.count({ where: directoryWhere(ctx, filter, now) });
+}
+
 /** Directory page: filters and sort in SQL (REQ-DIR-01). */
 export async function listDirectory(
   db: DbClient,

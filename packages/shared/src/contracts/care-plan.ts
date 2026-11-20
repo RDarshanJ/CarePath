@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { instantSchema, localDateSchema, personRefSchema, weekdaySchema } from "./common.js";
+import {
+  exerciseMediaShape,
+  instantSchema,
+  localDateSchema,
+  personRefSchema,
+  weekdaySchema,
+} from "./common.js";
 
 /**
  * Care plans (Scenario B). A plan has one mutable draft (CarePlan.draftContent) and immutable
@@ -112,6 +118,12 @@ export const carePlanDraftSchema = z
   .meta({ id: "CarePlanDraft" });
 export type CarePlanDraft = z.infer<typeof carePlanDraftSchema>;
 
+/** GET draft: `{ draft: null }` when the plan has no unpublished draft (checkpoint C2, F4). */
+export const carePlanDraftResultSchema = z
+  .object({ draft: carePlanDraftSchema.nullable() })
+  .meta({ id: "CarePlanDraftResult" });
+export type CarePlanDraftResult = z.infer<typeof carePlanDraftResultSchema>;
+
 export const carePlanPublishRequestSchema = z
   .object({
     /** Required from version 2 (AC-B4): a missing or blank note is a 400 on this path. */
@@ -135,7 +147,7 @@ export const carePlanItemSchema = z.object({
     category: z.string(),
     description: z.string(),
     instructions: z.string(),
-    mediaPath: z.string().nullable(),
+    ...exerciseMediaShape,
   }),
   /** "Set by your care team" (REQ-PLN-06). */
   dose: doseSchema,

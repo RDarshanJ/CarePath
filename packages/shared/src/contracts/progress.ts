@@ -8,8 +8,9 @@ import { instantSchema, localDateSchema } from "./common.js";
  * (AC-C2). Pain is labelled patient-reported and carries no trend caption (AC-C7).
  *
  * Definitions, all in the organization's time zone, for days up to and including today:
- * - assignedSessions: days on which the plan version current at the end of that day schedules
- *   exercises, times its timesPerDay.
+ * - assignedSessions: week to date. Days from the week's Monday up to and including today on which
+ *   the plan version current at the end of that day schedules exercises, times its timesPerDay.
+ *   In the current week it counts only days so far, so copy should say "so far this week".
  * - completedSessions: sessions with status completed whose start falls in the week.
  * - stoppedSessions: sessions stopped for discomfort.
  * - completedActivities / skippedActivities: SessionActivity rows of those sessions.
@@ -24,6 +25,7 @@ export const weeklyProgressSchema = z
     /** Monday of the week. */
     weekStart: localDateSchema,
     weekEnd: localDateSchema,
+    /** Week to date: scheduled sessions on days up to and including today (see above). */
     assignedSessions: z.number().int(),
     completedSessions: z.number().int(),
     stoppedSessions: z.number().int(),

@@ -25,7 +25,10 @@ export const clinicianOverviewSchema = z
     timezone: z.string(),
     /** Number of patients whose care team includes the signed-in clinician. */
     caseloadSize: z.number().int(),
-    /** Open and in-review tasks of care-team patients, highest priority then oldest first. */
+    /**
+     * Open and in-review tasks of the signed-in clinician's caseload (care-team patients) only, not
+     * the whole clinic queue; highest priority then oldest first. `GET /review-tasks` is the clinic queue.
+     */
     openTasks: workList(reviewTaskSchema),
     /** Check-ins of care-team patients not yet marked reviewed, oldest first. */
     unreviewedCheckIns: workList(
@@ -38,8 +41,8 @@ export const clinicianOverviewSchema = z
       }),
     ),
     /**
-     * Active care-team patients with fewer completed sessions than assigned over the last 7
-     * days before today (same definitions as ProgressView).
+     * Active care-team patients with fewer completed sessions than assigned over the 7 days
+     * before today, `windowStart` to `windowEnd` (same definitions as ProgressView).
      */
     missedActivity: workList(
       z.object({

@@ -353,3 +353,43 @@ describe("enrollment codes and clinic settings", () => {
     );
   });
 });
+
+describe("exercise illustration description (migration exercise_media_alt, checkpoint C2 ruling 3.4)", () => {
+  const base = (org: Org) => ({
+    organizationId: org.orgId,
+    slug: `ex-${randomUUID().slice(0, 8)}`,
+    name: "Fictional heel slide",
+    bodyArea: "knee",
+    category: "mobility",
+    description: "Fictional demonstration exercise.",
+    instructions: "Fictional instructions.",
+  });
+
+  it("stores a path with its description, or neither", async () => {
+    const org = await createOrg();
+    await exercise(org);
+    const id = await insert("Exercise", {
+      ...base(org),
+      mediaPath: "/assets/exercises/heel-slide.webp",
+      mediaAlt: "A person lying on a mat with one knee bent",
+    });
+    const row = await one<{ mediaAlt: string }>(`SELECT "mediaAlt" FROM "Exercise" WHERE id = $1`, [
+      id,
+    ]);
+    expect(row.mediaAlt).toBe("A person lying on a mat with one knee bent");
+  });
+
+  it("rejects a path without a description and a description without a path", async () => {
+    const org = await createOrg();
+    await expectDbError(
+      insert("Exercise", { ...base(org), mediaPath: "/assets/exercises/heel-slide.webp" }),
+      E.checkViolation,
+      "Exercise_media_alt_with_path",
+    );
+    await expectDbError(
+      insert("Exercise", { ...base(org), mediaAlt: "A person lying on a mat" }),
+      E.checkViolation,
+      "Exercise_media_alt_with_path",
+    );
+  });
+});

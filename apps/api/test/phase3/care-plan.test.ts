@@ -70,7 +70,10 @@ describe("draft autosave", () => {
 
   it("has no draft at first, then saves one (the plan already exists)", async () => {
     const call = as(app, therapist);
-    expect((await call({ method: "GET", url: `${base()}/care-plan/draft` })).statusCode).toBe(404);
+    // No draft is a normal state: 200 with { draft: null } (checkpoint C2, F4).
+    const none = await call({ method: "GET", url: `${base()}/care-plan/draft` });
+    expect(none.statusCode).toBe(200);
+    expect(none.json()).toEqual({ draft: null });
     // The patient starts a session on version 2 before anything is published (AC-B5).
     const s = await as(app, patient)({ method: "POST", url: `${base()}/sessions`, payload: {} });
     openSessionId = s.json().id;
@@ -278,9 +281,9 @@ describe("draft autosave", () => {
         resourceId: v3.version.id,
         patientId: org.patient.patientId,
       });
-      expect(
-        (await as(app, therapist)({ method: "GET", url: `${base()}/care-plan/draft` })).statusCode,
-      ).toBe(404);
+      const after = await as(app, therapist)({ method: "GET", url: `${base()}/care-plan/draft` });
+      expect(after.statusCode).toBe(200);
+      expect(after.json()).toEqual({ draft: null });
       const goals = await goalsOfPlan(db, fx.carePlanId);
       expect(goals.map((g) => [g.description, g.lifecycleStatus]).sort()).toEqual([
         ["Climb one flight of stairs without stopping", "cancelled"],

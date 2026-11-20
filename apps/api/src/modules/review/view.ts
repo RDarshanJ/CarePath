@@ -32,8 +32,11 @@ export function ruleKind(key: string): "clinical" | "administrative" {
   return clinicalReviewRuleKeys.includes(key as ReviewRuleKey) ? "clinical" : "administrative";
 }
 
-/** A task with why it appeared: rule, value, threshold, explanation and source links. */
-export function toReviewTask(row: TaskRow, now: Date): ReviewTask {
+/**
+ * A task with why it appeared: rule, value, threshold, explanation and source links.
+ * `onCareTeam` is computed for the caller (careTeamPatientIds or isOnCareTeam).
+ */
+export function toReviewTask(row: TaskRow, now: Date, onCareTeam: boolean): ReviewTask {
   const evidence = evidenceOf(row);
   const measured = evidence.find((e) => typeof e.value === "number");
   const sources: ReviewTaskSource[] = evidence.map((e) => ({
@@ -61,5 +64,6 @@ export function toReviewTask(row: TaskRow, now: Date): ReviewTask {
     resolvedAt: row.resolvedAt?.toISOString() ?? null,
     resolvedBy: userRef(row.resolvedBy?.user ?? null),
     resolutionNote: row.resolutionNote,
+    onCareTeam,
   };
 }

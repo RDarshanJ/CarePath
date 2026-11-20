@@ -19,6 +19,7 @@ export const exerciseSelect = {
   description: true,
   instructions: true,
   mediaPath: true,
+  mediaAlt: true,
 } as const;
 
 export const assignmentSelect = {
