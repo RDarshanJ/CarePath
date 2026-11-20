@@ -20,6 +20,12 @@ const personSelect = {
   },
 } as const;
 
+/** Equal `joinedAt` is possible (one transaction adds the whole care team), so `id` breaks the tie. */
+const participantOrder: Prisma.ConversationParticipantOrderByWithRelationInput[] = [
+  { joinedAt: "asc" },
+  { id: "asc" },
+];
+
 const conversationSelect = {
   id: true,
   subject: true,
@@ -27,7 +33,7 @@ const conversationSelect = {
   lastMessageAt: true,
   patient: { select: { id: true, givenName: true, familyName: true } },
   participants: {
-    orderBy: { joinedAt: "asc" },
+    orderBy: participantOrder,
     select: { userId: true, ...personSelect },
   },
 } as const;

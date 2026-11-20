@@ -202,6 +202,42 @@ describe("send, delivery and unread counts", () => {
     expect([...all].sort().reverse()).toEqual(all);
   });
 
+  it("lists participants with equal joinedAt in id order", async () => {
+    const at = new Date("2026-11-19T11:00:00Z");
+    const c = await db.conversation.create({
+      data: {
+        organizationId: org.orgId,
+        patientId: org.patient.patientId,
+        subject: "Tie-break",
+        createdAt: at,
+      },
+      select: { id: true },
+    });
+    // Same joinedAt for all three; ids are chosen so id order differs from insertion order.
+    const rows = [
+      { id: "00000000-0000-4000-8000-000000000003", userId: org.patient.userId },
+      { id: "00000000-0000-4000-8000-000000000001", userId: org.therapist.userId },
+      { id: "00000000-0000-4000-8000-000000000002", userId: org.coordinator.userId },
+    ];
+    for (const r of rows) {
+      await db.conversationParticipant.create({
+        data: { ...r, organizationId: org.orgId, conversationId: c.id, joinedAt: at },
+      });
+    }
+    for (let i = 0; i < 3; i++) {
+      const res = await messages(therapist, c.id);
+      expect(res.statusCode).toBe(200);
+      expect(
+        res.json().conversation.participants.map((p: { roleLabel: string }) => p.roleLabel),
+      ).toEqual(["Physical therapist", "Care coordinator", "Patient"]);
+    }
+    // Later tests count the organization's threads.
+    await db.conversationParticipant.deleteMany({ where: { conversationId: c.id } });
+    await db.conversation.delete({
+      where: { id_organizationId: { id: c.id, organizationId: org.orgId } },
+    });
+  });
+
   it("rejects empty, oversized and unknown-key bodies", async () => {
     for (const payload of [{ body: "   " }, { body: "x".repeat(2001) }, { body: "hi", extra: 1 }]) {
       const res = await patient({
