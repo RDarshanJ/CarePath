@@ -94,8 +94,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 M, S6c; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): WP 5.2
 - Blocking: Yes, WP 5.3.
-- Status: open
-- Answer: pending
+- Status: delivered (WP 5.2, branch `wp/5.2`)
+- Answer: the review state is stored in `AIReview.editedOutput` (`carepath.ai.review-state.v1`): per-statement resolution (`edited` with text, `removed`, `acknowledged` with a note), `acknowledgedMissing`, and `evidenceOpened` entries ({statementId, type, id, at}) recorded by `POST /patients/:patientId/ai/generations/:generationId/evidence-opens`. `AiGeneration` exposes `statements[].resolution`, `note`, `evidenceOpened`, `missingInformation[].acknowledged`, `revisions[].kind` and `approval.blockers` (`unsupported_unresolved`, `missing_unacknowledged`, `evidence_not_opened`, `empty_output`, `consent_withdrawn`). Approval after consent withdrawal answers 409 `ai_consent_withdrawn` with an `ai.refused` event; rejecting stays available. Demo rules pending clinical governance review.
 
 ### CR-8: Notes: amendment, completeness and entered in error
 
@@ -106,8 +106,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 M, S4, S5; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): WP 5.2
 - Blocking: Yes, WP 5.3 notes.
-- Status: open
-- Answer: pending
+- Status: delivered (WP 5.2, branch `wp/5.2`)
+- Answer: `POST /patients/:patientId/notes/:noteId/amendments` (author only, `reason` required, creates and signs the amendment in one call; `note.sign` event with detail `amendment`); `POST .../versions` now takes working versions on drafts only; `POST .../sign` answers 409 `note_empty` when all four sections are blank; `POST .../entered-in-error` (author or clinic administrator, `reason` required, signed notes only, irreversible by trigger; `note.entered_in_error` event). `ClinicalNote` carries `enteredInError {at, by, reason}`, `canSign`, `canAmend`, `canMarkEnteredInError`. Excluding entered-in-error notes from FHIR export belongs to the DocumentReference mapper (WP 5.4 batch 2): export only `status = signed`. Demo rules pending clinical governance review.
 
 ### CR-9: Review task priority level
 
@@ -202,8 +202,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 H; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): WP 5.2
 - Blocking: No. The group appears when the field does.
-- Status: open
-- Answer: pending
+- Status: delivered (WP 5.2, branch `wp/5.2`)
+- Answer: `ClinicianOverview.aiDraftsAwaitingReview` (`{ count, items }`): succeeded generations of care-team patients with no decision and no regeneration, oldest first; each item has `generationId`, `patient`, `kind`, `reviewState` (`unreviewed` or `in_review`), `createdAt`, `unsupportedStatementCount`.
 
 ### CR-17: Idempotency key on booking
 
