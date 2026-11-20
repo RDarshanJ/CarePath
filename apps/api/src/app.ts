@@ -19,10 +19,12 @@ import { loggerOptions, registerRequestLogging } from "./core/logging.js";
 import { registerOpenApi, registerOpenApiRoute } from "./core/openapi.js";
 import { carePlanRoutes } from "./modules/care-plans/routes.js";
 import { checkInRoutes } from "./modules/check-ins/routes.js";
+import { checkInWriteRoutes } from "./modules/check-ins/write-routes.js";
 import { clinicRoutes } from "./modules/clinic/routes.js";
 import { patientRoutes } from "./modules/patients/routes.js";
 import { progressRoutes } from "./modules/progress/routes.js";
 import { sessionRoutes } from "./modules/sessions/routes.js";
+import { sessionWriteRoutes } from "./modules/sessions/write-routes.js";
 import { todayRoutes } from "./modules/today/routes.js";
 
 export interface BuildAppOptions {
@@ -88,6 +90,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(checkInRoutes);
   await app.register(progressRoutes);
   await app.register(clinicRoutes);
+  // Step 2: session and check-in writes.
+  await app.register(sessionWriteRoutes);
+  await app.register(checkInWriteRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();
