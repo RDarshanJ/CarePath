@@ -105,7 +105,13 @@ for (const role of roles) {
     }
     if (account.shell === "clinician") {
       const nav = page.getByRole("navigation", { name: "Clinician" });
-      await expect(nav.getByRole("link")).toHaveText(["Overview", "Patients", "Review queue"]);
+      await expect(nav.getByRole("link")).toHaveText([
+        "Overview",
+        "Patients",
+        "Schedule",
+        /^Messages/,
+        "Review queue",
+      ]);
       for (const [name, url] of [
         ["Patients", /\/patients$/],
         ["Review queue", /\/review-queue$/],

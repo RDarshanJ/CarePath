@@ -5,7 +5,7 @@ import {
   expect,
   findPatientId,
   patientApi,
-  screenshot,
+  screenshot as takeScreenshot,
   signInClinician,
   tabTo,
   test,
@@ -16,6 +16,12 @@ import {
  * Real sign-ins and real API calls. Axe (serious and critical) runs on every screen at 1440 and 1024.
  */
 desktopOnly();
+
+/** Let the rail's unread count and any polling settle first, so a screenshot is the same on every run. */
+async function screenshot(page: Page, name: string, width: 1440 | 1024) {
+  await page.waitForTimeout(700);
+  await takeScreenshot(page, name, width);
+}
 
 const forceFailure = process.env["MESSAGE_FORCE_FAILURE"] === "true";
 
@@ -191,7 +197,7 @@ test.describe("messages", () => {
       await expect(people.first()).toContainText(/Patient|Physical therapist|Care coordinator/);
     }
 
-    const text = `Test reply ${Date.now()}`;
+    const text = "Test reply from the end-to-end run";
     await page.getByLabel(/^Message to /).fill(text);
     await page.getByRole("button", { name: "Send message" }).click();
     const sent = thread.getByRole("listitem").filter({ hasText: text });
@@ -232,7 +238,7 @@ test.describe("messages", () => {
     await expect(page).toHaveURL(/\/messages\?c=/);
     const box = page.getByLabel(/^Message to /);
     await tabTo(page, box);
-    const text = `Keyboard reply ${Date.now()}`;
+    const text = "Keyboard reply from the end-to-end run";
     await page.keyboard.type(text);
     await page.keyboard.press("Control+Enter");
     await expect(page.getByRole("log", { name: /^Messages with / }).getByText(text)).toBeVisible();
@@ -300,7 +306,7 @@ test.describe("failed delivery", () => {
       .first()
       .click();
     const thread = page.getByRole("log", { name: /^Messages with / });
-    const text = `Will not deliver ${Date.now()}`;
+    const text = "This message will not deliver";
     await page.getByLabel(/^Message to /).fill(text);
     await page.getByRole("button", { name: "Send message" }).click();
     const item = thread.getByRole("listitem").filter({ hasText: text });

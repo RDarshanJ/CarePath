@@ -14,7 +14,7 @@ source scripts/gate-env.sh wp43b 4044 3044 || exit 1
 run() { echo; echo "==> $*"; "$@" || { echo "FAILED: $*" >&2; exit 1; }; }
 OWNED=(
   "apps/web/app/(clinician)" apps/web/components/shells.tsx
-  apps/web/e2e/clinician-schedule-messages.spec.ts
+  apps/web/e2e/clinician-schedule-messages.spec.ts apps/web/e2e/auth.spec.ts
   apps/api/src/modules/messaging/repo.ts apps/api/test/phase4/messaging.test.ts
 )
 run pnpm db:migrate
@@ -27,7 +27,8 @@ run pnpm --filter @carepath/api exec vitest run test/phase4/messaging.test.ts
 run scripts/with-web-lock.sh pnpm --filter @carepath/web build
 export SCREENSHOT_DIR="$PWD/docs/screenshots/4.3b"
 mkdir -p "$SCREENSHOT_DIR"
-export E2E_ARGS="${GATE_E2E_ARGS:-clinician- --project=desktop-1440}"
+# Only this package's spec records screenshots here; the rest of the suite runs in `pnpm verify`.
+export E2E_ARGS="${GATE_E2E_ARGS:-clinician-schedule-messages --project=desktop-1440}"
 run scripts/with-web-lock.sh scripts/e2e.sh
 echo; echo "==> failed delivery and retry (API with MESSAGE_FORCE_FAILURE=true)"
 MESSAGE_FORCE_FAILURE=true E2E_ARGS="clinician-schedule-messages --project=desktop-1440 -g failed" \
@@ -37,7 +38,9 @@ if [ -z "${GATE_SKIP_VERIFY:-}" ]; then
   run pnpm verify
 fi
 echo; echo "==> git status --porcelain"
-status="$(git status --porcelain)"
+# Screenshot PNGs are re-recorded by every run and are not byte-identical between runs (font rasterising),
+# so the committed set is whatever the last run wrote; everything else must be clean.
+status="$(git status --porcelain -- . ':(exclude)docs/screenshots/4.3b')"
 if [ -n "$status" ]; then echo "$status"; echo "FAILED: working tree not clean" >&2; exit 1; fi
 echo "(clean)"
 echo; echo "WP 4.3b gate: PASSED"
