@@ -8,3 +8,5 @@ docs/decisions/advisor-plan.md
 docs/BRIEF.md
 docs
 packages/ui/src/styles/tokens.css
+packages/db/src/generated
+packages/db/prisma/migrations

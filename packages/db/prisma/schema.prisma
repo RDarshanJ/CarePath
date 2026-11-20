@@ -1,0 +1,1329 @@
+// CarePath data model. Synthetic data only; not for clinical use.
+//
+// Conventions (see docs/architecture/domain-model.md):
+// - Every tenant row carries organizationId. Child rows reference tenant parents through
+//   composite foreign keys (parentId, organizationId) -> parent(id, organizationId), so a row
+//   can never point at a parent in another organization. The @@unique([id, organizationId])
+//   on each parent exists only to back those foreign keys.
+// - User actors inside a tenant row reference OrganizationMembership(userId, organizationId),
+//   which proves the actor belongs to the same organization.
+// - All timestamps are timestamptz (UTC). Date-only values (birth, onset, due) are date.
+// - CarePlanVersion, ExerciseAssignment, ClinicalNoteVersion, AIReview and AuditEvent are
+//   append-only (triggers in the constraints migration reject UPDATE and DELETE).
+// - Status transitions are enforced by a trigger reading "_StatusTransition"; the same table
+//   is mirrored in src/status.ts and a test asserts they match.
+// - Constraints Prisma cannot express (exclusion, check, partial unique, triggers) live in
+//   prisma/migrations/*_constraints/migration.sql.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+  runtime             = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum RoleKey {
+  patient
+  physical_therapist
+  care_coordinator
+  clinic_admin
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum MembershipStatus {
+  active
+  revoked
+}
+
+enum AdministrativeGender {
+  female
+  male
+  other
+  unknown
+}
+
+enum PatientStatus {
+  intake_incomplete
+  awaiting_assignment
+  active
+  inactive
+  discharged
+}
+
+enum CareTeamStatus {
+  active
+  inactive
+}
+
+enum CareTeamMemberRole {
+  primary_therapist
+  therapist
+  care_coordinator
+}
+
+/// Exactly three types (advisor plan rev1). ai_assisted_features is enforced before any AI
+/// generation; motion_tracking is used only with the Phase 9 demo.
+enum ConsentType {
+  treatment_and_data_use
+  ai_assisted_features
+  motion_tracking
+}
+
+enum ConsentStatus {
+  active
+  inactive
+  rejected
+  entered_in_error
+}
+
+enum IntakeStatus {
+  in_progress
+  submitted
+  reviewed
+}
+
+enum ConditionCategory {
+  problem_list_item
+  encounter_diagnosis
+  health_concern
+}
+
+enum ConditionClinicalStatus {
+  active
+  recurrence
+  relapse
+  inactive
+  remission
+  resolved
+}
+
+enum ConditionVerificationStatus {
+  unconfirmed
+  provisional
+  differential
+  confirmed
+  refuted
+  entered_in_error
+}
+
+enum GoalLifecycleStatus {
+  proposed
+  planned
+  accepted
+  active
+  on_hold
+  completed
+  cancelled
+  entered_in_error
+  rejected
+}
+
+enum CarePlanStatus {
+  draft
+  active
+  on_hold
+  revoked
+  completed
+  entered_in_error
+}
+
+enum ExerciseSessionStatus {
+  in_progress
+  paused
+  completed
+  abandoned
+}
+
+enum SessionActivityStatus {
+  pending
+  completed
+  skipped
+}
+
+enum CheckInDifficulty {
+  easier
+  as_expected
+  harder
+}
+
+enum ObservationStatus {
+  final
+  amended
+  corrected
+  cancelled
+  entered_in_error
+}
+
+enum ObservationCategory {
+  survey
+  activity
+  exam
+  vital_signs
+}
+
+enum ObservationPerformerType {
+  patient
+  practitioner
+}
+
+enum SlotStatus {
+  open
+  booked
+  blocked
+}
+
+enum AppointmentType {
+  initial_evaluation
+  follow_up
+  video_follow_up
+}
+
+enum AppointmentStatus {
+  requested
+  booked
+  checked_in
+  in_progress
+  completed
+  cancelled_by_patient
+  cancelled_by_clinic
+  no_show
+}
+
+enum EncounterClass {
+  AMB
+  VR
+}
+
+/// No planned or cancelled states: an Encounter exists only for a visit that took place.
+enum EncounterStatus {
+  in_progress
+  finished
+  entered_in_error
+}
+
+enum ClinicalNoteType {
+  progress_note
+  initial_evaluation
+}
+
+/// draft -> signed. Amendments are new versions on a signed note, not a status.
+enum ClinicalNoteStatus {
+  draft
+  signed
+  entered_in_error
+}
+
+enum NoteVersionSource {
+  clinician
+  ai_draft
+}
+
+enum MessageStatus {
+  queued
+  sent
+  failed
+}
+
+enum NotificationType {
+  appointment_reminder
+  appointment_changed
+  message_received
+  care_plan_published
+  review_task_assigned
+  ai_draft_ready
+}
+
+enum ReviewTaskStatus {
+  open
+  in_review
+  resolved
+  dismissed
+}
+
+enum AIGenerationKind {
+  progress_summary
+  note_draft
+  navigation_answer
+}
+
+enum AIGenerationStatus {
+  pending
+  succeeded
+  failed
+}
+
+enum AIReviewDecision {
+  approved
+  approved_with_edits
+  rejected
+}
+
+enum AuditActorType {
+  user
+  system
+  ai
+}
+
+enum AuditAction {
+  C
+  R
+  U
+  D
+  E
+}
+
+enum AuditOutcome {
+  success
+  minor_failure
+  serious_failure
+  major_failure
+}
+
+enum PurposeOfUse {
+  treatment
+  operations
+  patient_access
+  admin
+  export
+}
+
+enum JobStatus {
+  queued
+  running
+  succeeded
+  dead
+}
+
+// ---------------------------------------------------------------------------
+// Identity, tenancy, access
+// ---------------------------------------------------------------------------
+
+/// Tenant boundary. Maps to FHIR Organization.
+model Organization {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String   @unique
+  timezone  String   @default("UTC")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  memberships          OrganizationMembership[]
+  authSessions         AuthSession[]
+  patients             Patient[]
+  practitioners        Practitioner[]
+  careTeams            CareTeam[]
+  careTeamMembers      CareTeamMember[]
+  consents             Consent[]
+  intakeAssessments    IntakeAssessment[]
+  conditions           Condition[]
+  goals                Goal[]
+  exercises            Exercise[]
+  carePlans            CarePlan[]
+  carePlanVersions     CarePlanVersion[]
+  exerciseAssignments  ExerciseAssignment[]
+  exerciseSessions     ExerciseSession[]
+  sessionActivities    SessionActivity[]
+  checkIns             PatientCheckIn[]
+  observations         Observation[]
+  availabilitySlots    AvailabilitySlot[]
+  appointments         Appointment[]
+  encounters           Encounter[]
+  clinicalNotes        ClinicalNote[]
+  clinicalNoteVersions ClinicalNoteVersion[]
+  conversations        Conversation[]
+  participants         ConversationParticipant[]
+  messages             Message[]
+  notifications        Notification[]
+  reviewRules          ReviewRule[]
+  reviewTasks          ReviewTask[]
+  aiGenerations        AIGeneration[]
+  aiReviews            AIReview[]
+  auditEvents          AuditEvent[]
+  jobs                 Job[]
+}
+
+/// Login principal. Global (not a tenant row); access comes only from memberships.
+/// Links to at most one Patient or one Practitioner profile, never both (trigger).
+model User {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String     @unique
+  passwordHash String
+  displayName  String
+  status       UserStatus @default(active)
+  lastLoginAt  DateTime?  @db.Timestamptz(3)
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime   @default(now()) @updatedAt @db.Timestamptz(3)
+
+  memberships  OrganizationMembership[]
+  patient      Patient?
+  practitioner Practitioner?
+  auditEvents  AuditEvent[]
+}
+
+/// Reference table of the four roles and their permission keys. Global, read-only in v1.
+model Role {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         RoleKey  @unique
+  name        String
+  description String
+  permissions String[]
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  memberships OrganizationMembership[]
+}
+
+/// A user's role in one organization. FHIR PractitionerRole is derived from this row plus
+/// Practitioner; it is not stored separately.
+model OrganizationMembership {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String           @db.Uuid
+  userId         String           @db.Uuid
+  roleId         String           @db.Uuid
+  status         MembershipStatus @default(active)
+  startedAt      DateTime         @default(now()) @db.Timestamptz(3)
+  endedAt        DateTime?        @db.Timestamptz(3)
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime         @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  authSessions          AuthSession[]
+  patient               Patient?
+  practitioner          Practitioner?
+  careTeamMembers       CareTeamMember[]
+  consentsCaptured      Consent[]
+  checkInsReviewed      PatientCheckIn[]
+  appointmentsBooked    Appointment[]             @relation("AppointmentBookedBy")
+  appointmentsCancelled Appointment[]             @relation("AppointmentCancelledBy")
+  noteVersions          ClinicalNoteVersion[]
+  participants          ConversationParticipant[]
+  notifications         Notification[]
+  reviewTasksResolved   ReviewTask[]
+  aiGenerations         AIGeneration[]
+  aiReviews             AIReview[]
+
+  @@unique([userId, organizationId])
+  @@index([organizationId, roleId])
+}
+
+/// Server-side login session (ADR-7). The cookie carries a random token; only its hash is stored.
+model AuthSession {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @db.Uuid
+  userId         String    @db.Uuid
+  tokenHash      String    @unique
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  lastSeenAt     DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt      DateTime  @db.Timestamptz(3)
+  revokedAt      DateTime? @db.Timestamptz(3)
+  userAgent      String?
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  membership   OrganizationMembership @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// People
+// ---------------------------------------------------------------------------
+
+/// Person receiving care. id is an internal UUID; mrn is a business identifier, unique per
+/// organization, exported as Patient.identifier (never as the resource id).
+model Patient {
+  id                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String               @db.Uuid
+  userId            String?              @unique @db.Uuid
+  mrn               String
+  givenName         String
+  familyName        String
+  birthDate         DateTime             @db.Date
+  gender            AdministrativeGender @default(unknown)
+  email             String?
+  phone             String?
+  timezone          String               @default("UTC")
+  preferredLanguage String               @default("en")
+  status            PatientStatus        @default(intake_incomplete)
+  active            Boolean              @default(true)
+  lastActivityAt    DateTime?            @db.Timestamptz(3)
+  createdAt         DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime             @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user         User?                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  membership   OrganizationMembership? @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  careTeam          CareTeam?
+  consents          Consent[]
+  intakeAssessments IntakeAssessment[]
+  conditions        Condition[]
+  goals             Goal[]
+  carePlans         CarePlan[]
+  exerciseSessions  ExerciseSession[]
+  checkIns          PatientCheckIn[]
+  observations      Observation[]
+  appointments      Appointment[]
+  encounters        Encounter[]
+  clinicalNotes     ClinicalNote[]
+  conversations     Conversation[]
+  reviewTasks       ReviewTask[]
+  aiGenerations     AIGeneration[]
+  auditEvents       AuditEvent[]
+
+  @@unique([id, organizationId])
+  @@unique([organizationId, mrn])
+  @@unique([userId, organizationId])
+  @@index([organizationId, familyName, givenName])
+  @@index([organizationId, status])
+  @@index([organizationId, lastActivityAt])
+}
+
+/// Clinician who delivers care (physical therapist). Administrative staff have a membership
+/// but no Practitioner row, so they are never exported as clinical actors.
+model Practitioner {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String   @db.Uuid
+  userId         String?  @unique @db.Uuid
+  staffId        String
+  npi            String?
+  givenName      String
+  familyName     String
+  credentials    String?
+  bio            String?
+  timezone       String   @default("UTC")
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user         User?                   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  membership   OrganizationMembership? @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  conditionsRecorded Condition[]
+  carePlansCreated   CarePlan[]
+  versionsPublished  CarePlanVersion[]
+  availabilitySlots  AvailabilitySlot[]
+  appointments       Appointment[]
+  encounters         Encounter[]
+  notesAuthored      ClinicalNote[]     @relation("NoteAuthor")
+  notesSigned        ClinicalNote[]     @relation("NoteSigner")
+  observations       Observation[]
+  reviewTasks        ReviewTask[]
+
+  @@unique([id, organizationId])
+  @@unique([organizationId, staffId])
+  @@unique([userId, organizationId])
+  @@index([organizationId, familyName, givenName])
+}
+
+/// One care team per patient. Members are memberships (therapists and coordinators alike).
+model CareTeam {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String         @db.Uuid
+  patientId      String         @db.Uuid
+  name           String
+  status         CareTeamStatus @default(active)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient      @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  members CareTeamMember[]
+
+  @@unique([id, organizationId])
+  // patientId determines organizationId, so this means one care team per patient.
+  @@unique([patientId, organizationId])
+}
+
+model CareTeamMember {
+  id             String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String             @db.Uuid
+  careTeamId     String             @db.Uuid
+  userId         String             @db.Uuid
+  role           CareTeamMemberRole
+  startedAt      DateTime           @default(now()) @db.Timestamptz(3)
+  endedAt        DateTime?          @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  careTeam     CareTeam               @relation(fields: [careTeamId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  membership   OrganizationMembership @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, userId])
+  @@index([careTeamId])
+}
+
+// ---------------------------------------------------------------------------
+// Intake, consent, conditions, goals
+// ---------------------------------------------------------------------------
+
+model Consent {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId   String        @db.Uuid
+  patientId        String        @db.Uuid
+  type             ConsentType
+  status           ConsentStatus @default(active)
+  policyVersion    String
+  policyUri        String
+  grantedAt        DateTime      @default(now()) @db.Timestamptz(3)
+  revokedAt        DateTime?     @db.Timestamptz(3)
+  capturedByUserId String?       @db.Uuid
+  createdAt        DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime      @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient                 @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  capturedBy   OrganizationMembership? @relation(fields: [capturedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, patientId, type])
+}
+
+/// Onboarding answers with autosave and resume (currentStep + answers JSON validated by Zod
+/// contracts in packages/shared).
+model IntakeAssessment {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String       @db.Uuid
+  patientId      String       @db.Uuid
+  status         IntakeStatus @default(in_progress)
+  currentStep    String
+  answers        Json         @default("{}")
+  reasonForCare  String?
+  bodyArea       String?
+  painScore      Int?
+  startedAt      DateTime     @default(now()) @db.Timestamptz(3)
+  submittedAt    DateTime?    @db.Timestamptz(3)
+  reviewedAt     DateTime?    @db.Timestamptz(3)
+  updatedAt      DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient      @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, status])
+  @@index([patientId])
+}
+
+/// Clinician-confirmed problem or diagnosis (FHIR Condition). Codes are synthetic/local.
+model Condition {
+  id                       String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId           String                      @db.Uuid
+  patientId                String                      @db.Uuid
+  encounterId              String?                     @db.Uuid
+  codeSystem               String
+  code                     String
+  display                  String
+  category                 ConditionCategory           @default(problem_list_item)
+  clinicalStatus           ConditionClinicalStatus?    @default(active)
+  verificationStatus       ConditionVerificationStatus @default(confirmed)
+  bodySite                 String?
+  onsetDate                DateTime?                   @db.Date
+  abatementDate            DateTime?                   @db.Date
+  recordedByPractitionerId String?                     @db.Uuid
+  note                     String?
+  recordedAt               DateTime                    @default(now()) @db.Timestamptz(3)
+  updatedAt                DateTime                    @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient       @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  encounter    Encounter?    @relation(fields: [encounterId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  recordedBy   Practitioner? @relation(fields: [recordedByPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  goals Goal[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId, patientId])
+}
+
+model Goal {
+  id                   String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId       String              @db.Uuid
+  patientId            String              @db.Uuid
+  carePlanId           String?             @db.Uuid
+  addressesConditionId String?             @db.Uuid
+  description          String
+  lifecycleStatus      GoalLifecycleStatus @default(proposed)
+  achievementStatus    String?
+  measureSystem        String?
+  measureCode          String?
+  targetValue          Decimal?            @db.Decimal(10, 2)
+  targetUnit           String?
+  startDate            DateTime?           @db.Date
+  dueDate              DateTime?           @db.Date
+  createdAt            DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime            @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient      @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  carePlan     CarePlan?    @relation(fields: [carePlanId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  addresses    Condition?   @relation(fields: [addressesConditionId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, patientId])
+  @@index([carePlanId])
+}
+
+// ---------------------------------------------------------------------------
+// Care plans and exercises
+// ---------------------------------------------------------------------------
+
+/// Organization exercise library. All content is fictional and not medically reviewed.
+model Exercise {
+  id                     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId         String   @db.Uuid
+  slug                   String
+  name                   String
+  bodyArea               String
+  category               String
+  description            String
+  instructions           String
+  mediaPath              String?
+  defaultSets            Int?
+  defaultReps            Int?
+  defaultHoldSeconds     Int?
+  defaultDurationSeconds Int?
+  active                 Boolean  @default(true)
+  createdAt              DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  assignments  ExerciseAssignment[]
+
+  @@unique([id, organizationId])
+  @@unique([organizationId, slug])
+  @@index([organizationId, bodyArea])
+}
+
+/// Mutable plan header. The builder autosaves into draftContent (JSON, Zod-validated in
+/// packages/shared). Publishing inserts an immutable CarePlanVersion with its assignments and
+/// moves currentVersionId in the same transaction (ADR-10).
+model CarePlan {
+  id                      String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId          String         @db.Uuid
+  patientId               String         @db.Uuid
+  title                   String
+  status                  CarePlanStatus @default(draft)
+  currentVersionId        String?        @db.Uuid
+  draftContent            Json?
+  draftUpdatedAt          DateTime?      @db.Timestamptz(3)
+  createdByPractitionerId String         @db.Uuid
+  createdAt               DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime       @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient        Patient          @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  createdBy      Practitioner     @relation(fields: [createdByPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  currentVersion CarePlanVersion? @relation("CurrentCarePlanVersion", fields: [currentVersionId, id], references: [id, carePlanId], onDelete: Restrict)
+
+  versions CarePlanVersion[] @relation("CarePlanVersions")
+  goals    Goal[]
+
+  @@unique([id, organizationId])
+  @@unique([currentVersionId, id])
+  @@index([organizationId, patientId])
+  @@index([organizationId, status])
+}
+
+/// Append-only published snapshot of a care plan.
+model CarePlanVersion {
+  id                        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId            String   @db.Uuid
+  carePlanId                String   @db.Uuid
+  versionNumber             Int
+  title                     String
+  instructions              String
+  /// Patient-facing explanation of what changed. Required from version 2 (CHECK constraint).
+  changeNoteForPatient      String?
+  publishedByPractitionerId String   @db.Uuid
+  publishedAt               DateTime @default(now()) @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  carePlan     CarePlan     @relation("CarePlanVersions", fields: [carePlanId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  publishedBy  Practitioner @relation(fields: [publishedByPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  currentOf   CarePlan?            @relation("CurrentCarePlanVersion")
+  assignments ExerciseAssignment[]
+  sessions    ExerciseSession[]
+
+  @@unique([id, organizationId])
+  @@unique([id, carePlanId])
+  @@unique([carePlanId, versionNumber])
+}
+
+/// Append-only: one exercise prescription inside a published version.
+model ExerciseAssignment {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String   @db.Uuid
+  carePlanVersionId String   @db.Uuid
+  exerciseId        String   @db.Uuid
+  position          Int
+  sets              Int?
+  reps              Int?
+  holdSeconds       Int?
+  durationSeconds   Int?
+  restSeconds       Int      @default(30)
+  daysOfWeek        Int[]
+  timesPerDay       Int      @default(1)
+  instructions      String?
+  createdAt         DateTime @default(now()) @db.Timestamptz(3)
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  carePlanVersion CarePlanVersion @relation(fields: [carePlanVersionId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  exercise        Exercise        @relation(fields: [exerciseId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  activities SessionActivity[]
+
+  @@unique([id, organizationId])
+  @@unique([carePlanVersionId, position])
+}
+
+/// A guided session run against one immutable plan version. Persisted so it can resume.
+model ExerciseSession {
+  id                String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId    String                @db.Uuid
+  patientId         String                @db.Uuid
+  carePlanVersionId String                @db.Uuid
+  status            ExerciseSessionStatus @default(in_progress)
+  currentPosition   Int                   @default(0)
+  elapsedSeconds    Int                   @default(0)
+  startedAt         DateTime              @default(now()) @db.Timestamptz(3)
+  pausedAt          DateTime?             @db.Timestamptz(3)
+  completedAt       DateTime?             @db.Timestamptz(3)
+  updatedAt         DateTime              @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient         Patient         @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  carePlanVersion CarePlanVersion @relation(fields: [carePlanVersionId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  activities   SessionActivity[]
+  checkIns     PatientCheckIn[]
+  observations Observation[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId, patientId, startedAt])
+}
+
+model SessionActivity {
+  id                 String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId     String                @db.Uuid
+  sessionId          String                @db.Uuid
+  assignmentId       String                @db.Uuid
+  status             SessionActivityStatus @default(pending)
+  completedSets      Int?
+  completedReps      Int?
+  durationSeconds    Int?
+  discomfortReported Boolean               @default(false)
+  discomfortLevel    Int?
+  discomfortNote     String?
+  completedAt        DateTime?             @db.Timestamptz(3)
+  updatedAt          DateTime              @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  session      ExerciseSession    @relation(fields: [sessionId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  assignment   ExerciseAssignment @relation(fields: [assignmentId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@unique([sessionId, assignmentId])
+}
+
+/// Patient-reported check-in. Pain is also recorded as an Observation (LOINC 72514-3).
+model PatientCheckIn {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId   String             @db.Uuid
+  patientId        String             @db.Uuid
+  sessionId        String?            @db.Uuid
+  painScore        Int
+  difficulty       CheckInDifficulty?
+  notes            String?
+  submittedAt      DateTime           @default(now()) @db.Timestamptz(3)
+  reviewedAt       DateTime?          @db.Timestamptz(3)
+  reviewedByUserId String?            @db.Uuid
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient                 @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  session      ExerciseSession?        @relation(fields: [sessionId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  reviewedBy   OrganizationMembership? @relation(fields: [reviewedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  observations Observation[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId, patientId, submittedAt])
+  @@index([organizationId, reviewedAt])
+}
+
+/// FHIR-aligned observation. Exactly one of valueQuantity, valueString or dataAbsentReason
+/// is set (obs-6). Codes use LOINC where verified, otherwise urn:carepath:observation-code.
+model Observation {
+  id                      String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId          String                   @db.Uuid
+  patientId               String                   @db.Uuid
+  encounterId             String?                  @db.Uuid
+  checkInId               String?                  @db.Uuid
+  sessionId               String?                  @db.Uuid
+  status                  ObservationStatus        @default(final)
+  category                ObservationCategory
+  codeSystem              String
+  code                    String
+  display                 String
+  valueQuantity           Decimal?                 @db.Decimal(10, 2)
+  valueUnit               String?
+  valueString             String?
+  dataAbsentReason        String?
+  performerType           ObservationPerformerType
+  performerPractitionerId String?                  @db.Uuid
+  effectiveAt             DateTime                 @db.Timestamptz(3)
+  recordedAt              DateTime                 @default(now()) @db.Timestamptz(3)
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient          @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  encounter    Encounter?       @relation(fields: [encounterId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  checkIn      PatientCheckIn?  @relation(fields: [checkInId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  session      ExerciseSession? @relation(fields: [sessionId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  performer    Practitioner?    @relation(fields: [performerPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, patientId, code, effectiveAt])
+}
+
+// ---------------------------------------------------------------------------
+// Scheduling and encounters
+// ---------------------------------------------------------------------------
+
+/// Bookable time for a practitioner. Overlapping slots per practitioner are rejected by an
+/// exclusion constraint. Booking locks the slot row (ADR-9).
+model AvailabilitySlot {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId   String            @db.Uuid
+  practitionerId   String            @db.Uuid
+  startsAt         DateTime          @db.Timestamptz(3)
+  endsAt           DateTime          @db.Timestamptz(3)
+  status           SlotStatus        @default(open)
+  appointmentTypes AppointmentType[]
+  createdAt        DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  practitioner Practitioner  @relation(fields: [practitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  appointments Appointment[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId, practitionerId, startsAt])
+  @@index([organizationId, status, startsAt])
+}
+
+/// Planned visit. Rescheduling cancels this row and creates a new one linked by
+/// rescheduledFromId. Overlap per practitioner and per patient is rejected for every
+/// non-cancelled status by exclusion constraints.
+model Appointment {
+  id                 String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId     String            @db.Uuid
+  patientId          String            @db.Uuid
+  practitionerId     String            @db.Uuid
+  slotId             String?           @db.Uuid
+  type               AppointmentType
+  status             AppointmentStatus @default(booked)
+  startsAt           DateTime          @db.Timestamptz(3)
+  endsAt             DateTime          @db.Timestamptz(3)
+  bookedTimezone     String
+  reason             String?
+  bookedByUserId     String?           @db.Uuid
+  cancelledAt        DateTime?         @db.Timestamptz(3)
+  cancellationReason String?
+  cancelledByUserId  String?           @db.Uuid
+  rescheduledFromId  String?           @db.Uuid
+  reminderSentAt     DateTime?         @db.Timestamptz(3)
+  createdAt          DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime          @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization    Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient         Patient                 @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  practitioner    Practitioner            @relation(fields: [practitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  slot            AvailabilitySlot?       @relation(fields: [slotId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  bookedBy        OrganizationMembership? @relation("AppointmentBookedBy", fields: [bookedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+  cancelledBy     OrganizationMembership? @relation("AppointmentCancelledBy", fields: [cancelledByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+  rescheduledFrom Appointment?            @relation("Reschedule", fields: [rescheduledFromId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  rescheduledTo   Appointment?            @relation("Reschedule")
+
+  encounter Encounter?
+
+  @@unique([id, organizationId])
+  @@unique([rescheduledFromId, organizationId])
+  @@index([organizationId, practitionerId, startsAt])
+  @@index([organizationId, patientId, startsAt])
+  @@index([organizationId, status, startsAt])
+}
+
+/// A synchronous visit that happened or is happening (class AMB in person, VR video).
+/// Asynchronous review of check-ins is a ReviewTask, never an Encounter.
+model Encounter {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String          @db.Uuid
+  patientId      String          @db.Uuid
+  practitionerId String          @db.Uuid
+  appointmentId  String?         @db.Uuid
+  class          EncounterClass
+  typeCode       String
+  typeDisplay    String
+  status         EncounterStatus @default(in_progress)
+  startedAt      DateTime        @db.Timestamptz(3)
+  endedAt        DateTime?       @db.Timestamptz(3)
+  transcript     String?
+  createdAt      DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime        @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient      @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  practitioner Practitioner @relation(fields: [practitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  appointment  Appointment? @relation(fields: [appointmentId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  conditions    Condition[]
+  observations  Observation[]
+  clinicalNotes ClinicalNote[]
+
+  @@unique([id, organizationId])
+  @@unique([appointmentId, organizationId])
+  @@index([organizationId, patientId, startedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Clinical documentation
+// ---------------------------------------------------------------------------
+
+/// SOAP note header. Content lives in append-only ClinicalNoteVersion rows. Only signed notes
+/// are exportable (FHIR DocumentReference); a note whose current version came from an AI
+/// draft still needs a clinician signature, and only the author can sign.
+model ClinicalNote {
+  id                     String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId         String             @db.Uuid
+  patientId              String             @db.Uuid
+  encounterId            String?            @db.Uuid
+  authorPractitionerId   String             @db.Uuid
+  noteType               ClinicalNoteType   @default(progress_note)
+  status                 ClinicalNoteStatus @default(draft)
+  currentVersionId       String?            @db.Uuid
+  signedAt               DateTime?          @db.Timestamptz(3)
+  signedByPractitionerId String?            @db.Uuid
+  createdAt              DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient        Patient              @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  encounter      Encounter?           @relation(fields: [encounterId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  author         Practitioner         @relation("NoteAuthor", fields: [authorPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  signedBy       Practitioner?        @relation("NoteSigner", fields: [signedByPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  currentVersion ClinicalNoteVersion? @relation("CurrentNoteVersion", fields: [currentVersionId, id], references: [id, noteId], onDelete: Restrict)
+
+  versions ClinicalNoteVersion[] @relation("NoteVersions")
+
+  @@unique([id, organizationId])
+  @@unique([currentVersionId, id])
+  @@index([organizationId, patientId, createdAt])
+  @@index([organizationId, authorPractitionerId, status])
+}
+
+/// Append-only SOAP content. source = ai_draft requires the AIGeneration it came from.
+/// On a draft note, versions are working drafts. On a signed note, a new version must be an
+/// amendment (isAmendment + amendmentReason, authored by a clinician); a trigger enforces this.
+model ClinicalNoteVersion {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId  String            @db.Uuid
+  noteId          String            @db.Uuid
+  versionNumber   Int
+  subjective      String
+  objective       String
+  assessment      String
+  plan            String
+  source          NoteVersionSource @default(clinician)
+  aiGenerationId  String?           @db.Uuid
+  isAmendment     Boolean           @default(false)
+  amendmentReason String?
+  createdByUserId String            @db.Uuid
+  createdAt       DateTime          @default(now()) @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  note         ClinicalNote           @relation("NoteVersions", fields: [noteId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  aiGeneration AIGeneration?          @relation(fields: [aiGenerationId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  createdBy    OrganizationMembership @relation(fields: [createdByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  currentOf ClinicalNote? @relation("CurrentNoteVersion")
+
+  @@unique([id, noteId])
+  @@unique([noteId, versionNumber])
+}
+
+// ---------------------------------------------------------------------------
+// Messaging and notifications
+// ---------------------------------------------------------------------------
+
+model Conversation {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @db.Uuid
+  patientId      String    @db.Uuid
+  subject        String
+  lastMessageAt  DateTime? @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient      @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId, patientId, lastMessageAt])
+}
+
+/// Unread state is derived from lastReadAt versus message createdAt.
+model ConversationParticipant {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String    @db.Uuid
+  conversationId String    @db.Uuid
+  userId         String    @db.Uuid
+  lastReadAt     DateTime? @db.Timestamptz(3)
+  joinedAt       DateTime  @default(now()) @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  conversation Conversation           @relation(fields: [conversationId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  membership   OrganizationMembership @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  messagesSent Message[]
+
+  @@unique([conversationId, userId])
+  @@index([organizationId, userId])
+}
+
+/// The sender must be a participant of the conversation (composite FK).
+model Message {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String        @db.Uuid
+  conversationId String        @db.Uuid
+  senderUserId   String        @db.Uuid
+  body           String
+  status         MessageStatus @default(queued)
+  failureReason  String?
+  sentAt         DateTime?     @db.Timestamptz(3)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  conversation Conversation            @relation(fields: [conversationId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  sender       ConversationParticipant @relation(fields: [conversationId, senderUserId], references: [conversationId, userId], onDelete: Restrict)
+
+  @@index([conversationId, createdAt])
+}
+
+model Notification {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String           @db.Uuid
+  userId         String           @db.Uuid
+  type           NotificationType
+  title          String
+  body           String
+  linkPath       String?
+  sourceType     String?
+  sourceId       String?          @db.Uuid
+  readAt         DateTime?        @db.Timestamptz(3)
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  recipient    OrganizationMembership @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, userId, readAt])
+}
+
+// ---------------------------------------------------------------------------
+// Review queue
+// ---------------------------------------------------------------------------
+
+/// Configurable administrative rule (not a clinical risk model). params are rule-specific
+/// thresholds validated by Zod contracts.
+model ReviewRule {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String   @db.Uuid
+  key            String
+  name           String
+  description    String
+  enabled        Boolean  @default(true)
+  priority       Int      @default(50)
+  params         Json     @default("{}")
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  tasks        ReviewTask[]
+
+  @@unique([id, organizationId])
+  @@unique([organizationId, key])
+}
+
+/// One queue item. explanation says why it appeared; evidence holds source refs
+/// [{type, id, field}]. dedupeKey prevents duplicate open tasks for the same trigger.
+model ReviewTask {
+  id                     String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId         String           @db.Uuid
+  patientId              String           @db.Uuid
+  ruleId                 String           @db.Uuid
+  dedupeKey              String
+  explanation            String
+  evidence               Json             @default("[]")
+  priority               Int
+  status                 ReviewTaskStatus @default(open)
+  assignedPractitionerId String?          @db.Uuid
+  dueAt                  DateTime?        @db.Timestamptz(3)
+  resolvedAt             DateTime?        @db.Timestamptz(3)
+  resolvedByUserId       String?          @db.Uuid
+  resolutionNote         String?
+  createdAt              DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime         @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization            @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient                 @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  rule         ReviewRule              @relation(fields: [ruleId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  assignedTo   Practitioner?           @relation(fields: [assignedPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  resolvedBy   OrganizationMembership? @relation(fields: [resolvedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, status, priority])
+  @@index([organizationId, patientId])
+}
+
+// ---------------------------------------------------------------------------
+// AI
+// ---------------------------------------------------------------------------
+
+/// One provider call. provider/providerLabel are stored so the UI can always say which
+/// provider produced the output (e.g. "Demo provider, rule-based"). input holds redacted
+/// source references, never raw identifiers.
+model AIGeneration {
+  id                        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId            String             @db.Uuid
+  patientId                 String             @db.Uuid
+  kind                      AIGenerationKind
+  provider                  String
+  providerLabel             String
+  model                     String?
+  promptKey                 String
+  promptVersion             String
+  status                    AIGenerationStatus @default(pending)
+  input                     Json
+  output                    Json?
+  error                     String?
+  inputTokens               Int?
+  outputTokens              Int?
+  costMicroUsd              Int?
+  latencyMs                 Int?
+  unsupportedStatementCount Int?
+  requestedByUserId         String             @db.Uuid
+  createdAt                 DateTime           @default(now()) @db.Timestamptz(3)
+  completedAt               DateTime?          @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient      Patient                @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  requestedBy  OrganizationMembership @relation(fields: [requestedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  reviews      AIReview[]
+  noteVersions ClinicalNoteVersion[]
+
+  @@unique([id, organizationId])
+  @@index([organizationId, patientId, createdAt])
+}
+
+/// Append-only human decision on a generation.
+model AIReview {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String           @db.Uuid
+  generationId   String           @db.Uuid
+  reviewerUserId String           @db.Uuid
+  decision       AIReviewDecision
+  editedOutput   Json?
+  reason         String?
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  generation   AIGeneration           @relation(fields: [generationId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  reviewer     OrganizationMembership @relation(fields: [reviewerUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  @@index([generationId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Platform
+// ---------------------------------------------------------------------------
+
+/// Append-only security log (UPDATE and DELETE rejected by trigger). organizationId is null
+/// only for events with no tenant context, such as a failed login for an unknown email.
+/// A hash chain is stretch scope (advisor plan rev1) and not implemented.
+model AuditEvent {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String?        @db.Uuid
+  actorUserId    String?        @db.Uuid
+  actorRole      RoleKey?
+  actorType      AuditActorType
+  action         AuditAction
+  eventName      String
+  outcome        AuditOutcome
+  resourceType   String?
+  resourceId     String?
+  patientId      String?        @db.Uuid
+  purposeOfUse   PurposeOfUse?
+  requestId      String?
+  sourceIpHash   String?
+  detailCode     String?
+  metadata       Json           @default("{}")
+  occurredAt     DateTime       @default(now()) @db.Timestamptz(3)
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  actor        User?         @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+  patient      Patient?      @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@index([organizationId, occurredAt])
+  @@index([organizationId, eventName, occurredAt])
+  @@index([resourceType, resourceId])
+}
+
+/// Postgres-backed job queue (ADR-4), claimed with FOR UPDATE SKIP LOCKED.
+model Job {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String?   @db.Uuid
+  queue          String
+  payload        Json
+  status         JobStatus @default(queued)
+  attempts       Int       @default(0)
+  maxAttempts    Int       @default(5)
+  runAt          DateTime  @default(now()) @db.Timestamptz(3)
+  lockedAt       DateTime? @db.Timestamptz(3)
+  lockedBy       String?
+  lastError      String?
+  dedupeKey      String?
+  completedAt    DateTime? @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime  @default(now()) @updatedAt @db.Timestamptz(3)
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+
+  @@index([status, runAt])
+  @@index([queue, status, runAt])
+}
+
+/// Allowed status changes, read by the enforce_status_transition() trigger on UPDATE. Rows are
+/// inserted by the constraints migration and mirrored in src/status.ts (a test keeps them
+/// equal). Reference data, not a tenant table.
+model StatusTransition {
+  tableName  String
+  column     String
+  fromStatus String
+  toStatus   String
+
+  @@id([tableName, column, fromStatus, toStatus])
+}

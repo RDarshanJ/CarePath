@@ -16,6 +16,7 @@
     "db:start": "scripts/db.sh start",
     "db:stop": "scripts/db.sh stop",
     "db:reset": "scripts/db.sh reset",
+    "db:migrate": "pnpm --filter @carepath/db migrate:deploy",
     "verify": "scripts/verify.sh"
   },
   "devDependencies": {
@@ -27,5 +28,11 @@
     "prettier": "3.10.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.73.0"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "prisma",
+      "@prisma/engines"
+    ]
   }
 }

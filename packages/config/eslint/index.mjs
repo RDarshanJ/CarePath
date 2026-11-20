@@ -13,6 +13,7 @@ export default tseslint.config(
       "**/coverage/**",
       "**/.data/**",
       "**/next-env.d.ts",
+      "packages/db/src/generated/**",
       "docs/**",
     ],
   },
@@ -30,6 +31,10 @@ export default tseslint.config(
           paths: [
             {
               name: "@prisma/client",
+              message: "Import the Prisma client only from repo.ts files (ADR-8).",
+            },
+            {
+              name: "@carepath/db/client",
               message: "Import the Prisma client only from repo.ts files (ADR-8).",
             },
           ],

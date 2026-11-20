@@ -6,11 +6,33 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "generate": "PRISMA_SCHEMA_ENGINE_BINARY=./scripts/no-schema-engine.sh prisma generate",
+    "postinstall": "pnpm run generate",
+    "migrate:deploy": "tsx scripts/schema-engine.ts deploy",
+    "migrate:reset": "tsx scripts/schema-engine.ts reset",
+    "migrate:create": "tsx scripts/schema-engine.ts create",
+    "migrate:check": "tsx scripts/schema-engine.ts check",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "tsx scripts/schema-engine.ts deploy && tsx scripts/schema-engine.ts check && vitest run"
   },
   "devDependencies": {
     "@carepath/config": "workspace:*",
+    "@prisma/driver-adapter-utils": "7.10.1",
+    "@prisma/schema-engine-wasm": "8.1.0-1.d1b3f377ca835d73fd50954a5e22128b9ebdd6b8",
     "@types/node": "22.20.5",
-    "typescript": "5.9.3"
+    "@types/pg": "8.20.0",
+    "prisma": "7.10.1",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "pg": "8.23.1"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts"
   }
 }

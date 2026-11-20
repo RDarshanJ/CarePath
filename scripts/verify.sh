@@ -28,7 +28,7 @@ skip() {
 }
 
 stage "db start" scripts/db.sh start
-skip "migrate" "WP 2.3"
+stage "migrate" pnpm db:migrate
 skip "seed (small profile)" "WP 2.6"
 stage "typecheck" pnpm typecheck
 stage "lint" pnpm lint
