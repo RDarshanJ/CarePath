@@ -1,5 +1,5 @@
 {
-  "description": "Generated illustrations, not medically reviewed. Trimmed from the WP 3.5 batch manifest; only accepted files are in the repository.",
+  "description": "Generated illustrations, not medically reviewed. 25 files with true alpha (no baked background), recoloured to the DR-001 illustration rule (design-tokens.md section 7). Trimmed from the WP 3.5 batch manifest and extended in D-WP-7; only accepted files are in the repository.",
   "licensing": {
     "status": "not verified",
     "statement": "Generated through a Magnific Plus account with Google Nano Banana 2.1. The provider's commercial-use and redistribution terms were not read or checked, so no licensing claim is made.",
@@ -10,10 +10,18 @@
       "training-data provenance"
     ]
   },
-  "exerciseFallbacks": "Exercises without their own picture show the picture for their body area (area-<body area>.webp).",
+  "exerciseFallbacks": "Exercises without their own picture show the picture for their body area (area-<body area>.webp). After D-WP-7 these are chin-tuck, neck-rotation and scapular-squeeze (ruled in WP 3.5) and any exercise outside the 12 in the demo persona plans.",
   "credits": {
-    "spentInTotal": 1500,
-    "ceiling": 1500
+    "spentInTotal": 1850,
+    "note": "WP 3.5 spent 1500 against its 1500 ceiling. D-WP-7 spent 350 against its own 600 ceiling: seven generations (six first passes and one retry of towel-reach-behind). Part 1 recolour used no credits.",
+    "d7": {
+      "ceiling": 600,
+      "spent": 350,
+      "generations": 7,
+      "rejected": [
+        "Lw8fVQ4swO (ex-towel-reach-behind try 1)"
+      ]
+    }
   },
   "assets": [
     {
@@ -28,10 +36,10 @@
       "alt": "The head, neck and shoulders of a person, seen from the side",
       "width": 960,
       "height": 720,
-      "bytes": 11802,
+      "bytes": 17638,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5494,
+      "bytes480": 7028,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -41,7 +49,30 @@
       "status": "accepted",
       "credits": 50,
       "reviewFlags": [],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-shoulder.webp",
@@ -55,10 +86,10 @@
       "alt": "A person's shoulder and upper arm, seen from the front",
       "width": 960,
       "height": 720,
-      "bytes": 12358,
+      "bytes": 16444,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5778,
+      "bytes480": 6426,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -70,7 +101,30 @@
       "reviewFlags": [
         "Crop runs from chin to hip rather than chin to elbow; the shoulder is still clearly the centre of interest."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-upper-back.webp",
@@ -84,10 +138,10 @@
       "alt": "A person seen from behind, from the back of the head to the waist",
       "width": 960,
       "height": 720,
-      "bytes": 12724,
+      "bytes": 17908,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5250,
+      "bytes480": 6442,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -97,7 +151,30 @@
       "status": "accepted",
       "credits": 50,
       "reviewFlags": [],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-general.webp",
@@ -111,10 +188,10 @@
       "alt": "A person standing, seen from the front, from the head to the knees",
       "width": 960,
       "height": 720,
-      "bytes": 10002,
+      "bytes": 14998,
       "width480": 480,
       "height480": 360,
-      "bytes480": 4534,
+      "bytes480": 5858,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -124,7 +201,30 @@
       "status": "accepted",
       "credits": 50,
       "reviewFlags": [],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-lower-back.webp",
@@ -138,10 +238,10 @@
       "alt": "A person seen from behind, from the lower ribs to the upper thighs, arms hanging at the sides",
       "width": 960,
       "height": 720,
-      "bytes": 22668,
+      "bytes": 30990,
       "width480": 480,
       "height480": 360,
-      "bytes480": 9984,
+      "bytes480": 12220,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -153,7 +253,30 @@
       "reviewFlags": [
         "Try 1 (5jDMeOiKxe) rejected rule 11: head and shoulders visible."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-hip.webp",
@@ -167,10 +290,10 @@
       "alt": "A person standing, seen from the side, from the waist to above the knee",
       "width": 960,
       "height": 720,
-      "bytes": 11630,
+      "bytes": 17202,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5214,
+      "bytes480": 6788,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -183,7 +306,30 @@
         "Try 1 (DoOJPHFpcl) rejected rule 11: whole figure.",
         "A sleeve cuff curls against the hip at the upper right; no hand or skin is drawn there. Accepted, flagged for reviewer."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00236,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-core.webp",
@@ -197,10 +343,10 @@
       "alt": "A person's torso from the chest to the hips, seen from the front",
       "width": 960,
       "height": 720,
-      "bytes": 16138,
+      "bytes": 25728,
       "width480": 480,
       "height480": 360,
-      "bytes480": 6876,
+      "bytes480": 10236,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -212,7 +358,30 @@
       "reviewFlags": [
         "Try 1 (1ldeB3kr4r) rejected rule 11: whole figure."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-ankle-and-foot.webp",
@@ -226,10 +395,10 @@
       "alt": "Two lower legs and shoes, seen from the side",
       "width": 960,
       "height": 720,
-      "bytes": 8922,
+      "bytes": 12728,
       "width480": 480,
       "height480": 360,
-      "bytes480": 3972,
+      "bytes480": 5684,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -242,7 +411,30 @@
         "Try 1 (xSBX8GnjfW) rejected rules 11/2: torso only, no legs.",
         "Flat-region QA metric was 2.1% (bar 0.5%): the right shoe top is a darker green than the measured fill green. It is the same hue (beyond the fill green on the paper-to-green ray), so the snap collapses it to the green token (98.6% exact tokens at 960). Accepted on visual review; this is an exception to the 0.5% bar."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.00013,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "area-balance.webp",
@@ -256,10 +448,10 @@
       "alt": "A person standing with one hand on a walking cane, shown from the waist down",
       "width": 960,
       "height": 720,
-      "bytes": 15074,
+      "bytes": 32640,
       "width480": 480,
       "height480": 360,
-      "bytes480": 6682,
+      "bytes480": 13094,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -271,7 +463,33 @@
       "reviewFlags": [
         "Try 1 (Xm946LgBfo) rejected rule 11: whole figure."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 3,
+        "lightSemiTransparentRate960": 0.00524,
+        "lightSemiTransparentRate480": 0.01726,
+        "pixelCheckStrictPass": false,
+        "pixelCheckNotes": [
+          "960: 68 light partially transparent px (0.5% of edge px); looked at, they are white fill meeting a thin gap (mat or table edge), not a halo against the outside",
+          "480: 99 light partially transparent px (1.7% of edge px); looked at, they are white fill meeting a thin gap (mat or table edge), not a halo against the outside"
+        ]
+      }
     },
     {
       "file": "area-knee.webp",
@@ -285,10 +503,10 @@
       "alt": "A person sitting on a chair, from mid-thigh to the shoe, seen from the side",
       "width": 960,
       "height": 720,
-      "bytes": 6542,
+      "bytes": 10636,
       "width480": 480,
       "height480": 360,
-      "bytes480": 3116,
+      "bytes480": 4172,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -302,7 +520,30 @@
         "Painted paper colour over a 19x74 px stray stroke at the top edge (x224-243, y0-74 in the 1020x765 crop).",
         "Try 1 (BhN9lLLoQR) rejected rules 11/2/1."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "ex-knee-to-chest.webp",
@@ -318,10 +559,10 @@
       "alt": "A person lying on a mat with one knee held toward the chest",
       "width": 960,
       "height": 720,
-      "bytes": 13518,
+      "bytes": 21346,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5984,
+      "bytes480": 8176,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -335,7 +576,33 @@
         "Prompt is the pre-revision wording (said 'grey hair' and 'skin tone'); not regenerated.",
         "Tries 1 (iG5bho63uK) and 3 (6AbqEdpiJO) rejected."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.00016,
+        "lightSemiTransparentRate480": 0.08527,
+        "pixelCheckStrictPass": false,
+        "pixelCheckNotes": [
+          "480: 249 light partially transparent px (8.5% of edge px); looked at, they are white fill meeting a thin gap (mat or table edge), not a halo against the outside"
+        ]
+      },
+      "recolourSource": "rejected/ex-knee-to-chest-try2-79fadwtJAL (Magnific 79fadwtJAL), the accepted try; it has no file in masters/"
     },
     {
       "file": "ex-pelvic-tilt.webp",
@@ -351,10 +618,10 @@
       "alt": "A person lying on a mat with both knees bent and feet flat",
       "width": 960,
       "height": 720,
-      "bytes": 9968,
+      "bytes": 13576,
       "width480": 480,
       "height480": 360,
-      "bytes480": 4192,
+      "bytes480": 5558,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -366,7 +633,30 @@
       "reviewFlags": [
         "Both legs overlap as one shape in the side view; reads as two bent knees at 480 px."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00033,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "ex-standing-trunk-rotation.webp",
@@ -382,10 +672,10 @@
       "alt": "A person standing with arms folded across the chest, upper body turned a little to one side",
       "width": 960,
       "height": 720,
-      "bytes": 7356,
+      "bytes": 9746,
       "width480": 480,
       "height480": 360,
-      "bytes480": 3274,
+      "bytes480": 4136,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -397,7 +687,30 @@
       "reviewFlags": [
         "Rotation is mostly in the head and shoulders; torso is near front-facing."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00036,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "ex-deep-breathing.webp",
@@ -413,10 +726,10 @@
       "alt": "A person sitting upright on a chair with hands resting on the thighs",
       "width": 960,
       "height": 720,
-      "bytes": 9802,
+      "bytes": 14860,
       "width480": 480,
       "height480": 360,
-      "bytes480": 4372,
+      "bytes480": 5890,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -428,7 +741,32 @@
       "reviewFlags": [
         "Eyes read as closed/lowered only loosely at 480 px."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 1,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00373,
+        "pixelCheckStrictPass": false,
+        "pixelCheckNotes": [
+          "960: 1 flat px of a skin-and-ink edge blend outside the four skin tokens"
+        ]
+      }
     },
     {
       "file": "ex-mini-squat.webp",
@@ -444,10 +782,10 @@
       "alt": "A person standing behind a chair with both hands on its back, knees slightly bent",
       "width": 960,
       "height": 720,
-      "bytes": 14854,
+      "bytes": 21262,
       "width480": 480,
       "height480": 360,
-      "bytes480": 6610,
+      "bytes480": 8114,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -459,7 +797,30 @@
       "reviewFlags": [
         "The chair seat edge is drawn twice (offset), so it can read as two chairs at a glance; accepted as one chair at an angle. Reviewer may want a retry if credits allow."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "ex-marching-in-place.webp",
@@ -475,10 +836,10 @@
       "alt": "A person standing beside a chair with one knee lifted",
       "width": 960,
       "height": 720,
-      "bytes": 11916,
+      "bytes": 17990,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5272,
+      "bytes480": 7132,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -488,7 +849,30 @@
       "status": "accepted",
       "credits": 50,
       "reviewFlags": [],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "moment-done-for-today.webp",
@@ -501,10 +885,10 @@
       "alt": "",
       "width": 960,
       "height": 720,
-      "bytes": 16928,
+      "bytes": 31554,
       "width480": 480,
       "height480": 360,
-      "bytes480": 7274,
+      "bytes480": 12054,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -517,7 +901,33 @@
         "Reused style frame ksep9Nt16B; painted paper colour over the steam (x608-646, y420-459 in the 1020x765 crop).",
         "50 credits were spent earlier on the style frame."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0021,
+        "lightSemiTransparentRate480": 0.00596,
+        "pixelCheckStrictPass": false,
+        "pixelCheckNotes": [
+          "480: 26 light partially transparent px (0.6% of edge px); looked at, they are white fill meeting a thin gap (mat or table edge), not a halo against the outside"
+        ]
+      },
+      "recolourSource": "style-frames/frame3-moment-quiet.png (Magnific ksep9Nt16B); it has no file in masters/"
     },
     {
       "file": "moment-details-with-clinic.webp",
@@ -530,10 +940,10 @@
       "alt": "",
       "width": 960,
       "height": 720,
-      "bytes": 12218,
+      "bytes": 19130,
       "width480": 480,
       "height480": 360,
-      "bytes480": 5308,
+      "bytes480": 7688,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -545,7 +955,30 @@
       "reviewFlags": [
         "Try 1 (Lw8ofyYswO) rejected rule 13: upright tabbed folder read as a laptop."
       ],
-      "transparentBackground": false
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00124,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     },
     {
       "file": "moment-nothing-to-review.webp",
@@ -558,10 +991,10 @@
       "alt": "",
       "width": 960,
       "height": 720,
-      "bytes": 7818,
+      "bytes": 7172,
       "width480": 480,
       "height480": 360,
-      "bytes480": 2820,
+      "bytes480": 2710,
       "format": "webp",
       "tool": "Magnific, Nano Banana 2.1",
       "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
@@ -574,7 +1007,361 @@
         "Exported with alpha (alpha = paper-to-green position, colour green).",
         "Plant pot is outline only, not solid green; subject is small in the frame (about 20% of the width)."
       ],
-      "transparentBackground": true
+      "transparentBackground": true,
+      "encoding": "lossless WebP with alpha",
+      "recolour": "D-WP-7: re-exported from the 1024 px master with true alpha (exterior removed), lines ink #172B4D, former forest-green fills accent #0E7490 (trousers) or ink (shoes, dark hair), tops accent-subtle #E0F4F8, seq-2 #C2D4F6 or white, other objects white with ink outline, ground and mat lines border-control #697A93, skin tokens unchanged. The prompt is the original generation prompt (old palette).",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.01672,
+        "lightSemiTransparentRate480": 0.0179,
+        "pixelCheckStrictPass": false,
+        "pixelCheckNotes": [
+          "960: 53 light partially transparent px (1.7% of edge px); looked at, they are white fill meeting a thin gap (mat or table edge), not a halo against the outside",
+          "480: 23 light partially transparent px (1.8% of edge px); looked at, they are white fill meeting a thin gap (mat or table edge), not a halo against the outside"
+        ]
+      }
+    },
+    {
+      "file": "ex-quad-set.webp",
+      "file480": "ex-quad-set-480.webp",
+      "set": "exercise",
+      "subject": "quad-set",
+      "usage": [
+        "Exercise picture (quad-set)",
+        "Session player, plan, care plan"
+      ],
+      "alt": "A person sitting on a mat with both legs out in front, leaning back on the hands, a small rolled towel under the knees",
+      "width": 960,
+      "height": 720,
+      "bytes": 14918,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5910,
+      "format": "webp",
+      "encoding": "lossless WebP with alpha",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration on a plain flat white background. Strictly these flat colors: deep navy ink (#172B4D) for all outlines, one flat warm skin color, solid teal (#0E7490) fill only on trousers or skirt, solid deep navy (#172B4D) fill only on shoes and dark hair. Clothing tops, hair that is white, and all furniture and objects are drawn as navy outline only with plain white inside. Where one solid shape overlaps another, a thin white gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his sixties with medium brown skin (#A9714B), short white hair and glasses, medium build, in a plain long-sleeved shirt and trousers. Sitting on a thin exercise mat with both legs out straight, leaning back on the hands, a small rolled towel under one knee, seen from the side. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no cream, no beige background, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 125371,
+      "webUrl": "https://www.magnific.com/app/creation/6AbjvuriJO",
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "retries": 0,
+      "reviewFlags": [
+        "Towel roll sits under both knees rather than one; reads as a rolled towel under the legs. Accepted."
+      ],
+      "transparentBackground": true,
+      "recolour": "Generated on a plain white background in the new palette wording; the 1024 px preview was mapped to paper, ink and skin anchors and run through the same region recolour as the 19 re-exports (exterior removed to alpha). Lines ink #172B4D, trousers accent #0E7490, shoes and dark hair ink, tops accent-subtle / seq-2 / white, other objects white with ink outline, ground and mat lines border-control #697A93.",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.0,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
+    },
+    {
+      "file": "ex-heel-slide.webp",
+      "file480": "ex-heel-slide-480.webp",
+      "set": "exercise",
+      "subject": "heel-slide",
+      "usage": [
+        "Exercise picture (heel-slide)",
+        "Session player, plan, care plan"
+      ],
+      "alt": "A person lying on their back on a mat with one knee bent and the other leg straight",
+      "width": 960,
+      "height": 720,
+      "bytes": 11874,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5206,
+      "format": "webp",
+      "encoding": "lossless WebP with alpha",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration on a plain flat white background. Strictly these flat colors: deep navy ink (#172B4D) for all outlines, one flat warm skin color, solid teal (#0E7490) fill only on trousers or skirt, solid deep navy (#172B4D) fill only on shoes and dark hair. Clothing tops, hair that is white, and all furniture and objects are drawn as navy outline only with plain white inside. Where one solid shape overlaps another, a thin white gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her sixties with warm tan skin (#D4A476), short curly white hair, slim, in a plain cardigan and trousers. Lying on the back on a thin exercise mat, seen from the side, one leg straight, the other knee half bent with the heel on the mat. Head at the left of the image, feet at the right, the face seen in side profile looking up. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no cream, no beige background, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 480238,
+      "webUrl": "https://www.magnific.com/app/creation/JNCboHcOq4",
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "retries": 0,
+      "reviewFlags": [
+        "Bent knee is raised higher than 'half bent'; still reads as one bent knee and one straight leg. Accepted."
+      ],
+      "transparentBackground": true,
+      "recolour": "Generated on a plain white background in the new palette wording; the 1024 px preview was mapped to paper, ink and skin anchors and run through the same region recolour as the 19 re-exports (exterior removed to alpha). Lines ink #172B4D, trousers accent #0E7490, shoes and dark hair ink, tops accent-subtle / seq-2 / white, other objects white with ink outline, ground and mat lines border-control #697A93.",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00043,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
+    },
+    {
+      "file": "ex-straight-leg-raise.webp",
+      "file480": "ex-straight-leg-raise-480.webp",
+      "set": "exercise",
+      "subject": "straight-leg-raise",
+      "usage": [
+        "Exercise picture (straight-leg-raise)",
+        "Session player, plan, care plan"
+      ],
+      "alt": "A person lying on their back on a mat with one knee bent and the other leg straight and a little off the mat",
+      "width": 960,
+      "height": 720,
+      "bytes": 8838,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 4048,
+      "format": "webp",
+      "encoding": "lossless WebP with alpha",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration on a plain flat white background. Strictly these flat colors: deep navy ink (#172B4D) for all outlines, one flat warm skin color, solid teal (#0E7490) fill only on trousers or skirt, solid deep navy (#172B4D) fill only on shoes and dark hair. Clothing tops, hair that is white, and all furniture and objects are drawn as navy outline only with plain white inside. Where one solid shape overlaps another, a thin white gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his thirties with deep brown skin (#844F30), short dark hair and a larger body, in a plain t-shirt and trousers. Lying on the back on a thin exercise mat, seen from the side, one knee bent with the foot flat, the other leg straight and lifted a little off the mat. Head at the left of the image, feet at the right, the face seen in side profile looking up. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no cream, no beige background, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 461440,
+      "webUrl": "https://www.magnific.com/app/creation/5jD8z8gKxe",
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "retries": 0,
+      "reviewFlags": [
+        "Straight leg passes in front of the bent leg, so the two overlap near the knee; at 480 px it reads as intended. Accepted."
+      ],
+      "transparentBackground": true,
+      "recolour": "Generated on a plain white background in the new palette wording; the 1024 px preview was mapped to paper, ink and skin anchors and run through the same region recolour as the 19 re-exports (exterior removed to alpha). Lines ink #172B4D, trousers accent #0E7490, shoes and dark hair ink, tops accent-subtle / seq-2 / white, other objects white with ink outline, ground and mat lines border-control #697A93.",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0003,
+        "lightSemiTransparentRate480": 0.001,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
+    },
+    {
+      "file": "ex-upper-trap-stretch.webp",
+      "file480": "ex-upper-trap-stretch-480.webp",
+      "set": "exercise",
+      "subject": "upper-trap-stretch",
+      "usage": [
+        "Exercise picture (upper-trap-stretch)",
+        "Session player, plan, care plan"
+      ],
+      "alt": "A person sitting on a stool with one hand on the seat, head tilted a little to one side",
+      "width": 960,
+      "height": 720,
+      "bytes": 14904,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 6320,
+      "format": "webp",
+      "encoding": "lossless WebP with alpha",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration on a plain flat white background. Strictly these flat colors: deep navy ink (#172B4D) for all outlines, one flat warm skin color, solid teal (#0E7490) fill only on trousers or skirt, solid deep navy (#172B4D) fill only on shoes and dark hair. Clothing tops, hair that is white, and all furniture and objects are drawn as navy outline only with plain white inside. Where one solid shape overlaps another, a thin white gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her sixties with warm tan skin (#D4A476), short curly white hair, slim, in a plain cardigan and trousers. Sitting upright on a plain chair, seen from the front, one hand resting on the seat, head tilted gently toward the opposite shoulder. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no cream, no beige background, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. No armrests.",
+      "seed": 390956,
+      "webUrl": "https://www.magnific.com/app/creation/mEZWy04hJQ",
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "retries": 0,
+      "reviewFlags": [
+        "Seat is a backless stool, not a chair with a back, and the legs are turned to one side rather than facing front; head tilt is slight. Accepted; flagged for the reviewer."
+      ],
+      "transparentBackground": true,
+      "recolour": "Generated on a plain white background in the new palette wording; the 1024 px preview was mapped to paper, ink and skin anchors and run through the same region recolour as the 19 re-exports (exterior removed to alpha). Lines ink #172B4D, trousers accent #0E7490, shoes and dark hair ink, tops accent-subtle / seq-2 / white, other objects white with ink outline, ground and mat lines border-control #697A93.",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00223,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
+    },
+    {
+      "file": "ex-towel-reach-behind.webp",
+      "file480": "ex-towel-reach-behind-480.webp",
+      "set": "exercise",
+      "subject": "towel-reach-behind",
+      "usage": [
+        "Exercise picture (towel-reach-behind)",
+        "Session player, plan, care plan"
+      ],
+      "alt": "A person standing, seen from the side, holding a small towel behind the back",
+      "width": 960,
+      "height": 720,
+      "bytes": 10082,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 4298,
+      "format": "webp",
+      "encoding": "lossless WebP with alpha",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration on a plain flat white background. Strictly these flat colors: deep navy ink (#172B4D) for all outlines, one flat warm skin color, solid teal (#0E7490) fill only on trousers or skirt, solid deep navy (#172B4D) fill only on shoes and dark hair. Clothing tops, hair that is white, and all furniture and objects are drawn as navy outline only with plain white inside. Where one solid shape overlaps another, a thin white gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her forties with warm tan skin (#D4A476), dark hair in a low bun, medium build, in a plain shirt and trousers. Standing upright, seen from the side, both arms held low behind the back with the hands together holding a small towel at the lower back, the head facing forward in clear side profile. The face is fully visible and nothing covers it, no arm near the head or shoulders. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no cream, no beige background, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 547154,
+      "webUrl": "https://www.magnific.com/app/creation/WDgy1MTcXe",
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "retries": 1,
+      "reviewFlags": [
+        "Try 1 (Lw8fVQ4swO, seed 142545) rejected: raised arm covered the face and the pose read as coughing into an elbow. Try 2 changed the pose to a side view with the towel held low behind the back, so it no longer shows a reach over the shoulder."
+      ],
+      "transparentBackground": true,
+      "recolour": "Generated on a plain white background in the new palette wording; the 1024 px preview was mapped to paper, ink and skin anchors and run through the same region recolour as the 19 re-exports (exterior removed to alpha). Lines ink #172B4D, trousers accent #0E7490, shoes and dark hair ink, tops accent-subtle / seq-2 / white, other objects white with ink outline, ground and mat lines border-control #697A93.",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.0,
+        "lightSemiTransparentRate480": 0.00096,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
+    },
+    {
+      "file": "ex-walking-program.webp",
+      "file480": "ex-walking-program-480.webp",
+      "set": "exercise",
+      "subject": "walking-program",
+      "usage": [
+        "Exercise picture (walking-program)",
+        "Session player, plan, care plan"
+      ],
+      "alt": "A person walking, seen from the side",
+      "width": 960,
+      "height": 720,
+      "bytes": 12718,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5004,
+      "format": "webp",
+      "encoding": "lossless WebP with alpha",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration on a plain flat white background. Strictly these flat colors: deep navy ink (#172B4D) for all outlines, one flat warm skin color, solid teal (#0E7490) fill only on trousers or skirt, solid deep navy (#172B4D) fill only on shoes and dark hair. Clothing tops, hair that is white, and all furniture and objects are drawn as navy outline only with plain white inside. Where one solid shape overlaps another, a thin white gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. An older man in his seventies with pale warm beige skin (#F0D2B6), bald with a little white hair at the sides and round glasses, slim, in a buttoned cardigan and trousers. Walking at an easy pace, seen from the side, mid-stride, arms swinging slightly, upright posture. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no cream, no beige background, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 769544,
+      "webUrl": "https://www.magnific.com/app/creation/eIPRlnudqL",
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "retries": 0,
+      "reviewFlags": [],
+      "transparentBackground": true,
+      "recolour": "Generated on a plain white background in the new palette wording; the 1024 px preview was mapped to paper, ink and skin anchors and run through the same region recolour as the 19 re-exports (exterior removed to alpha). Lines ink #172B4D, trousers accent #0E7490, shoes and dark hair ink, tops accent-subtle / seq-2 / white, other objects white with ink outline, ground and mat lines border-control #697A93.",
+      "qa": {
+        "cornerOpaquePx960": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "cornerOpaquePx480": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "warmNonSkinFlatPx": 0,
+        "forestGreenFlatPx": 0,
+        "creamFlatPx": 0,
+        "lightSemiTransparentRate960": 0.00027,
+        "lightSemiTransparentRate480": 0.00148,
+        "pixelCheckStrictPass": true,
+        "pixelCheckNotes": []
+      }
     }
-  ]
+  ],
+  "recolourRun": {
+    "date": "2026-11-20",
+    "wp": "D-WP-7",
+    "sources": "1024 px previews only (the Magnific CDN is blocked here). Two of the 19 have no master in masters/: ex-knee-to-chest (taken from rejected/, the accepted try 2) and moment-done-for-today (taken from style-frames/frame3-moment-quiet.png).",
+    "pixelCheck": "design-tokens.md section 7 on #FFFFFF, #F5F7FA, #EBEFF5. Corner regions (24 px at 960, 12 at 480) fully transparent; no flat non-skin pixel with hue 25 to 65 degrees and saturation above 0.10; no flat forest-green or cream pixel; partially transparent pixels carry token colours only (no matte, no paper)."
+  }
 }

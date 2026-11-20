@@ -847,3 +847,12 @@ verify: PASSED
 WP 5.4b gate: PASSED
 ```
 
+### D-WP-7 (illustrations)
+
+Worktree `/home/claude/wt/d7`, branch `wp/d7`. Image work is in `docs/design/after/d-wp-7/` (contact sheet on `#FFFFFF`, `#F5F7FA` and `#EBEFF5`, and `pixel-check.json`).
+
+- Part 1, recolour (no credits): all 19 accepted pictures re-exported at 960 and 480 as lossless WebP with true alpha, from the 1024 px previews (the Magnific CDN is blocked here; previews only). Exterior removed, lines ink `#172B4D`, former forest-green fills accent `#0E7490` (trousers) or ink (shoes, dark hair), tops accent-subtle, seq-2 or white, objects white with an ink outline, ground and mat lines `border-control`, skin tokens unchanged. Sources: 17 from `masters/`; `ex-knee-to-chest` from `rejected/ex-knee-to-chest-try2-79fadwtJAL.jpg` (the accepted try, which has no master); `moment-done-for-today` from `style-frames/frame3-moment-quiet.png` (no master either).
+- Pixel check (design-tokens section 7) run on all 50 files on all three backgrounds: corners transparent, no flat warm non-skin, forest-green or cream pixel in any file. A strict "no light partially transparent pixel" test flags 5 pictures (7 files); each was looked at and is white fill meeting a thin gap at a mat or table edge, not a halo; one file has a single skin-and-ink blend pixel. Listed per file in the manifest `qa.pixelCheckNotes`.
+- Part 2: six exercise pictures generated in the new palette wording on plain white (quad-set, heel-slide, straight-leg-raise, upper-trap-stretch, towel-reach-behind, walking-program), then mapped to the same recolour as Part 1. 6 accepted, 1 rejected (towel-reach-behind try 1: arm covered the face), 7 generations, 350 of 600 credits. Flagged for the reviewer: upper-trap-stretch shows a backless stool with the legs turned to one side; towel-reach-behind now shows a side view with the towel held low, not a reach over the shoulder.
+- Wiring: `exercise-media.ts` has the six new entries with plain alt text; `illustration.tsx` picture container is now a `bg-surface-sunken` tile, `rounded-container`, no border; the caption "Illustration only. Follow the written steps from your care team." is unchanged. `asset-manifest.json` has 25 assets with prompts, seeds, bytes, dimensions and licensing "not verified". The seed text changed, so the seed hash changes.
+- Not done: no vector trace (closed in WP 3.5); no medical review of the pictures (still "generated, not medically reviewed").

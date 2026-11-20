@@ -10,7 +10,8 @@ import {
 /**
  * An exercise or body-area picture with its mandatory caption. Explicit width and height reserve the
  * space, so nothing shifts; the first picture on a screen passes `priority` and loads at once, the rest
- * load lazily. Both sizes are offered through srcSet.
+ * load lazily. Both sizes are offered through srcSet. The files have true alpha, so the picture sits on a
+ * `surface-sunken` tile (radius 10, no border), DR-001 section 9.
  */
 export function IllustrationFigure({
   illustration,
@@ -33,7 +34,7 @@ export function IllustrationFigure({
         height={ILLUSTRATION_HEIGHT}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        className="h-auto w-full rounded-control border border-border bg-bg"
+        className="h-auto w-full rounded-container bg-surface-sunken"
       />
       <figcaption className="text-small text-ink-muted">{ILLUSTRATION_CAPTION}</figcaption>
     </figure>
