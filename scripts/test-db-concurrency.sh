@@ -4,8 +4,21 @@
 # untouched and no carepath_verify_* database remains. Also checks that stop and reset refuse
 # while a lease is live, and that the last release stops a cluster that a lease started.
 # Exit code is the truth. Run from any directory; logs go to .data/concurrency/.
+#
+#   scripts/test-db-concurrency.sh                   both verify runs in this checkout
+#   scripts/test-db-concurrency.sh <other-worktree>  verify B runs in another git worktree of this
+#                                                    repository (checkpoint C2, S1 acceptance): both
+#                                                    share one cluster, lease directory and web lock
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
+OTHER="${1:-$PWD}"
+[ -x "$OTHER/scripts/verify.sh" ] || { echo "FAIL: $OTHER has no scripts/verify.sh" >&2; exit 1; }
+# shellcheck source=scripts/data-root.sh
+source scripts/data-root.sh
+other_root="$(cd "$OTHER" && bash -c 'unset CAREPATH_DATA_ROOT; source scripts/data-root.sh; echo "$CAREPATH_DATA_ROOT"')"
+[ "$other_root" = "$CAREPATH_DATA_ROOT" ] ||
+  { echo "FAIL: data roots differ: $CAREPATH_DATA_ROOT and $other_root" >&2; exit 1; }
+echo "data root: $CAREPATH_DATA_ROOT (verify A in $PWD, verify B in $OTHER)"
 
 LOGS=.data/concurrency
 mkdir -p "$LOGS"
@@ -51,7 +64,7 @@ echo "stop and reset refused with exit 3 while leased"
 # 3. Two verify runs started together.
 pnpm verify >"$LOGS/verify-a.log" 2>&1 &
 a=$!
-pnpm verify >"$LOGS/verify-b.log" 2>&1 &
+(cd "$OTHER" && pnpm verify) >"$LOGS/verify-b.log" 2>&1 &
 b=$!
 set +e
 wait "$a"

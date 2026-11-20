@@ -30,7 +30,7 @@ Copy this block to the end of the file and fill every line.
 - What is missing: a list of the signed-in clinician's appointments for the organization's current day (id, patient, start and end instants, visit type, status), with a count equal to the list length (REQ-OVR-01). The contract says appointment lists arrive in Phase 4.
 - Why: the overview brief asks for today's appointments. Until Phase 4, the overview derives "Visits today" from the patient directory (`GET /patients?clinicianId=<me>&hasUpcomingAppointment=true`, `nextAppointmentAt` on today's date in the clinic zone). That shows only each patient's next visit, so a second visit for the same patient on the same day, a cancelled visit and the visit type are not visible.
 - Status: open
-- Answer:
+- Answer: accepted at checkpoint C2 (ruling 3.1), delivered by WP 4.1 as `GET /appointments?date&practitionerId` returning `AppointmentList`. Until then the overview titles the section "Next visits today".
 
 ### CR-2: Care-team membership on review tasks and the patient header
 
@@ -39,8 +39,8 @@ Copy this block to the end of the file and fill every line.
 - Endpoint and contract: `ReviewTask`, `PatientHeader` (or `CareTeamCard`)
 - What is missing: a boolean `onCareTeam` for the signed-in clinician. `GET /review-tasks` lists every task in the clinic, but assign, resolve, dismiss and plan saves answer 403 `not_on_care_team` for a patient outside the clinician's care teams.
 - Why: AC-B6, AC-D5. Without the flag the UI offers actions that it already knows will be refused and explains the refusal only afterwards. The UI handles the 403 with a plain message today.
-- Status: open
-- Answer:
+- Status: done
+- Answer: accepted at checkpoint C2 (ruling 3.2), delivered by WP 3.4a (commit "contracts: onCareTeam, totals, draft null, mediaAlt"). `ReviewTask.onCareTeam: boolean` on every task response (queue, per-patient list, overview, assign, resolve, dismiss) and `PatientHeader.onCareTeam: boolean | null` (null for the patient and for roles without clinical.read), both computed for the signed-in user. The 403 `not_on_care_team` stays as the backstop.
 
 ### CR-3: Total count on the patient directory
 
@@ -49,8 +49,8 @@ Copy this block to the end of the file and fill every line.
 - Endpoint and contract: `GET /patients`, `PatientDirectoryPage`
 - What is missing: `total: number`, the count of rows matching the query ignoring the cursor.
 - Why: REQ-DIR-01 and interaction principle 11 ask for a visible count. Cursor pages cannot say "21 to 40 of 312", so the footer says "Page 2, 25 patients shown, more on the next page". Not a blocker.
-- Status: open
-- Answer:
+- Status: done
+- Answer: accepted at checkpoint C2 (ruling 3.3), delivered by WP 3.4a (same commit). `total: number` on `PatientDirectoryPage` and `ReviewTaskPage` (queue and per-patient list), from a count with the same WHERE and scope as the page, cursor ignored.
 
 ### CR-4: Exercise illustrations for the patient session
 
@@ -60,4 +60,4 @@ Copy this block to the end of the file and fill every line.
 - What is missing: `mediaPath` is null for every seeded exercise and there is no route that serves exercise images or video.
 - Why: REQ-SES asks for a picture or short clip beside the written steps. The session shows the written steps only, with no empty image box. Not a blocker.
 - Status: open
-- Answer:
+- Answer: accepted at checkpoint C2 (ruling 3.4). Contract part delivered by WP 3.4a: `mediaAlt: string | null` beside `mediaPath` on every exercise shape (`Exercise`, plan items, session activities) and an `Exercise.mediaAlt` column with a check that path and description are set together. Both stay null in the seed until WP 3.5 assets pass review and WP 3.4b wires them; no API route serves media.
