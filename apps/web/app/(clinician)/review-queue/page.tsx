@@ -1,0 +1,16 @@
+import { EmptyState, Heading } from "@carepath/ui";
+
+export const metadata = { title: "Review queue | CarePath" };
+
+// Interim page from WP 3.2a. WP 3.3 replaces it with the real screen.
+export default function Page() {
+  return (
+    <div className="flex flex-col gap-5">
+      <Heading level={1}>Review queue</Heading>
+      <EmptyState icon="clipboard" title="Review queue is not built yet">
+        Open review tasks from the rules arrive in the clinician work package. Nothing is shown here
+        until it can show real records.
+      </EmptyState>
+    </div>
+  );
+}

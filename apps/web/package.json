@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "screenshots": "node scripts/design-system-screenshots.mjs"
+    "screenshots": "node scripts/design-system-screenshots.mjs",
+    "test": "node --test test/style-rule.test.mjs",
+    "e2e": "playwright test --config e2e/playwright.config.ts"
   },
   "dependencies": {
     "@carepath/shared": "workspace:*",

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { DemoNotice } from "@carepath/ui";
 import "@carepath/ui/fonts";
 import "./globals.css";
+import { QueryProvider } from "../lib/query/providers";
 
 export const metadata = {
   title: "CarePath",
@@ -11,9 +12,9 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="flex min-h-dvh flex-col">
         <DemoNotice />
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
