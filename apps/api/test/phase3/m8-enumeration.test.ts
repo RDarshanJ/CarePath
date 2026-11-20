@@ -12,6 +12,7 @@ import {
 import { createClinicalFixture, type ClinicalFixture } from "../support/fixtures/repo.js";
 import { createConversation } from "../support/fixtures/messaging.js";
 import { createSlots } from "../support/scheduling/repo.js";
+import { createEncounter, createGenerationAndNote } from "../support/fixtures/ai.js";
 
 /**
  * Checkpoint C1, M8 (hard gate for WP 3.1), AC-I1, AC-I2.
@@ -110,6 +111,38 @@ function bodyFor(ids: Ids): Record<string, unknown> {
     "POST /patients/{patientId}/appointments/{appointmentId}/reschedule": {
       slotId: ids["slotId"],
     },
+    // WP 5.2 AI and notes.
+    "POST /patients/{patientId}/ai/summaries": {},
+    "POST /patients/{patientId}/ai/note-drafts": { encounterId: ids["encounterId"] },
+    "POST /patients/{patientId}/ai/generations/{generationId}/revisions": {
+      baseRevisionId: null,
+      changes: [{ action: "remove", statementId: "s1" }],
+    },
+    "POST /patients/{patientId}/ai/generations/{generationId}/evidence-opens": {
+      statementId: "s1",
+      sourceType: "check_in",
+      sourceId: ids["sourceId"],
+    },
+    "POST /patients/{patientId}/ai/generations/{generationId}/approve": { revisionId: null },
+    "POST /patients/{patientId}/ai/generations/{generationId}/reject": { reason: "probe" },
+    "POST /patients/{patientId}/ai/generations/{generationId}/regenerate": {},
+    "POST /patients/{patientId}/notes/{noteId}/versions": {
+      expectedVersionId: ids["noteId"],
+      subjective: "probe",
+      objective: "",
+      assessment: "",
+      plan: "",
+    },
+    "POST /patients/{patientId}/notes/{noteId}/sign": { expectedVersionId: ids["noteId"] },
+    "POST /patients/{patientId}/notes/{noteId}/amendments": {
+      expectedVersionId: ids["noteId"],
+      subjective: "probe",
+      objective: "",
+      assessment: "",
+      plan: "",
+      reason: "probe",
+    },
+    "POST /patients/{patientId}/notes/{noteId}/entered-in-error": { reason: "probe" },
   };
 }
 
@@ -240,9 +273,25 @@ beforeAll(async () => {
         payload: { body: "fixture" },
       })
     ).json();
+    // WP 5.2: an encounter, an AI generation and a draft note of this patient.
+    const author = patientId === orgA.patient.patientId ? orgA.therapist : orgA.otherTherapist;
+    const encounterId = await createEncounter(
+      db,
+      orgA.orgId,
+      patientId,
+      author.practitionerId,
+      new Date(NOW.getTime() - day),
+      "Clinician: How is the knee?\nPatient: Better, about 3 out of 10.",
+    );
+    const ai = await createGenerationAndNote(db, orgA.orgId, patientId, author, encounterId, NOW);
     const ids = {
       patientId,
       conversationId,
+      encounterId,
+      generationId: ai.generationId,
+      noteId: ai.noteId,
+      sourceType: "check_in",
+      sourceId: checkIn.checkIn?.id,
       messageId: message.id,
       sessionId: session.id,
       activityId: session.activities?.[0]?.id,
@@ -330,6 +379,9 @@ describe("M8: OpenAPI enumeration of tenant-scoped routes", () => {
       "versionId",
       "consentId",
       "appointmentId",
+      "generationId",
+      "noteId",
+      "sourceId",
     ];
     // Patient 1's path with patient 2's child ids.
     const mixed: Ids = { ...p2, patientId: p1.patientId! };
@@ -357,7 +409,7 @@ describe("M8: OpenAPI enumeration of tenant-scoped routes", () => {
       orgA.otherPatient.patientId,
       ...Object.values(p1),
       ...Object.values(p2),
-    ].filter((v) => v !== "primary_goal" && v !== fxA.ruleIds["reported_pain"]);
+    ].filter((v) => v !== "primary_goal" && v !== "check_in" && v !== fxA.ruleIds["reported_pain"]);
     const problems: string[] = [];
     for (const op of operations().filter((o) => o.params.length === 0 && o.method === "get")) {
       for (const r of roles) {
