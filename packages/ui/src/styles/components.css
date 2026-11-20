@@ -1,0 +1,68 @@
+/* Keyframes and Radix data-state animations. Motion is limited to overlays and a spinner. */
+@keyframes cp-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cp-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes cp-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes cp-slide-in-right {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@keyframes cp-slide-in-bottom {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+@keyframes cp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cp-scrim[data-state="open"] {
+  animation: cp-fade-in var(--cp-duration-base) var(--cp-ease);
+}
+.cp-dialog[data-state="open"],
+.cp-popover[data-state="open"],
+.cp-menu[data-state="open"] {
+  animation: cp-pop-in var(--cp-duration-fast) var(--cp-ease);
+}
+.cp-drawer-right[data-state="open"] {
+  animation: cp-slide-in-right var(--cp-duration-base) var(--cp-ease);
+}
+.cp-drawer-bottom[data-state="open"] {
+  animation: cp-slide-in-bottom var(--cp-duration-base) var(--cp-ease);
+}
+.cp-toast[data-state="open"] {
+  animation: cp-fade-in var(--cp-duration-base) var(--cp-ease);
+}
+.cp-toast[data-state="closed"] {
+  animation: cp-fade-out var(--cp-duration-fast) var(--cp-ease);
+}
+.cp-spinner {
+  animation: cp-spin 800ms linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

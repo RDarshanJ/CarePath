@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@carepath/ui/styles.css";
+
+/* Tailwind does not scan node_modules or symlinked workspace packages by default. */
+@source "../../../packages/ui/src";

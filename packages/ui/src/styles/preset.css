@@ -1,0 +1,146 @@
+/* Tailwind v4 preset: exposes the CarePath tokens as utilities and removes Tailwind's default palette, radii and shadows. */
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --animate-*: initial;
+}
+
+@theme inline {
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-scrim: var(--cp-scrim);
+  --color-bg: var(--cp-bg);
+  --color-surface: var(--cp-surface);
+  --color-surface-sunken: var(--cp-surface-sunken);
+  --color-ink: var(--cp-ink);
+  --color-ink-muted: var(--cp-ink-muted);
+  --color-ink-inverse: var(--cp-ink-inverse);
+  --color-primary: var(--cp-primary);
+  --color-primary-hover: var(--cp-primary-hover);
+  --color-primary-active: var(--cp-primary-active);
+  --color-primary-subtle: var(--cp-primary-subtle);
+  --color-border: var(--cp-border);
+  --color-border-control: var(--cp-border-control);
+  --color-focus: var(--cp-focus);
+  --color-success-ink: var(--cp-success-ink);
+  --color-success-bg: var(--cp-success-bg);
+  --color-warning-ink: var(--cp-warning-ink);
+  --color-warning-bg: var(--cp-warning-bg);
+  --color-error-ink: var(--cp-error-ink);
+  --color-error-bg: var(--cp-error-bg);
+  --color-error-hover: var(--cp-error-hover);
+  --color-info-ink: var(--cp-info-ink);
+  --color-info-bg: var(--cp-info-bg);
+  --color-neutral-ink: var(--cp-neutral-ink);
+  --color-neutral-bg: var(--cp-neutral-bg);
+  --color-disabled-ink: var(--cp-disabled-ink);
+  --color-disabled-bg: var(--cp-disabled-bg);
+  --color-ai-rule: var(--cp-ai-rule);
+  --color-chart-1: var(--cp-chart-1);
+  --color-chart-2: var(--cp-chart-2);
+  --color-chart-3: var(--cp-chart-3);
+  --color-chart-4: var(--cp-chart-4);
+
+  --font-sans: var(--cp-font-sans);
+  --font-mono: var(--cp-font-mono);
+  --font-serif: var(--cp-font-serif);
+  --font-heading: var(--cp-font-heading);
+
+  --radius-control: var(--cp-radius-control);
+  --radius-container: var(--cp-radius-container);
+
+  --shadow-overlay: var(--cp-shadow-overlay);
+
+  --text-caption: var(--cp-text-caption);
+  --text-caption--line-height: var(--cp-text-caption-lh);
+  --text-small: var(--cp-text-small);
+  --text-small--line-height: var(--cp-text-small-lh);
+  --text-body: var(--cp-text-body);
+  --text-body--line-height: var(--cp-text-body-lh);
+  --text-table: var(--cp-text-table);
+  --text-table--line-height: var(--cp-text-table-lh);
+  --text-label: var(--cp-text-label);
+  --text-label--line-height: var(--cp-text-label-lh);
+  --text-h4: var(--cp-text-h4);
+  --text-h4--line-height: var(--cp-text-h4-lh);
+  --text-h3: var(--cp-text-h3);
+  --text-h3--line-height: var(--cp-text-h3-lh);
+  --text-h2: var(--cp-text-h2);
+  --text-h2--line-height: var(--cp-text-h2-lh);
+  --text-h1: var(--cp-text-h1);
+  --text-h1--line-height: var(--cp-text-h1-lh);
+}
+
+/* Density-driven sizes. */
+@utility h-control {
+  height: var(--cp-control-h);
+}
+@utility h-control-sm {
+  height: var(--cp-control-h-sm);
+}
+@utility w-control-sm {
+  width: var(--cp-control-h-sm);
+}
+@utility size-control {
+  width: var(--cp-control-h);
+  height: var(--cp-control-h);
+}
+@utility min-h-target {
+  min-height: var(--cp-target-min);
+}
+@utility min-w-target {
+  min-width: var(--cp-target-min);
+}
+@utility h-row {
+  height: var(--cp-row-h);
+}
+@utility px-control {
+  padding-inline: var(--cp-control-px);
+}
+@utility max-w-measure {
+  max-width: var(--cp-measure);
+}
+@utility px-gutter {
+  padding-inline: var(--cp-page-gutter);
+}
+
+/* Motion: 120 ms and 200 ms ease-out; durations are zeroed under prefers-reduced-motion. */
+@utility motion-fast {
+  transition-duration: var(--cp-duration-fast);
+  transition-timing-function: var(--cp-ease);
+}
+@utility motion-base {
+  transition-duration: var(--cp-duration-base);
+  transition-timing-function: var(--cp-ease);
+}
+
+/* Focus: 2 px ring plus 2 px offset, never removed. */
+@utility focus-ring {
+  outline: var(--cp-focus-width) solid var(--cp-focus);
+  outline-offset: var(--cp-focus-offset);
+}
+
+/* The gallery forces interaction states with data-demo="hover focus active" so they can be shown at rest. */
+@custom-variant hover {
+  &:is([data-demo~="hover"]) {
+    @slot;
+  }
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+}
+@custom-variant active {
+  &:is([data-demo~="active"], :active) {
+    @slot;
+  }
+}
+@custom-variant focus-visible {
+  &:is([data-demo~="focus"], :focus-visible) {
+    @slot;
+  }
+}

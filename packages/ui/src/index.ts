@@ -1,2 +1,21 @@
-// Placeholder: @carepath/ui is populated by a later work package (see docs/decisions/advisor-plan.md).
-export {};
+export * from "./tokens";
+export * from "./lib/cx";
+export * from "./components/icons";
+export * from "./components/theme";
+export * from "./components/text";
+export * from "./components/button";
+export * from "./components/field";
+export * from "./components/inputs";
+export * from "./components/select";
+export * from "./components/choice";
+export * from "./components/pain-scale";
+export * from "./components/tabs";
+export * from "./components/nav";
+export * from "./components/overlays";
+export * from "./components/status";
+export * from "./components/surfaces";
+export * from "./components/progress";
+export * from "./components/table";
+export * from "./components/ai-draft";
+export * from "./components/toast";
+export { overlayClasses } from "./components/overlay-classes";

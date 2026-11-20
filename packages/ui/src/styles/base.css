@@ -1,0 +1,40 @@
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--cp-bg);
+    color: var(--cp-ink);
+    font-family: var(--cp-font-sans);
+    font-size: var(--cp-text-body);
+    line-height: var(--cp-text-body-lh);
+    -webkit-font-smoothing: antialiased;
+  }
+  [data-theme] {
+    background: var(--cp-bg);
+    color: var(--cp-ink);
+    font-family: var(--cp-font-sans);
+    font-size: var(--cp-text-body);
+    line-height: var(--cp-text-body-lh);
+  }
+  table,
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  :focus-visible {
+    outline: var(--cp-focus-width) solid var(--cp-focus);
+    outline-offset: var(--cp-focus-offset);
+  }
+  button,
+  [role="tab"],
+  [role="radio"],
+  [role="checkbox"],
+  [role="switch"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}

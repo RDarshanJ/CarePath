@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
+import { ThemeScope } from "@carepath/ui";
 
-// Route group layout. Navigation and theme tokens arrive in later work packages.
+// Route group layout. Navigation arrives in later work packages.
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <div data-theme="clinician">{children}</div>;
+  return <ThemeScope theme="clinician">{children}</ThemeScope>;
 }
