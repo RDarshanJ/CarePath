@@ -14,6 +14,7 @@ export * from "./common.js";
 export * from "./consents.js";
 export * from "./errors.js";
 export * from "./exercises.js";
+export * from "./fhir.js";
 export * from "./health.js";
 export * from "./intake.js";
 export * from "./messaging.js";
