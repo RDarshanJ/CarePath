@@ -30,8 +30,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm db:migrate
+      # Same stages as scripts/verify.sh: the seed runs and its integrity checks must pass.
+      - run: pnpm db:seed --profile small
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
-      # Seed, Playwright and axe stages are added by WP 2.6 and 3.2.
+      # Playwright and axe stages are added by WP 3.2a.

@@ -9,15 +9,18 @@ Date: 2026-11-19. Synthetic data only; not for clinical use.
 - WP 2.6 Deterministic seed generator, small profile, full-profile parameter, demo accounts (gate output below).
 - WP 2.3 Schema (37 tables), raw-SQL constraints, typed client, ERD and domain model (gate output below). Includes advisor plan revision 1 schema items.
 - WP 2.4 API core: session auth, CSRF and CORS, role permission keys, org-scoped repositories, audit writer, error envelope, OpenAPI, rate limiting, PHI-safe logging, health check, Postgres job runner (gate output below).
+- WP 2.2 Tooling probe (`docs/decisions/tooling-probe.md`). Accepted at checkpoint C1. Failures are recorded there as failures: the Playwright browser download and the HL7 packages are blocked; system Chrome 153 with Playwright 1.65.1 is an unverified version pairing.
+- Checkpoint C1 (`docs/decisions/checkpoint-c1.md`): go for Phase 3, conditional on WP 3.0.
+- WP 3.0 C1 must-fixes M1 to M7 plus the fixed-clock hook (gate output below).
 
 ## Outstanding
 
-- WP 2.2 tooling probe.
-- WP 2.4 items for C1: new dependencies and deviations in `docs/decisions/wp-2.4-api-core.md`.
+- WP 3.1 (API for Scenarios A to D, with the M8 enumeration test as a hard gate), WP 3.2a, 3.2b and 3.3, per C1 section 5. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
-- Checkpoint C1 (schema, isolation and auth review) after WP 2.4.
-- Phases 3 to 9 per `docs/decisions/advisor-plan.md`.
-- `pnpm verify` skips the Playwright/axe stage until WP 2.2/3.2. The migrate and seed stages run.
+- Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
+- `pnpm verify` skips the Playwright/axe stage until WP 3.2a. The migrate and seed stages run.
+- PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
+- `CLAUDE.md` "Commands" still describes `scripts/db.sh start|stop|reset|status` and a verify run that tears the database down. Since WP 3.0, gates take a lease through `scripts/gate-env.sh` and never stop a shared cluster. The orchestrator owns that file; it was not edited here.
 
 ## Blockers
 
@@ -186,3 +189,86 @@ Notes:
 - Concurrency note: the WP 2.6 seed truncates all tenant tables, and `pnpm verify` stops Postgres at the end. Running either while API tests run in another shell breaks those tests (seen once during this WP, then re-run clean). The API tests create their own organizations and never truncate.
 - Not done here: AC-I1 enumeration across every patient-scoped route (waits for WP 3.1 routes), audit viewer endpoint (WP 6.1), per-route AI, export, import and booking rate limits (WP 4.1, 5.2, 5.4).
 - A concurrent gate (for example the API worker's) that stops the shared Postgres cluster mid-run makes the seed tests fail with connection errors; re-run once the other gate has finished.
+
+### WP 3.0 (checkpoint C1 must-fixes)
+
+Scope: `scripts/` (db.sh, gate-env.sh, with-web-lock.sh, verify.sh, test-db-concurrency.sh; gate-wp-2.4.sh and gate-wp-2.6.sh removed), migration `20261121000000_phase3_alignment`, `packages/db` (status rules, seed, tests), `packages/shared` (contracts, copy, enrollment-code helper), `apps/api` (contracts moved, TRUST_PROXY, withTx, database error mapping, no-emit build, fixed clock), `.github/workflows/ci.yml`, `docs/architecture/{api-phase3,erd,domain-model}.md`, `docs/decisions/contract-requests.md`, `docs/demo-accounts.md`, `.env.example`. Commands: `pnpm verify` and `scripts/test-db-concurrency.sh`, both exit 0, run from a stopped cluster.
+
+| Item | Result |
+|---|---|
+| M1 concurrency | `db.sh` takes `CAREPATH_DB` and adds `acquire`, `release`, `drop` with flock leases in `.data/pg-leases`; `stop` and `reset` exit 3 while a lease is live unless `--force`; `release` stops only a cluster a lease started. `gate-env.sh` gives each gate its own database; `verify.sh` uses it (API 4090, web 3090) and builds under `with-web-lock.sh`. Acceptance run below |
+| M2 schema | One migration: `anonymous` audit actor (no user, check), `SessionActivity.skipReason` (skipped only), `stopped_discomfort` with `stoppedAt` and transitions from `in_progress` and `paused`, `EnrollmentCode`, `Organization.phone` and `replyTimeText`, `enforce_same_parent` trigger for the six probed cases (one rejection test each) plus `reject_reparent`. Seed, integrity checks (72), status rules, ERD, domain model and demo accounts updated |
+| M3 contracts | `@carepath/shared/contracts` (auth, errors, health, patients, permissions, roles), shared safety copy, `TRUST_PROXY=off|loopback`, route table `docs/architecture/api-phase3.md`, empty `docs/decisions/contract-requests.md` |
+| M4 audit atomicity | `AuditWriter` takes a transaction client; `withTx(request, fn)`; login and logout use it. A forced audit failure leaves no changed row |
+| M5 database errors | 23P01 `booking_conflict`, 23505 `already_exists`, CP001 `invalid_transition`, CP003 `rule_violation`, all 409 |
+| M6 packaging | `tsx` in `apps/api` dependencies; `build` is `tsc --noEmit`; no `dist` |
+| M7 CI and progress | CI seeds after migrate (CI itself has still never run); this file corrected for WP 2.2 |
+| Clock (ruling 3.8) | `CAREPATH_FIXED_NOW` honoured outside production with one warning line; `pnpm db:seed --anchor now`; seed integrity checks pass on three anchors (Saturday 03:00, Monday 20:00, Wednesday 06:00 UTC) |
+
+`pnpm verify` (exit 0). Tail:
+
+```
+==> gate environment
+db: started by lease 31047
+db: lease 31047 acquired (database carepath_verify_31047)
+==> migrate
+==> seed (small profile)
+integrity checks: 72 passed
+content-hash: b804588a0c023bb7f43757f77fefbb2016d04751e1a724a60e34696e8bef241f
+==> typecheck
+==> lint
+==> unit + API tests
+packages/ui test:       Tests  106 passed (106)
+packages/db test:       Tests  58 passed (58)
+apps/api test:       Tests  86 passed (86)
+==> build
+==> start servers + Playwright + axe (runs under scripts/with-web-lock.sh): SKIPPED (not implemented until WP 3.2a)
+verify: PASSED with skipped stages:
+  - start servers + Playwright + axe (runs under scripts/with-web-lock.sh) [WP 3.2a]
+db: stopped
+db: lease 31047 released
+```
+
+M1 acceptance, `scripts/test-db-concurrency.sh` (exit 0): one process holds a lease on `carepath_hold`, `stop` and `reset` are refused, two `pnpm verify` runs start together and both pass, then the cluster is still up, `carepath_hold` is untouched and no `carepath_verify_*` database remains. Output:
+
+```
+db: started by lease 32046
+db: lease 32046 acquired (database carepath_hold)
+holder: lease held by pid 32046, marker row written to carepath_hold
+db: refusing, live leases held by pid(s): 32046. Use --force to override.
+db: refusing, live leases held by pid(s): 32046. Use --force to override.
+stop and reset refused with exit 3 while leased
+verify A exit 0: database: carepath_verify_32152
+verify: PASSED with skipped stages:
+  - start servers + Playwright + axe (runs under scripts/with-web-lock.sh) [WP 3.2a]
+db: lease 32152 released
+verify B exit 0: database: carepath_verify_32125
+verify: PASSED with skipped stages:
+  - start servers + Playwright + axe (runs under scripts/with-web-lock.sh) [WP 3.2a]
+db: lease 32125 released
+127.0.0.1:54329 - accepting connections
+carepath_hold untouched: hold_marker = held
+no carepath_verify_* database remains
+db: dropped carepath_hold
+db: stopped
+db: lease 32046 released
+last release stopped the lease-started cluster
+concurrency acceptance: PASSED
+```
+
+Both verify runs printed the same content hash and the same test counts (ui 106, db 58, api 86).
+
+Seed after M2 (small profile, default seed and anchor): 6449 rows (6439 before plus 10 `EnrollmentCode` rows), 72 integrity checks, content hash `b804588a0c023bb7f43757f77fefbb2016d04751e1a724a60e34696e8bef241f` (was `dbe27991…52cd`). Session statuses: 307 completed, 16 stopped for discomfort, 11 abandoned, 3 paused.
+
+Notes and deviations:
+
+- `withTx` takes the Fastify request, not the bare `ctx`, because the audit event needs the request id, route template and IP hash. It passes `ctx` (null on public routes) to the callback.
+- `EnrollmentCode` has a `label` column (last four characters of the normalised code) for staff lists; codes are matched after removing spaces and upper-casing (`@carepath/shared/enrollment-code`). Codes belong to an organization, not to a patient.
+- `ExerciseSession.stoppedAt` was added so a stopped session does not reuse `completedAt`.
+- `reject_reparent` (not asked for) keeps the same-patient checks from being undone by changing a parent's `patientId` or a session's `carePlanVersionId` after the fact.
+- The seed guarantees at least one clinic-cancelled appointment for any anchor; before, it held only for most anchors (two of six tried failed).
+- `scripts/gate-wp-2.4.sh` and `scripts/gate-wp-2.6.sh` were removed rather than converted; their checks run inside `pnpm verify`. `gate-wp-2.5.sh` runs its build and `next start` under the web lock but does not use a database.
+- API tests pin `allowedOrigins` so a gate's `CORS_ORIGINS` does not change them.
+- Prisma interactive transactions over `@prisma/adapter-pg` 7.10.1 print a `pg` deprecation warning ("client.query() when the client is already executing a query") from inside Prisma's query interpreter. Queries are still queued in order under `pg` 8; `pg` 9 removes that queueing, so a `pg` upgrade needs a Prisma adapter that awaits each query.
+- Not done: no Next.js rewrite or web code (owned by WP 3.2a); no Phase 3 endpoints or their contracts beyond the names in the route table (WP 3.1); CI still never run.
+
