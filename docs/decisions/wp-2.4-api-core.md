@@ -48,7 +48,7 @@ All exact-pinned in `apps/api/package.json`.
 ## 5. Audit
 
 - `AuditWriter.fromRequest` fills actor, organization, request id, HMAC of the client IP, route template and method. `metadata` takes short scalars only; callers never pass bodies, names or raw URLs (AC-I7).
-- Deviation (for C1): the schema check `AuditEvent_user_actor_check` requires `actorUserId` when `actorType = 'user'`. A failed login for an unknown email has no user, so it is recorded with `actorType = 'system'` and `metadata.anonymous = true`. Suggested fix: add `anonymous` to the `AuditActorType` enum.
+- Deviation (for C1): the schema check `AuditEvent_user_actor_check` requires `actorUserId` when `actorType = 'user'`. A failed login for an unknown email has no user, so it is recorded with `actorType = 'system'` and `metadata.anonymous = true`. Suggested fix: add `anonymous` to the `AuditActorType` enum. Resolved in WP 3.0 (M2): the `anonymous` actor type exists and the API uses it.
 - Audit writes are awaited. If one fails, the request fails with 500 instead of serving unaudited PHI.
 
 ## 6. Errors, logging and headers

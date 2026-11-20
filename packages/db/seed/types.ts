@@ -34,6 +34,7 @@ export interface Tables {
   CareTeamMember: Wire<M.CareTeamMember>[];
   Consent: Wire<M.Consent>[];
   IntakeAssessment: Wire<M.IntakeAssessment>[];
+  EnrollmentCode: Wire<M.EnrollmentCode>[];
   Condition: Wire<M.Condition>[];
   Exercise: Wire<M.Exercise>[];
   CarePlan: Wire<M.CarePlan>[];
@@ -78,6 +79,7 @@ export const insertOrder: readonly TableName[] = [
   "CareTeamMember",
   "Consent",
   "IntakeAssessment",
+  "EnrollmentCode",
   "Condition",
   "Exercise",
   "CarePlan",

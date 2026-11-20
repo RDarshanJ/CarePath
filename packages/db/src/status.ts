@@ -63,8 +63,8 @@ export const statusTransitions = {
   ExerciseSession: {
     column: "status",
     allowed: {
-      in_progress: ["paused", "completed", "abandoned"],
-      paused: ["in_progress", "abandoned"],
+      in_progress: ["paused", "completed", "abandoned", "stopped_discomfort"],
+      paused: ["in_progress", "abandoned", "stopped_discomfort"],
     },
   },
   SessionActivity: {

@@ -1,9 +1,13 @@
 /**
- * pnpm db:seed [--profile small|full] [--seed <text>] [--anchor <ISO instant>] [--check] [--json]
+ * pnpm db:seed [--profile small|full] [--seed <text>] [--anchor <ISO instant>|now] [--check] [--json]
  * Replaces all tenant data in the local database with a deterministic synthetic dataset, runs the
  * integrity checks, and prints one checksum per table plus a content hash. Running it twice
  * prints the same hashes.
+ *
+ * `--anchor now` seeds a world whose "now" is the current hour (hand demos only; checkpoint C1
+ * ruling 3.8). This file is the only place in seed/ that reads the clock, and only for that flag.
  */
+import { resolveAnchor } from "./anchor.js";
 import {
   checkSeededDatabase,
   DEFAULT_ANCHOR,
@@ -42,7 +46,8 @@ async function main(): Promise<void> {
     );
   }
   const seed = typeof args.seed === "string" ? args.seed : DEFAULT_SEED;
-  const anchor = typeof args.anchor === "string" ? args.anchor : DEFAULT_ANCHOR;
+  const anchor =
+    typeof args.anchor === "string" ? resolveAnchor(args.anchor, Date.now()) : DEFAULT_ANCHOR;
 
   if (args.check) {
     const result = await checkSeededDatabase({ profile: profileName, anchor });

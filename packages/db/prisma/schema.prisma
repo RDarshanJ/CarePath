@@ -145,6 +145,8 @@ enum ExerciseSessionStatus {
   paused
   completed
   abandoned
+  /// The patient chose "Stop, this hurts" (AC-C4). Terminal; stoppedAt is required.
+  stopped_discomfort
 }
 
 enum SessionActivityStatus {
@@ -273,8 +275,11 @@ enum AIReviewDecision {
 
 enum AuditActorType {
   user
+  /// Jobs and automated rules only.
   system
   ai
+  /// Unauthenticated caller, for example a failed login for an unknown email. No actorUserId.
+  anonymous
 }
 
 enum AuditAction {
@@ -313,13 +318,17 @@ enum JobStatus {
 
 /// Tenant boundary. Maps to FHIR Organization.
 model Organization {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String
-  slug      String   @unique
-  timezone  String   @default("UTC")
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(3)
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  slug          String   @unique
+  timezone      String   @default("UTC")
+  active        Boolean  @default(true)
+  /// Clinic phone shown in the pain notice (AC-D7). Null: the notice says "contact your clinic".
+  phone         String?
+  /// Patient-facing reply-time text for messaging (REQ-ADM-05, REQ-MSG-02).
+  replyTimeText String?
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @default(now()) @updatedAt @db.Timestamptz(3)
 
   memberships          OrganizationMembership[]
   authSessions         AuthSession[]
@@ -354,6 +363,7 @@ model Organization {
   aiReviews            AIReview[]
   auditEvents          AuditEvent[]
   jobs                 Job[]
+  enrollmentCodes      EnrollmentCode[]
 }
 
 /// Login principal. Global (not a tenant row); access comes only from memberships.
@@ -486,6 +496,7 @@ model Patient {
   reviewTasks       ReviewTask[]
   aiGenerations     AIGeneration[]
   auditEvents       AuditEvent[]
+  enrollmentCodes   EnrollmentCode[]
 
   @@unique([id, organizationId])
   @@unique([organizationId, mrn])
@@ -803,6 +814,8 @@ model ExerciseSession {
   startedAt         DateTime              @default(now()) @db.Timestamptz(3)
   pausedAt          DateTime?             @db.Timestamptz(3)
   completedAt       DateTime?             @db.Timestamptz(3)
+  /// Set when the patient stops for discomfort (status stopped_discomfort).
+  stoppedAt         DateTime?             @db.Timestamptz(3)
   updatedAt         DateTime              @default(now()) @updatedAt @db.Timestamptz(3)
 
   organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Restrict)
@@ -829,6 +842,8 @@ model SessionActivity {
   discomfortReported Boolean               @default(false)
   discomfortLevel    Int?
   discomfortNote     String?
+  /// Patient's reason for skipping (AC-C3). Null unless status is skipped (CHECK).
+  skipReason         String?
   completedAt        DateTime?             @db.Timestamptz(3)
   updatedAt          DateTime              @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -1290,6 +1305,27 @@ model AuditEvent {
   @@index([organizationId, occurredAt])
   @@index([organizationId, eventName, occurredAt])
   @@index([resourceType, resourceId])
+}
+
+/// Demo eligibility code for onboarding (AC-A3). Only a SHA-256 hash of the code is stored.
+/// A code is redeemed once: redeemedAt and redeemedByPatientId are set together (CHECK), in the
+/// same transaction that creates the account, so an invalid or reused code creates nothing.
+model EnrollmentCode {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId      String    @db.Uuid
+  codeHash            String    @unique
+  /// Short non-secret label for staff lists, for example the last four characters.
+  label               String
+  expiresAt           DateTime  @db.Timestamptz(3)
+  redeemedAt          DateTime? @db.Timestamptz(3)
+  redeemedByPatientId String?   @db.Uuid
+  createdAt           DateTime  @default(now()) @db.Timestamptz(3)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  redeemedBy   Patient?     @relation(fields: [redeemedByPatientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@unique([redeemedByPatientId])
+  @@index([organizationId, expiresAt])
 }
 
 /// Postgres-backed job queue (ADR-4), claimed with FOR UPDATE SKIP LOCKED.

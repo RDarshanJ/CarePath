@@ -206,6 +206,41 @@ export async function checkIntegrity(
     `SELECT count(*) n FROM "AIGeneration" WHERE status = 'failed'`,
   );
 
+  await zero(
+    "skipped activities carry a skip reason",
+    `SELECT count(*) n FROM "SessionActivity" WHERE status = 'skipped' AND "skipReason" IS NULL`,
+  );
+  await atLeast(
+    "sessions stopped for discomfort",
+    `SELECT count(*) n FROM "ExerciseSession" WHERE status = 'stopped_discomfort'`,
+  );
+  await zero(
+    "stopped sessions record the discomfort that stopped them",
+    `SELECT count(*) n FROM "ExerciseSession" s WHERE s.status = 'stopped_discomfort' AND NOT EXISTS (SELECT 1 FROM "SessionActivity" a WHERE a."sessionId" = s.id AND a."discomfortReported")`,
+  );
+  await zero(
+    "every organization has a clinic phone and reply-time text",
+    `SELECT count(*) n FROM "Organization" WHERE phone IS NULL OR "replyTimeText" IS NULL`,
+  );
+  await equals(
+    "unused, unexpired enrollment codes (3 per organization)",
+    `SELECT count(*) n FROM "EnrollmentCode" WHERE "redeemedAt" IS NULL AND "expiresAt" > $1::timestamptz`,
+    3 * profile.orgs,
+    [anchor],
+  );
+  await equals(
+    "redeemed enrollment codes (1 per organization)",
+    `SELECT count(*) n FROM "EnrollmentCode" WHERE "redeemedAt" IS NOT NULL AND "redeemedAt" >= "createdAt" AND "redeemedAt" <= $1::timestamptz`,
+    profile.orgs,
+    [anchor],
+  );
+  await equals(
+    "expired enrollment codes (1 per organization)",
+    `SELECT count(*) n FROM "EnrollmentCode" WHERE "redeemedAt" IS NULL AND "expiresAt" <= $1::timestamptz`,
+    profile.orgs,
+    [anchor],
+  );
+
   // ---- agreement between tables ----------------------------------------------------------
   await zero(
     "sessions run against their own patient's plan",

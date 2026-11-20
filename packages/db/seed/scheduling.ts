@@ -321,6 +321,18 @@ export function buildScheduling(ctx: Ctx): void {
     }
   }
 
+  // Edge-case guarantee for any seed and anchor: at least one visit the clinic cancelled.
+  if (!ctx.appointments.some((a) => a.status === "cancelled_by_clinic")) {
+    const pick = ctx.appointments.find(
+      (a) => a.status === "cancelled_by_patient" && a.patient.persona === null,
+    );
+    if (pick) {
+      pick.status = "cancelled_by_clinic";
+      pick.row.status = "cancelled_by_clinic";
+      pick.row.cancelledByUserId = pick.patient.org.coordinatorUserId;
+    }
+  }
+
   // Some unused slots are blocked (time off, meetings).
   for (const s of slots.values()) {
     if (!s.used && rng.chance(0.05)) s.row.status = "blocked";

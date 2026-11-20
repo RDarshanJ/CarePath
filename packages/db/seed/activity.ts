@@ -14,7 +14,7 @@ import {
   type PatientInfo,
   type VersionInfo,
 } from "./ctx.js";
-import { checkInNotes, discomfortNotes } from "./data/text.js";
+import { checkInNotes, discomfortNotes, skipReasons } from "./data/text.js";
 
 interface Candidate {
   patient: PatientInfo;
@@ -99,7 +99,7 @@ export function buildActivity(ctx: Ctx): void {
     const n = items.length;
     const truncated = s.keep < n;
     const isLast = lastPerPatient.get(p.id) === i;
-    let status: "completed" | "abandoned" | "paused" = "completed";
+    let status: "completed" | "abandoned" | "paused" | "stopped_discomfort" = "completed";
     let doneCount = n; // activities finished before the session stops
     if (s.c.forced === "resume") {
       status = "paused";
@@ -138,6 +138,10 @@ export function buildActivity(ctx: Ctx): void {
       } else if (skipped) state = "skipped";
       const discomfort = (done && !skipped && rng.chance(0.08)) || (stoppedHere && rng.chance(0.6));
       const level = discomfort ? rng.int(3, 8) : null;
+      // A separate stream, so adding skip reasons left every other generated value unchanged.
+      const skipReason = skipped
+        ? ctx.rng.fork(`skip/${sessionId}/${item.id}`).pick(skipReasons)
+        : null;
       return {
         id: ctx.id("activity", `${sessionId}/${item.id}`),
         organizationId: p.org.id,
@@ -153,12 +157,18 @@ export function buildActivity(ctx: Ctx): void {
         discomfortReported: discomfort,
         discomfortLevel: level,
         discomfortNote: discomfort ? rng.pick(discomfortNotes) : null,
+        skipReason,
         completedAt,
         updatedAt: completedAt ?? iso(startMs),
       };
     });
     for (const row of activityRows) t.SessionActivity.push(row);
 
+    // "Stop, this hurts" (AC-C4): an interrupted session whose stopping exercise reported
+    // discomfort ended as stopped for discomfort rather than abandoned.
+    if (status === "abandoned" && activityRows[doneCount]?.discomfortReported) {
+      status = "stopped_discomfort";
+    }
     const endMs = startMs + elapsed * 1000;
     t.ExerciseSession.push({
       id: sessionId,
@@ -171,6 +181,7 @@ export function buildActivity(ctx: Ctx): void {
       startedAt: iso(startMs),
       pausedAt: status === "paused" ? iso(endMs) : null,
       completedAt: status === "completed" ? iso(endMs) : null,
+      stoppedAt: status === "stopped_discomfort" ? iso(endMs) : null,
       updatedAt: iso(endMs),
     });
     p.sessions.push({

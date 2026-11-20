@@ -64,7 +64,7 @@ export interface SessionInfo {
   id: string;
   startedAtMs: number;
   completedAtMs: number | null;
-  status: "completed" | "abandoned" | "paused";
+  status: "completed" | "abandoned" | "paused" | "stopped_discomfort";
   version: VersionInfo;
 }
 
@@ -142,6 +142,7 @@ export function emptyTables(): Tables {
     CareTeamMember: [],
     Consent: [],
     IntakeAssessment: [],
+    EnrollmentCode: [],
     Condition: [],
     Exercise: [],
     CarePlan: [],

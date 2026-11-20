@@ -245,6 +245,14 @@ export const checkInNotes = [
   "Felt steadier than last week.",
 ] as const;
 
+export const skipReasons = [
+  "Short on time today.",
+  "Too tired today.",
+  "Did not have the space for it.",
+  "Not sure how to do this one.",
+  "Felt uncomfortable to start.",
+] as const;
+
 export const discomfortNotes = [
   "Pulling feeling on the second set.",
   "Felt tight at the end of the movement.",

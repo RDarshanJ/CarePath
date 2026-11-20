@@ -44,7 +44,8 @@ export interface AuditRecord {
   orgId: string | null;
   actorUserId: string | null;
   actorRole: RoleKey | null;
-  actorType: "user" | "system" | "ai";
+  /** system: jobs and automated rules only. anonymous: a caller with no known account. */
+  actorType: "user" | "system" | "ai" | "anonymous";
   resourceType?: string | null;
   resourceId?: string | null;
   /** Only for a patient inside `orgId`; out-of-scope ids go in resourceId instead. */
@@ -89,15 +90,14 @@ export class AuditWriter {
       orgId: input.orgId !== undefined ? input.orgId : (ctx?.orgId ?? null),
       actorUserId,
       actorRole: input.actorRole !== undefined ? input.actorRole : (ctx?.role ?? null),
-      // The schema requires a user id for actorType "user". A request with no known account
-      // (failed login for an unknown email) is recorded as "system" and flagged anonymous.
-      actorType: actorUserId ? "user" : "system",
+      // A request with no known account (failed login for an unknown email) is "anonymous"
+      // (checkpoint C1, ruling 3.1). "system" is reserved for jobs and automated rules.
+      actorType: actorUserId ? "user" : "anonymous",
       requestId: request.id,
       sourceIpHash: request.ipHash,
       metadata: {
         route: request.routeOptions.url ?? "unmatched",
         method: request.method,
-        ...(actorUserId ? {} : { anonymous: true }),
         ...input.metadata,
       },
     });

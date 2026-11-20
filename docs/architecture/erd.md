@@ -1,6 +1,6 @@
 # CarePath entity relationship diagram
 
-Generated from `packages/db/prisma/schema.prisma` (Prisma 7.10.1) on 2026-11-19 and checked by hand. Synthetic data only; not for clinical use.
+Generated from `packages/db/prisma/schema.prisma` (Prisma 7.10.1) on 2026-11-19 and checked by hand. Updated for migration `phase3_alignment` (WP 3.0): `EnrollmentCode` added. Synthetic data only; not for clinical use.
 
 Read with `docs/architecture/domain-model.md`, which explains organization boundaries, status transitions and the constraints that live in raw SQL. Diagrams list key columns only (PK, FK, unique, status); `schema.prisma` is the full definition.
 
@@ -10,10 +10,11 @@ Conventions in every diagram:
 - Edge labels show the relation field and its foreign-key columns. A label such as `patient (patientId, organizationId)` is a composite key into `Patient(id, organizationId)`, which is what makes a cross-organization reference impossible.
 - Edges to `OrganizationMembership` use `(userId, organizationId)`: the acting user must belong to the same organization.
 - Cardinality is read from the schema: `o|` means at most one child per parent (a unique key on the foreign-key columns).
+- Composite keys prove the same organization. Same-patient parents (a session's plan version, a check-in's session, an observation's check-in or session, a goal's care plan, a note's encounter) and a session activity's assignment belonging to the session's plan version are enforced by the `enforce_same_parent` trigger, not by keys; see `domain-model.md` section 6.
 
 ## Overview
 
-All 37 tables and their foreign keys, without columns.
+All 38 tables and their foreign keys, without columns.
 
 ```mermaid
 erDiagram
@@ -31,6 +32,8 @@ erDiagram
   Patient ||--o{ Consent : "patient"
   OrganizationMembership |o--o{ Consent : "capturedBy"
   Patient ||--o{ IntakeAssessment : "patient"
+  Organization ||--o{ EnrollmentCode : "organization"
+  Patient |o--o| EnrollmentCode : "redeemedBy"
   Patient ||--o{ Condition : "patient"
   Encounter |o--o{ Condition : "encounter"
   Practitioner |o--o{ Condition : "recordedBy"
@@ -144,6 +147,14 @@ erDiagram
     String careTeamId FK
     String userId FK
   }
+  EnrollmentCode {
+    String id PK
+    String organizationId FK
+    String codeHash UK
+    DateTime expiresAt
+    DateTime redeemedAt
+    String redeemedByPatientId FK,UK
+  }
   Organization ||--o{ OrganizationMembership : "organization (organizationId)"
   User ||--o{ OrganizationMembership : "user (userId)"
   Role ||--o{ OrganizationMembership : "role (roleId)"
@@ -157,6 +168,8 @@ erDiagram
   Patient ||--o| CareTeam : "patient (patientId, organizationId)"
   CareTeam ||--o{ CareTeamMember : "careTeam (careTeamId, organizationId)"
   OrganizationMembership ||--o{ CareTeamMember : "membership (userId, organizationId)"
+  Organization ||--o{ EnrollmentCode : "organization (organizationId)"
+  Patient |o--o| EnrollmentCode : "redeemedBy (redeemedByPatientId, organizationId)"
 ```
 
 ## Intake, consent, conditions and goals

@@ -80,6 +80,10 @@ describe("login", () => {
     const [u] = await auditEventsForRequest(db, unknown.headers["x-request-id"] as string);
     expect(u?.eventName).toBe("auth.login_failed");
     expect(u?.actorUserId).toBeNull();
+    // Checkpoint C1 ruling 3.1: an unknown caller is anonymous, not the system.
+    expect(u?.actorType).toBe("anonymous");
+    expect(w?.actorType).toBe("user");
+    expect(u?.metadata).not.toHaveProperty("anonymous");
     expect(JSON.stringify(u)).not.toContain("nobody@example.test");
   });
 

@@ -21,6 +21,7 @@ export { buildDataset } from "./build.js";
 export { checkIntegrity, fixedAccounts, type Check } from "./integrity.js";
 export { contentChecksums, type TableChecksum } from "./checksum.js";
 export { DEMO_PASSWORD } from "./people.js";
+export { demoEnrollmentCodes } from "./enrollment.js";
 export { seedPasswordHash } from "./password.js";
 export {
   DEFAULT_ANCHOR,

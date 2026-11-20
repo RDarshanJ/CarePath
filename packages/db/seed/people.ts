@@ -168,6 +168,9 @@ export function buildPeople(ctx: Ctx): { demoAccounts: DemoAccount[] } {
       slug: org.slug,
       timezone,
       active: true,
+      // Fictional numbers from the reserved 555-0100 to 555-0199 range.
+      phone: `(555) 555-01${String(10 + (oi % 90)).padStart(2, "0")}`,
+      replyTimeText: "Your care team usually replies within one business day.",
       createdAt: created,
       updatedAt: created,
     });

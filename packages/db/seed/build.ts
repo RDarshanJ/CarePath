@@ -7,6 +7,7 @@ import { buildCarePlans, buildExercises } from "./careplans.js";
 import { buildConversations } from "./comms.js";
 import { makeCtx } from "./ctx.js";
 import { buildDocumentation } from "./documentation.js";
+import { buildEnrollmentCodes } from "./enrollment.js";
 import { buildOps } from "./ops.js";
 import { DEMO_PASSWORD, buildPeople } from "./people.js";
 import { DEFAULT_ANCHOR, DEFAULT_SEED, type SeedProfile } from "./profiles.js";
@@ -28,6 +29,7 @@ export function buildDataset(profile: SeedProfile, options: BuildOptions): Datas
   const ctx = makeCtx(profile, `${seed}/${profile.name}`, anchorMs, options.passwordHash);
 
   const { demoAccounts } = buildPeople(ctx);
+  buildEnrollmentCodes(ctx);
   buildExercises(ctx);
   buildCarePlans(ctx);
   buildActivity(ctx);
