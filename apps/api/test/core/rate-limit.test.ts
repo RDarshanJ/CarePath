@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { loadConfig } from "../../src/config.js";
-import { loginRaw, testApp } from "../support/http.js";
+import { login, loginRaw, testApp } from "../support/http.js";
 import { createOrgFixture, createTestDb, PASSWORD, type OrgFixture } from "../support/repo.js";
 
 const db = createTestDb();
@@ -115,6 +115,69 @@ describe("TRUST_PROXY (checkpoint C1 section 5.2)", () => {
         (await health(app, "203.0.113.3", "198.51.100.9")).statusCode,
       ];
       expect(codes).toEqual([200, 200, 429]);
+    } finally {
+      await app.close();
+    }
+  });
+});
+
+describe("global limit keyed on the session (checkpoint C2, F3 and ruling 3.5)", () => {
+  // Every request arrives from the web server on loopback with the same forwarded address, as
+  // server-rendered reads and the /api rewrite do for users behind one network address.
+  const PROXY = { remoteAddress: "127.0.0.1", forwardedFor: "203.0.113.50" };
+  const sessionRead = (app: FastifyInstance, cookie: string) =>
+    app.inject({
+      method: "GET",
+      url: "/auth/session",
+      remoteAddress: PROXY.remoteAddress,
+      headers: { "x-forwarded-for": PROXY.forwardedFor, cookie },
+    });
+
+  it("the default limit answers 429 with Retry-After for a single session", async () => {
+    const defaults = loadConfig({ NODE_ENV: "test" }).rateLimit;
+    expect(defaults.globalPerMinute).toBe(300);
+    const app = await testApp(db, { config: { trustProxy: "loopback", rateLimit: defaults } });
+    try {
+      const a = await login(app, org.coordinator.email);
+      for (let i = 0; i < defaults.globalPerMinute; i += 1) {
+        const res = await sessionRead(app, a.cookie);
+        if (res.statusCode !== 200) throw new Error(`request ${i + 1}: ${res.statusCode}`);
+      }
+      const blocked = await sessionRead(app, a.cookie);
+      expect(blocked.statusCode).toBe(429);
+      expect(Number(blocked.headers["retry-after"])).toBeGreaterThan(0);
+      expect(blocked.json()).toEqual({
+        error: { code: "rate_limited", message: "Too many requests. Try again later." },
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("two sessions behind the proxy are limited separately, and apart from the address", async () => {
+    const app = await testApp(db, {
+      config: { trustProxy: "loopback", rateLimit: { globalPerMinute: 2, loginPerMinute: 10 } },
+    });
+    try {
+      const a = await login(app, org.coordinator.email);
+      const b = await login(app, org.admin.email);
+      const codesA = [
+        (await sessionRead(app, a.cookie)).statusCode,
+        (await sessionRead(app, a.cookie)).statusCode,
+        (await sessionRead(app, a.cookie)).statusCode,
+      ];
+      expect(codesA).toEqual([200, 200, 429]);
+      expect((await sessionRead(app, b.cookie)).statusCode).toBe(200);
+      expect((await sessionRead(app, b.cookie)).statusCode).toBe(200);
+      expect((await sessionRead(app, b.cookie)).statusCode).toBe(429);
+      // Without a session the same forwarded address has its own budget.
+      const anonymous = await app.inject({
+        method: "GET",
+        url: "/health",
+        remoteAddress: PROXY.remoteAddress,
+        headers: { "x-forwarded-for": PROXY.forwardedFor },
+      });
+      expect(anonymous.statusCode).toBe(200);
     } finally {
       await app.close();
     }

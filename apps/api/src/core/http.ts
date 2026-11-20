@@ -30,7 +30,13 @@ export async function registerHttp(app: FastifyInstance): Promise<void> {
     global: true,
     max: config.rateLimit.globalPerMinute,
     timeWindow: 60_000,
-    keyGenerator: (request) => request.ip,
+    // Checkpoint C2, F3: the key is the session id when the request carries a valid session and the
+    // client address otherwise. Server-rendered pages reach the API from the web server, so an address
+    // key alone puts every signed-in user in one bucket. The plugin adds its check as a route-level
+    // onRequest hook, which runs after the app-level access hook has loaded `request.ctx`.
+    // Sign-in and account creation keep their own per-address limits (route config).
+    keyGenerator: (request) =>
+      request.ctx ? `session:${request.ctx.sessionId}` : `address:${request.ip}`,
     errorResponseBuilder: () => new AppError("rate_limited"),
   });
 
