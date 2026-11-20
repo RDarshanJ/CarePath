@@ -11,6 +11,7 @@ import { scheduleVersions, sessionsSince } from "../progress/repo.js";
 import { listTasks } from "../review/repo.js";
 import { toReviewTask } from "../review/view.js";
 import { caseload, recentPublishes, unreviewedCheckIns, WORK_LIST_LIMIT } from "./repo.js";
+import { draftsAwaitingReview } from "../ai/repo.js";
 
 const D = 86_400_000;
 
@@ -78,6 +79,8 @@ export const overviewRoutes: FastifyPluginAsyncZod = async (app) => {
         .filter((m) => m.missedSessions > 0)
         .sort((a, b) => b.missedSessions - a.missedSessions);
 
+      const aiDrafts = await draftsAwaitingReview(db, ctx, ids, WORK_LIST_LIMIT);
+
       const list = <T>(items: T[]) => ({ count: items.length, items });
       return {
         generatedAt: at.toISOString(),
@@ -104,6 +107,17 @@ export const overviewRoutes: FastifyPluginAsyncZod = async (app) => {
             versionNumber: v.versionNumber,
             publishedAt: v.publishedAt.toISOString(),
             publishedBy: practitionerRef(v.publishedBy),
+          })),
+        ),
+        // WP 5.2, CR-16.
+        aiDraftsAwaitingReview: list(
+          aiDrafts.map((g) => ({
+            generationId: g.id,
+            patient: g.patient,
+            kind: g.kind as "progress_summary" | "note_draft",
+            reviewState: g._count.reviews > 0 ? ("in_review" as const) : ("unreviewed" as const),
+            createdAt: g.createdAt.toISOString(),
+            unsupportedStatementCount: g.unsupportedStatementCount,
           })),
         ),
       };

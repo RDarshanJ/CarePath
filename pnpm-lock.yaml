@@ -35,6 +35,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@carepath/ai':
+        specifier: workspace:*
+        version: link:../../packages/ai
       '@carepath/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -166,6 +169,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@carepath/ai':
+        specifier: workspace:*
+        version: link:../ai
       '@carepath/shared':
         specifier: workspace:*
         version: link:../shared

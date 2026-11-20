@@ -32,6 +32,9 @@ import { fhirRoutes } from "./modules/fhir/routes.js";
 import { overviewRoutes } from "./modules/overview/routes.js";
 import { recordRoutes } from "./modules/records/routes.js";
 import { schedulingRoutes } from "./modules/scheduling/routes.js";
+import { aiRoutes } from "./modules/ai/routes.js";
+import { noteRoutes } from "./modules/notes/routes.js";
+import type { LLMProvider } from "@carepath/ai";
 import { reviewActionRoutes } from "./modules/review/action-routes.js";
 import { reviewRoutes } from "./modules/review/routes.js";
 import { patientRoutes } from "./modules/patients/routes.js";
@@ -49,6 +52,8 @@ export interface BuildAppOptions {
   logStream?: NodeJS.WritableStream;
   /** Extra routes registered after the core (tests use it for fixture routes). */
   extraRoutes?: (app: FastifyInstance) => void | Promise<void>;
+  /** WP 5.2: AI provider override for tests; otherwise chosen from configuration. */
+  aiProvider?: LLMProvider;
 }
 
 /**
@@ -124,6 +129,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(messagingRoutes);
   await app.register(schedulingRoutes); // WP 4.1
   await app.register(fhirRoutes); // WP 5.4
+  await app.register(aiRoutes, { provider: options.aiProvider }); // WP 5.2
+  await app.register(noteRoutes); // WP 5.2
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();

@@ -67,7 +67,19 @@ export async function checkIntegrity(
     50 * profile.orgs,
   );
   await equals("appointments", `SELECT count(*) n FROM "Appointment"`, profile.appointments);
-  await equals("encounters", `SELECT count(*) n FROM "Encounter"`, profile.encounters);
+  // Plus patient.demo's Scenario F visit without a note (WP 5.2), when the demo persona exists.
+  await equals(
+    "encounters",
+    `SELECT count(*) n FROM "Encounter"`,
+    profile.encounters +
+      Number(
+        (
+          await db.query<{ n: string }>(
+            `SELECT count(*) n FROM "User" WHERE email = 'patient.demo@carepath.test'`,
+          )
+        ).rows[0]?.n ?? 0,
+      ),
+  );
   if (profile.activityRecords !== null)
     await equals(
       "activity records",
@@ -298,14 +310,24 @@ export async function checkIntegrity(
         WHEN 'Appointment' THEN EXISTS (SELECT 1 FROM "Appointment" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = t."patientId")
         ELSE false END)`,
   );
+  // WP 5.2: input references in the API's stored format, each inside the generation's patient.
   await zero(
-    "AI generation source references exist",
-    `SELECT count(*) n FROM "AIGeneration" g, jsonb_array_elements(g.input->'sourceRefs') e WHERE NOT (
+    "AI generation input references exist for the same patient",
+    `SELECT count(*) n FROM "AIGeneration" g, jsonb_array_elements(g.input->'inputRefs') e WHERE NOT (
       CASE e->>'type'
-        WHEN 'ExerciseSession' THEN EXISTS (SELECT 1 FROM "ExerciseSession" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
-        WHEN 'PatientCheckIn' THEN EXISTS (SELECT 1 FROM "PatientCheckIn" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
-        WHEN 'Encounter' THEN EXISTS (SELECT 1 FROM "Encounter" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
+        WHEN 'exercise_session' THEN EXISTS (SELECT 1 FROM "ExerciseSession" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
+        WHEN 'session_activity' THEN EXISTS (SELECT 1 FROM "SessionActivity" x JOIN "ExerciseSession" s ON s.id = x."sessionId" WHERE x.id = (e->>'id')::uuid AND s."patientId" = g."patientId")
+        WHEN 'check_in' THEN EXISTS (SELECT 1 FROM "PatientCheckIn" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
+        WHEN 'message' THEN EXISTS (SELECT 1 FROM "Message" x JOIN "Conversation" c ON c.id = x."conversationId" WHERE x.id = (e->>'id')::uuid AND c."patientId" = g."patientId" AND x.status = 'sent')
+        WHEN 'appointment' THEN EXISTS (SELECT 1 FROM "Appointment" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
+        WHEN 'care_plan_version' THEN EXISTS (SELECT 1 FROM "CarePlanVersion" x JOIN "CarePlan" c ON c.id = x."carePlanId" WHERE x.id = (e->>'id')::uuid AND c."patientId" = g."patientId")
+        WHEN 'encounter' THEN EXISTS (SELECT 1 FROM "Encounter" x WHERE x.id = (e->>'id')::uuid AND x."patientId" = g."patientId")
         ELSE false END)`,
+  );
+  await zero(
+    "AI generations are stored in the WP 5.2 format",
+    `SELECT count(*) n FROM "AIGeneration" WHERE input->>'schema' IS DISTINCT FROM 'carepath.ai.generation-input.v1'
+      OR (status = 'succeeded' AND output->>'schema' IS DISTINCT FROM 'carepath.ai.generation-output.v1')`,
   );
   await zero(
     "AI generations only for patients with active consent at the time",

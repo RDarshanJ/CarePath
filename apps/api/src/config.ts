@@ -21,6 +21,15 @@ const envSchema = z.object({
   TRUST_PROXY: z.enum(["off", "loopback"]).default("off"),
   // WP 4.2 test hook: every message delivery fails. Ignored in production.
   MESSAGE_FORCE_FAILURE: z.enum(["true", "false"]).default("false"),
+  // WP 5.2 AI. The deterministic demo provider is the default; the Anthropic provider runs only
+  // when chosen here and CAREPATH_ANTHROPIC_API_KEY and CAREPATH_ANTHROPIC_MODEL are set.
+  AI_PROVIDER: z.enum(["deterministic", "anthropic"]).default("deterministic"),
+  AI_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
+  AI_GENERATIONS_PER_MINUTE: z.coerce.number().int().positive().default(10),
+  AI_ROUTES_PER_MINUTE: z.coerce.number().int().positive().default(60),
+  // Test hook, ignored in production: "fail" makes every attempt return invalid output;
+  // "unsupported" adds one statement with no source to each deterministic draft.
+  AI_PROBE: z.enum(["none", "fail", "unsupported"]).default("none"),
 });
 
 export interface AppConfig {
@@ -44,6 +53,18 @@ export interface AppConfig {
   trustProxy: "off" | "loopback";
   logLevel: string;
   messaging: { forceDeliveryFailure: boolean };
+  ai: {
+    provider: "deterministic" | "anthropic";
+    /** Per attempt; two retries follow a failed attempt (PRD section 11). */
+    timeoutMs: number;
+    maxRetries: number;
+    backoffMs: number;
+    /** Generations per user per minute (PRD section 13: AI 10 per minute per user). */
+    generationsPerMinute: number;
+    /** Requests per session per minute on every AI and note route. */
+    routesPerMinute: number;
+    probe: "none" | "fail" | "unsupported";
+  };
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -74,6 +95,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     },
     trustProxy: parsed.TRUST_PROXY,
     messaging: { forceDeliveryFailure: !production && parsed.MESSAGE_FORCE_FAILURE === "true" },
+    ai: {
+      provider: parsed.AI_PROVIDER,
+      timeoutMs: parsed.AI_TIMEOUT_MS,
+      maxRetries: 2,
+      backoffMs: 500,
+      generationsPerMinute: parsed.AI_GENERATIONS_PER_MINUTE,
+      routesPerMinute: parsed.AI_ROUTES_PER_MINUTE,
+      probe: production ? "none" : parsed.AI_PROBE,
+    },
     logLevel: parsed.LOG_LEVEL ?? (parsed.NODE_ENV === "test" ? "silent" : "info"),
   };
 }

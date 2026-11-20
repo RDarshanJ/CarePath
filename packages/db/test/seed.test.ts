@@ -85,7 +85,8 @@ describe("seed generator (no database)", () => {
     expect(ds.tables.Practitioner).toHaveLength(6);
     expect(ds.tables.Patient).toHaveLength(40);
     expect(ds.tables.Appointment).toHaveLength(90);
-    expect(ds.tables.Encounter).toHaveLength(8);
+    // The profile count plus patient.demo's Scenario F visit without a note (WP 5.2).
+    expect(ds.tables.Encounter).toHaveLength(8 + 1);
     expect(new Set(ds.tables.Exercise.map((e) => e.slug)).size).toBe(50);
   });
 
@@ -96,7 +97,7 @@ describe("seed generator (no database)", () => {
     expect(ds.tables.Patient).toHaveLength(1000);
     expect(ds.tables.Appointment).toHaveLength(2000);
     expect(ds.tables.SessionActivity).toHaveLength(10000);
-    expect(ds.tables.Encounter).toHaveLength(50);
+    expect(ds.tables.Encounter).toHaveLength(50 + 1);
     expect(ds.tables.Exercise).toHaveLength(250);
   });
 

@@ -19,6 +19,10 @@ export const auditEventNames = [
   "phi.read",
   "careplan.publish",
   "note.sign",
+  // WP 5.2, not in PRD section 13: a working version of a draft note, and a signed note
+  // marked entered in error (CR-8).
+  "note.version",
+  "note.entered_in_error",
   "ai.generate",
   "ai.refused",
   "ai.review",

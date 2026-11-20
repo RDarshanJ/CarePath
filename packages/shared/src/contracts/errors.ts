@@ -63,6 +63,39 @@ export const errorCodes = {
     status: 409,
     message: "That time can no longer be booked. Choose another time.",
   },
+  // Phase 5 AI and notes (WP 5.2).
+  ai_consent_required: {
+    status: 409,
+    message: "The patient has not allowed AI-assisted drafting. Nothing was generated.",
+  },
+  ai_generation_failed: {
+    status: 502,
+    message: "Could not generate a draft. Nothing in the record was changed. Try again.",
+  },
+  ai_consent_withdrawn: {
+    status: 409,
+    message:
+      "The patient withdrew consent to AI-assisted drafting. This draft can no longer be approved.",
+  },
+  ai_not_reviewable: { status: 409, message: "This generation failed and cannot be reviewed." },
+  ai_already_decided: {
+    status: 409,
+    message: "This draft already has a decision. Regenerate to start a new draft.",
+  },
+  ai_approval_blocked: {
+    status: 409,
+    message: "Resolve every statement without a supporting record before approving.",
+  },
+  revision_stale: {
+    status: 409,
+    message: "Someone changed this draft since you opened it. Reload it and try again.",
+  },
+  encounter_no_transcript: {
+    status: 409,
+    message: "This visit has no transcript to draft a note from.",
+  },
+  not_note_author: { status: 403, message: "Only the note's author can do this." },
+  note_empty: { status: 409, message: "A note with all four sections empty cannot be signed." },
   payload_too_large: { status: 413, message: "The request body is too large." },
   unsupported_media_type: { status: 415, message: "Unsupported content type." },
   rate_limited: { status: 429, message: "Too many requests. Try again later." },

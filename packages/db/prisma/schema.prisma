@@ -267,10 +267,13 @@ enum AIGenerationStatus {
   failed
 }
 
+/// revised: a working edit by a clinician (WP 5.2), not a decision. At most one decision
+/// (approved, approved_with_edits, rejected) per generation, and nothing after it.
 enum AIReviewDecision {
   approved
   approved_with_edits
   rejected
+  revised
 }
 
 enum AuditActorType {
@@ -422,6 +425,7 @@ model OrganizationMembership {
   appointmentsBooked    Appointment[]             @relation("AppointmentBookedBy")
   appointmentsCancelled Appointment[]             @relation("AppointmentCancelledBy")
   noteVersions          ClinicalNoteVersion[]
+  notesEnteredInError   ClinicalNote[]            @relation("NoteEnteredInErrorBy")
   participants          ConversationParticipant[]
   notifications         Notification[]
   reviewTasksResolved   ReviewTask[]
@@ -1033,6 +1037,10 @@ model ClinicalNote {
   currentVersionId       String?            @db.Uuid
   signedAt               DateTime?          @db.Timestamptz(3)
   signedByPractitionerId String?            @db.Uuid
+  /// Set together when a signed note is marked entered in error (WP 5.2, CR-8). Irreversible.
+  enteredInErrorAt       DateTime?          @db.Timestamptz(3)
+  enteredInErrorReason   String?
+  enteredInErrorByUserId String?            @db.Uuid
   createdAt              DateTime           @default(now()) @db.Timestamptz(3)
   updatedAt              DateTime           @default(now()) @updatedAt @db.Timestamptz(3)
 
@@ -1042,6 +1050,7 @@ model ClinicalNote {
   author         Practitioner         @relation("NoteAuthor", fields: [authorPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
   signedBy       Practitioner?        @relation("NoteSigner", fields: [signedByPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
   currentVersion ClinicalNoteVersion? @relation("CurrentNoteVersion", fields: [currentVersionId, id], references: [id, noteId], onDelete: Restrict)
+  enteredInErrorBy OrganizationMembership? @relation("NoteEnteredInErrorBy", fields: [enteredInErrorByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
 
   versions ClinicalNoteVersion[] @relation("NoteVersions")
 
@@ -1243,15 +1252,19 @@ model AIGeneration {
   latencyMs                 Int?
   unsupportedStatementCount Int?
   requestedByUserId         String             @db.Uuid
+  /// Set when this generation was requested as a regeneration of an earlier one (WP 5.2).
+  previousGenerationId      String?            @db.Uuid
   createdAt                 DateTime           @default(now()) @db.Timestamptz(3)
   completedAt               DateTime?          @db.Timestamptz(3)
 
-  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  patient      Patient                @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
-  requestedBy  OrganizationMembership @relation(fields: [requestedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+  organization       Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  patient            Patient                @relation(fields: [patientId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  requestedBy        OrganizationMembership @relation(fields: [requestedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+  previousGeneration AIGeneration?          @relation("Regeneration", fields: [previousGenerationId, organizationId], references: [id, organizationId], onDelete: Restrict)
 
-  reviews      AIReview[]
-  noteVersions ClinicalNoteVersion[]
+  regenerations AIGeneration[]        @relation("Regeneration")
+  reviews       AIReview[]
+  noteVersions  ClinicalNoteVersion[]
 
   @@unique([id, organizationId])
   @@index([organizationId, patientId, createdAt])
