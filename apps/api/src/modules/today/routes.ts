@@ -14,6 +14,7 @@ import { latestCheckIn } from "../check-ins/repo.js";
 import { findClinic } from "../clinic/repo.js";
 import { assignedOn, weeklyProgress, windowStart } from "../progress/compute.js";
 import { scheduleVersions, sessionsSince } from "../progress/repo.js";
+import { unreadSummary } from "../messaging/repo.js";
 import { findLastEndedSession, findOpenSession } from "../sessions/repo.js";
 import { findPatientBasics } from "./repo.js";
 
@@ -111,6 +112,7 @@ export const todayRoutes: FastifyPluginAsyncZod = async (app) => {
               }
             : null,
         week: weeklyProgress(today, 1, tz, versions, sessions)[0]!,
+        messages: await unreadSummary(db, ctx),
       };
     },
   );

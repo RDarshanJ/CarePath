@@ -8,10 +8,19 @@ import { clockFromEnv } from "../clock.js";
 import { createDb } from "../db/repo.js";
 import { JobRunner } from "./runner.js";
 
-const db = createDb(loadConfig().databaseUrl);
+const config = loadConfig();
+const db = createDb(config.databaseUrl);
 const { now } = clockFromEnv(process.env);
 try {
-  const stats = await new JobRunner({ db, handlers: createJobHandlers({ db, now }), now }).drain();
+  const stats = await new JobRunner({
+    db,
+    handlers: createJobHandlers({
+      db,
+      now,
+      forceMessageFailure: () => config.messaging.forceDeliveryFailure,
+    }),
+    now,
+  }).drain();
   console.log(
     `jobs:drain claimed=${stats.claimed} succeeded=${stats.succeeded} retried=${stats.retried} dead=${stats.dead}`,
   );

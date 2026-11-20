@@ -16,6 +16,7 @@ export * from "./errors.js";
 export * from "./exercises.js";
 export * from "./health.js";
 export * from "./intake.js";
+export * from "./messaging.js";
 export * from "./onboarding.js";
 export * from "./overview.js";
 export * from "./patients.js";

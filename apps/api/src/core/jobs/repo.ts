@@ -1,4 +1,4 @@
-import type { Db } from "../db/repo.js";
+import type { Db, DbClient } from "../db/repo.js";
 
 export interface ClaimedJob {
   id: string;
@@ -20,7 +20,8 @@ export interface EnqueueInput {
   dedupeKey?: string;
 }
 
-export async function insertJob(db: Db, input: EnqueueInput): Promise<string | null> {
+/** Takes a transaction client too, so a job can be enqueued in the same transaction as its cause. */
+export async function insertJob(db: DbClient, input: EnqueueInput): Promise<string | null> {
   const rows = await db.$queryRaw<{ id: string }[]>`
     INSERT INTO "Job" (queue, payload, "organizationId", "runAt", "maxAttempts", "dedupeKey")
     VALUES (

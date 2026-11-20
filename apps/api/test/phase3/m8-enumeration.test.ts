@@ -10,6 +10,7 @@ import {
   type OrgFixture,
 } from "../support/repo.js";
 import { createClinicalFixture, type ClinicalFixture } from "../support/fixtures/repo.js";
+import { createConversation } from "../support/fixtures/messaging.js";
 
 /**
  * Checkpoint C1, M8 (hard gate for WP 3.1), AC-I1, AC-I2.
@@ -95,6 +96,9 @@ function bodyFor(ids: Ids): Record<string, unknown> {
       textVersion: "2026-11-01",
     },
     "POST /patients/{patientId}/consents/{consentId}/revoke": {},
+    "POST /conversations/{conversationId}/messages": { body: "probe" },
+    "POST /conversations/{conversationId}/read": {},
+    "POST /conversations/{conversationId}/messages/{messageId}/retry": {},
     "POST /patients/{patientId}/care-team/assignments": {
       practitionerId: orgA.therapist.practitionerId,
     },
@@ -174,7 +178,11 @@ beforeAll(async () => {
   notFoundBody = JSON.stringify(envelope("not_found"));
 
   // Real child rows for both patients, made through the API.
-  async function children(patientEmail: string, patientId: string): Promise<Ids> {
+  async function children(
+    patientEmail: string,
+    patientId: string,
+    userIds: string[],
+  ): Promise<Ids> {
     const s = as(app, await login(app, patientEmail));
     const base = `/patients/${patientId}`;
     const session = (await s({ method: "POST", url: `${base}/sessions`, payload: {} })).json();
@@ -195,8 +203,19 @@ beforeAll(async () => {
     const therapist = as(app, await login(app, orgA.therapist.email));
     const tasks = (await therapist({ method: "GET", url: `${base}/review-tasks` })).json();
     const versions = (await therapist({ method: "GET", url: `${base}/care-plan/versions` })).json();
+    // WP 4.2: a conversation of this patient with one message, for the {conversationId} routes.
+    const conversationId = await createConversation(db, orgA, { patientId, userIds });
+    const message = (
+      await s({
+        method: "POST",
+        url: `/conversations/${conversationId}/messages`,
+        payload: { body: "fixture" },
+      })
+    ).json();
     const ids = {
       patientId,
+      conversationId,
+      messageId: message.id,
       sessionId: session.id,
       activityId: session.activities?.[0]?.id,
       checkInId: checkIn.checkIn?.id,
@@ -211,8 +230,14 @@ beforeAll(async () => {
     }
     return ids;
   }
-  p1 = await children(orgA.patient.email, orgA.patient.patientId);
-  p2 = await children(orgA.otherPatient.email, orgA.otherPatient.patientId);
+  p1 = await children(orgA.patient.email, orgA.patient.patientId, [
+    orgA.patient.userId,
+    orgA.therapist.userId,
+  ]);
+  p2 = await children(orgA.otherPatient.email, orgA.otherPatient.patientId, [
+    orgA.otherPatient.userId,
+    orgA.otherTherapist.userId,
+  ]);
 });
 afterAll(async () => {
   await app.close();
@@ -251,7 +276,10 @@ describe("M8: OpenAPI enumeration of tenant-scoped routes", () => {
   it("answers 404 or 403 to patient 2 for patient 1's ids (AC-I2)", async () => {
     const s = await login(app, orgA.otherPatient.email);
     const problems: string[] = [];
-    for (const op of operations().filter((o) => o.params.includes("patientId"))) {
+    // Conversation routes carry no patient id; patient 2 must still be refused patient 1's thread.
+    for (const op of operations().filter(
+      (o) => o.params.includes("patientId") || o.params.includes("conversationId"),
+    )) {
       const res = await as(app, s)(request(op, p1));
       const outcome = await denied(res);
       if (outcome === "other")

@@ -19,6 +19,8 @@ const envSchema = z.object({
   // the same host. "loopback" trusts X-Forwarded-For only when the socket peer is a loopback
   // address (127.0.0.0/8, ::1), so rate limits and IP hashes see the browser's address.
   TRUST_PROXY: z.enum(["off", "loopback"]).default("off"),
+  // WP 4.2 test hook: every message delivery fails. Ignored in production.
+  MESSAGE_FORCE_FAILURE: z.enum(["true", "false"]).default("false"),
 });
 
 export interface AppConfig {
@@ -41,6 +43,7 @@ export interface AppConfig {
   /** Which proxies may set X-Forwarded-For. Never "any": only the same-host Next.js rewrite. */
   trustProxy: "off" | "loopback";
   logLevel: string;
+  messaging: { forceDeliveryFailure: boolean };
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -70,6 +73,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       loginPerMinute: parsed.RATE_LIMIT_LOGIN_PER_MINUTE,
     },
     trustProxy: parsed.TRUST_PROXY,
+    messaging: { forceDeliveryFailure: !production && parsed.MESSAGE_FORCE_FAILURE === "true" },
     logLevel: parsed.LOG_LEVEL ?? (parsed.NODE_ENV === "test" ? "silent" : "info"),
   };
 }

@@ -22,6 +22,7 @@ import { carePlanRoutes } from "./modules/care-plans/routes.js";
 import { careTeamRoutes } from "./modules/care-team/routes.js";
 import { consentRoutes } from "./modules/consents/routes.js";
 import { intakeRoutes } from "./modules/intake/routes.js";
+import { messagingRoutes } from "./modules/messaging/routes.js";
 import { onboardingRoutes } from "./modules/onboarding/routes.js";
 import { checkInRoutes } from "./modules/check-ins/routes.js";
 import { checkInWriteRoutes } from "./modules/check-ins/write-routes.js";
@@ -117,6 +118,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(intakeRoutes);
   await app.register(consentRoutes);
   await app.register(careTeamRoutes);
+  // WP 4.2: messaging.
+  await app.register(messagingRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();

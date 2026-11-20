@@ -5,6 +5,7 @@ import { errorResponses } from "../../core/errors.js";
 import { practitionerRef } from "../../core/people.js";
 import { addDays, localDate, startOfLocalDay } from "../../core/time.js";
 import { findClinic } from "../clinic/repo.js";
+import { unreadSummary } from "../messaging/repo.js";
 import { totalsBetween } from "../progress/compute.js";
 import { scheduleVersions, sessionsSince } from "../progress/repo.js";
 import { listTasks } from "../review/repo.js";
@@ -95,6 +96,7 @@ export const overviewRoutes: FastifyPluginAsyncZod = async (app) => {
           })),
         ),
         missedActivity: list(missed),
+        messages: await unreadSummary(db, ctx),
         recentPublishes: list(
           publishes.map((v) => ({
             versionId: v.id,

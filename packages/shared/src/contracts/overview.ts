@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { instantSchema, localDateSchema, personRefSchema } from "./common.js";
+import { unreadMessagesSchema } from "./messaging.js";
 import { reviewTaskSchema } from "./review.js";
 
 /**
@@ -54,6 +55,8 @@ export const clinicianOverviewSchema = z
         windowEnd: localDateSchema,
       }),
     ),
+    /** Unread messages across the clinician's own conversations (WP 4.2). */
+    messages: unreadMessagesSchema,
     /** Plan versions published for care-team patients in the last 7 days, newest first. */
     recentPublishes: workList(
       z.object({

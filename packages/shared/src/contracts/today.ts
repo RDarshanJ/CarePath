@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { instantSchema, localDateSchema, personRefSchema } from "./common.js";
+import { unreadMessagesSchema } from "./messaging.js";
 import { weeklyProgressSchema } from "./progress.js";
 
 /**
@@ -65,6 +66,8 @@ export const todayViewSchema = z
       })
       .nullable(),
     week: weeklyProgressSchema,
+    /** Unread messages from the care team, from the participant read marker (WP 4.2). */
+    messages: unreadMessagesSchema,
   })
   .meta({ id: "TodayView" });
 export type TodayView = z.infer<typeof todayViewSchema>;

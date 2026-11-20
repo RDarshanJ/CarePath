@@ -17,7 +17,11 @@ const runner =
     ? null
     : new JobRunner({
         db: app.deps.db,
-        handlers: createJobHandlers({ db: app.deps.db, now: clock.now }),
+        handlers: createJobHandlers({
+          db: app.deps.db,
+          now: clock.now,
+          forceMessageFailure: () => app.deps.config.messaging.forceDeliveryFailure,
+        }),
         now: clock.now,
         logger: app.log,
       });

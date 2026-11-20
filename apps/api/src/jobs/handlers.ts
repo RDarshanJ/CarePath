@@ -1,5 +1,6 @@
 import type { Db } from "../core/db/repo.js";
 import { JobError, type JobHandler } from "../core/jobs/runner.js";
+import { MESSAGE_DELIVER_QUEUE, messageDeliveryHandler } from "../modules/messaging/delivery.js";
 import { ABANDON_SESSIONS_QUEUE, TIME_RULES_QUEUE } from "../modules/review/queues.js";
 import { abandonSessions, runTimeRules, type SystemScope } from "../modules/review/time-rules.js";
 
@@ -13,6 +14,8 @@ import { abandonSessions, runTimeRules, type SystemScope } from "../modules/revi
 export interface JobDeps {
   db: Db;
   now: () => Date;
+  /** Non-production hook: every message delivery fails (see messageDeliveryHandler). */
+  forceMessageFailure?: () => boolean;
 }
 
 function scopeOf(job: { organizationId: string | null }): SystemScope {
@@ -28,6 +31,11 @@ export function createJobHandlers(deps: JobDeps): Record<string, JobHandler> {
     [ABANDON_SESSIONS_QUEUE]: async (job) => {
       await abandonSessions(deps.db, scopeOf(job), deps.now());
     },
+    [MESSAGE_DELIVER_QUEUE]: messageDeliveryHandler({
+      db: deps.db,
+      now: deps.now,
+      ...(deps.forceMessageFailure ? { forceFailure: deps.forceMessageFailure } : {}),
+    }),
   };
 }
 
