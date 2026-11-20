@@ -277,3 +277,12 @@ export async function count(db: Db, table: "user" | "patient" | "intakeAssessmen
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (db[table] as any).count({ where });
 }
+
+/** Attempts an UPDATE on a published version; the append-only trigger must reject it. */
+export async function tryEditVersion(db: Db, versionId: string) {
+  return db.carePlanVersion.update({ where: { id: versionId }, data: { title: "edited" } });
+}
+
+export async function goalsOfPlan(db: Db, carePlanId: string) {
+  return db.goal.findMany({ where: { carePlanId }, orderBy: { createdAt: "asc" } });
+}

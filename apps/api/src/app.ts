@@ -17,6 +17,7 @@ import { healthRoutes } from "./core/health/routes.js";
 import { registerHttp } from "./core/http.js";
 import { loggerOptions, registerRequestLogging } from "./core/logging.js";
 import { registerOpenApi, registerOpenApiRoute } from "./core/openapi.js";
+import { carePlanDraftRoutes } from "./modules/care-plans/draft-routes.js";
 import { carePlanRoutes } from "./modules/care-plans/routes.js";
 import { checkInRoutes } from "./modules/check-ins/routes.js";
 import { checkInWriteRoutes } from "./modules/check-ins/write-routes.js";
@@ -102,6 +103,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(recordRoutes);
   await app.register(exerciseRoutes);
   await app.register(reviewRoutes);
+  // Step 4: plan draft autosave, preview and publish.
+  await app.register(carePlanDraftRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();
