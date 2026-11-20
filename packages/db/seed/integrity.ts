@@ -316,6 +316,23 @@ export async function checkIntegrity(
     "appointments fit inside their slot",
     `SELECT count(*) n FROM "Appointment" a JOIN "AvailabilitySlot" s ON s.id = a."slotId" WHERE a."startsAt" < s."startsAt" OR a."endsAt" > s."endsAt" OR a."practitionerId" <> s."practitionerId"`,
   );
+  // Checkpoint C2 section 2 (WP 4.1).
+  await zero(
+    "every non-cancelled appointment with a slot matches it",
+    `SELECT count(*) n FROM "Appointment" a JOIN "AvailabilitySlot" s ON s.id = a."slotId" WHERE a.status NOT IN ('cancelled_by_patient', 'cancelled_by_clinic') AND (a."organizationId" <> s."organizationId" OR a."practitionerId" <> s."practitionerId" OR a."startsAt" < s."startsAt" OR a."endsAt" > s."endsAt")`,
+  );
+  await zero(
+    "non-cancelled appointments sit on a booked slot",
+    `SELECT count(*) n FROM "Appointment" a JOIN "AvailabilitySlot" s ON s.id = a."slotId" WHERE a.status NOT IN ('cancelled_by_patient', 'cancelled_by_clinic') AND s.status <> 'booked'`,
+  );
+  await zero(
+    "every seeded appointment has a slot",
+    `SELECT count(*) n FROM "Appointment" WHERE "slotId" IS NULL`,
+  );
+  await zero(
+    "no requested appointments (C1 ruling 3.3)",
+    `SELECT count(*) n FROM "Appointment" WHERE status = 'requested'`,
+  );
   await zero(
     "booked slots have exactly one live appointment",
     `SELECT count(*) n FROM "AvailabilitySlot" s WHERE s.status = 'booked' AND (SELECT count(*) FROM "Appointment" a WHERE a."slotId" = s.id AND a.status NOT IN ('cancelled_by_patient', 'cancelled_by_clinic')) <> 1`,

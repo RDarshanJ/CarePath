@@ -3,7 +3,9 @@
  * grid in the clinic's local time. An appointment takes one grid cell, so cancelled and live
  * bookings never overlap per therapist or per patient, and the database exclusion constraints
  * (ADR-9) are satisfied by construction. Rows are inserted with their final status, which the
- * UPDATE-only transition trigger allows.
+ * UPDATE-only transition trigger allows. Every appointment takes its slot's practitioner and
+ * fits inside the slot (trigger Appointment_matches_slot, WP 4.1); a live appointment's slot is
+ * `booked`, a cancelled one's slot stays `open` but is not reused.
  */
 import {
   D,
@@ -116,6 +118,9 @@ export function buildScheduling(ctx: Ctx): void {
         ["requested", 4],
       ]);
     else status = "booked";
+    // No workflow creates `requested` (C1 ruling 3.3, C2 section 5). The draw above is kept so
+    // the random stream, and every other seeded row, stays as it was; the row is booked.
+    if (status === "requested") status = "booked";
     // Patients without a login are booked by the coordinator.
     const bookedBy = p.userId && rng.chance(0.7) ? p.userId : p.org.coordinatorUserId;
     const createdMs = Math.max(
@@ -134,11 +139,7 @@ export function buildScheduling(ctx: Ctx): void {
           : p.org.coordinatorUserId;
     const live = !cancelled;
     const reminderMs =
-      live &&
-      status !== "requested" &&
-      startMs - D >= createdMs &&
-      startMs - D <= ctx.anchorMs &&
-      (!past || rng.chance(0.6))
+      live && startMs - D >= createdMs && startMs - D <= ctx.anchorMs && (!past || rng.chance(0.6))
         ? startMs - D
         : null;
 
@@ -161,7 +162,7 @@ export function buildScheduling(ctx: Ctx): void {
           : rng.chance(0.7)
             ? rng.pick(reasons)
             : null),
-      bookedByUserId: status === "requested" ? (p.userId ?? p.org.coordinatorUserId) : bookedBy,
+      bookedByUserId: bookedBy,
       cancelledAt: cancelledMs === null ? null : iso(cancelledMs),
       cancellationReason: cancelled
         ? rng.chance(0.8)
