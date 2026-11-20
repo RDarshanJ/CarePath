@@ -33,7 +33,7 @@ const IMPORT_BODY_LIMIT = 5 * 1024 * 1024;
 const importFailure = z.union([errorEnvelopeSchema, operationOutcomeSchema]);
 
 /**
- * FHIR R4 export and import (WP 5.4, batch 1 resources). Plain CarePath paths: the export is one
+ * FHIR R4 export and import (WP 5.4 batch 1, WP 5.4b batch 2). Plain CarePath paths: the export is one
  * patient's record as a collection Bundle, not the FHIR Bulk Data `$export` operation.
  */
 export const fhirRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -54,7 +54,7 @@ export const fhirRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "exportPatientFhir",
         tags: ["fhir"],
         summary:
-          "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Goal, CarePlan per published version, Observation). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
+          "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Appointment, Encounter for visits that took place, Condition, Goal, CarePlan per published version, Observation, DocumentReference per signed note version; drafts are never exported). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
         params: patientIdParamsSchema,
         response: { 200: fhirBundleSchema, ...errorResponses(400, 401, 403, 404, 429, 500) },
       },
@@ -98,7 +98,7 @@ export const fhirRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "importFhirBundle",
         tags: ["fhir"],
         summary:
-          "Validate a FHIR R4 Bundle (collection, transaction or batch) with three layers and import its batch 1 resources into the caller's organization. Other resource types are skipped and listed. 400: not a Bundle or structurally invalid; 422: CarePath checks fail; 409: duplicates with onDuplicate=reject; failures answer with an itemised OperationOutcome and write nothing.",
+          "Validate a FHIR R4 Bundle (collection, transaction or batch) with three layers and import its Practitioner, Patient, Encounter (AMB and VR visits), Condition, Goal, CarePlan and Observation resources into the caller's organization. Other resource types, including Appointment and DocumentReference (export only), are skipped and listed. 400: not a Bundle or structurally invalid; 422: CarePath checks fail; 409: duplicates with onDuplicate=reject; failures answer with an itemised OperationOutcome and write nothing.",
         querystring: fhirImportQuerySchema,
         body: fhirImportBodySchema,
         response: {

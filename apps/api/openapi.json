@@ -19271,7 +19271,7 @@
     "/patients/{patientId}/fhir/export": {
       "get": {
         "operationId": "exportPatientFhir",
-        "summary": "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Goal, CarePlan per published version, Observation). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
+        "summary": "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Appointment, Encounter for visits that took place, Condition, Goal, CarePlan per published version, Observation, DocumentReference per signed note version; drafts are never exported). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
         "tags": [
           "fhir"
         ],
@@ -19364,7 +19364,7 @@
     "/fhir/import": {
       "post": {
         "operationId": "importFhirBundle",
-        "summary": "Validate a FHIR R4 Bundle (collection, transaction or batch) with three layers and import its batch 1 resources into the caller's organization. Other resource types are skipped and listed. 400: not a Bundle or structurally invalid; 422: CarePath checks fail; 409: duplicates with onDuplicate=reject; failures answer with an itemised OperationOutcome and write nothing.",
+        "summary": "Validate a FHIR R4 Bundle (collection, transaction or batch) with three layers and import its Practitioner, Patient, Encounter (AMB and VR visits), Condition, Goal, CarePlan and Observation resources into the caller's organization. Other resource types, including Appointment and DocumentReference (export only), are skipped and listed. 400: not a Bundle or structurally invalid; 422: CarePath checks fail; 409: duplicates with onDuplicate=reject; failures answer with an itemised OperationOutcome and write nothing.",
         "tags": [
           "fhir"
         ],
