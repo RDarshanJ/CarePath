@@ -20,6 +20,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 3.4b (branch `wp/3.4b`): F1 `/admin/patients` with Assign therapist, onboarding link, sticky staff rail, `PatientShell` removed, C2 patient fixes (1.5.1 to 1.5.4), `e2e/slice.spec.ts`, CR-4 illustrations wired (gate output below).
 - WP 3.4c (branch `wp/3.4c`): clinician fixes from C2 (F2 intake on the record and in the builder, 1.6.1 to 1.6.7, CR-2 and CR-3 consumed, flaky axe test fixed); gate output below.
 - WP 4.2 (branch `wp/4.2`): messaging API (five routes), delivery job with failed state and retry, unread counts from participant read markers, audited coordinator read via `message.org`, M8 fixtures (gate output below).
+- WP 4.1 (branch `wp/4.1`): scheduling. Migration `phase4_scheduling` (appointment matches its slot), six routes (slots, patient appointments, book, cancel, reschedule, clinician day for CR-1), `TodayView.nextAppointment`, 24-hour in-app reminder job, the 50-parallel booking test (20 of 20), care-team thread created on assignment, M8 fixtures (gate output below).
 
 ## Outstanding
 
@@ -603,3 +604,39 @@ WP 4.2 gate: PASSED
 - Unread = messages from others, `sent`, with `sentAt` after the caller's `lastReadAt`, computed in SQL. Sending does not move the sender's marker. Delivery time is set later than every delivered message and read marker in the thread, and `createdAt` is strictly increasing per conversation, so counts and order stay right under a fixed clock (`CAREPATH_FIXED_NOW`).
 - Contract edits outside messaging, for merge: `TodayView.messages` (`{ unreadCount, unreadConversations }`, one line after `week`) in `today.ts`, `ClinicianOverview.messages` (same shape, after `missedActivity`) in `overview.ts`, and one export line in `contracts/index.ts`. Also `insertJob` now accepts a transaction client (`core/jobs/repo.ts`).
 - Not built, by the brief: no route creates a conversation, so a patient without a seeded thread has nothing to write in; coordinators who are not participants cannot send. Both need a decision (see the reply to the orchestrator).
+
+### WP 4.1 (scheduling)
+
+Worktree `/home/claude/wt/4.1`, branch `wp/4.1`, rebased onto master `18a3e1b` (WP 4.2 merged). `scripts/gate-wp-4.1.sh` (API port 4041, own database, includes `pnpm verify`, ends with `git status --porcelain` empty). Gate run before the rebase, exit 0:
+
+```
+==> pnpm --filter @carepath/db exec vitest run test/phase4-scheduling.test.ts --reporter=verbose
+      Tests  8 passed (8)
+==> booking concurrency results
+repetitions=20 parallel=50 all exactly one 201: true wall ms min=154 median=224 max=579
+==> scheduling.test.ts + m8-enumeration.test.ts
+      Tests  22 passed (22)
+openapi: valid OpenAPI 3.1.0, 57 operations, house rules pass
+integrity checks: 76 passed
+content-hash: 29a76b82dc8b92fc82675477a6e41a3d5474b4af4b5da5df2d3422f763a98e1a
+pnpm verify: packages/ui 106, packages/db 71, apps/api 183 tests passed
+  e2e: 43 passed (4.0m)
+verify: PASSED
+==> git status --porcelain
+(clean)
+WP 4.1 gate: PASSED
+```
+
+Per-repetition counts and timings: `docs/evaluation/booking-concurrency.md`.
+
+- Migration `20261123000000_phase4_scheduling` (SQL only, `schema.prisma` unchanged, `migrate:check` passes): trigger `Appointment_matches_slot` (`enforce_appointment_slot`, CP003) on INSERT and UPDATE of `slotId`, `practitionerId`, `startsAt`, `endsAt`: same practitioner, start not before the slot, end not after it; trigger `AvailabilitySlot_keeps_appointments` (CP003) refuses moving a slot out from under its appointments; partial index `Appointment_reminder_due_idx`. The one-live-appointment-per-slot index (`Appointment_slot_live_key`, status not cancelled) and the exclusion constraints already existed in the constraints migration and are kept. Tests: `packages/db/test/phase4-scheduling.test.ts` (one rejection per condition, UPDATE paths, slot side, live-slot index).
+- Routes (`apps/api/src/modules/scheduling`, contracts `packages/shared/src/contracts/scheduling.ts`, table in `docs/architecture/api-phase3.md` section 10): `GET /practitioners/:practitionerId/slots`, `GET /patients/:patientId/appointments`, `POST /patients/:patientId/appointments`, `POST .../appointments/:appointmentId/cancel`, `POST .../appointments/:appointmentId/reschedule`, `GET /appointments?date&practitionerId` (CR-1). Patients book only with a therapist on their active care team (400 `not_care_team_practitioner`) and see slots only of those therapists (404); coordinators (`appointment.manage`) book, cancel and reschedule for anyone in the organization; therapists and admins read only. New error code `slot_unavailable` (409, past or blocked slot). Audit `appointment.book` and `appointment.cancel` in the same transaction.
+- Booking: `SELECT ... FOR UPDATE` on the slot, `open -> booked`, insert in `initialStatus.Appointment`; cancel reopens the slot in the same transaction; reschedule is cancel plus book in one transaction with `rescheduledFromId` (AC-E7 test: original unchanged when the new slot is taken). Booking transactions get `maxWait` 15 s and `timeout` 20 s through a new optional `TxOptions` argument on `withTx`/`inTransaction`.
+- AC-E5: test with a New York clinic across the 2027-03-14 change, slots grouped by clinic day, a 23:30 local slot dated to the local day.
+- Reminder job `scheduling.appointment_reminders`, recurring every 15 minutes per organization, handler scoped by `job.organizationId`: one `appointment_reminder` notification per booked visit starting within 24 hours, claimed through `reminderSentAt` in the same transaction (rerun writes nothing).
+- `TodayView.nextAppointment` (next `booked` or `checked_in` visit not yet ended).
+- Seed: no `requested` appointments any more (C1 ruling 3.3; the random draw is kept so other rows do not move, the row is `booked`); new integrity checks (non-cancelled appointments match their slot, sit on a booked slot, every seeded appointment has a slot, no `requested`).
+- Care-team thread (orchestrator ruling after WP 4.2 merged): `POST /patients/:patientId/care-team/assignments` now creates the patient's care-team conversation in the same transaction when there is none (subject `CARE_TEAM_THREAD_SUBJECT` in `@carepath/shared`), adding patient, assigned therapist and the care team's active coordinators as participants, idempotently (`ensureCareTeamConversation` in `modules/care-team/repo.ts`; patient row lock from the status update serialises two assignments). Test `apps/api/test/phase4/assignment-thread.test.ts` (refused assignment creates nothing; participants; reassignment reuses the thread). The seed adds the coordinator as a participant (read) of assigned patients' threads and creates an empty care-team thread for every assigned patient with a login that had none; integrity check "every assigned patient with a login has a care-team thread with their therapist". Seed after this: 77 integrity checks, content hash `7edce4a5344f971ecaf7aa71abfa583b619048c373ea2325e0f73d974b76e742`. Coordinators stay read-only (audited) on threads they are not in.
+- Merge notes for the orchestrator: shared files touched with minimal edits: `contracts/index.ts` (one export line), `contracts/today.ts` (`nextAppointment` after WP 4.2's `messages`), `contracts/errors.ts` (`slot_unavailable`), `app.ts` (one registration line), `jobs/handlers.ts` (one handler, one recurring queue), `modules/today/routes.ts` (one field), `core/db/repo.ts` and `core/db/tx.ts` (optional `TxOptions`), `core/scope/repo.ts` and `patient-scope.ts` (`Appointment` child kind, `requirePractitioner`), `m8-enumeration.test.ts` (scheduling fixtures beside the messaging ones), `shared/src/copy.ts` (thread subject), `modules/care-team`. `openapi.json` regenerated after the rebase (62 operations). `ClinicianOverview` not touched (CR-1 is a second call).
+- Fix in WP 4.2 files: `messaging.test.ts` failed 3 of 4 runs after the rebase on participant role order. Participants were ordered by `joinedAt` only and the test fixture gave them equal times. `test/support/fixtures/messaging.ts` now spaces `joinedAt` by 1 ms in the given order, and `modules/messaging/repo.ts` orders by `joinedAt` then `id`.
+

@@ -178,3 +178,5 @@ The appointment always takes the whole slot (`startsAt` and `endsAt` copied from
 
 Reminder job: queue `scheduling.appointment_reminders`, enqueued every 15 minutes per active organization like the review rules, handler scoped by `job.organizationId`. For each `booked` visit starting within the next 24 hours whose patient has a login and no reminder yet, it sets `reminderSentAt` and writes one `appointment_reminder` notification ("Visit coming up", the visit type, practitioner and local time with the clinic zone named, link `/appointments`) in one transaction, so a rerun writes nothing twice.
 
+Assignment and the care-team thread (orchestrator ruling with WP 4.1): `POST /patients/:patientId/care-team/assignments` also creates the patient-to-care-team `Conversation` in the same transaction when the patient has none, and adds the patient, the assigned therapist and the care team's active coordinators as participants (idempotent; a reassignment reuses the thread and adds the new therapist). A refused assignment creates nothing. Messaging still has no create-conversation route.
+
