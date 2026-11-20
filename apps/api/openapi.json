@@ -2103,6 +2103,236 @@
           "nextCursor"
         ]
       },
+      "FhirResourceInput": {
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "resourceType"
+        ],
+        "additionalProperties": {}
+      },
+      "FhirBundleInput": {
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "Bundle"
+          },
+          "type": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "entry": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fullUrl": {
+                  "type": "string"
+                },
+                "resource": {
+                  "$ref": "#/components/schemas/FhirResourceInput"
+                }
+              },
+              "required": [
+                "resource"
+              ],
+              "additionalProperties": {}
+            }
+          }
+        },
+        "required": [
+          "resourceType",
+          "type"
+        ],
+        "additionalProperties": {}
+      },
+      "FhirImportBodyInput": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "OperationOutcomeInput": {
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "OperationOutcome"
+          },
+          "issue": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "fatal",
+                    "error",
+                    "warning",
+                    "information"
+                  ]
+                },
+                "code": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "object",
+                  "properties": {
+                    "coding": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "system",
+                          "code"
+                        ]
+                      }
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "diagnostics": {
+                  "type": "string"
+                },
+                "expression": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "severity",
+                "code"
+              ]
+            }
+          }
+        },
+        "required": [
+          "resourceType",
+          "issue"
+        ]
+      },
+      "FhirImportReportInput": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "imported",
+              "nothing_new"
+            ]
+          },
+          "counts": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "created": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "duplicate": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "skipped": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "invalid": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "created",
+                "duplicate",
+                "skipped",
+                "invalid"
+              ]
+            }
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "fullUrl": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "resourceType": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "create",
+                    "duplicate",
+                    "skipped",
+                    "organization",
+                    "invalid"
+                  ]
+                },
+                "id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "index",
+                "fullUrl",
+                "resourceType",
+                "action",
+                "id"
+              ]
+            }
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/OperationOutcomeInput"
+          }
+        },
+        "required": [
+          "status",
+          "counts",
+          "entries",
+          "outcome"
+        ]
+      },
       "HealthInput": {
         "type": "object",
         "properties": {
@@ -8506,6 +8736,243 @@
         "required": [
           "items",
           "nextCursor"
+        ],
+        "additionalProperties": false
+      },
+      "FhirResource": {
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "resourceType"
+        ],
+        "additionalProperties": {}
+      },
+      "FhirBundle": {
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "Bundle"
+          },
+          "type": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "entry": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "fullUrl": {
+                  "type": "string"
+                },
+                "resource": {
+                  "$ref": "#/components/schemas/FhirResource"
+                }
+              },
+              "required": [
+                "resource"
+              ],
+              "additionalProperties": {}
+            }
+          }
+        },
+        "required": [
+          "resourceType",
+          "type"
+        ],
+        "additionalProperties": {}
+      },
+      "FhirImportBody": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": {}
+      },
+      "OperationOutcome": {
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "OperationOutcome"
+          },
+          "issue": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "fatal",
+                    "error",
+                    "warning",
+                    "information"
+                  ]
+                },
+                "code": {
+                  "type": "string"
+                },
+                "details": {
+                  "type": "object",
+                  "properties": {
+                    "coding": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "system",
+                          "code"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "diagnostics": {
+                  "type": "string"
+                },
+                "expression": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "severity",
+                "code"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "resourceType",
+          "issue"
+        ],
+        "additionalProperties": false
+      },
+      "FhirImportReport": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "imported",
+              "nothing_new"
+            ]
+          },
+          "counts": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "created": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "duplicate": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "skipped": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "invalid": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "created",
+                "duplicate",
+                "skipped",
+                "invalid"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "fullUrl": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "resourceType": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "create",
+                    "duplicate",
+                    "skipped",
+                    "organization",
+                    "invalid"
+                  ]
+                },
+                "id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "index",
+                "fullUrl",
+                "resourceType",
+                "action",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/OperationOutcome"
+          }
+        },
+        "required": [
+          "status",
+          "counts",
+          "entries",
+          "outcome"
         ],
         "additionalProperties": false
       },
@@ -18784,6 +19251,256 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/patients/{patientId}/fhir/export": {
+      "get": {
+        "operationId": "exportPatientFhir",
+        "summary": "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Goal, CarePlan per published version, Observation). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
+        "tags": [
+          "fhir"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "patientId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FhirBundle"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/fhir/import": {
+      "post": {
+        "operationId": "importFhirBundle",
+        "summary": "Validate a FHIR R4 Bundle (collection, transaction or batch) with three layers and import its batch 1 resources into the caller's organization. Other resource types are skipped and listed. 400: not a Bundle or structurally invalid; 422: CarePath checks fail; 409: duplicates with onDuplicate=reject; failures answer with an itemised OperationOutcome and write nothing.",
+        "tags": [
+          "fhir"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FhirImportBodyInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "default": "reject",
+              "type": "string",
+              "enum": [
+                "reject",
+                "skip"
+              ]
+            },
+            "in": "query",
+            "name": "onDuplicate",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FhirImportReport"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FhirImportReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorEnvelope"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OperationOutcome"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorEnvelope"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OperationOutcome"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ErrorEnvelope"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OperationOutcome"
+                    }
+                  ]
                 }
               }
             }
