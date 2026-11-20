@@ -19,6 +19,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 3.4a (branch `wp/3.4a`): S1 shared data root for every worktree, F3 session-keyed rate limit with forwarded client address, F4 contracts (CR-2 `onCareTeam`, CR-3 `total`, draft `{ draft: null }`, `mediaAlt`, corrected descriptions), F5 gate fails when a run changes `docs/` (gate output below).
 - WP 3.4b (branch `wp/3.4b`): F1 `/admin/patients` with Assign therapist, onboarding link, sticky staff rail, `PatientShell` removed, C2 patient fixes (1.5.1 to 1.5.4), `e2e/slice.spec.ts`, CR-4 illustrations wired (gate output below).
 - WP 3.4c (branch `wp/3.4c`): clinician fixes from C2 (F2 intake on the record and in the builder, 1.6.1 to 1.6.7, CR-2 and CR-3 consumed, flaky axe test fixed); gate output below.
+- WP 4.2 (branch `wp/4.2`): messaging API (five routes), delivery job with failed state and retry, unread counts from participant read markers, audited coordinator read via `message.org`, M8 fixtures (gate output below).
 
 ## Outstanding
 
@@ -578,3 +579,27 @@ WP 3.4b gate: PASSED
 - CR-4 delivered. 19 accepted WebP files (960 and 480) in `apps/web/public/assets/illustrations`, trimmed manifest `docs/design-system/asset-manifest.json` (prompts, model, dimensions, bytes, licensing "not verified"). Seed sets `mediaPath` and `mediaAlt` for all 50 exercises: own picture for six (knee-to-chest, pelvic-tilt, standing-trunk-rotation, deep-breathing, mini-squat, marching-in-place), body-area picture for the rest. Shown in the session player, session overview, care plan and the onboarding body-area step, each with the caption "Illustration only. Follow the written steps from your care team." `moment-done-for-today` and `moment-details-with-clinic` are on Today (decorative, empty alt). Content hash changed to the value above. Generated illustrations, not medically reviewed.
 - Seed touch outside ownership: `packages/db/seed/careplans.ts` (two lines) and new `packages/db/seed/data/exercise-media.ts`.
 - Screenshots: `docs/screenshots/3.4b/` (390 and 1440): `slice-01` to `slice-09`, `admin-*`, `a05-body-area`, `a13-today-awaiting`, `c01-today-due`, `c03-exercise`, `c10-today-done`, `c11-progress`, `c12-progress-tables`.
+
+### WP 4.2 (messaging API)
+
+Worktree `/home/claude/wt/4.2`, branch `wp/4.2`, code commit `ffa2d96`. `scripts/gate-wp-4.2.sh` (API port 4042, own database, includes `pnpm verify`) exit 0; `git status --porcelain` empty afterwards. No schema change and no contract request: the message tables were enough.
+
+```
+seed check: 72/72 integrity checks passed
+messaging tests:  Tests  17 passed (17)
+M8 enumeration:   Tests  5 passed (5)
+API tests (all):  Test Files 23 passed, Tests 182 passed (182)
+openapi: valid OpenAPI 3.1.0, 56 operations, house rules pass
+pnpm verify: packages/ui 106, packages/db 63, apps/api 182 tests passed
+  e2e: 43 passed (4.3m)
+==> docs/ unchanged by the run
+verify: PASSED
+WP 4.2 gate: PASSED
+```
+
+- Routes: `GET /conversations`, `GET /conversations/:conversationId/messages`, `POST /conversations/:conversationId/messages`, `POST /conversations/:conversationId/read`, `POST /conversations/:conversationId/messages/:messageId/retry`. Contracts in `packages/shared/src/contracts/messaging.ts`; module in `apps/api/src/modules/messaging`.
+- One helper, `requireConversation` (`access.ts`): participants read and write; a coordinator (`message.org`) may read a thread they are not in, which writes a `phi.read` event (resource `Conversation`, patient, detail `message_org`); everyone else, including a clinician on the patient's care team who is not in the thread, gets the byte-identical 404 and `security.access_denied`. Clinic administrators have no messaging permission (403).
+- Messages are created `queued` (`initialStatus.Message`) with a `messages.deliver` job in the same transaction. The handler is scoped by `job.organizationId`, marks `sent`, or `failed` with a plain reason when delivery is forced to fail (`MESSAGE_FORCE_FAILURE=true`, ignored in production; `createJobHandlers({ forceMessageFailure })` for tests) or when the last attempt errors. Only the sender sees a queued or failed message and can retry it (`failed -> queued`, new job); the recipient never sees it.
+- Unread = messages from others, `sent`, with `sentAt` after the caller's `lastReadAt`, computed in SQL. Sending does not move the sender's marker. Delivery time is set later than every delivered message and read marker in the thread, and `createdAt` is strictly increasing per conversation, so counts and order stay right under a fixed clock (`CAREPATH_FIXED_NOW`).
+- Contract edits outside messaging, for merge: `TodayView.messages` (`{ unreadCount, unreadConversations }`, one line after `week`) in `today.ts`, `ClinicianOverview.messages` (same shape, after `missedActivity`) in `overview.ts`, and one export line in `contracts/index.ts`. Also `insertJob` now accepts a transaction client (`core/jobs/repo.ts`).
+- Not built, by the brief: no route creates a conversation, so a patient without a seeded thread has nothing to write in; coordinators who are not participants cannot send. Both need a decision (see the reply to the orchestrator).
