@@ -1,0 +1,352 @@
+{
+  "meta": {
+    "name": "Direction B - Contemporary digital care",
+    "tagline": "Teal primary, green accent, deep-teal navy ink",
+    "brief": "docs/DESIGN-BRIEF.md section 3",
+    "extraKeys": [
+      "surface-elevated",
+      "ink-subtle",
+      "focus-inner",
+      "accent",
+      "accent-ink",
+      "accent-subtle",
+      "secondary-border",
+      "secondary-hover-bg",
+      "selected-bg",
+      "selected-ink",
+      "selected-edge",
+      "critical-solid",
+      "critical-on",
+      "critical-subtle-bg",
+      "critical-subtle-ink",
+      "ai-bg",
+      "ai-ink",
+      "chart-5..chart-8",
+      "seq-1..seq-7",
+      "div-1..div-5"
+    ],
+    "mapping": "brief s4 role -> key: canvas=bg, primary surface=surface, secondary surface=surface-sunken, elevated=surface-elevated, primary/secondary/muted/disabled text=ink/ink-muted/ink-subtle/disabled-ink, default/strong border=border/border-control, primary action(+hover/pressed)=primary(+-hover/-active), secondary action=secondary-border+secondary-hover-bg, selected=selected-*, focus=focus+focus-inner, information/success/warning/error=*-ink+*-bg, critical attention=critical-*, AI content=ai-*, data viz=chart-*/seq-*/div-*",
+    "shape": "Mirrors packages/ui/src/tokens/tokens.ts: colours.{patient,clinician}, density.{patient,clinician}, fonts. Keys beyond the current ColourTokens interface are additive (see meta.extraKeys)."
+  },
+  "colours": {
+    "patient": {
+      "ink-inverse": "#FFFFFF",
+      "surface": "#FFFFFF",
+      "surface-elevated": "#FFFFFF",
+      "focus-inner": "#FFFFFF",
+      "critical-on": "#FFFFFF",
+      "bg": "#F4F7F8",
+      "surface-sunken": "#E9EFF1",
+      "ink": "#123047",
+      "ink-muted": "#3F5A6B",
+      "ink-subtle": "#53697A",
+      "disabled-ink": "#6D8190",
+      "disabled-bg": "#E9EFF1",
+      "border": "#DCE6E9",
+      "border-control": "#667F8E",
+      "primary": "#087F8C",
+      "link": "#066A75",
+      "primary-hover": "#066A75",
+      "primary-active": "#05545D",
+      "primary-subtle": "#E3F3F5",
+      "secondary-border": "#087F8C",
+      "secondary-hover-bg": "#E3F3F5",
+      "selected-bg": "#E3F3F5",
+      "selected-ink": "#065A64",
+      "selected-edge": "#087F8C",
+      "focus": "#123047",
+      "accent": "#0D9488",
+      "accent-ink": "#0A665E",
+      "accent-subtle": "#E1F5F2",
+      "success-ink": "#17652F",
+      "success-bg": "#EBF7ED",
+      "warning-ink": "#8A4B08",
+      "warning-bg": "#FFF7E0",
+      "error-ink": "#B42318",
+      "error-bg": "#FEF3F2",
+      "error-hover": "#912018",
+      "info-ink": "#1B5E8C",
+      "info-bg": "#EBF4FA",
+      "neutral-ink": "#2F4656",
+      "neutral-bg": "#E9EFF1",
+      "critical-solid": "#912018",
+      "critical-subtle-bg": "#FEE4E2",
+      "critical-subtle-ink": "#7A271A",
+      "ai-ink": "#2F4A5C",
+      "ai-bg": "#EFF3F6",
+      "ai-rule": "#5B7384",
+      "chart-1": "#087F8C",
+      "chart-2": "#D9531E",
+      "chart-3": "#124AE2",
+      "chart-4": "#424B57",
+      "chart-5": "#1D99ED",
+      "chart-6": "#0EAA42",
+      "chart-7": "#1E672C",
+      "chart-8": "#1273E2",
+      "seq-1": "#E6F4F6",
+      "seq-2": "#B2D8DD",
+      "seq-3": "#7EBDC4",
+      "seq-4": "#48A0AA",
+      "seq-5": "#28909B",
+      "seq-6": "#087F8C",
+      "seq-7": "#05545D",
+      "div-1": "#05545D",
+      "div-2": "#7EC4CC",
+      "div-3": "#E9EFF1",
+      "div-4": "#F9B27C",
+      "div-5": "#9A3412"
+    },
+    "clinician": {
+      "ink-inverse": "#FFFFFF",
+      "surface": "#FFFFFF",
+      "surface-elevated": "#FFFFFF",
+      "focus-inner": "#FFFFFF",
+      "critical-on": "#FFFFFF",
+      "bg": "#F4F7F8",
+      "surface-sunken": "#E9EFF1",
+      "ink": "#123047",
+      "ink-muted": "#3F5A6B",
+      "ink-subtle": "#53697A",
+      "disabled-ink": "#6D8190",
+      "disabled-bg": "#E9EFF1",
+      "border": "#DCE6E9",
+      "border-control": "#667F8E",
+      "primary": "#087F8C",
+      "link": "#066A75",
+      "primary-hover": "#066A75",
+      "primary-active": "#05545D",
+      "primary-subtle": "#E3F3F5",
+      "secondary-border": "#087F8C",
+      "secondary-hover-bg": "#E3F3F5",
+      "selected-bg": "#E3F3F5",
+      "selected-ink": "#065A64",
+      "selected-edge": "#087F8C",
+      "focus": "#123047",
+      "accent": "#0D9488",
+      "accent-ink": "#0A665E",
+      "accent-subtle": "#E1F5F2",
+      "success-ink": "#17652F",
+      "success-bg": "#EBF7ED",
+      "warning-ink": "#8A4B08",
+      "warning-bg": "#FFF7E0",
+      "error-ink": "#B42318",
+      "error-bg": "#FEF3F2",
+      "error-hover": "#912018",
+      "info-ink": "#1B5E8C",
+      "info-bg": "#EBF4FA",
+      "neutral-ink": "#2F4656",
+      "neutral-bg": "#E9EFF1",
+      "critical-solid": "#912018",
+      "critical-subtle-bg": "#FEE4E2",
+      "critical-subtle-ink": "#7A271A",
+      "ai-ink": "#2F4A5C",
+      "ai-bg": "#EFF3F6",
+      "ai-rule": "#5B7384",
+      "chart-1": "#087F8C",
+      "chart-2": "#D9531E",
+      "chart-3": "#124AE2",
+      "chart-4": "#424B57",
+      "chart-5": "#1D99ED",
+      "chart-6": "#0EAA42",
+      "chart-7": "#1E672C",
+      "chart-8": "#1273E2",
+      "seq-1": "#E6F4F6",
+      "seq-2": "#B2D8DD",
+      "seq-3": "#7EBDC4",
+      "seq-4": "#48A0AA",
+      "seq-5": "#28909B",
+      "seq-6": "#087F8C",
+      "seq-7": "#05545D",
+      "div-1": "#05545D",
+      "div-2": "#7EC4CC",
+      "div-3": "#E9EFF1",
+      "div-4": "#F9B27C",
+      "div-5": "#9A3412"
+    }
+  },
+  "density": {
+    "patient": {
+      "font-heading": "\"IBM Plex Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "heading-weight": "600",
+      "scale": [
+        15,
+        17,
+        20,
+        24,
+        32,
+        40
+      ],
+      "text": {
+        "caption": [
+          15,
+          22
+        ],
+        "small": [
+          15,
+          22
+        ],
+        "body": [
+          17,
+          26
+        ],
+        "table": [
+          16,
+          24
+        ],
+        "label": [
+          16,
+          24
+        ],
+        "h4": [
+          20,
+          28
+        ],
+        "h3": [
+          20,
+          28
+        ],
+        "h2": [
+          24,
+          32
+        ],
+        "h1": [
+          32,
+          40
+        ]
+      },
+      "control-h": 48,
+      "control-h-sm": 48,
+      "target-min": 48,
+      "target-floor": 48,
+      "row-h": 56,
+      "control-px": 16,
+      "measure": "60ch",
+      "page-gutter": 20
+    },
+    "clinician": {
+      "font-heading": "\"IBM Plex Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "heading-weight": "600",
+      "scale": [
+        12,
+        13,
+        14,
+        15,
+        18,
+        24
+      ],
+      "text": {
+        "caption": [
+          12,
+          16
+        ],
+        "small": [
+          13,
+          18
+        ],
+        "body": [
+          14,
+          20
+        ],
+        "table": [
+          13,
+          18
+        ],
+        "label": [
+          13,
+          18
+        ],
+        "h4": [
+          14,
+          20
+        ],
+        "h3": [
+          15,
+          20
+        ],
+        "h2": [
+          18,
+          24
+        ],
+        "h1": [
+          24,
+          32
+        ]
+      },
+      "control-h": 32,
+      "control-h-sm": 24,
+      "target-min": 32,
+      "target-floor": 24,
+      "row-h": 36,
+      "control-px": 10,
+      "measure": "none",
+      "page-gutter": 24
+    }
+  },
+  "textExtra": {
+    "patient": {
+      "data-value-lg": [
+        40,
+        44
+      ],
+      "data-value": [
+        20,
+        28
+      ],
+      "notes": [
+        17,
+        28
+      ],
+      "page-title": [
+        32,
+        40
+      ],
+      "section-heading": [
+        24,
+        32
+      ],
+      "component-title": [
+        20,
+        28
+      ],
+      "overline": [
+        15,
+        22
+      ]
+    },
+    "clinician": {
+      "data-value-lg": [
+        24,
+        28
+      ],
+      "data-value": [
+        14,
+        20
+      ],
+      "notes": [
+        14,
+        22
+      ],
+      "page-title": [
+        24,
+        32
+      ],
+      "section-heading": [
+        18,
+        24
+      ],
+      "component-title": [
+        15,
+        20
+      ],
+      "overline": [
+        12,
+        16
+      ]
+    }
+  },
+  "fonts": {
+    "sans": "\"IBM Plex Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
+    "mono": "\"IBM Plex Mono\", ui-monospace, \"SFMono-Regular\", Menlo, monospace",
+    "serif": "\"IBM Plex Sans\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
+  }
+}
