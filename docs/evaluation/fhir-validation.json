@@ -1,0 +1,661 @@
+{
+  "roundTrip": [
+    {
+      "type": "Organization",
+      "records": 1,
+      "passLayers": 1,
+      "recordEqual": 1,
+      "fhirStable": 1
+    },
+    {
+      "type": "Practitioner",
+      "records": 2,
+      "passLayers": 2,
+      "recordEqual": 2,
+      "fhirStable": 2
+    },
+    {
+      "type": "Patient",
+      "records": 1,
+      "passLayers": 1,
+      "recordEqual": 1,
+      "fhirStable": 1
+    },
+    {
+      "type": "Goal",
+      "records": 2,
+      "passLayers": 2,
+      "recordEqual": 2,
+      "fhirStable": 2
+    },
+    {
+      "type": "CarePlan",
+      "records": 2,
+      "passLayers": 2,
+      "recordEqual": 2,
+      "fhirStable": 2
+    },
+    {
+      "type": "Observation",
+      "records": 5,
+      "passLayers": 5,
+      "recordEqual": 5,
+      "fhirStable": 5
+    }
+  ],
+  "sampleBundle": {
+    "entries": 13,
+    "errors": 0,
+    "warnings": 0
+  },
+  "broken": [
+    {
+      "fixture": "bundle-duplicate-fullurl",
+      "expectedRule": "bdl-7",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 5,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "bundle-duplicate-patient",
+      "expectedRule": "dup.in-bundle",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 0,
+      "duplicateErrors": 1,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "bundle-entry-without-fullurl",
+      "expectedRule": "bundle.fullUrl",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 2,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "bundle-foreign-identifier",
+      "expectedRule": "org.boundary.identifier",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "bundle-not-a-bundle",
+      "expectedRule": "bundle.resource-type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "bundle-request-in-collection",
+      "expectedRule": "bdl-3",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "bundle-versioned-fullurl",
+      "expectedRule": "bdl-8",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 2,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "careplan-activity-reference-and-detail",
+      "expectedRule": "cpl-3",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "careplan-missing-assess-plan",
+      "expectedRule": "uscore.careplan.category",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "careplan-missing-intent",
+      "expectedRule": "r4.structure",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "careplan-subject-practitioner",
+      "expectedRule": "ref.target-type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "goal-missing-description",
+      "expectedRule": "uscore.goal.description",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "goal-status-not-a-code",
+      "expectedRule": "code.goal.lifecycleStatus",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "import-patient-exists",
+      "expectedRule": "dup.existing",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 0,
+      "duplicateErrors": 1,
+      "importErrors": 0,
+      "status": 409
+    },
+    {
+      "fixture": "import-reference-outside-organization",
+      "expectedRule": "ref.unresolved",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": 422
+    },
+    {
+      "fixture": "observation-dangling-subject",
+      "expectedRule": "ref.dangling",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-encounter-not-an-encounter",
+      "expectedRule": "ref.target-type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-missing-status",
+      "expectedRule": "r4.structure",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-no-value",
+      "expectedRule": "us-core-2",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-pain-out-of-range",
+      "expectedRule": "carepath.pain-nrs-range",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-reference-type-mismatch",
+      "expectedRule": "ref.type-mismatch",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-status-not-a-code",
+      "expectedRule": "code.observation.status",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "observation-value-and-absent-reason",
+      "expectedRule": "r4.invariant",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 0,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "organization-missing-name",
+      "expectedRule": "uscore.organization.name",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "patient-birthdate-malformed",
+      "expectedRule": "r4.structure",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 0,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "patient-gender-not-a-code",
+      "expectedRule": "code.patient.gender",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "patient-missing-gender",
+      "expectedRule": "uscore.patient.gender",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "patient-missing-identifier",
+      "expectedRule": "uscore.patient.identifier",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "patient-missing-name",
+      "expectedRule": "uscore.patient.name",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "patient-unknown-element",
+      "expectedRule": "r4.structure",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 0,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "practitioner-npi-check-digit",
+      "expectedRule": "us-core-17",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    }
+  ],
+  "synthea": {
+    "files": [
+      {
+        "file": "practitioners.json",
+        "entries": 22,
+        "status": 201,
+        "counts": {
+          "Practitioner": {
+            "created": 11,
+            "duplicate": 0,
+            "skipped": 0,
+            "invalid": 0
+          },
+          "PractitionerRole": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 11,
+            "invalid": 0
+          }
+        },
+        "errors": 0,
+        "skippedTypeIssues": 11,
+        "derivedPractitioner": 0,
+        "laboratorySkipped": 0,
+        "noStorableValueSkipped": 0,
+        "openPlanSkipped": 0,
+        "activityNotExercise": 0
+      },
+      {
+        "file": "patient-1.json",
+        "entries": 106,
+        "status": 201,
+        "counts": {
+          "Patient": {
+            "created": 1,
+            "duplicate": 0,
+            "skipped": 0,
+            "invalid": 0
+          },
+          "Encounter": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 18,
+            "invalid": 0
+          },
+          "Condition": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 16,
+            "invalid": 0
+          },
+          "Device": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 2,
+            "invalid": 0
+          },
+          "CareTeam": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 2,
+            "invalid": 0
+          },
+          "CarePlan": {
+            "created": 1,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "MedicationRequest": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 9,
+            "invalid": 0
+          },
+          "Observation": {
+            "created": 9,
+            "duplicate": 0,
+            "skipped": 38,
+            "invalid": 0
+          },
+          "Procedure": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 6,
+            "invalid": 0
+          },
+          "Immunization": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 2,
+            "invalid": 0
+          },
+          "Provenance": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          }
+        },
+        "errors": 0,
+        "skippedTypeIssues": 56,
+        "derivedPractitioner": 49,
+        "laboratorySkipped": 36,
+        "noStorableValueSkipped": 2,
+        "openPlanSkipped": 1,
+        "activityNotExercise": 4
+      },
+      {
+        "file": "patient-2.json",
+        "entries": 94,
+        "status": 201,
+        "counts": {
+          "Patient": {
+            "created": 1,
+            "duplicate": 0,
+            "skipped": 0,
+            "invalid": 0
+          },
+          "Encounter": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 16,
+            "invalid": 0
+          },
+          "Condition": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 17,
+            "invalid": 0
+          },
+          "CareTeam": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 2,
+            "invalid": 0
+          },
+          "CarePlan": {
+            "created": 1,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "Device": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 3,
+            "invalid": 0
+          },
+          "MedicationRequest": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 10,
+            "invalid": 0
+          },
+          "Observation": {
+            "created": 10,
+            "duplicate": 0,
+            "skipped": 12,
+            "invalid": 0
+          },
+          "Procedure": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 17,
+            "invalid": 0
+          },
+          "Immunization": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "Medication": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "MedicationAdministration": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "Provenance": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          }
+        },
+        "errors": 0,
+        "skippedTypeIssues": 69,
+        "derivedPractitioner": 24,
+        "laboratorySkipped": 10,
+        "noStorableValueSkipped": 2,
+        "openPlanSkipped": 1,
+        "activityNotExercise": 6
+      },
+      {
+        "file": "patient-3.json",
+        "entries": 144,
+        "status": 201,
+        "counts": {
+          "Patient": {
+            "created": 1,
+            "duplicate": 0,
+            "skipped": 0,
+            "invalid": 0
+          },
+          "Encounter": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 20,
+            "invalid": 0
+          },
+          "Condition": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 21,
+            "invalid": 0
+          },
+          "Device": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 3,
+            "invalid": 0
+          },
+          "MedicationRequest": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 5,
+            "invalid": 0
+          },
+          "CareTeam": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 6,
+            "invalid": 0
+          },
+          "CarePlan": {
+            "created": 3,
+            "duplicate": 0,
+            "skipped": 3,
+            "invalid": 0
+          },
+          "Observation": {
+            "created": 13,
+            "duplicate": 0,
+            "skipped": 43,
+            "invalid": 0
+          },
+          "Procedure": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 20,
+            "invalid": 0
+          },
+          "Immunization": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 3,
+            "invalid": 0
+          },
+          "Medication": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "MedicationAdministration": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          },
+          "Provenance": {
+            "created": 0,
+            "duplicate": 0,
+            "skipped": 1,
+            "invalid": 0
+          }
+        },
+        "errors": 0,
+        "skippedTypeIssues": 81,
+        "derivedPractitioner": 62,
+        "laboratorySkipped": 41,
+        "noStorableValueSkipped": 2,
+        "openPlanSkipped": 3,
+        "activityNotExercise": 13
+      }
+    ],
+    "reimportPatient1": {
+      "status": 409,
+      "duplicates": 11
+    }
+  }
+}

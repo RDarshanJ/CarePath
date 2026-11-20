@@ -117,8 +117,7 @@ describe("export bundle", () => {
         count += 1;
         const res = index.resolve(r.reference);
         if (res.kind !== "entry") dangling.push(`${i}.${r.path} -> ${r.reference}`);
-        else if (res.index > i && e.resource!.resourceType !== "CarePlan")
-          dangling.push(`${i}.${r.path} before target`);
+        else if (res.index > i) dangling.push(`${i}.${r.path} before target`);
       }
     });
     expect(dangling).toEqual([]);
