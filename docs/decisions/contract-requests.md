@@ -72,3 +72,147 @@ Copy this block to the end of the file and fill every line.
 - Why: checkpoint C2 Phase 5 (25 reviewed transcripts with expected facts); PRD section 11 (evaluation).
 - Status: done
 - Answer: defined by WP 5.1 in the commit "ai: eval case schema (EvalCase v1), README, checker, two fixture cases". Changes to the format go through a new entry here.
+
+### CR-6: Stop without a pain rating
+
+- Requested by: D-WP-10 (decisions C, D; was CR-C1), 2026-11-20
+- Screen or test: `(patient)/(session)/**`
+- Endpoint and contract: `SessionStopRequest`
+- What is missing: `discomfortLevel` nullable, so Stop ends the session at once and the rating follows.
+- Why: DR-002 C, D; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): B-CR
+- Blocking: No. D-WP-10 ships the current order and switches in a follow-up commit.
+- Status: open
+- Answer: pending
+
+### CR-7: AI review payload: resolutions, acknowledgement, evidence opens
+
+- Requested by: D-WP-0 (DR-002 M, S6c; `06`), 2026-11-20
+- Screen or test: clinician AI review panel
+- Endpoint and contract: `AIReview` payload
+- What is missing: Statement resolutions (removed, edited, kept with note), missing-information acknowledgement and evidence-open references; an unreviewed draft cannot be approved after AI consent is withdrawn (409 with a reason).
+- Why: DR-002 M, S6c; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): WP 5.2
+- Blocking: Yes, WP 5.3.
+- Status: open
+- Answer: pending
+
+### CR-8: Notes: amendment, completeness and entered in error
+
+- Requested by: D-WP-0 (DR-002 M; `07`), 2026-11-20
+- Screen or test: clinician notes
+- Endpoint and contract: note sign, amend and entered-in-error endpoints
+- What is missing: An amendment is created and signed in one call with a required reason, author only; signing refuses a note with all four sections empty; an `entered_in_error` endpoint with required reason, author or clinic administrator, irreversible.
+- Why: DR-002 M, S4, S5; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): WP 5.2
+- Blocking: Yes, WP 5.3 notes.
+- Status: open
+- Answer: pending
+
+### CR-9: Review task priority level
+
+- Requested by: D-WP-0 (CD-235), 2026-11-20
+- Screen or test: clinician review queue
+- Endpoint and contract: `ReviewTask`
+- What is missing: `priorityLevel: "high" | "standard"`, derived on the server.
+- Why: CD-235; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): B-CR
+- Blocking: No. Tag absent until then.
+- Status: open
+- Answer: pending
+
+### CR-10: Per-rule totals on review tasks
+
+- Requested by: D-WP-0 (DR-002 L), 2026-11-20
+- Screen or test: clinician review queue
+- Endpoint and contract: `GET /review-tasks`
+- What is missing: Per-rule totals.
+- Why: DR-002 L; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): B-CR
+- Blocking: No. Chips absent until then.
+- Status: open
+- Answer: pending
+
+### CR-11: Review task event history
+
+- Requested by: D-WP-0 (DR-002 L), 2026-11-20
+- Screen or test: clinician review queue
+- Endpoint and contract: review task detail
+- What is missing: Event history: created, assigned, unassigned, reviewed, closed.
+- Why: DR-002 L; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): B-CR
+- Blocking: No. History shows created and resolution.
+- Status: open
+- Answer: pending
+
+### CR-12: Patient search with the term in the body
+
+- Requested by: D-WP-0 (DR-002 I), 2026-11-20
+- Screen or test: `(clinician)/patients`
+- Endpoint and contract: `POST /patients/search`
+- What is missing: The search term in the request body so it never appears in a URL (R2).
+- Why: DR-002 I, CD-333; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): B-CR
+- Blocking: No. The browser-URL fix in D-WP-13 is UI-only and is the blocking part.
+- Status: open
+- Answer: pending
+
+### CR-13: Metrics endpoint with definitions and drill-down
+
+- Requested by: D-WP-0 (DR-002 N), 2026-11-20
+- Screen or test: `(admin)` metrics
+- Endpoint and contract: metrics endpoint
+- What is missing: Per metric: numerator, denominator, window, `computedAt`, previous-window value where computable, and a drill-down whose row count equals the number; filters for onboarding not submitted, active without a published plan, cancelled appointments, review tasks by age band.
+- Why: DR-002 N; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): WP 6.1
+- Blocking: Yes, WP 6.2.
+- Status: open
+- Answer: pending
+
+### CR-14: Availability writes and agenda open times
+
+- Requested by: D-WP-0 (DR-002 N; CD-312, CD-313), 2026-11-20
+- Screen or test: `(admin)` availability, clinician agenda
+- Endpoint and contract: availability endpoints
+- What is missing: Add times for a therapist and day, block a time, remove an open time (409 when booked); the clinician agenda returns open times including earlier today.
+- Why: DR-002 N, CD-312, CD-313; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): WP 6.1
+- Blocking: Yes, WP 6.2 availability. The agenda part does not block D-WP-14.
+- Status: open
+- Answer: pending
+
+### CR-15: Audit query with filters and cursor paging
+
+- Requested by: D-WP-0 (DR-002 N; CD-413), 2026-11-20
+- Screen or test: `(admin)` audit log
+- Endpoint and contract: audit query endpoint
+- What is missing: Filters and cursor paging.
+- Why: DR-002 N, CD-413; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): WP 6.1
+- Blocking: Yes, WP 6.2 audit viewer.
+- Status: open
+- Answer: pending
+
+### CR-16: Overview: AI drafts awaiting review
+
+- Requested by: D-WP-0 (DR-002 H; REQ-OVR-01), 2026-11-20
+- Screen or test: clinician overview
+- Endpoint and contract: overview endpoint
+- What is missing: An "AI drafts awaiting review" list with count.
+- Why: DR-002 H; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): WP 5.2
+- Blocking: No. The group appears when the field does.
+- Status: open
+- Answer: pending
+
+### CR-17: Idempotency key on booking
+
+- Requested by: D-WP-0 (`10`; DR-002 F), 2026-11-20
+- Screen or test: `(patient)/(app)/appointments`
+- Endpoint and contract: booking request
+- What is missing: An idempotency key on the booking request.
+- Why: DR-002 F; filed from `docs/design/rebuild-plan.md` section 5.
+- Owner (WP): B-CR
+- Blocking: No. Until it lands the unknown-outcome banner tells the patient to check Appointments.
+- Status: open
+- Answer: pending

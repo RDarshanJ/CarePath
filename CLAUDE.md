@@ -15,7 +15,10 @@ Authority order: `docs/decisions/advisor-plan.md` overrides `docs/BRIEF.md` wher
 
 ## Design principles
 
-- Follow advisor plan section 4: one token set, two themes via `data-theme`, self-hosted fonts, no gradients, no purple, no glass, never colour alone for status.
+- Colour and type follow `docs/design/decision-records/DR-001-visual-identity.md` and `docs/design/design-tokens.md`, which supersede the colour and type values in advisor plan section 4 (the rest of section 4 stands): one token set, two themes via `data-theme`, self-hosted fonts, no gradients, no purple, no glass, never colour alone for status.
+- No cream or warm surfaces: backgrounds and borders are white or cool grey.
+- IBM Plex Sans for all text and headings, in both themes and for every role. No serif. Plex Mono is allowed only for identifiers, as DR-001 specifies.
+- Browser storage rule R1 (`docs/design/decision-records/DR-002-feature-decisions.md`, rules R1 to R7 apply to every feature): no `localStorage`; `sessionStorage` for interface state only (open panels, set count, scroll position), never typed health text, patient search terms or account fields; no PHI or patient identifiers in URLs or document titles (R2).
 - In `apps/web`, ESLint bans raw colour values and Tailwind arbitrary values (`bg-[#fff]`, `w-[13px]`); use token utilities from `@carepath/ui`. Only the `/design-system` gallery is exempt.
 - No dead buttons, fake charts, hardcoded interactions, or placeholder text. A route with no working action is removed, not stubbed.
 - Every app shell shows "Demonstration product. Synthetic data. Not for clinical use."

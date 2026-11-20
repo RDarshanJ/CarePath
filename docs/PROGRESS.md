@@ -772,3 +772,11 @@ verify: PASSED
 WP 5.4 gate: PASSED
 ```
 
+### D-WP-0 (land the design decisions, docs only)
+
+Worktree `/home/claude/wt/d0`, branch `wp/d0` from main (which already contains the D1 merge `5823c4c`, so no `wp/design` rebase was needed). No code, no `packages/shared` and no `contracts/` change; `URGENT_NOTICE`, the pain anchor constants and the R5 label stay with D-WP-3.
+
+- `docs/product/prd.md`: REQ-APT-03, AC-E5, AC-E10 and REQ-CHK-01 (pain anchors) edited; therapist navigation order set to Overview, Schedule, Patients, Review queue, Messages; new "Revisions (design checkpoint D1)" table dated 2026-11-20 with rejected change requests and open sign-offs S1 to S9 recorded as open with the shipped demo behaviour.
+- `docs/decisions/contract-requests.md`: CR-6 to CR-17 filed as open, each with owner work package and blocking status. Blocking: CR-7 and CR-8 (WP 5.3), CR-13, CR-14 (availability), CR-15 (WP 6.2). All others non-blocking.
+- `CLAUDE.md` "Design principles": cites DR-001 and `docs/design/design-tokens.md`; records no cream or warm surfaces, IBM Plex Sans only (Plex Mono for identifiers), and browser storage rule R1 with R2.
+- Gate: `pnpm install --frozen-lockfile --offline` and `pnpm lint`; see the commit message for the result. `docs` is in `.prettierignore`; `CLAUDE.md` is not under `docs`.

@@ -71,7 +71,7 @@ Roles: `patient`, `physical_therapist`, `care_coordinator`, `clinic_admin`, held
 ### 4.3 Information architecture
 
 - **Patient** (bottom tab bar, four text tabs, plan §4): Today, Progress, Appointments, Messages (assistant is a separate labelled entry). Account menu: profile, Sharing and consent, About, sign out. "Contact care team" sits in the same header position on every screen.
-- **Therapist** (left rail): Overview, Patients, Review queue, Schedule, Messages. The record is two-pane with a persistent header and sections: overview, timeline, plan, outcomes, activity, appointments, messages, notes, AI summaries, record history.
+- **Therapist** (left rail): Overview, Schedule, Patients, Review queue, Messages (DR-002 H). The record is two-pane with a persistent header and sections: overview, timeline, plan, outcomes, activity, appointments, messages, notes, AI summaries, record history.
 - **Coordinator and admin** (shared shell): Enrollment, Assignments, Availability, Appointments, Messages (coordinator), Metrics; admin only: Settings (organisation, review rules, clinic phone, reply-time text), Roles (read-only), Audit, FHIR import.
 
 ## 5. Permission matrix
@@ -144,7 +144,7 @@ Columns: ID, requirement, role (P patient, T therapist, C coordinator, A admin, 
 | REQ-SES-03 | State persisted per step; session records its plan version | S | Core-Must | AC-C1, AC-B5 | Plan ADR-10 |
 | REQ-SES-04 | Fictional-content notice on exercise content | P | Core-Must | PW text assertion | Plan §6 |
 | REQ-SES-05 | Optional camera rep counting behind a flag, manual fallback | P | Stretch-Could | Plan WP 9.1 gate | Brief §4 |
-| REQ-CHK-01 | Pain is the 0 to 10 radio group in `packages/ui` with word anchors; no slider | P | Core-Must | Unit: arrow keys move selection | Rev1, HD §8 (2.5.7) [Standards] |
+| REQ-CHK-01 | Pain is the 0 to 10 radio group in `packages/ui`; no slider. Anchors read "0 No pain" and "10 Worst pain imaginable" (LOINC 72514-3 wording; not clinically reviewed, open sign-off S1) | P | Core-Must | Unit: arrow keys move selection | Rev1, HD §8 (2.5.7) [Standards] |
 | REQ-CHK-02 | "Your therapist will see this" after submission | P | Core-Must | AC-C6 | MP §8 [Observed] |
 | REQ-CHK-03 | Contact-your-clinic notice at the pain threshold | P | Core-Must | AC-D7 | PO 3 |
 | REQ-CHK-04 | Each pain report stores an Observation, LOINC 72514-3, performer Patient | S | Core-Must | AC-C2, AC-G2 | HD §3.3 [Standards] |
@@ -157,7 +157,7 @@ Columns: ID, requirement, role (P patient, T therapist, C coordinator, A admin, 
 |---|---|---|---|---|---|
 | REQ-APT-01 | Profiles, types, slots from persisted availability, confirm, reschedule, cancel | P | Core-Must | AC-E2, AC-E4 | Brief §4 |
 | REQ-APT-02 | Server availability check; exclusion constraints for practitioner and patient | S | Core-Must | AC-E1, AC-E3, AC-E6 | Plan ADR-9, PO 9 |
-| REQ-APT-03 | UTC storage; viewer-zone display with the zone named | All | Core-Must | AC-E5 | Plan ADR-9 |
+| REQ-APT-03 | Instants are stored in UTC. Every time is shown in the clinic's zone with the zone named. For a video visit, the viewer's local time is added when the browser zone differs | All | Core-Must | AC-E5 | Plan ADR-9 |
 | REQ-APT-04 | Atomic reschedule | P, C | Core-Must | AC-E7 | Brief §4 |
 | REQ-APT-05 | On conflict, nearby slots offered and selections kept | P | Core-Must | AC-E8 | MP principle 9 [Assumption] |
 | REQ-APT-06 | Check in and complete a visit; completion creates an Encounter | T | Core-Should | API: Encounter only for completed visits | HD §3.1 [Standards] |
@@ -298,12 +298,12 @@ Outline minimums, unweakened, plus additions. Each maps to tests in section 20.
 - AC-E2 Given a booking, then the patient's list and the clinician's calendar show it from the same row.
 - AC-E3 Given an overlapping booking by the same patient with another clinician, then 409.
 - AC-E4 Given a cancellation, then the slot is bookable again and both calendars update.
-- AC-E5 Given viewers in different zones, then each sees the correct local time for the same instant, across a daylight-saving boundary in test data.
+- AC-E5 Given the same instant, then every viewer sees the clinic-zone time with the zone named, across a daylight-saving boundary in test data; for a video visit viewed from another zone, the viewer's local time is also shown.
 - AC-E6 Given a past slot or one outside availability, then rejection.
 - AC-E7 Given a reschedule whose new slot is taken, then the original booking is unchanged.
 - AC-E8 Given a 409 in the UI, then nearby slots are offered and type and clinician selections are kept.
 - AC-E9 Given a send failure, then a failed state with retry; opening a thread clears its unread count.
-- AC-E10 Every message shows sender name and role; the composer shows reply time and "Not monitored for emergencies."
+- AC-E10 Every message shows sender name and role; the patient composer shows reply time and the emergency notice ("Not monitored for emergencies. If this is an emergency, call 911."). The staff composer shows no emergency notice; it shows the reply-time line the patient was given.
 - AC-E11 Given a non-participant, then reading a thread returns 404.
 
 **F. AI-supported progress review**
@@ -501,6 +501,35 @@ Rows 1 to 11 are rev1 §3; the rest follow from the plan.
 | §7 role management | Read-only matrix; editing Stretch | Plan §1 |
 | §8, §10 Storybook and stack | Gallery route; one Next.js app, Fastify, TypeScript AI, Postgres jobs, polling | Plan §1, ADR-1 to ADR-5, ADR-12 |
 | §4 motion tracking | Stretch | Plan §1 |
+
+### Revisions (design checkpoint D1)
+
+Dated 2026-11-20. Source: `docs/design/decision-records/DR-002-feature-decisions.md` (DR-002). The shared `URGENT_NOTICE` constant is added by D-WP-3, not here.
+
+| Item | Revision | Source |
+|---|---|---|
+| REQ-APT-03 | UTC storage; times shown in the clinic zone with the zone named; viewer's local time added for video visits when the zone differs | DR-002 F, CD-314 |
+| AC-E5 | Keeps the daylight-saving test; adds the video-visit case | DR-002 F |
+| AC-E10 | Clarified to the patient composer; staff composer has no emergency notice and shows the reply-time line | DR-002 G, CD-511 |
+| REQ-CHK-01 | Pain anchors "0 No pain" and "10 Worst pain imaginable"; live line "You chose 7 of 10." with no band word | DR-002 D |
+| Section 4 therapist navigation | Order is Overview, Schedule, Patients, Review queue, Messages; both inboxes carry a count badge | DR-002 H, CD-501 |
+| Section 5 browser storage | No `localStorage`; `sessionStorage` for interface state only; no patient identifiers in URLs or titles; free-text drafts held in memory with a leave guard (R1, R2) | DR-002 R1, R2 |
+| Withdrawn | "Draft restored after a reload" for messages | DR-002 G |
+| Rejected change requests | Eligibility pre-check, email confirmation, per-set storage (CR-C2), check-in body area and timing (CR-D1), "none" versus "skipped" on limitations, `estimatedMinutes`, saved personal views, plan templates and archive, pre-filled message subject | DR-002 sections 2 and 3 |
+
+Open sign-offs (recorded as open; no answer is invented; shipped demo behaviour shown):
+
+| Id | Question | Owner | Demo behaviour until answered |
+|---|---|---|---|
+| S1 | Is "Worst pain imaginable" the right upper anchor, and are both anchors acceptable? | Clinical | LOINC wording; docs say "not clinically reviewed" |
+| S2 | Should a pain threshold ship with a default, and is 7 acceptable? | Clinical | 7, labelled demo default in admin settings; hidden from patients |
+| S3 | What do Active, Inactive and Discharged mean, and which workflow sets the last two? | Product | Active defined in text as "intake submitted and a therapist assigned"; others shown as stored words; metrics denominator is status `active` |
+| S4 | Does an amendment need its own signature; may anyone but the author amend? | Clinical governance | Signed, author only |
+| S5 | Who may mark a note entered in error; is a second person needed? | Clinical governance | Author or clinic administrator, reason required, one person |
+| S6 | Consent wording; what is kept if required consent is declined after an account exists; unreviewed drafts when AI consent is withdrawn; behaviour while changed wording is unread | Legal and product | Demonstration wording; account stays `intake_incomplete`, nothing deleted; no new drafts and unreviewed drafts cannot be approved; existing agreement stands with a banner |
+| S7 | Review age-band edges | Product | Under 24 h, 24 to 48 h, over 48 h, labelled demo default |
+| S8 | Does opening evidence count as inspection for the approval gate? | Product, with clinicians | Required for reported-change statements; marked untested |
+| S9 | Is a list-level peek a record open for the audit? | Privacy | Peek not built |
 
 ## 19. Assumptions, risks, open questions
 
