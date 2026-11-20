@@ -10,6 +10,7 @@
     "screenshots": "node scripts/design-system-screenshots.mjs"
   },
   "dependencies": {
+    "@carepath/shared": "workspace:*",
     "@carepath/ui": "workspace:*",
     "@tailwindcss/postcss": "4.3.5",
     "@tanstack/react-query": "5.108.1",

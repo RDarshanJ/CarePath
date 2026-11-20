@@ -87,6 +87,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@carepath/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@carepath/ui':
         specifier: workspace:*
         version: link:../../packages/ui
