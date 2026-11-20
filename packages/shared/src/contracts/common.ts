@@ -14,11 +14,10 @@ export const localDateSchema = z.iso.date();
  * Query schemas carry no `.meta({ id })`: OpenAPI lists query parameters inline, and a named
  * query schema would become a $ref that @fastify/swagger cannot expand into parameters.
  */
-export const cursorQuerySchema = z
-  .object({
-    cursor: z.string().max(200).optional(),
-    limit: z.coerce.number().int().min(1).max(100).default(25),
-  });
+export const cursorQuerySchema = z.object({
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(25),
+});
 
 export type CursorQuery = z.input<typeof cursorQuerySchema>;
 

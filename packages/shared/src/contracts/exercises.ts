@@ -31,14 +31,13 @@ export const exerciseSchema = z
   .meta({ id: "Exercise" });
 export type Exercise = z.infer<typeof exerciseSchema>;
 
-export const exerciseLibraryQuerySchema = z
-  .object({
-    q: z.string().trim().min(1).max(100).optional(),
-    bodyArea: bodyAreaSchema.optional(),
-    category: exerciseCategorySchema.optional(),
-    cursor: z.string().max(200).optional(),
-    limit: z.coerce.number().int().min(1).max(100).default(25),
-  });
+export const exerciseLibraryQuerySchema = z.object({
+  q: z.string().trim().min(1).max(100).optional(),
+  bodyArea: bodyAreaSchema.optional(),
+  category: exerciseCategorySchema.optional(),
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(25),
+});
 export type ExerciseLibraryQuery = z.input<typeof exerciseLibraryQuerySchema>;
 
 /** Sorted by name. Inactive exercises are not listed. */

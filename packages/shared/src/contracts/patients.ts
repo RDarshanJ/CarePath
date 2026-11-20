@@ -34,24 +34,23 @@ export type PlanStage = z.infer<typeof planStageSchema>;
 
 const booleanQuery = z.enum(["true", "false"]).transform((v) => v === "true");
 
-export const patientDirectoryQuerySchema = z
-  .object({
-    /** Name or MRN, case-insensitive substring. */
-    q: z.string().trim().min(1).max(100).optional(),
-    status: patientStatusSchema.optional(),
-    /** Practitioner id: patients whose active care team includes this clinician. */
-    clinicianId: z.uuid().optional(),
-    /** Patients with no activity since this instant (no activity at all included). */
-    lastActivityBefore: z.iso.datetime().optional(),
-    hasUpcomingAppointment: booleanQuery.optional(),
-    planStage: planStageSchema.optional(),
-    hasOpenReview: booleanQuery.optional(),
-    sort: z
-      .enum(["name", "-name", "lastActivity", "-lastActivity", "status", "-status"])
-      .default("name"),
-    cursor: z.string().max(200).optional(),
-    limit: z.coerce.number().int().min(1).max(100).default(25),
-  });
+export const patientDirectoryQuerySchema = z.object({
+  /** Name or MRN, case-insensitive substring. */
+  q: z.string().trim().min(1).max(100).optional(),
+  status: patientStatusSchema.optional(),
+  /** Practitioner id: patients whose active care team includes this clinician. */
+  clinicianId: z.uuid().optional(),
+  /** Patients with no activity since this instant (no activity at all included). */
+  lastActivityBefore: z.iso.datetime().optional(),
+  hasUpcomingAppointment: booleanQuery.optional(),
+  planStage: planStageSchema.optional(),
+  hasOpenReview: booleanQuery.optional(),
+  sort: z
+    .enum(["name", "-name", "lastActivity", "-lastActivity", "status", "-status"])
+    .default("name"),
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(25),
+});
 export type PatientDirectoryQuery = z.input<typeof patientDirectoryQuerySchema>;
 
 const directoryBase = {

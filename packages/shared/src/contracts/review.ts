@@ -159,18 +159,17 @@ export const reviewTaskSchema = z
   .meta({ id: "ReviewTask" });
 export type ReviewTask = z.infer<typeof reviewTaskSchema>;
 
-export const reviewTaskQuerySchema = z
-  .object({
-    /** `active` (default) is open and in_review together. */
-    status: z
-      .enum(["active", "open", "in_review", "resolved", "dismissed", "closed"])
-      .default("active"),
-    /** `me`, `unassigned` or a practitioner id. */
-    assignedTo: z.union([z.literal("me"), z.literal("unassigned"), z.uuid()]).optional(),
-    ruleKey: reviewRuleKeySchema.optional(),
-    cursor: z.string().max(200).optional(),
-    limit: z.coerce.number().int().min(1).max(100).default(25),
-  });
+export const reviewTaskQuerySchema = z.object({
+  /** `active` (default) is open and in_review together. */
+  status: z
+    .enum(["active", "open", "in_review", "resolved", "dismissed", "closed"])
+    .default("active"),
+  /** `me`, `unassigned` or a practitioner id. */
+  assignedTo: z.union([z.literal("me"), z.literal("unassigned"), z.uuid()]).optional(),
+  ruleKey: reviewRuleKeySchema.optional(),
+  cursor: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(25),
+});
 export type ReviewTaskQuery = z.input<typeof reviewTaskQuerySchema>;
 
 export const reviewTaskPageSchema = pageOf(reviewTaskSchema)
