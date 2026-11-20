@@ -1,13 +1,6 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { z } from "zod";
+import { healthSchema } from "@carepath/shared/contracts";
 import { pingDatabase } from "../db/repo.js";
-
-const healthSchema = z
-  .object({
-    status: z.enum(["ok", "unavailable"]),
-    checks: z.object({ database: z.enum(["ok", "unavailable"]) }),
-  })
-  .meta({ id: "Health" });
 
 export const healthRoutes: FastifyPluginAsyncZod = async (app) => {
   app.get(

@@ -1,6 +1,6 @@
 import type { FastifyInstance, LightMyRequestResponse } from "fastify";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { errorEnvelopeSchema } from "../../src/core/errors.js";
+import { errorEnvelopeSchema } from "@carepath/shared/contracts";
 import { fixtureRoutes } from "../support/fixture-routes.js";
 import { as, login, ORIGIN, testApp } from "../support/http.js";
 import { createOrgFixture, createTestDb, type OrgFixture } from "../support/repo.js";

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { isPermission, type RoleKey } from "../authz/permissions.js";
 import { requireCtx } from "../context.js";
 import { AppError, errorResponses } from "../errors.js";
-import { loginBodySchema, sessionInfoSchema, type SessionInfo } from "./contracts.js";
+import { loginBodySchema, sessionInfoSchema, type SessionInfo } from "@carepath/shared/contracts";
 import {
   createSession,
   findSessionByTokenHash,

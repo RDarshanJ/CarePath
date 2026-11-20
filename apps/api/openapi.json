@@ -14,71 +14,6 @@
       }
     },
     "schemas": {
-      "ErrorEnvelopeInput": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string",
-                "enum": [
-                  "validation_error",
-                  "organization_required",
-                  "invalid_credentials",
-                  "unauthenticated",
-                  "session_expired",
-                  "origin_rejected",
-                  "csrf_failed",
-                  "forbidden",
-                  "not_on_care_team",
-                  "not_found",
-                  "conflict",
-                  "payload_too_large",
-                  "unsupported_media_type",
-                  "rate_limited",
-                  "internal_error",
-                  "service_unavailable"
-                ]
-              },
-              "message": {
-                "type": "string"
-              },
-              "details": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "path": {
-                      "type": "string",
-                      "description": "Dot path of the offending field, empty for the whole input."
-                    },
-                    "issue": {
-                      "type": "string",
-                      "description": "Machine-readable issue code."
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "path",
-                    "issue",
-                    "message"
-                  ]
-                }
-              }
-            },
-            "required": [
-              "code",
-              "message"
-            ]
-          }
-        },
-        "required": [
-          "error"
-        ]
-      },
       "LoginRequestInput": {
         "type": "object",
         "properties": {
@@ -258,6 +193,162 @@
           "idleExpiresAt"
         ]
       },
+      "ErrorEnvelopeInput": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "validation_error",
+                  "organization_required",
+                  "invalid_credentials",
+                  "unauthenticated",
+                  "session_expired",
+                  "origin_rejected",
+                  "csrf_failed",
+                  "forbidden",
+                  "not_on_care_team",
+                  "not_found",
+                  "conflict",
+                  "payload_too_large",
+                  "unsupported_media_type",
+                  "rate_limited",
+                  "internal_error",
+                  "service_unavailable"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "Dot path of the offending field, empty for the whole input."
+                    },
+                    "issue": {
+                      "type": "string",
+                      "description": "Machine-readable issue code."
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "issue",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "HealthInput": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "database"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ]
+      },
+      "PatientHeaderInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "mrn": {
+            "type": "string"
+          },
+          "givenName": {
+            "type": "string"
+          },
+          "familyName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male",
+              "other",
+              "unknown"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "intake_incomplete",
+              "awaiting_assignment",
+              "active",
+              "inactive",
+              "discharged"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "preferredLanguage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "mrn",
+          "givenName",
+          "familyName",
+          "birthDate",
+          "gender",
+          "status",
+          "timezone",
+          "preferredLanguage"
+        ]
+      },
       "RoleMatrixInput": {
         "type": "object",
         "properties": {
@@ -401,165 +492,6 @@
           "roles",
           "permissions"
         ]
-      },
-      "HealthInput": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "ok",
-              "unavailable"
-            ]
-          },
-          "checks": {
-            "type": "object",
-            "properties": {
-              "database": {
-                "type": "string",
-                "enum": [
-                  "ok",
-                  "unavailable"
-                ]
-              }
-            },
-            "required": [
-              "database"
-            ]
-          }
-        },
-        "required": [
-          "status",
-          "checks"
-        ]
-      },
-      "PatientHeaderInput": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "mrn": {
-            "type": "string"
-          },
-          "givenName": {
-            "type": "string"
-          },
-          "familyName": {
-            "type": "string"
-          },
-          "birthDate": {
-            "type": "string",
-            "format": "date",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
-          },
-          "gender": {
-            "type": "string",
-            "enum": [
-              "female",
-              "male",
-              "other",
-              "unknown"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "intake_incomplete",
-              "awaiting_assignment",
-              "active",
-              "inactive",
-              "discharged"
-            ]
-          },
-          "timezone": {
-            "type": "string"
-          },
-          "preferredLanguage": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "mrn",
-          "givenName",
-          "familyName",
-          "birthDate",
-          "gender",
-          "status",
-          "timezone",
-          "preferredLanguage"
-        ]
-      },
-      "ErrorEnvelope": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string",
-                "enum": [
-                  "validation_error",
-                  "organization_required",
-                  "invalid_credentials",
-                  "unauthenticated",
-                  "session_expired",
-                  "origin_rejected",
-                  "csrf_failed",
-                  "forbidden",
-                  "not_on_care_team",
-                  "not_found",
-                  "conflict",
-                  "payload_too_large",
-                  "unsupported_media_type",
-                  "rate_limited",
-                  "internal_error",
-                  "service_unavailable"
-                ]
-              },
-              "message": {
-                "type": "string"
-              },
-              "details": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "path": {
-                      "type": "string",
-                      "description": "Dot path of the offending field, empty for the whole input."
-                    },
-                    "issue": {
-                      "type": "string",
-                      "description": "Machine-readable issue code."
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "path",
-                    "issue",
-                    "message"
-                  ],
-                  "additionalProperties": false
-                }
-              }
-            },
-            "required": [
-              "code",
-              "message"
-            ],
-            "additionalProperties": false
-          }
-        },
-        "required": [
-          "error"
-        ],
-        "additionalProperties": false
       },
       "LoginRequest": {
         "type": "object",
@@ -743,6 +675,168 @@
         ],
         "additionalProperties": false
       },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "validation_error",
+                  "organization_required",
+                  "invalid_credentials",
+                  "unauthenticated",
+                  "session_expired",
+                  "origin_rejected",
+                  "csrf_failed",
+                  "forbidden",
+                  "not_on_care_team",
+                  "not_found",
+                  "conflict",
+                  "payload_too_large",
+                  "unsupported_media_type",
+                  "rate_limited",
+                  "internal_error",
+                  "service_unavailable"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "Dot path of the offending field, empty for the whole input."
+                    },
+                    "issue": {
+                      "type": "string",
+                      "description": "Machine-readable issue code."
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "issue",
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "database"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ],
+        "additionalProperties": false
+      },
+      "PatientHeader": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "mrn": {
+            "type": "string"
+          },
+          "givenName": {
+            "type": "string"
+          },
+          "familyName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male",
+              "other",
+              "unknown"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "intake_incomplete",
+              "awaiting_assignment",
+              "active",
+              "inactive",
+              "discharged"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "preferredLanguage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "mrn",
+          "givenName",
+          "familyName",
+          "birthDate",
+          "gender",
+          "status",
+          "timezone",
+          "preferredLanguage"
+        ],
+        "additionalProperties": false
+      },
       "RoleMatrix": {
         "type": "object",
         "properties": {
@@ -887,100 +981,6 @@
         "required": [
           "roles",
           "permissions"
-        ],
-        "additionalProperties": false
-      },
-      "Health": {
-        "type": "object",
-        "properties": {
-          "status": {
-            "type": "string",
-            "enum": [
-              "ok",
-              "unavailable"
-            ]
-          },
-          "checks": {
-            "type": "object",
-            "properties": {
-              "database": {
-                "type": "string",
-                "enum": [
-                  "ok",
-                  "unavailable"
-                ]
-              }
-            },
-            "required": [
-              "database"
-            ],
-            "additionalProperties": false
-          }
-        },
-        "required": [
-          "status",
-          "checks"
-        ],
-        "additionalProperties": false
-      },
-      "PatientHeader": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "mrn": {
-            "type": "string"
-          },
-          "givenName": {
-            "type": "string"
-          },
-          "familyName": {
-            "type": "string"
-          },
-          "birthDate": {
-            "type": "string",
-            "format": "date",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
-          },
-          "gender": {
-            "type": "string",
-            "enum": [
-              "female",
-              "male",
-              "other",
-              "unknown"
-            ]
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "intake_incomplete",
-              "awaiting_assignment",
-              "active",
-              "inactive",
-              "discharged"
-            ]
-          },
-          "timezone": {
-            "type": "string"
-          },
-          "preferredLanguage": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "mrn",
-          "givenName",
-          "familyName",
-          "birthDate",
-          "gender",
-          "status",
-          "timezone",
-          "preferredLanguage"
         ],
         "additionalProperties": false
       }

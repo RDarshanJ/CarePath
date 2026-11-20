@@ -48,7 +48,8 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     // Never trust a client-supplied request id.
     requestIdHeader: false,
     bodyLimit: 1024 * 1024,
-    trustProxy: false,
+    // Off by default. "loopback" for the same-origin Next.js proxy (TRUST_PROXY, C1 5.2).
+    trustProxy: config.trustProxy === "loopback" ? "loopback" : false,
   }).withTypeProvider<ZodTypeProvider>();
 
   app.setValidatorCompiler(validatorCompiler);

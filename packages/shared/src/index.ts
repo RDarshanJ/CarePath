@@ -1,2 +1,6 @@
-// Placeholder: @carepath/shared is populated by a later work package (see docs/decisions/advisor-plan.md).
-export {};
+/**
+ * @carepath/shared root: browser-safe constants. Zod contracts are under
+ * "@carepath/shared/contracts"; server-only helpers (password, enrollment-code) have their own
+ * subpaths so the web bundle never pulls in node:crypto.
+ */
+export * from "./copy.js";

@@ -15,6 +15,10 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).optional(),
   RATE_LIMIT_GLOBAL_PER_MINUTE: z.coerce.number().int().positive().default(300),
   RATE_LIMIT_LOGIN_PER_MINUTE: z.coerce.number().int().positive().default(10),
+  // Checkpoint C1 section 5.2: the browser reaches the API through the Next.js /api rewrite on
+  // the same host. "loopback" trusts X-Forwarded-For only when the socket peer is a loopback
+  // address (127.0.0.0/8, ::1), so rate limits and IP hashes see the browser's address.
+  TRUST_PROXY: z.enum(["off", "loopback"]).default("off"),
 });
 
 export interface AppConfig {
@@ -34,6 +38,8 @@ export interface AppConfig {
     touchIntervalMs: number;
   };
   rateLimit: { globalPerMinute: number; loginPerMinute: number };
+  /** Which proxies may set X-Forwarded-For. Never "any": only the same-host Next.js rewrite. */
+  trustProxy: "off" | "loopback";
   logLevel: string;
 }
 
@@ -63,6 +69,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       globalPerMinute: parsed.RATE_LIMIT_GLOBAL_PER_MINUTE,
       loginPerMinute: parsed.RATE_LIMIT_LOGIN_PER_MINUTE,
     },
+    trustProxy: parsed.TRUST_PROXY,
     logLevel: parsed.LOG_LEVEL ?? (parsed.NODE_ENV === "test" ? "silent" : "info"),
   };
 }

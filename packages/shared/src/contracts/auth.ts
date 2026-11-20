@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { allPermissions, roleKeys } from "../authz/permissions.js";
+import { allPermissions, roleKeys, type Permission } from "./permissions.js";
 
 export const loginBodySchema = z
   .object({
@@ -15,12 +15,17 @@ export const loginBodySchema = z
   .strict()
   .meta({ id: "LoginRequest" });
 
+export type LoginRequest = z.input<typeof loginBodySchema>;
+
+export const roleKeySchema = z.enum(roleKeys);
+export const permissionSchema = z.enum(allPermissions as [Permission, ...Permission[]]);
+
 export const sessionInfoSchema = z
   .object({
     user: z.object({ id: z.uuid(), displayName: z.string(), email: z.string() }),
     organization: z.object({ id: z.uuid(), name: z.string(), slug: z.string() }),
-    role: z.enum(roleKeys),
-    permissions: z.array(z.enum(allPermissions as [string, ...string[]])),
+    role: roleKeySchema,
+    permissions: z.array(permissionSchema),
     patientId: z.uuid().nullable(),
     practitionerId: z.uuid().nullable(),
     csrfToken: z

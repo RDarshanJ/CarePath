@@ -1,30 +1,8 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
-import { z } from "zod";
+import { patientHeaderSchema, patientIdParamsSchema } from "@carepath/shared/contracts";
 import { requirePatientRead } from "../../core/scope/patient-scope.js";
 import { AppError, errorResponses } from "../../core/errors.js";
 import { findPatientHeader } from "./repo.js";
-
-export const patientIdParams = z.object({ patientId: z.uuid() });
-
-export const patientHeaderSchema = z
-  .object({
-    id: z.uuid(),
-    mrn: z.string(),
-    givenName: z.string(),
-    familyName: z.string(),
-    birthDate: z.iso.date(),
-    gender: z.enum(["female", "male", "other", "unknown"]),
-    status: z.enum([
-      "intake_incomplete",
-      "awaiting_assignment",
-      "active",
-      "inactive",
-      "discharged",
-    ]),
-    timezone: z.string(),
-    preferredLanguage: z.string(),
-  })
-  .meta({ id: "PatientHeader" });
 
 const purposeByRole = {
   patient: "patient_access",
@@ -44,7 +22,7 @@ export const patientRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "getPatientHeader",
         tags: ["patients"],
         summary: "Patient header. Opening it writes a phi.read audit event.",
-        params: patientIdParams,
+        params: patientIdParamsSchema,
         response: { 200: patientHeaderSchema, ...errorResponses(400, 401, 403, 404, 429) },
       },
     },
