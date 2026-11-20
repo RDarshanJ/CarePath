@@ -34,6 +34,7 @@ fi
 
 # 1. Hold a lease in a background process for the whole test.
 holder_pid_file="$LOGS/holder.pid"
+rm -f "$holder_pid_file"
 (
   export CAREPATH_DB=carepath_hold DB_LEASE_PID=$BASHPID
   scripts/db.sh acquire

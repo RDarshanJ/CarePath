@@ -1,6 +1,6 @@
 # CarePath progress
 
-Date: 2026-11-19. Synthetic data only; not for clinical use.
+Date: 2026-11-20. Synthetic data only; not for clinical use.
 
 ## Completed
 
@@ -15,9 +15,12 @@ Date: 2026-11-19. Synthetic data only; not for clinical use.
 - WP 3.1 API for Scenarios A to D: 51 operations (39 with an id in the path), contracts in `@carepath/shared/contracts`, job handlers for time-based rules and session abandonment, M8 enumeration test as the hard gate (gate output below).
 - WP 3.2a Web foundation: `/api` rewrite, typed API helpers, TanStack Query provider, sign-in with demo mode, sign-out, role-guarded patient/clinician/admin shells, apps/web ESLint style ban, end-to-end stage in `pnpm verify` (gate output below).
 - WP 3.2b Patient experience: onboarding (account, code, nine steps, consent, review), Today, guided session with persistence and stop flow, Progress with SVG charts and table alternatives, Sharing and consent, care plan (gate output below).
+- Checkpoint C2 (`docs/decisions/checkpoint-c2.md`): the slice is real; go for Phase 4 after WP 3.4.
+- WP 3.4a (branch `wp/3.4a`): S1 shared data root for every worktree, F3 session-keyed rate limit with forwarded client address, F4 contracts (CR-2 `onCareTeam`, CR-3 `total`, draft `{ draft: null }`, `mediaAlt`, corrected descriptions), F5 gate fails when a run changes `docs/` (gate output below).
 
 ## Outstanding
 
+- WP 3.4b and 3.4c (wave 1, in their own worktrees) consume the 3.4a contracts. 3.4b sets `mediaPath` and `mediaAlt` in the seed only for accepted WP 3.5 assets.
 - WP 3.3 is committed by its own worker; WP 3.2b is listed above. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
@@ -444,3 +447,67 @@ exit=0
 ```
 
 Screenshots: `docs/screenshots/3.2b/` (390 and 1440). Open item: CR-4 in `docs/decisions/contract-requests.md`.
+
+### WP 3.4a (checkpoint C2: S1, F3, F4, F5)
+
+Worktree `/home/claude/wt/3.4a`, branch `wp/3.4a`. Both gates were run there after the last code commit; `git status --porcelain` was empty afterwards.
+
+`scripts/gate-wp-3.1.sh` (exit 0):
+
+```
+==> seed (small profile)
+integrity checks: 72 passed
+content-hash: d55864495170783e355170c91c52c81f9ff4c8b8daef0f79285509fdef600b27
+==> db tests
+ Test Files  6 passed (6)
+      Tests  63 passed (63)
+==> API tests
+ Test Files  22 passed (22)
+      Tests  165 passed (165)
+==> OpenAPI check
+openapi: valid OpenAPI 3.1.0, 51 operations, house rules pass
+WP 3.1 gate: PASSED
+```
+
+`pnpm verify` (exit 0):
+
+```
+database: carepath_verify_24886
+data root: /home/claude/carepath/.data
+integrity checks: 72 passed
+content-hash: d55864495170783e355170c91c52c81f9ff4c8b8daef0f79285509fdef600b27
+packages/ui test:       Tests  106 passed (106)
+packages/db test:       Tests  63 passed (63)
+apps/api test:       Tests  165 passed (165)
+==> end-to-end (API + next start + Playwright + axe)
+  11 skipped
+  41 passed (3.5m)
+==> docs/ unchanged by the run
+verify: PASSED
+```
+
+S1 acceptance, `scripts/test-db-concurrency.sh /home/claude/wt/3.4a-twin` (a second, temporary worktree of `wp/3.4a`, removed afterwards; exit 0):
+
+```
+data root: /home/claude/carepath/.data (verify A in /home/claude/wt/3.4a, verify B in /home/claude/wt/3.4a-twin)
+stop and reset refused with exit 3 while leased
+verify A exit 0: database: carepath_verify_11134
+verify B exit 0: database: carepath_verify_11126
+127.0.0.1:54329 - accepting connections
+carepath_hold untouched: hold_marker = held
+no carepath_verify_* database remains
+concurrency acceptance: PASSED
+```
+
+Notes:
+
+- S1. `scripts/data-root.sh` resolves `CAREPATH_DATA_ROOT` (default: `.data` beside the main checkout, from `git rev-parse --git-common-dir`). `db.sh`, `gate-env.sh` and `with-web-lock.sh` use it, so every worktree shares one cluster, one lease directory and one web lock. End-to-end logs and screenshots stay in the worktree's own `.data`. The web lock serialises build and end-to-end across worktrees, which is why every worktree can use the `pnpm verify` ports 4090 and 3090.
+- The first acceptance attempt failed verify A at "docs/ unchanged by the run", because I edited `docs/decisions/contract-requests.md` in that worktree while it ran. That is F5 working. It also left its lease holder running; the test now stops the holder on any exit and clears the stale pid file.
+- F3. The global limiter keys on `session:<id>` when the request has a valid session and `address:<ip>` otherwise. The plugin runs as a route-level hook, after the access hook has loaded the session. Sign-in and account creation keep their per-address limits. `serverGet` forwards `x-forwarded-for` (Next sets it to the incoming header or the connection address) and `x-request-id`; the API still issues its own request id (`requestIdHeader: false`). New API tests: the default limit of 300 answers 429 with `Retry-After` for one session; two sessions behind the proxy are limited separately, and a request without a session from the same address has its own budget.
+- Ruling 3.5. The end-to-end suite passes at the default global limit, so `RATE_LIMIT_GLOBAL_PER_MINUTE=6000` is removed from `scripts/e2e.sh`. Measured from the API log of one full run: 867 requests, at most 265 in any 60 seconds for one user, 82 for requests without a session. The margin is about 12 percent; a suite that grows by a few signed-in screens per minute will reach it. `RATE_LIMIT_LOGIN_PER_MINUTE=500` stays.
+- F4. `ReviewTask.onCareTeam` (every task response) and `PatientHeader.onCareTeam` (`null` for the patient and roles without clinical.read); `total` on `PatientDirectoryPage` and `ReviewTaskPage`; `GET /patients/:patientId/care-plan/draft` answers 200 `CarePlanDraftResult` (`{ draft: null }` with no draft); `mediaAlt` on every exercise shape, with column `Exercise.mediaAlt` and check `Exercise_media_alt_with_path` (migration `20261122000000_exercise_media_alt`); overview tasks described as caseload only, `assignedSessions` as week to date. `openapi.json` regenerated. No route was added, so the M8 fixtures needed no change. The seed content hash changed with the new column: `d55864495170783e355170c91c52c81f9ff4c8b8daef0f79285509fdef600b27`.
+- Web changes kept to what compiles and behaves: `reads.draft` returns `CarePlanDraft | null`, and the builder and the plan tab read `null` as "no draft" instead of a 404. No screen uses `onCareTeam` or `total` yet (WP 3.4c).
+- F5. `scripts/e2e.sh` fingerprints `docs/` before and after Playwright and fails on any change outside an explicit `SCREENSHOT_DIR`; without one, screenshots go to `.data/e2e-screenshots`. `verify.sh` always sends screenshots to `.data/verify-screenshots` and fails when `docs/` was clean before the run and is not after.
+- One end-to-end flake seen in seven runs of the suite: `clinician-screens.spec.ts`, axe `document-title` on the review queue at 1024 with the task drawer open. The rerun passed. Owned by WP 3.4c (clinician specs).
+- `CLAUDE.md` still says the cluster data is in `.data/pg`; with S1 it is `$CAREPATH_DATA_ROOT/pg`. Not edited here.
+
