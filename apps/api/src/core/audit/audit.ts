@@ -1,6 +1,6 @@
 import type { FastifyRequest } from "fastify";
 import type { RoleKey } from "../authz/permissions.js";
-import type { Db } from "../db/repo.js";
+import type { Db, DbClient } from "../db/repo.js";
 import { insertAuditEvent } from "./repo.js";
 
 /**
@@ -74,32 +74,45 @@ function cleanMetadata(metadata: Record<string, Scalar> | undefined): Record<str
   return out;
 }
 
+/**
+ * Writes audit events. Without a client it uses the root client, which suits events that
+ * describe no change (reads, denials, failed logins). An event that describes a change must
+ * be written with the transaction client of that change: use withTx() from core/db/tx.ts,
+ * so a failed audit insert rolls the change back (checkpoint C1, M4).
+ */
 export class AuditWriter {
   constructor(private readonly db: Db) {}
 
-  async record(record: AuditRecord): Promise<string> {
-    return insertAuditEvent(this.db, { ...record, metadata: cleanMetadata(record.metadata) });
+  async record(record: AuditRecord, client: DbClient = this.db): Promise<string> {
+    return insertAuditEvent(client, { ...record, metadata: cleanMetadata(record.metadata) });
   }
 
   /** Fills actor, request id, IP hash, route template and method from the request. */
-  async fromRequest(request: FastifyRequest, input: RequestAuditInput): Promise<string> {
+  async fromRequest(
+    request: FastifyRequest,
+    input: RequestAuditInput,
+    client: DbClient = this.db,
+  ): Promise<string> {
     const ctx = request.ctx;
     const actorUserId = input.actorUserId !== undefined ? input.actorUserId : (ctx?.userId ?? null);
-    return this.record({
-      ...input,
-      orgId: input.orgId !== undefined ? input.orgId : (ctx?.orgId ?? null),
-      actorUserId,
-      actorRole: input.actorRole !== undefined ? input.actorRole : (ctx?.role ?? null),
-      // A request with no known account (failed login for an unknown email) is "anonymous"
-      // (checkpoint C1, ruling 3.1). "system" is reserved for jobs and automated rules.
-      actorType: actorUserId ? "user" : "anonymous",
-      requestId: request.id,
-      sourceIpHash: request.ipHash,
-      metadata: {
-        route: request.routeOptions.url ?? "unmatched",
-        method: request.method,
-        ...input.metadata,
+    return this.record(
+      {
+        ...input,
+        orgId: input.orgId !== undefined ? input.orgId : (ctx?.orgId ?? null),
+        actorUserId,
+        actorRole: input.actorRole !== undefined ? input.actorRole : (ctx?.role ?? null),
+        // A request with no known account (failed login for an unknown email) is "anonymous"
+        // (checkpoint C1, ruling 3.1). "system" is reserved for jobs and automated rules.
+        actorType: actorUserId ? "user" : "anonymous",
+        requestId: request.id,
+        sourceIpHash: request.ipHash,
+        metadata: {
+          route: request.routeOptions.url ?? "unmatched",
+          method: request.method,
+          ...input.metadata,
+        },
       },
-    });
+      client,
+    );
   }
 }

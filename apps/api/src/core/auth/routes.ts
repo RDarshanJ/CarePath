@@ -4,6 +4,7 @@ import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { isPermission, type RoleKey } from "../authz/permissions.js";
 import { requireCtx } from "../context.js";
+import { withTx } from "../db/tx.js";
 import { AppError, errorResponses } from "../errors.js";
 import { loginBodySchema, sessionInfoSchema, type SessionInfo } from "@carepath/shared/contracts";
 import {
@@ -125,34 +126,36 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       const at = now();
-      // Rotation: a session presented with the login request is ended, never reused.
-      const presented = request.cookies[config.cookie.name];
-      if (presented) await revokeSessionByTokenHash(db, hashToken(presented), at);
-
       const token = newSessionToken();
       const expiresAt = new Date(at.getTime() + config.session.absoluteTimeoutMs);
-      await createSession(db, {
-        orgId: membership.organizationId,
-        userId: user.id,
-        tokenHash: hashToken(token),
-        now: at,
-        expiresAt,
-        userAgent: request.headers["user-agent"] ?? null,
-      });
-      await recordLogin(db, user.id, at);
-
-      const row = await findSessionByTokenHash(db, hashToken(token));
-      const state = row ? evaluateSession(config, row, at) : null;
-      if (!row || !state?.ok) throw new Error("session was not readable after creation");
-      await audit.fromRequest(request, {
-        eventName: "auth.login",
-        action: "E",
-        outcome: "success",
-        orgId: row.organizationId,
-        actorUserId: user.id,
-        actorRole: row.membership.role.key as RoleKey,
-        resourceType: "AuthSession",
-        resourceId: row.id,
+      // Session, last-login time and the audit event commit together (checkpoint C1, M4).
+      const { row, state } = await withTx(request, async ({ tx, audit }) => {
+        // Rotation: a session presented with the login request is ended, never reused.
+        const presented = request.cookies[config.cookie.name];
+        if (presented) await revokeSessionByTokenHash(tx, hashToken(presented), at);
+        await createSession(tx, {
+          orgId: membership.organizationId,
+          userId: user.id,
+          tokenHash: hashToken(token),
+          now: at,
+          expiresAt,
+          userAgent: request.headers["user-agent"] ?? null,
+        });
+        await recordLogin(tx, user.id, at);
+        const row = await findSessionByTokenHash(tx, hashToken(token));
+        const state = row ? evaluateSession(config, row, at) : null;
+        if (!row || !state?.ok) throw new Error("session was not readable after creation");
+        await audit({
+          eventName: "auth.login",
+          action: "E",
+          outcome: "success",
+          orgId: row.organizationId,
+          actorUserId: user.id,
+          actorRole: row.membership.role.key as RoleKey,
+          resourceType: "AuthSession",
+          resourceId: row.id,
+        });
+        return { row, state };
       });
       reply.setCookie(
         config.cookie.name,
@@ -176,13 +179,15 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
     },
     async (request, reply) => {
       const ctx = requireCtx(request.ctx);
-      await revokeSession(db, ctx.sessionId, now());
-      await audit.fromRequest(request, {
-        eventName: "auth.logout",
-        action: "E",
-        outcome: "success",
-        resourceType: "AuthSession",
-        resourceId: ctx.sessionId,
+      await withTx(request, async ({ tx, audit }) => {
+        await revokeSession(tx, ctx.sessionId, now());
+        await audit({
+          eventName: "auth.logout",
+          action: "E",
+          outcome: "success",
+          resourceType: "AuthSession",
+          resourceId: ctx.sessionId,
+        });
       });
       reply.clearCookie(config.cookie.name, { path: "/" });
       return reply.code(204).send();

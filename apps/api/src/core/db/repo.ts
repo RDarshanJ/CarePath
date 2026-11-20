@@ -2,9 +2,21 @@
  * The one place the API creates a Prisma client (ADR-8). Other repo.ts files receive the
  * client as `Db`; nothing outside repo.ts files imports Prisma.
  */
-import { createPrismaClient, type PrismaClient } from "@carepath/db/client";
+import { createPrismaClient, type Prisma, type PrismaClient } from "@carepath/db/client";
 
 export type Db = PrismaClient;
+/** A client inside an interactive transaction: model delegates, no $transaction. */
+export type DbTx = Prisma.TransactionClient;
+/** What repositories take, so the same function runs inside or outside a transaction. */
+export type DbClient = Db | DbTx;
+
+/**
+ * Runs `fn` in one interactive transaction. Anything it throws rolls the whole transaction back.
+ * Route handlers use withTx() (core/db/tx.ts), which adds the audit writer.
+ */
+export function inTransaction<T>(db: Db, fn: (tx: DbTx) => Promise<T>): Promise<T> {
+  return db.$transaction(fn);
+}
 
 export function createDb(databaseUrl: string): Db {
   return createPrismaClient(databaseUrl);

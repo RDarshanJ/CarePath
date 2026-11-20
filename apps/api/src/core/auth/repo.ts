@@ -1,4 +1,4 @@
-import type { Db } from "../db/repo.js";
+import type { Db, DbClient } from "../db/repo.js";
 
 /** Login lookup by normalised email. Returns null for unknown users. */
 export async function findUserForLogin(db: Db, email: string) {
@@ -22,7 +22,7 @@ export async function findUserForLogin(db: Db, email: string) {
 }
 
 export async function createSession(
-  db: Db,
+  db: DbClient,
   input: {
     orgId: string;
     userId: string;
@@ -47,12 +47,12 @@ export async function createSession(
   return row.id;
 }
 
-export async function recordLogin(db: Db, userId: string, now: Date): Promise<void> {
+export async function recordLogin(db: DbClient, userId: string, now: Date): Promise<void> {
   await db.user.update({ where: { id: userId }, data: { lastLoginAt: now } });
 }
 
 /** Everything the request context needs, in one query. */
-export async function findSessionByTokenHash(db: Db, tokenHash: string) {
+export async function findSessionByTokenHash(db: DbClient, tokenHash: string) {
   return db.authSession.findUnique({
     where: { tokenHash },
     select: {
@@ -86,14 +86,14 @@ export async function touchSession(db: Db, sessionId: string, now: Date): Promis
   });
 }
 
-export async function revokeSession(db: Db, sessionId: string, now: Date): Promise<void> {
+export async function revokeSession(db: DbClient, sessionId: string, now: Date): Promise<void> {
   await db.authSession.updateMany({
     where: { id: sessionId, revokedAt: null },
     data: { revokedAt: now },
   });
 }
 
-export async function revokeSessionByTokenHash(db: Db, tokenHash: string, now: Date) {
+export async function revokeSessionByTokenHash(db: DbClient, tokenHash: string, now: Date) {
   await db.authSession.updateMany({
     where: { tokenHash, revokedAt: null },
     data: { revokedAt: now },

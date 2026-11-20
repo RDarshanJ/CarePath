@@ -1,7 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
+import { requireCtx } from "../../src/core/context.js";
+import { withTx } from "../../src/core/db/tx.js";
 import { requirePatientWrite } from "../../src/core/scope/patient-scope.js";
+import { setPatientPhone } from "./repo.js";
 
 /**
  * Routes that exist only in tests. They exercise core plumbing (care-team write scope,
@@ -18,6 +22,35 @@ export function fixtureRoutes(app: FastifyInstance): void {
     },
     async (request) => {
       await requirePatientWrite(request, request.params.patientId, { careTeamOnly: true });
+      return { ok: true };
+    },
+  );
+
+  // A mutation plus its audit event through withTx (M4). `failAudit` makes the audit insert
+  // fail on a foreign key (an unknown patient id), after the change has been written.
+  r.post(
+    "/test/patients/:patientId/phone",
+    {
+      config: { access: { permission: ["patient.update_admin", "patient.update_own"] } },
+      schema: {
+        params: z.object({ patientId: z.uuid() }),
+        body: z.object({ phone: z.string().min(3).max(40), failAudit: z.boolean() }).strict(),
+      },
+    },
+    async (request) => {
+      const { patientId } = request.params;
+      await requirePatientWrite(request, patientId, { careTeamOnly: false });
+      await withTx(request, async ({ tx, ctx, audit }) => {
+        await setPatientPhone(tx, requireCtx(ctx), patientId, request.body.phone);
+        await audit({
+          eventName: "settings.update",
+          action: "U",
+          outcome: "success",
+          resourceType: "Patient",
+          resourceId: patientId,
+          patientId: request.body.failAudit ? randomUUID() : patientId,
+        });
+      });
       return { ok: true };
     },
   );

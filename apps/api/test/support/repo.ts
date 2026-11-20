@@ -6,7 +6,8 @@
 import { randomUUID } from "node:crypto";
 import { createPrismaClient } from "@carepath/db/client";
 import { hashPassword } from "@carepath/shared/password";
-import type { Db } from "../../src/core/db/repo.js";
+import type { RequestCtx } from "../../src/core/context.js";
+import type { Db, DbClient } from "../../src/core/db/repo.js";
 
 export const PASSWORD = "synthetic-demo-password-1";
 
@@ -163,4 +164,26 @@ export async function latestActiveSessionId(db: Db, userId: string): Promise<str
 /** Simulates recent activity without stepping through hours of requests. */
 export async function setLastSeen(db: Db, sessionId: string, at: Date): Promise<void> {
   await db.authSession.update({ where: { id: sessionId }, data: { lastSeenAt: at } });
+}
+
+/** Scoped write used by the M4 fixture route: organization-filtered like every repository. */
+export async function setPatientPhone(
+  db: DbClient,
+  ctx: RequestCtx,
+  patientId: string,
+  phone: string,
+): Promise<void> {
+  const res = await db.patient.updateMany({
+    where: { id: patientId, organizationId: ctx.orgId },
+    data: { phone },
+  });
+  if (res.count !== 1) throw new Error("patient not found in scope");
+}
+
+export async function patientPhone(db: Db, patientId: string): Promise<string | null> {
+  const row = await db.patient.findUniqueOrThrow({
+    where: { id: patientId },
+    select: { phone: true },
+  });
+  return row.phone;
 }
