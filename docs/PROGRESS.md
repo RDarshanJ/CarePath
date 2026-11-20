@@ -21,12 +21,14 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 3.4c (branch `wp/3.4c`): clinician fixes from C2 (F2 intake on the record and in the builder, 1.6.1 to 1.6.7, CR-2 and CR-3 consumed, flaky axe test fixed); gate output below.
 - WP 4.2 (branch `wp/4.2`): messaging API (five routes), delivery job with failed state and retry, unread counts from participant read markers, audited coordinator read via `message.org`, M8 fixtures (gate output below).
 - WP 4.1 (branch `wp/4.1`): scheduling. Migration `phase4_scheduling` (appointment matches its slot), six routes (slots, patient appointments, book, cancel, reschedule, clinician day for CR-1), `TodayView.nextAppointment`, 24-hour in-app reminder job, the 50-parallel booking test (20 of 20), care-team thread created on assignment, M8 fixtures (gate output below).
+- WP 5.4 batch 1 (branch `wp/5.4`): `@carepath/fhir` mappers for Organization, Practitioner, Patient, CarePlan (one per published version), Goal, Observation; collection Bundle export; three validation layers (Medplum `validateResource`, CarePath checks, duplicates); import planning with itemised OperationOutcome; `GET /patients/:patientId/fhir/export` and `POST /fhir/import`; `pnpm synthea:demo` and three committed Synthea patient bundles plus the practitioner bundle; `docs/evaluation/fhir-validation.md`. Official HL7 validation not performed (package hosts blocked). Batch 2 (Condition, Appointment, Encounter, DocumentReference) outstanding (gate output below).
 
 ## Outstanding
 
 - CR-4 follow-ups: `moment-nothing-to-review` is in `public/assets/illustrations` but not yet shown (the queue empty state is `Empty` in `(clinician)/_components/common.tsx`, more than a one-line change; use `MomentImage` from `apps/web/components/illustration.tsx`). The plan builder preview in `(clinician)/_components/plan-view.tsx` does not yet show exercise pictures; use `IllustrationFigure` and `exerciseIllustration`. The patient `/plan`, session overview and session player do.
 - WP 3.3 is committed by its own worker; WP 3.2b is listed above. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
+- WP 5.4 batch 2 (Condition, Appointment, Encounter, DocumentReference): slots into `packages/fhir/src/mappers/index.ts`, `types.ts`, `validate/carepath.ts` and `references.ts`; C3 decides whether it survives. Goal.addresses and Observation.encounter are exported only once batch 2 exists.
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
 - PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
 - Interim pages from WP 3.2a (Today, Progress, Overview, Patients, Review queue, Administration) are honest empty states; WP 3.2b, 3.3 and a later admin phase replace them.
@@ -703,3 +705,33 @@ WP 4.3b gate: PASSED
 - API fix: `apps/api/src/modules/messaging/repo.ts` participant order is `joinedAt` then `id` (typed `Prisma.ConversationParticipantOrderByWithRelationInput[]`, outside the `as const` select, so it type-checks); test "lists participants with equal joinedAt in id order".
 - Deviations: (1) The clinician Messages route is `/inbox`, not `/messages`: WP 4.3a owns `(patient)/(app)/messages` and Next refuses two pages on one path. (2) Edits outside `(clinician)/**`: `apps/web/components/shells.tsx` (two nav items and the unread count on Messages, clinician shell only) and one assertion in `apps/web/e2e/auth.spec.ts` (clinician nav links now include Schedule and Messages). (3) The failed-delivery spec needs the API started with `MESSAGE_FORCE_FAILURE=true`; the gate runs it in a second e2e pass and it skips in `pnpm verify`. With delivery forced to fail, a retry ends failed again; retry-to-sent is covered by the WP 4.2 API tests. (4) The empty-queue picture is checked by answering the queue route with an empty page inside the test (no seeded clinic has an empty queue). (5) The agenda e2e books through the API as the patient (the booking screens are 4.3a's). (6) Screenshots are not byte-identical between runs, so the gate's clean-tree check excludes `docs/screenshots/4.3b`; the committed PNGs are the last run's. (7) No clinician conversation-creation or coordinator messaging UI: coordinators are read-only and sit in the admin shell, outside this package.
 - Screenshots (`docs/screenshots/4.3b/`, 1440 and 1024 unless noted): `schedule-today`, `schedule-empty-day` (1440), `overview-visits`, `record-appointments`, `messages-list`, `messages-thread`, `messages-failed` (1440), `plan-preview-illustrations` (1440), `review-queue-empty` (1440).
+
+### WP 5.4 (FHIR batch 1 and Synthea)
+
+Worktree `/home/claude/wt/5.4`, branch `wp/5.4`. Dependencies (own commit): `@medplum/core`, `@medplum/fhirtypes`, `@medplum/definitions` 5.2.18, exact. Routes: `GET /patients/:patientId/fhir/export` (`fhir.export`, `fhir.export_own`), `POST /fhir/import?onDuplicate=reject|skip` (`fhir.import`). Plain paths, not the FHIR Bulk Data `$export` operation. Measured results: `docs/evaluation/fhir-validation.md`. `pnpm synthea:demo` on 2026-11-20 regenerated byte-identical bundles and imported them (3 patients, 11 practitioners, 5 care plans, 32 observations created; 217 entries of other types skipped and listed; re-import 409). `scripts/gate-wp-5.4.sh` (API 4054, own database; `pnpm verify` inside) exit 0. It was run after the WP 5.1 gate finished: an earlier attempt overlapped that gate's `pnpm verify` and failed with `EADDRINUSE 127.0.0.1:4090` in the booking concurrency test, because both verify runs use port 4090. Tail:
+
+```
+==> evaluation (/tmp/fhir-eval.9ULC8o.json)
+round trip Organization  records=1 pass layers 1-2=1 record equal=1 FHIR stable=1
+round trip Practitioner  records=2 pass layers 1-2=2 record equal=2 FHIR stable=2
+round trip Patient       records=1 pass layers 1-2=1 record equal=1 FHIR stable=1
+round trip Goal          records=2 pass layers 1-2=2 record equal=2 FHIR stable=2
+round trip CarePlan      records=2 pass layers 1-2=2 record equal=2 FHIR stable=2
+round trip Observation   records=5 pass layers 1-2=5 record equal=5 FHIR stable=5
+sample export bundle: entries=13 errors=0
+broken fixtures: 31/31 fail with the expected rule; layer 1 (Medplum) flags 7
+synthea practitioners.json  HTTP-equivalent 201 errors=0 created/skipped Patient 0/0 Practitioner 11/0 CarePlan 0/0 Observation 0/0
+synthea patient-1.json      HTTP-equivalent 201 errors=0 created/skipped Patient 1/0 Practitioner 0/0 CarePlan 1/1 Observation 9/38
+synthea patient-2.json      HTTP-equivalent 201 errors=0 created/skipped Patient 1/0 Practitioner 0/0 CarePlan 1/1 Observation 10/12
+synthea patient-3.json      HTTP-equivalent 201 errors=0 created/skipped Patient 1/0 Practitioner 0/0 CarePlan 3/3 Observation 13/43
+synthea re-import patient-1: 409 with 11 duplicates
+ Test Files  4 passed (4)
+      Tests  28 passed (28)
+GET /patients/{patientId}/fhir/export is in openapi.json, so M8 enumerates it
+openapi: valid OpenAPI 3.1.0, 64 operations, house rules pass
+  25 skipped
+  53 passed (5.1m)
+verify: PASSED
+WP 5.4 gate: PASSED
+```
+
