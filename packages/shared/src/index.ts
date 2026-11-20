@@ -4,3 +4,5 @@
  * subpaths so the web bundle never pulls in node:crypto.
  */
 export * from "./copy.js";
+export * from "./format/index.js";
+export * from "./labels/index.js";
