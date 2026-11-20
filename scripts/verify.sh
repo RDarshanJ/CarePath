@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # `pnpm verify`: the single gate command (ADR-14). Exit code is the truth.
-# Stages marked SKIPPED are not implemented yet; each names the work package that adds it.
+# Stages marked SKIPPED are not implemented yet; each names the work package that adds it (none at present).
 # A skipped stage is printed loudly so a green run is never mistaken for full coverage.
 #
 # Concurrency (checkpoint C1, section 4): the run takes a lease on the shared cluster through
@@ -38,7 +38,7 @@ stage "typecheck" pnpm typecheck
 stage "lint" pnpm lint
 stage "unit + API tests" pnpm test
 stage "build" scripts/with-web-lock.sh pnpm build
-skip "start servers + Playwright + axe (runs under scripts/with-web-lock.sh)" "WP 3.2a"
+stage "end-to-end (API + next start + Playwright + axe)" scripts/with-web-lock.sh scripts/e2e.sh
 
 echo
 if [ "${#SKIPPED[@]}" -gt 0 ]; then
