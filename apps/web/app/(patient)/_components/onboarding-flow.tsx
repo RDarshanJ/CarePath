@@ -28,7 +28,9 @@ import {
   TextInput,
   Textarea,
 } from "@carepath/ui";
+import { IllustrationFigure } from "../../../components/illustration";
 import { api, apiRequest, rememberCsrfToken } from "../../../lib/api/client";
+import { areaIllustration } from "../../../lib/illustrations";
 import { ApiError } from "../../../lib/api/errors";
 import { consentCopy } from "../_lib/consent-copy";
 import { formatLocalDate } from "../_lib/format";
@@ -123,6 +125,7 @@ function validateAccount(
 export function OnboardingFlow(props: OnboardingFlowProps) {
   const [stage, setStage] = useState<Stage>(props.stage);
   const [form, setForm] = useState<OnboardingForm>(props.form);
+  const areaPicture = form.bodyArea ? areaIllustration(form.bodyArea) : null;
   const [patientId, setPatientId] = useState(props.patientId);
   const [email, setEmail] = useState(props.email);
   const [password, setPassword] = useState("");
@@ -682,6 +685,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
                 ))}
               </RadioGroup>
             </FieldGroup>
+            {areaPicture ? (
+              <IllustrationFigure illustration={areaPicture} className="mt-3" />
+            ) : null}
           </div>
           <div data-field="side">
             <FieldGroup legend="Side" requirement="required" {...optErr(errorFor("side"))}>

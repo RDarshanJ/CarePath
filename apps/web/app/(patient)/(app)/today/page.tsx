@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { CarePlanView, TodayView } from "@carepath/shared/contracts";
 import { Heading, Icon, Progress } from "@carepath/ui";
+import { MomentImage } from "../../../../components/illustration";
+import { moments } from "../../../../lib/illustrations";
 import { ButtonLink } from "../../_components/button-link";
 import { TextLink } from "../../_components/text-link";
 import { PlanChangeNote } from "../../_components/plan-change-note";
@@ -124,7 +126,7 @@ export default async function TodayPage() {
               label={`Sessions, week of ${formatLocalDate(week.weekStart, "short")}`}
               value={Math.min(week.completedSessions, weekTarget)}
               max={weekTarget}
-              valueText={`${week.completedSessions} of ${week.assignedSessions} planned`}
+              valueText={`${week.completedSessions} of ${week.assignedSessions} planned so far this week`}
             />
             <p className="text-small text-ink-muted">
               {plural(week.completedActivities, "exercise")} done
@@ -197,6 +199,7 @@ function Hero({
             Review Sharing and consent
           </ButtonLink>
         </div>
+        <MomentImage path={moments.detailsWithClinic} />
       </section>
     );
   }
@@ -261,10 +264,13 @@ function Hero({
     eyebrow = "Today's session";
     title = "Done for today";
     body = (
-      <p className="max-w-measure text-body">
-        Today&apos;s session is finished.{" "}
-        {next ? `Your plan next schedules exercises on ${next}.` : ""}
-      </p>
+      <>
+        <p className="max-w-measure text-body">
+          Today&apos;s session is finished.{" "}
+          {next ? `Your plan next schedules exercises on ${next}.` : ""}
+        </p>
+        <MomentImage path={moments.doneForToday} />
+      </>
     );
     if (checkInDue) {
       action = (

@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { Heading } from "@carepath/ui";
+import { IllustrationFigure } from "../../../../components/illustration";
+import { exerciseIllustration } from "../../../../lib/illustrations";
 import { ButtonLink } from "../../_components/button-link";
 import { StartSession } from "../../_components/start-session";
 import { getCarePlan, getToday, requirePatient } from "../../_lib/data";
@@ -34,29 +36,39 @@ export default async function SessionOverviewPage() {
       </p>
 
       <ol className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface">
-        {items.map((item, index) => (
-          <li key={item.position} className="flex gap-3 p-4">
-            <span
-              aria-hidden="true"
-              className="flex size-8 shrink-0 items-center justify-center rounded-control bg-primary-subtle font-semibold tabular-nums text-primary"
-            >
-              {index + 1}
-            </span>
-            <div className="flex min-w-0 flex-col gap-1">
-              <p className="font-heading text-h4 font-semibold">{item.exercise.name}</p>
-              <p className="text-body">{doseText(item.dose)}</p>
-              <p className="text-small text-ink-muted">
-                {restText(item.dose)}. Set by your care team.
-              </p>
-              {item.clinicianInstructions ? (
-                <p className="text-small text-ink">
-                  <span className="font-medium">From your therapist:</span>{" "}
-                  {item.clinicianInstructions}
+        {items.map((item, index) => {
+          const picture = exerciseIllustration(item.exercise);
+          return (
+            <li key={item.position} className="flex gap-3 p-4">
+              <span
+                aria-hidden="true"
+                className="flex size-8 shrink-0 items-center justify-center rounded-control bg-primary-subtle font-semibold tabular-nums text-primary"
+              >
+                {index + 1}
+              </span>
+              <div className="flex min-w-0 flex-col gap-1">
+                <p className="font-heading text-h4 font-semibold">{item.exercise.name}</p>
+                <p className="text-body">{doseText(item.dose)}</p>
+                <p className="text-small text-ink-muted">
+                  {restText(item.dose)}. Set by your care team.
                 </p>
-              ) : null}
-            </div>
-          </li>
-        ))}
+                {item.clinicianInstructions ? (
+                  <p className="text-small text-ink">
+                    <span className="font-medium">From your therapist:</span>{" "}
+                    {item.clinicianInstructions}
+                  </p>
+                ) : null}
+                {picture ? (
+                  <IllustrationFigure
+                    illustration={picture}
+                    priority={index === 0}
+                    className="mt-2"
+                  />
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
       </ol>
 
       <section aria-labelledby="stop-heading" className="flex flex-col gap-1 text-body">

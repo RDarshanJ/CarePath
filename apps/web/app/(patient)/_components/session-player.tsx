@@ -26,6 +26,8 @@ import {
 } from "@carepath/ui";
 import { api } from "../../../lib/api/client";
 import { ApiError } from "../../../lib/api/errors";
+import { IllustrationFigure } from "../../../components/illustration";
+import { exerciseIllustration } from "../../../lib/illustrations";
 import { clock, doseText, restText, secondsText } from "../_lib/format";
 import { ButtonLink } from "./button-link";
 import { CheckInForm } from "./check-in-form";
@@ -389,6 +391,7 @@ function ExerciseView({
     if (ok) window.sessionStorage.removeItem(storageKey);
   }
 
+  const picture = exerciseIllustration(exercise);
   const total = session.activities.length;
   const upNext = session.activities.find((a) => a.status === "pending" && a.id !== activity.id);
 
@@ -410,6 +413,8 @@ function ExerciseView({
         <ViewHeading>{exercise.name}</ViewHeading>
         <p className="text-small text-ink-muted">{exercise.description}</p>
       </header>
+
+      {picture ? <IllustrationFigure illustration={picture} priority={index === 0} /> : null}
 
       <section
         aria-labelledby="dose-heading"

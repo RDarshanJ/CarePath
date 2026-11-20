@@ -1,4 +1,6 @@
 import { Heading, EmptyState, Prose, Tag } from "@carepath/ui";
+import { IllustrationFigure } from "../../../../components/illustration";
+import { exerciseIllustration } from "../../../../lib/illustrations";
 import { DiffList } from "../../_components/diff-list";
 import { getCarePlan, getToday, getVersionList, requirePatient } from "../../_lib/data";
 import {
@@ -57,27 +59,37 @@ export default async function PlanPage() {
         </Heading>
         <p className="text-small text-ink-muted">{plan.contentNotice}</p>
         <ol className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface">
-          {plan.items.map((item) => (
-            <li key={item.position} className="flex flex-col gap-1.5 p-4">
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="text-h4 font-heading font-semibold">{item.exercise.name}</p>
-                <Tag>{sentenceCase(item.exercise.bodyArea)}</Tag>
-              </div>
-              <p className="text-body">
-                {doseText(item.dose)}. {restText(item.dose)}.
-              </p>
-              <p className="text-small text-ink-muted">
-                {daysText(item.schedule.daysOfWeek)}, {item.schedule.timesPerDay}{" "}
-                {item.schedule.timesPerDay === 1 ? "time" : "times"} a day. Set by your care team.
-              </p>
-              {item.clinicianInstructions ? (
+          {plan.items.map((item, index) => {
+            const picture = exerciseIllustration(item.exercise);
+            return (
+              <li key={item.position} className="flex flex-col gap-1.5 p-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-h4 font-heading font-semibold">{item.exercise.name}</p>
+                  <Tag>{sentenceCase(item.exercise.bodyArea)}</Tag>
+                </div>
                 <p className="text-body">
-                  <span className="font-medium">From your therapist:</span>{" "}
-                  {item.clinicianInstructions}
+                  {doseText(item.dose)}. {restText(item.dose)}.
                 </p>
-              ) : null}
-            </li>
-          ))}
+                <p className="text-small text-ink-muted">
+                  {daysText(item.schedule.daysOfWeek)}, {item.schedule.timesPerDay}{" "}
+                  {item.schedule.timesPerDay === 1 ? "time" : "times"} a day. Set by your care team.
+                </p>
+                {item.clinicianInstructions ? (
+                  <p className="text-body">
+                    <span className="font-medium">From your therapist:</span>{" "}
+                    {item.clinicianInstructions}
+                  </p>
+                ) : null}
+                {picture ? (
+                  <IllustrationFigure
+                    illustration={picture}
+                    priority={index === 0}
+                    className="mt-1"
+                  />
+                ) : null}
+              </li>
+            );
+          })}
         </ol>
       </section>
 

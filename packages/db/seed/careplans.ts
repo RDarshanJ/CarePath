@@ -10,6 +10,7 @@ import {
   type VersionInfo,
 } from "./ctx.js";
 import { EXERCISE_DISCLAIMER, exerciseLibrary, type ExerciseDef } from "./data/exercises.js";
+import { exerciseMedia } from "./data/exercise-media.js";
 import { changeReasons, planInstructions } from "./data/text.js";
 import type { Rng } from "./rng.js";
 
@@ -42,9 +43,8 @@ export function buildExercises(ctx: Ctx): void {
         category: def.category,
         description: `${def.description} ${EXERCISE_DISCLAIMER}`,
         instructions: def.instructions,
-        // Set together by WP 3.4b once illustrations pass review (checkpoint C2, ruling 3.4).
-        mediaPath: null,
-        mediaAlt: null,
+        // Own picture or the body-area picture, set together (checkpoint C2, ruling 3.4).
+        ...exerciseMedia(def.slug, def.bodyArea),
         defaultSets: def.sets,
         defaultReps: def.reps ?? null,
         defaultHoldSeconds: def.holdSeconds ?? null,

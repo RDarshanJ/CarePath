@@ -1,0 +1,580 @@
+{
+  "description": "Generated illustrations, not medically reviewed. Trimmed from the WP 3.5 batch manifest; only accepted files are in the repository.",
+  "licensing": {
+    "status": "not verified",
+    "statement": "Generated through a Magnific Plus account with Google Nano Banana 2.1. The provider's commercial-use and redistribution terms were not read or checked, so no licensing claim is made.",
+    "notVerified": [
+      "commercial use rights",
+      "attribution requirements",
+      "redistribution in a repository",
+      "training-data provenance"
+    ]
+  },
+  "exerciseFallbacks": "Exercises without their own picture show the picture for their body area (area-<body area>.webp).",
+  "credits": {
+    "spentInTotal": 1500,
+    "ceiling": 1500
+  },
+  "assets": [
+    {
+      "file": "area-neck.webp",
+      "file480": "area-neck-480.webp",
+      "set": "body_area",
+      "subject": "neck",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "The head, neck and shoulders of a person, seen from the side",
+      "width": 960,
+      "height": 720,
+      "bytes": 11802,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5494,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her forties with warm tan skin (#D4A476), dark hair in a low bun, medium build, in a plain shirt and trousers. Head, neck and shoulders seen from the side and slightly behind, cropped at the upper chest, looking straight ahead. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 975823,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-shoulder.webp",
+      "file480": "area-shoulder-480.webp",
+      "set": "body_area",
+      "subject": "shoulder",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person's shoulder and upper arm, seen from the front",
+      "width": 960,
+      "height": 720,
+      "bytes": 12358,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5778,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his thirties with deep brown skin (#844F30), short dark hair and a larger body, in a plain t-shirt and trousers. Seen from the front at a slight angle, cropped from the chin to the elbow, one shoulder in the centre of the image, arm relaxed. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 533198,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [
+        "Crop runs from chin to hip rather than chin to elbow; the shoulder is still clearly the centre of interest."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-upper-back.webp",
+      "file480": "area-upper-back-480.webp",
+      "set": "body_area",
+      "subject": "upper-back",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person seen from behind, from the back of the head to the waist",
+      "width": 960,
+      "height": 720,
+      "bytes": 12724,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5250,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. An older woman in her seventies with deep brown skin (#844F30), a white chin-length bob and a fuller body, in a loose long top and trousers. Seen from behind, cropped from the back of the head to the waist, arms relaxed at the sides. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 425010,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-general.webp",
+      "file480": "area-general-480.webp",
+      "set": "body_area",
+      "subject": "general",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person standing, seen from the front, from the head to the knees",
+      "width": 960,
+      "height": 720,
+      "bytes": 10002,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 4534,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his thirties with deep brown skin (#844F30), short dark hair and a larger body, in a plain t-shirt and trousers. Standing, seen from the front, cropped from the top of the head to the knees, arms relaxed. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 726406,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-lower-back.webp",
+      "file480": "area-lower-back-480.webp",
+      "set": "body_area",
+      "subject": "lower-back",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person seen from behind, from the lower ribs to the upper thighs, arms hanging at the sides",
+      "width": 960,
+      "height": 720,
+      "bytes": 22668,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 9984,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his sixties with medium brown skin (#A9714B), short white hair and glasses, medium build, in a plain long-sleeved shirt and trousers. Seen from behind, cropped from the lower ribs to the upper thighs, arms hanging relaxed, shirt tucked at a simple waistband. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. Strict crop: the top edge of the image cuts across the ribs and the bottom edge cuts across the thighs, so no head, no neck, no shoulders and no face are visible at all. Seen from directly behind.",
+      "seed": 222253,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Try 1 (5jDMeOiKxe) rejected rule 11: head and shoulders visible."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-hip.webp",
+      "file480": "area-hip-480.webp",
+      "set": "body_area",
+      "subject": "hip",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person standing, seen from the side, from the waist to above the knee",
+      "width": 960,
+      "height": 720,
+      "bytes": 11630,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5214,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. An older woman in her seventies with deep brown skin (#844F30), a white chin-length bob and a fuller body, in a loose long top and trousers. Standing, seen from the side, cropped from the waist to just above the knee, arms out of frame or relaxed. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. Strict crop: the top edge of the image cuts through the waist and the bottom edge cuts through the thigh just above the knee, so no head, no chest, no lower leg and no shoes are visible at all. Arms are out of frame. Side view of the hip and upper thigh only.",
+      "seed": 700818,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Try 1 (DoOJPHFpcl) rejected rule 11: whole figure.",
+        "A sleeve cuff curls against the hip at the upper right; no hand or skin is drawn there. Accepted, flagged for reviewer."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-core.webp",
+      "file480": "area-core-480.webp",
+      "set": "body_area",
+      "subject": "core",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person's torso from the chest to the hips, seen from the front",
+      "width": 960,
+      "height": 720,
+      "bytes": 16138,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 6876,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her forties with warm tan skin (#D4A476), dark hair in a low bun, medium build, in a plain shirt and trousers. Seen from the front, cropped from the chest to the hips, arms relaxed slightly away from the body. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. Strict crop: the top edge of the image cuts across the chest below the collar and the bottom edge cuts across the hips, so no head, no neck, no legs and no shoes are visible at all.",
+      "seed": 750911,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Try 1 (1ldeB3kr4r) rejected rule 11: whole figure."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-ankle-and-foot.webp",
+      "file480": "area-ankle-and-foot-480.webp",
+      "set": "body_area",
+      "subject": "ankle-and-foot",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "Two lower legs and shoes, seen from the side",
+      "width": 960,
+      "height": 720,
+      "bytes": 8922,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 3972,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her sixties with warm tan skin (#D4A476), short curly white hair, slim, in a plain cardigan and trousers. Two lower legs and shoes seen from the side, cropped from mid-shin down, standing flat. A thin ground line is allowed here. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. Strict crop: the top edge of the image cuts through the shins, so only two lower legs and two shoes are visible, with no knees, no torso, no cardigan, no arms, no head and no face. A thin ground line under the shoes is fine.",
+      "seed": 910532,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Try 1 (xSBX8GnjfW) rejected rules 11/2: torso only, no legs.",
+        "Flat-region QA metric was 2.1% (bar 0.5%): the right shoe top is a darker green than the measured fill green. It is the same hue (beyond the fill green on the paper-to-green ray), so the snap collapses it to the green token (98.6% exact tokens at 960). Accepted on visual review; this is an exception to the 0.5% bar."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-balance.webp",
+      "file480": "area-balance-480.webp",
+      "set": "body_area",
+      "subject": "balance",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person standing with one hand on a walking cane, shown from the waist down",
+      "width": 960,
+      "height": 720,
+      "bytes": 15074,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 6682,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. An older man in his seventies with pale warm beige skin (#F0D2B6), bald with a little white hair at the sides and round glasses, slim, in a buttoned cardigan and trousers. Standing, seen from the front at a slight angle, cropped from the waist down to the shoes, feet a little apart, one hand resting on a simple walking cane. A thin ground line is allowed here. Close crop: only the named part of the body is in the image, drawn large and cut off by the edges of the image. No head or face unless the description names it. No hand touching or resting on the body. Still, relaxed posture. No ground line, no furniture unless named, nothing else in the image. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. Strict crop: the top edge of the image cuts through the waist, so no head, no face, no shoulders and no chest are visible at all; only the waist, trousers, shoes, one hand holding the cane handle, and the cane. A thin ground line under the shoes is fine.",
+      "seed": 324746,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Try 1 (Xm946LgBfo) rejected rule 11: whole figure."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "area-knee.webp",
+      "file480": "area-knee-480.webp",
+      "set": "body_area",
+      "subject": "knee",
+      "usage": [
+        "Onboarding, Where it bothers you",
+        "Fallback beside any exercise without its own picture (session, session overview, care plan)"
+      ],
+      "alt": "A person sitting on a chair, from mid-thigh to the shoe, seen from the side",
+      "width": 960,
+      "height": 720,
+      "bytes": 6542,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 3116,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white or grey, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. One even line weight, rounded joins and line ends, very few inner lines. A woman in her sixties with tan skin tone, short curly grey hair, slim, in a plain cardigan and trousers. Seated on a plain chair seen from the side, cropped from mid-thigh to the shoe, the bent knee in the centre, in long trousers. Only the chair seat edge and one leg of the chair visible. Close crop: the figure is large and cut off by the edges of the image, standing or sitting still in a relaxed neutral posture. No ground line, no furniture unless named, nothing else in the image. Calm, minimal face with a neutral expression. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white or grey fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. Strict crop: the top edge of the image cuts through the middle of the thigh, so no torso, no head, no face, no arms and no hands are visible at all, and no hand rests on the knee. The legs are not crossed: the thigh lies flat along the chair seat and the lower leg drops straight down from the knee, bent at a right angle, with the shoe flat on the floor.",
+      "seed": 125063,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Accepted by advisor ruling R1.1.",
+        "Painted paper colour over a 19x74 px stray stroke at the top edge (x224-243, y0-74 in the 1020x765 crop).",
+        "Try 1 (BhN9lLLoQR) rejected rules 11/2/1."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "ex-knee-to-chest.webp",
+      "file480": "ex-knee-to-chest-480.webp",
+      "set": "exercise",
+      "subject": "knee-to-chest",
+      "usage": [
+        "Session player",
+        "Session overview",
+        "Care plan",
+        "Plan builder preview"
+      ],
+      "alt": "A person lying on a mat with one knee held toward the chest",
+      "width": 960,
+      "height": 720,
+      "bytes": 13518,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5984,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white or grey, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. One even line weight, rounded joins and line ends, very few inner lines. An older man in his seventies with light skin tone, bald with a little grey hair at the sides and round glasses, slim, in a buttoned cardigan and trousers. Lying on the back on a thin exercise mat, seen from the side, one knee bent with the foot on the mat, the other knee held loosely toward the chest with both hands. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Calm, minimal face with a neutral expression. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white or grey fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. The two legs must be clearly separate shapes that do not overlap or merge: the leg with the foot on the mat stays low, and the leg held toward the chest is drawn higher with a clear paper-colored gap between the two legs. The face is very simple: two small dots for eyes behind simple round glasses drawn as two plain circles, one short nose line, one small straight mouth, no ear detail, and no hair or white shape under the chin.",
+      "seed": 909697,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 150,
+      "reviewFlags": [
+        "Accepted by advisor ruling R1.1 after free re-process: neutral grey hair fill recoloured to paper (rule C, 530 px), skin remapped to light token.",
+        "Prompt is the pre-revision wording (said 'grey hair' and 'skin tone'); not regenerated.",
+        "Tries 1 (iG5bho63uK) and 3 (6AbqEdpiJO) rejected."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "ex-pelvic-tilt.webp",
+      "file480": "ex-pelvic-tilt-480.webp",
+      "set": "exercise",
+      "subject": "pelvic-tilt",
+      "usage": [
+        "Session player",
+        "Session overview",
+        "Care plan",
+        "Plan builder preview"
+      ],
+      "alt": "A person lying on a mat with both knees bent and feet flat",
+      "width": 960,
+      "height": 720,
+      "bytes": 9968,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 4192,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A woman in her forties with warm tan skin (#D4A476), dark hair in a low bun, medium build, in a plain shirt and trousers. Lying on the back on a thin exercise mat, seen from the side, both knees bent, feet flat, arms resting by the sides. Head at the left of the image, feet at the right, the face seen in side profile looking up. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 662059,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [
+        "Both legs overlap as one shape in the side view; reads as two bent knees at 480 px."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "ex-standing-trunk-rotation.webp",
+      "file480": "ex-standing-trunk-rotation-480.webp",
+      "set": "exercise",
+      "subject": "standing-trunk-rotation",
+      "usage": [
+        "Session player",
+        "Session overview",
+        "Care plan",
+        "Plan builder preview"
+      ],
+      "alt": "A person standing with arms folded across the chest, upper body turned a little to one side",
+      "width": 960,
+      "height": 720,
+      "bytes": 7356,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 3274,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his thirties with deep brown skin (#844F30), short dark hair and a larger body, in a plain t-shirt and trousers. Standing with feet apart, arms folded across the chest, upper body turned a little to one side. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery.",
+      "seed": 146782,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [
+        "Rotation is mostly in the head and shoulders; torso is near front-facing."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "ex-deep-breathing.webp",
+      "file480": "ex-deep-breathing-480.webp",
+      "set": "exercise",
+      "subject": "deep-breathing",
+      "usage": [
+        "Session player",
+        "Session overview",
+        "Care plan",
+        "Plan builder preview"
+      ],
+      "alt": "A person sitting upright on a chair with hands resting on the thighs",
+      "width": 960,
+      "height": 720,
+      "bytes": 9802,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 4372,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. An older woman in her seventies with deep brown skin (#844F30), a white chin-length bob and a fuller body, in a loose long top and trousers. Sitting upright on a plain chair, seen from the side at a slight angle, hands resting on the thighs, eyes closed, shoulders relaxed. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. No armrests.",
+      "seed": 544133,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [
+        "Eyes read as closed/lowered only loosely at 480 px."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "ex-mini-squat.webp",
+      "file480": "ex-mini-squat-480.webp",
+      "set": "exercise",
+      "subject": "mini-squat",
+      "usage": [
+        "Session player",
+        "Session overview",
+        "Care plan",
+        "Plan builder preview"
+      ],
+      "alt": "A person standing behind a chair with both hands on its back, knees slightly bent",
+      "width": 960,
+      "height": 720,
+      "bytes": 14854,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 6610,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. An older woman in her seventies with deep brown skin (#844F30), a white chin-length bob and a fuller body, in a loose long top and trousers. Standing behind a plain chair with both hands resting on its back, knees bent a little, seen from the side. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. No armrests.",
+      "seed": 11253,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [
+        "The chair seat edge is drawn twice (offset), so it can read as two chairs at a glance; accepted as one chair at an angle. Reviewer may want a retry if credits allow."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "ex-marching-in-place.webp",
+      "file480": "ex-marching-in-place-480.webp",
+      "set": "exercise",
+      "subject": "marching-in-place",
+      "usage": [
+        "Session player",
+        "Session overview",
+        "Care plan",
+        "Plan builder preview"
+      ],
+      "alt": "A person standing beside a chair with one knee lifted",
+      "width": 960,
+      "height": 720,
+      "bytes": 11916,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5272,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his sixties with medium brown skin (#A9714B), short white hair and glasses, medium build, in a plain long-sleeved shirt and trousers. Standing beside a plain chair, one hand near its back, one knee lifted to a comfortable height, the opposite arm forward, seen from the side. The whole figure is visible, small in the frame, with generous empty space around it, on a single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. No armrests.",
+      "seed": 633362,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [],
+      "transparentBackground": false
+    },
+    {
+      "file": "moment-done-for-today.webp",
+      "file480": "moment-done-for-today-480.webp",
+      "set": "moment",
+      "subject": "done-for-today",
+      "usage": [
+        "Today, done for today"
+      ],
+      "alt": "",
+      "width": 960,
+      "height": 720,
+      "bytes": 16928,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 7274,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration, strictly two colors plus paper: solid deep forest green (#1E4D40) line and fill, one warm light neutral fill for skin, on a flat warm paper background (#F5F2EA). A calm quiet moment: a single older man in a cardigan sitting relaxed in an armchair beside a small side table with a mug and a plant, at rest, peaceful, minimal face. Even line weight, rounded joins, generous empty space, simple ground line. Absolutely no gradients, no shadows, no texture, no text, no letters, no numbers, no clock, no checkmark, no arrows, no second figure.",
+      "seed": 446126,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 0,
+      "reviewFlags": [
+        "Reused style frame ksep9Nt16B; painted paper colour over the steam (x608-646, y420-459 in the 1020x765 crop).",
+        "50 credits were spent earlier on the style frame."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "moment-details-with-clinic.webp",
+      "file480": "moment-details-with-clinic-480.webp",
+      "set": "moment",
+      "subject": "details-with-clinic",
+      "usage": [
+        "Today, details are with the clinic"
+      ],
+      "alt": "",
+      "width": 960,
+      "height": 720,
+      "bytes": 12218,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 5308,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. A man in his sixties with medium brown skin (#A9714B), short white hair and glasses, medium build, in a plain long-sleeved shirt and trousers. Sitting at a small table on a plain chair, seen from the side, hands resting beside a closed folder and a mug, looking ahead, at ease. Small in the frame, generous empty space, single thin straight ground line. Very simple face: two small dots for eyes, one short line for the nose, one short line for the mouth, neutral expression, no eyebrows, no wrinkles, no ear detail. Everyday clothes with long trousers and closed shoes. Exactly one person. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. No writing on the folder, no steam, no armrests. The folder lies flat on the table as a plain closed rectangle with no tab standing up. There is no laptop, no screen, no computer and no book. Both hands rest on the table beside the folder, not touching it.",
+      "seed": 580387,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 100,
+      "reviewFlags": [
+        "Try 1 (Lw8ofyYswO) rejected rule 13: upright tabbed folder read as a laptop."
+      ],
+      "transparentBackground": false
+    },
+    {
+      "file": "moment-nothing-to-review.webp",
+      "file480": "moment-nothing-to-review-480.webp",
+      "set": "moment",
+      "subject": "nothing-to-review",
+      "usage": [
+        "Review queue, nothing to review (staff screen)"
+      ],
+      "alt": "",
+      "width": 960,
+      "height": 720,
+      "bytes": 7818,
+      "width480": 480,
+      "height480": 360,
+      "bytes480": 2820,
+      "format": "webp",
+      "tool": "Magnific, Nano Banana 2.1",
+      "model": "imagen-nano-banana-2-1 (Google Nano Banana 2.1)",
+      "prompt": "Flat editorial vector-style illustration. Strictly three flat colors: deep forest green (#1E4D40) for all lines and for the solid fills named below, one flat warm skin tone, and a flat warm paper background (#F5F2EA). Outline-dominant drawing: clothing tops, hair that is white, and all furniture and objects are drawn as green outline only with the paper color inside. Solid green fill only on trousers or skirt, shoes, and dark hair. Where one solid green shape overlaps another, a thin paper-colored gap line separates them. One even line weight, rounded joins and line ends, very few inner lines. No person. A tidy small desk with a closed notebook, a potted plant and a plain chair pushed in. Small in the frame, generous empty space, single thin straight ground line. No people. Absolutely no gradients, no shadows, no shading, no texture, no off-white fills, no 3D, no purple, no text, no letters, no numbers, no arrows, no motion lines, no steam, no highlights or colored marks on the body, no anatomical drawing, no second figure, no wall, no window, no scenery. No second figure.",
+      "seed": 420561,
+      "generatedAt": "2026-11-20",
+      "status": "accepted",
+      "credits": 50,
+      "reviewFlags": [
+        "Exported with alpha (alpha = paper-to-green position, colour green).",
+        "Plant pot is outline only, not solid green; subject is small in the frame (about 20% of the width)."
+      ],
+      "transparentBackground": true
+    }
+  ]
+}
