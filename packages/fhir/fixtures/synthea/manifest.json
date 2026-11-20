@@ -1,0 +1,91 @@
+{
+  "description": "Synthea output committed as import fixtures so tests need no Java. Synthetic data only. Regenerate with `pnpm synthea:demo --write-fixtures`.",
+  "generatedOn": "2026-11-20",
+  "generator": {
+    "name": "Synthea",
+    "release": "master-branch-latest (version not read: the GitHub release API is blocked here)",
+    "jarUrl": "https://github.com/synthetichealth/synthea/releases/download/master-branch-latest/synthea-with-dependencies.jar",
+    "jarSha256": "20098ec70c24c715ea874b19140983634711cc4986196105b5b0a9ca72a4b644",
+    "java": "OpenJDK 21.0.13"
+  },
+  "command": "java -jar synthea-with-dependencies.jar -s 20261120 -cs 20261120 -r 20261101 -p 3 -a 40-70 --exporter.years_of_history=1 --exporter.fhir.use_us_core_ig=true --exporter.fhir.us_core_version=6.1.0 --exporter.fhir.excluded_resources=Claim,ExplanationOfBenefit,DiagnosticReport,DocumentReference,SupplyDelivery,ImagingStudy --exporter.baseDirectory=<scratch>/output/ Arizona",
+  "seed": 20261120,
+  "clinicianSeed": 20261120,
+  "referenceDate": "2026-11-01",
+  "population": 3,
+  "naming": "patient-1..3 are the patient bundles in byte order of their Synthea file names; practitioners.json is practitionerInformation*.json. hospitalInformation*.json (Organization, Location) is not committed: import never creates organizations.",
+  "determinism": "Two runs of the command on 2026-11-20 produced byte-identical bundles.",
+  "files": {
+    "patient-1.json": {
+      "sha256": "eb8f39507631265d7e1d05986f3ceb40b8f6e4b453e04366ee39d291c2f06997",
+      "bytes": 202060,
+      "bundleType": "transaction",
+      "entries": 106,
+      "resourceTypes": {
+        "Patient": 1,
+        "Encounter": 18,
+        "Condition": 16,
+        "Device": 2,
+        "CareTeam": 2,
+        "CarePlan": 2,
+        "MedicationRequest": 9,
+        "Observation": 47,
+        "Procedure": 6,
+        "Immunization": 2,
+        "Provenance": 1
+      }
+    },
+    "patient-2.json": {
+      "sha256": "48638f9d8382dc7517d0950ca1b4f995decf5762b55a798f4cd465f3f00ecd24",
+      "bytes": 179488,
+      "bundleType": "transaction",
+      "entries": 94,
+      "resourceTypes": {
+        "Patient": 1,
+        "Encounter": 16,
+        "Condition": 17,
+        "CareTeam": 2,
+        "CarePlan": 2,
+        "Device": 3,
+        "MedicationRequest": 10,
+        "Observation": 22,
+        "Procedure": 17,
+        "Immunization": 1,
+        "Medication": 1,
+        "MedicationAdministration": 1,
+        "Provenance": 1
+      }
+    },
+    "patient-3.json": {
+      "sha256": "4789c925b224371c501fbec27d9f69f1e52de5529d2de4c54879cb273e21c3b9",
+      "bytes": 265541,
+      "bundleType": "transaction",
+      "entries": 144,
+      "resourceTypes": {
+        "Patient": 1,
+        "Encounter": 20,
+        "Condition": 21,
+        "Device": 3,
+        "MedicationRequest": 5,
+        "CareTeam": 6,
+        "CarePlan": 6,
+        "Observation": 56,
+        "Procedure": 20,
+        "Immunization": 3,
+        "Medication": 1,
+        "MedicationAdministration": 1,
+        "Provenance": 1
+      }
+    },
+    "practitioners.json": {
+      "sha256": "fb1561af48d79e312ad841e363234b8be0736779d9533a75fdd01730c61a933e",
+      "bytes": 36457,
+      "bundleType": "batch",
+      "entries": 22,
+      "resourceTypes": {
+        "Practitioner": 11,
+        "PractitionerRole": 11
+      }
+    }
+  }
+}
