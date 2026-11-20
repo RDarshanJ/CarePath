@@ -42,6 +42,8 @@ holder_pid_file="$LOGS/holder.pid"
   while :; do sleep 1; done
 ) >"$LOGS/holder.log" 2>&1 &
 holder=$!
+# On any exit (including a failed check) stop the holder so its lease does not outlive the test.
+trap 'kill "$holder" 2>/dev/null || true' EXIT
 for _ in $(seq 1 60); do [ -s "$holder_pid_file" ] && break; sleep 0.5; done
 [ -s "$holder_pid_file" ] || fail "holder did not acquire a lease"
 cat "$LOGS/holder.log"
