@@ -32,12 +32,13 @@ export const demoAccounts: readonly DemoAccount[] = [
     role: "care_coordinator",
     label: "Care coordinator",
     email: "coordinator.demo@carepath.test",
-    summary: "Enrollment, assignment and scheduling work. Screens arrive in a later phase.",
+    summary: "Assigns a therapist to each patient who has finished onboarding.",
   },
   {
     role: "clinic_admin",
     label: "Clinic administrator",
     email: "admin.demo@carepath.test",
-    summary: "Settings, metrics and audit. Screens arrive in a later phase.",
+    summary:
+      "Sees the administrative patient list and can assign therapists. Settings, metrics and audit screens arrive in a later phase.",
   },
 ];

@@ -13,8 +13,12 @@ export const accounts = {
     home: "/overview",
     shell: "clinician",
   },
-  care_coordinator: { email: "coordinator.demo@carepath.test", home: "/admin", shell: "admin" },
-  clinic_admin: { email: "admin.demo@carepath.test", home: "/admin", shell: "admin" },
+  care_coordinator: {
+    email: "coordinator.demo@carepath.test",
+    home: "/admin/patients",
+    shell: "admin",
+  },
+  clinic_admin: { email: "admin.demo@carepath.test", home: "/admin/patients", shell: "admin" },
 } as const;
 
 export type RoleName = keyof typeof accounts;

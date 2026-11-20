@@ -8,6 +8,8 @@ export default async function PatientAppLayout({ children }: { children: ReactNo
   const clinic = await getClinic(patientId);
   return (
     <PatientFrame variant="app" organizationName={session.organization.name} clinic={clinic}>
+      {/* Keeps a focused or scrolled-to control clear of the bottom tab bar. */}
+      <style>{"html{scroll-padding-bottom:6rem}"}</style>
       {children}
     </PatientFrame>
   );

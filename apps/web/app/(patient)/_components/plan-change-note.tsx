@@ -47,6 +47,8 @@ export function PlanChangeNote(props: PlanChangeNoteProps) {
     }
   }
 
+  // Version 1 is the first plan: nothing changed, so it is announced as ready and lists no changes.
+  const first = props.versionNumber === 1;
   return (
     <section
       aria-labelledby="plan-change-heading"
@@ -56,7 +58,7 @@ export function PlanChangeNote(props: PlanChangeNoteProps) {
         <Icon name="info" size={22} className="mt-1 shrink-0" />
         <div className="min-w-0 flex-1">
           <Heading level={3} id="plan-change-heading" className="text-info-ink">
-            Your plan changed
+            {first ? "Your plan is ready" : "Your plan changed"}
           </Heading>
           <p className="mt-0.5 text-small">
             Version {props.versionNumber}, published {props.publishedOn} by {props.clinicianName}
@@ -70,7 +72,7 @@ export function PlanChangeNote(props: PlanChangeNoteProps) {
                 <p className="mt-0.5">{props.note}</p>
               </blockquote>
             ) : null}
-            {props.diff ? <DiffList diff={props.diff} /> : null}
+            {props.diff && !first ? <DiffList diff={props.diff} /> : null}
           </div>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
             <Button

@@ -136,3 +136,24 @@ export async function arrow(page: Page, key: "ArrowDown" | "ArrowRight" | "Arrow
   await page.waitForTimeout(60);
   await page.keyboard.up(key);
 }
+
+/** Complete the exercise on screen by tapping Done for each set, skipping rest. */
+export async function finishExercise(page: Page) {
+  const skipRest = page.getByRole("button", { name: "Skip rest" });
+  const done = page.getByRole("button", { name: /^Done with/ });
+  for (let i = 0; i < 14; i++) {
+    // After a tap the screen shows either the rest timer or the next set's button; wait for one of them.
+    try {
+      await skipRest.or(done).first().waitFor({ state: "visible", timeout: 4000 });
+    } catch {
+      return;
+    }
+    if (await skipRest.isVisible()) {
+      await skipRest.click();
+      continue;
+    }
+    const label = await done.innerText();
+    await done.click();
+    if (/finish exercise|this exercise/i.test(label)) return;
+  }
+}

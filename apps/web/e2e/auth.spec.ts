@@ -114,7 +114,9 @@ for (const role of roles) {
       await page.goto(account.home);
     }
     if (account.shell === "admin") {
-      await expect(page.getByText("Available in a later phase")).toBeVisible();
+      const nav = page.getByRole("navigation", { name: "Administration" });
+      await expect(nav.getByRole("link")).toHaveText(["Patients"]);
+      await expect(page.getByRole("heading", { level: 1, name: "Patients" })).toBeVisible();
     }
 
     // Every other shell is refused: the visitor is redirected to their own home.

@@ -7,6 +7,10 @@ import { formatLocalDate } from "../_lib/format";
  * is paired with a table of the same values (AC-C7), rendered by the page next to it.
  */
 
+/**
+ * Drawing width in pixels. The SVG never renders wider than this, so axis text stays at caption size on
+ * wide screens (checkpoint C2, 1.5.3); on a narrow phone it scales down by a few percent at most.
+ */
 const W = 360;
 const PAD = { top: 16, right: 12, bottom: 34, left: 30 };
 
@@ -38,6 +42,7 @@ export function WeeklyBars({ weeks }: { weeks: WeeklyProgress[] }) {
       width="100%"
       role="img"
       aria-label={`Sessions assigned and completed per week. ${summary}.`}
+      style={{ maxWidth: W }}
       className="block h-auto w-full"
     >
       {ticks.map((t) => (
@@ -162,6 +167,7 @@ export function PainLine({ points }: { points: PainPoint[] }) {
       width="100%"
       role="img"
       aria-label={`Patient-reported pain from ${points.length} check-ins, on a scale of 0 to 10. Values are in the table below.`}
+      style={{ maxWidth: W }}
       className="block h-auto w-full"
     >
       {[0, 5, 10].map((t) => (

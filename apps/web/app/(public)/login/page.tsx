@@ -1,3 +1,4 @@
+import NextLink from "next/link";
 import { redirect } from "next/navigation";
 import { Banner, Heading } from "@carepath/ui";
 import { getSession } from "../../../lib/auth/session";
@@ -56,6 +57,16 @@ export default async function LoginPage({
             Sign in
           </Heading>
           <LoginForm next={safeNext(next)} section="form" />
+          <p className="text-body text-ink-muted">
+            New patient with an eligibility code?{" "}
+            <NextLink
+              href="/onboarding"
+              className="rounded-control text-primary underline underline-offset-2 hover:decoration-2 focus-visible:focus-ring"
+            >
+              Start here
+            </NextLink>
+            .
+          </p>
         </section>
         <section
           aria-labelledby="demo-heading"

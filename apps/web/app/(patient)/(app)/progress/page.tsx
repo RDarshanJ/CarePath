@@ -49,7 +49,8 @@ export default async function ProgressPage() {
             This week
           </Heading>
           <p className="font-heading text-h2 font-semibold">
-            {current.completedSessions} of {current.assignedSessions} planned sessions
+            {current.completedSessions} of {current.assignedSessions} planned sessions so far this
+            week
           </p>
           <p className="text-small text-ink-muted">
             Week of {formatLocalDate(current.weekStart, "short")}.{" "}
@@ -162,34 +163,54 @@ export default async function ProgressPage() {
         {progress.sessions.length === 0 ? (
           <p className="text-body text-ink-muted">No sessions in this period.</p>
         ) : (
-          <Table caption="Sessions in the last four weeks">
-            <THead>
-              <Tr>
-                <Th scope="col">Date</Th>
-                <Th scope="col">Result</Th>
-                <Th scope="col" numeric>
-                  Done
-                </Th>
-                <Th scope="col" numeric>
-                  Skipped
-                </Th>
-                <Th scope="col" numeric>
-                  Plan version
-                </Th>
-              </Tr>
-            </THead>
-            <TBody>
+          <>
+            <ul aria-label="Sessions in the last four weeks" className="flex flex-col sm:hidden">
               {progress.sessions.map((s) => (
-                <Tr key={s.id}>
-                  <Td>{formatInstantDate(s.startedAt, progress.timezone)}</Td>
-                  <Td>{statusText[s.status]}</Td>
-                  <Td numeric>{s.completedActivities}</Td>
-                  <Td numeric>{s.skippedActivities}</Td>
-                  <Td numeric>{s.versionNumber}</Td>
-                </Tr>
+                <li key={s.id} className="flex flex-col gap-0.5 border-b border-border py-3">
+                  <p className="flex flex-wrap items-baseline justify-between gap-x-3 text-body">
+                    <span className="font-medium">
+                      {formatInstantDate(s.startedAt, progress.timezone)}
+                    </span>
+                    <span>{statusText[s.status]}</span>
+                  </p>
+                  <p className="text-small text-ink-muted">
+                    {s.completedActivities} done, {s.skippedActivities} skipped. Plan version{" "}
+                    {s.versionNumber}.
+                  </p>
+                </li>
               ))}
-            </TBody>
-          </Table>
+            </ul>
+            <div className="hidden sm:block">
+              <Table caption="Sessions in the last four weeks">
+                <THead>
+                  <Tr>
+                    <Th scope="col">Date</Th>
+                    <Th scope="col">Result</Th>
+                    <Th scope="col" numeric>
+                      Done
+                    </Th>
+                    <Th scope="col" numeric>
+                      Skipped
+                    </Th>
+                    <Th scope="col" numeric>
+                      Plan version
+                    </Th>
+                  </Tr>
+                </THead>
+                <TBody>
+                  {progress.sessions.map((s) => (
+                    <Tr key={s.id}>
+                      <Td>{formatInstantDate(s.startedAt, progress.timezone)}</Td>
+                      <Td>{statusText[s.status]}</Td>
+                      <Td numeric>{s.completedActivities}</Td>
+                      <Td numeric>{s.skippedActivities}</Td>
+                      <Td numeric>{s.versionNumber}</Td>
+                    </Tr>
+                  ))}
+                </TBody>
+              </Table>
+            </div>
+          </>
         )}
       </section>
 

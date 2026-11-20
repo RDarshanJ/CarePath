@@ -5,8 +5,8 @@ export type Shell = "patient" | "clinician" | "admin";
 
 /**
  * Which shell a role works in. Coordinators and administrators have no clinical read permission
- * (checkpoint C1, ruling 3.7), so they use the administrative shell, not the clinician one; their
- * screens arrive in a later phase.
+ * (checkpoint C1, ruling 3.7), so they use the administrative shell, not the clinician one. Their
+ * one working screen is the patient list with therapist assignment (checkpoint C2, F1).
  */
 export const shellForRole: Record<RoleKey, Shell> = {
   patient: "patient",
@@ -18,7 +18,7 @@ export const shellForRole: Record<RoleKey, Shell> = {
 export const homeForShell: Record<Shell, string> = {
   patient: "/today",
   clinician: "/overview",
-  admin: "/admin",
+  admin: "/admin/patients",
 };
 
 export const roleLabel: Record<RoleKey, string> = {

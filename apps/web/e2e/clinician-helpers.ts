@@ -1,5 +1,4 @@
 import { mkdirSync } from "node:fs";
-import { resolve } from "node:path";
 import { request, type APIRequestContext, type Page } from "@playwright/test";
 import { accounts, expect, PASSWORD, signInWithForm, test as base } from "./fixtures";
 
@@ -7,9 +6,8 @@ import { accounts, expect, PASSWORD, signInWithForm, test as base } from "./fixt
 export const test = base;
 export { expect };
 
-/** Playwright runs from apps/web. */
-export const SHOTS =
-  process.env["SCREENSHOT_DIR"] ?? resolve(process.cwd(), "../../docs/screenshots/3.3");
+/** Screenshots are written only when SCREENSHOT_DIR is set (a work package gate); a plain run leaves the tree alone. */
+export const SHOTS = process.env["SCREENSHOT_DIR"];
 
 /** Clinician specs run at the desktop width only; the mobile project has nothing to check here. */
 export function desktopOnly() {
@@ -26,6 +24,7 @@ export async function signInClinician(page: Page) {
 }
 
 export async function screenshot(page: Page, name: string, width: 1440 | 1024) {
+  if (!SHOTS) return;
   mkdirSync(SHOTS, { recursive: true });
   await page.screenshot({ path: `${SHOTS}/${name}-${width}.png`, fullPage: false });
 }
