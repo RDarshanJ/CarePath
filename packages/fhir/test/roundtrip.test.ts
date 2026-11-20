@@ -1,4 +1,4 @@
-import type { Bundle, Resource } from "@medplum/fhirtypes";
+import type { Bundle, DocumentReference, Resource } from "@medplum/fhirtypes";
 import { describe, expect, it } from "vitest";
 import {
   buildPatientBundle,
@@ -12,7 +12,8 @@ import {
   type MappedType,
   type ToFhirContext,
 } from "../src/index.js";
-import { ids, ORG_SLUG, sampleExport } from "./samples.js";
+import { signedNoteDocuments } from "../src/index.js";
+import { ids, ORG_SLUG, sampleExport, sampleNotes } from "./samples.js";
 
 const ctx: ToFhirContext = { orgSlug: ORG_SLUG, organizationId: ids.org };
 const fromCtx = { ...defaultFromContext, orgSlug: ORG_SLUG };
@@ -26,16 +27,17 @@ function roundTrip<T extends MappedType>(
     record,
     ctx,
   );
-  const problems = [...validateStructure(resource, type), ...checkRequired(resource, type)].filter(
-    (i) => i.severity === "error" || i.severity === "fatal",
-  );
+  const problems = [
+    ...validateStructure(resource, type),
+    ...checkRequired(resource, type, { exportRules: true }),
+  ].filter((i) => i.severity === "error" || i.severity === "fatal");
   const back = mappers[type].fromFhir(resource, fromCtx);
   return { resource, problems, back };
 }
 
 const data = sampleExport();
 
-describe("round trip per resource (batch 1)", () => {
+describe("round trip per resource (batches 1 and 2)", () => {
   it("Organization", () => {
     const r = roundTrip("Organization", data.organization);
     expect(r.problems).toEqual([]);
@@ -80,6 +82,40 @@ describe("round trip per resource (batch 1)", () => {
     },
   );
 
+  it.each(data.conditions.map((c) => [c.code, c.verificationStatus, c] as const))(
+    "Condition %s %s",
+    (_, __, c) => {
+      const r = roundTrip("Condition", c);
+      expect(r.problems).toEqual([]);
+      expect(r.back.issues).toEqual([]);
+      expect(r.back.record).toEqual(c);
+    },
+  );
+
+  it.each(data.appointments.map((a) => [a.status, a] as const))("Appointment %s", (_, a) => {
+    const r = roundTrip("Appointment", a);
+    expect(r.problems).toEqual([]);
+    expect(r.back.record).toEqual(a);
+  });
+
+  it.each(data.encounters.map((e) => [e.class, e.status, e] as const))(
+    "Encounter %s %s",
+    (_, __, e) => {
+      const r = roundTrip("Encounter", e);
+      expect(r.problems).toEqual([]);
+      expect(r.back.record).toEqual(e);
+    },
+  );
+
+  it.each(data.documents.map((d) => [d.versionNumber, d.status, d] as const))(
+    "DocumentReference version %s %s",
+    (_, __, d) => {
+      const r = roundTrip("DocumentReference", d);
+      expect(r.problems).toEqual([]);
+      expect(r.back.record).toEqual(d);
+    },
+  );
+
   it("FHIR -> record -> FHIR is stable for CarePath-shaped resources", () => {
     const bundle = buildPatientBundle(data, "2026-11-19T16:00:00.000Z");
     for (const e of bundle.entry ?? []) {
@@ -92,6 +128,61 @@ describe("round trip per resource (batch 1)", () => {
       );
       expect(again).toEqual(e.resource);
     }
+  });
+});
+
+describe("practitioner NPI", () => {
+  it("leaves out a stored NPI that fails the check digit (us-core-17)", () => {
+    const p = { ...data.practitioners[0]!, npi: "9100007919" };
+    const r = mappers.Practitioner.toFhir(p, ctx) as { identifier: { system: string }[] };
+    expect(r.identifier.map((i) => i.system)).toEqual([`urn:carepath:${ORG_SLUG}:staff`]);
+  });
+});
+
+describe("signed notes only", () => {
+  const [signed, draft, error] = sampleNotes();
+
+  it("exports the signed version and each amendment, never working drafts", () => {
+    const docs = signedNoteDocuments(signed!);
+    expect(docs.map((d) => [d.versionId, d.status, d.isAmendment, d.replacesVersionId])).toEqual([
+      [ids.noteSignedV2, "superseded", false, null],
+      [ids.noteSignedV3, "current", true, ids.noteSignedV2],
+    ]);
+    expect(docs[0]!.signedAt).toBe(signed!.signedAt);
+    expect(docs[1]!.signedAt).toBe(signed!.versions[2]!.createdAt);
+    expect(docs[1]!.amendmentReason).toBe("Corrected the number of home sessions.");
+  });
+
+  it("exports nothing for a draft, and marks every version of a note entered in error", () => {
+    expect(signedNoteDocuments(draft!)).toEqual([]);
+    expect(
+      signedNoteDocuments({ ...error!, signedAt: null, signedByPractitionerId: null }),
+    ).toEqual([]);
+    expect(signedNoteDocuments(error!).map((d) => d.status)).toEqual(["entered_in_error"]);
+  });
+
+  it("writes amendments as docStatus amended replacing the earlier version", () => {
+    const bundle = buildPatientBundle(data, "2026-11-19T16:00:00.000Z");
+    const docs = bundle
+      .entry!.map((e) => e.resource!)
+      .filter((r) => r.resourceType === "DocumentReference") as DocumentReference[];
+    expect(docs.map((d) => d.id)).toEqual([ids.noteErrorV1, ids.noteSignedV2, ids.noteSignedV3]);
+    expect(docs.map((d) => [d.status, d.docStatus])).toEqual([
+      ["entered-in-error", "final"],
+      ["superseded", "final"],
+      ["current", "amended"],
+    ]);
+    expect(docs[2]!.relatesTo).toEqual([
+      {
+        code: "replaces",
+        target: { reference: `urn:uuid:${ids.noteSignedV2}`, type: "DocumentReference" },
+      },
+    ]);
+    expect(docs[1]!.type!.coding![0]!.code).toBe("11506-3");
+    expect(docs[0]!.type!.coding![0]!.code).toBe("34117-2");
+    expect(docs.every((d) => d.custodian?.reference === `urn:uuid:${ids.org}`)).toBe(true);
+    expect(JSON.stringify(bundle)).not.toContain(ids.noteDraftV1);
+    expect(JSON.stringify(bundle)).not.toContain(ids.noteSignedV1);
   });
 });
 

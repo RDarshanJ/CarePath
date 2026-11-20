@@ -21,7 +21,7 @@ import {
 /**
  * Observation (US Core mandatory: status, category, code, subject). Pain uses LOINC 72514-3
  * with category survey. A value or a dataAbsentReason, never both (obs-6). Numeric values carry
- * UCUM. Observation.encounter belongs to batch 2 and is not written.
+ * UCUM. Observation.encounter names the visit the observation was captured in (batch 2).
  */
 export function observationToFhir(o: ObservationRecord, ctx: ToFhirContext): Observation {
   const dar = o.dataAbsentReason;
@@ -39,6 +39,7 @@ export function observationToFhir(o: ObservationRecord, ctx: ToFhirContext): Obs
     ],
     code: { coding: [{ system: o.codeSystem, code: o.code, display: o.display }], text: o.display },
     subject: ref("Patient", o.patientId),
+    ...(o.encounterId ? { encounter: ref("Encounter", o.encounterId) } : {}),
     effectiveDateTime: o.effectiveAt,
     issued: o.recordedAt,
     performer: [
@@ -76,6 +77,8 @@ export function observationFromFhir(
   const coding = r.code?.coding?.find((c) => c.code && c.system);
   const subject = ctx.resolve(r.subject, "subject");
   const performer = r.performer?.[0] ? ctx.resolve(r.performer[0], "performer[0]") : null;
+  // An encounter that is not stored (an emergency visit, say) leaves the link empty.
+  const encounter = r.encounter ? ctx.resolve(r.encounter, "encounter") : null;
   const effective = instantUtc(r.effectiveDateTime) ?? instantUtc(r.effectivePeriod?.start);
   const valueString =
     r.valueString ??
@@ -194,6 +197,7 @@ export function observationFromFhir(
       dataAbsentReason: hasQuantity ? null : dar,
       performerType: performer!.type === "Patient" ? "patient" : "practitioner",
       performerPractitionerId: performer!.type === "Practitioner" ? performer!.id : null,
+      encounterId: encounter?.type === "Encounter" ? encounter.id : null,
       effectiveAt: effective!,
       recordedAt: instantUtc(r.issued) ?? effective!,
     },

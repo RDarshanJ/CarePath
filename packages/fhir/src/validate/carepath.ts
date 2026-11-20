@@ -1,12 +1,16 @@
 /**
  * Layer 2: CarePath's defined checks. Bundle rules (bdl-3, bdl-7, bdl-8), required US Core
- * elements for batch 1 (US Core 6.1.0 pinned; the lists were read from 7.0.0 to 9.0.0 pages, so
+ * elements for batches 1 and 2 (US Core 6.1.0 pinned; the lists were read from 7.0.0 to 9.0.0 pages, so
  * differences against 6.1.0 are unverified), required-binding codes, and reference rules:
  * resolution, allowed target types, Reference.type agreement and the organization boundary.
  */
 import type {
+  Appointment,
   Bundle,
   CarePlan,
+  Condition,
+  DocumentReference,
+  Encounter,
   Goal,
   Observation,
   Organization,
@@ -130,8 +134,18 @@ function hasCode(list: readonly string[], v: string | undefined) {
   return v !== undefined && list.includes(v);
 }
 
-/** Required elements and required-binding codes for one resource of a batch 1 type. */
-export function checkRequired(resource: Resource, at: string): FhirIssue[] {
+/**
+ * Required elements and required-binding codes for one resource of a mapped type. With
+ * `exportRules`, also the rules for what CarePath itself may send: an Encounter is a visit that
+ * took place (class AMB or VR; in-progress, finished or entered-in-error) and a DocumentReference
+ * is a signed note (docStatus final or amended; an amendment replaces the version before it).
+ * Import leaves those out, so a Synthea emergency visit is skipped and reported, not refused.
+ */
+export function checkRequired(
+  resource: Resource,
+  at: string,
+  options: { exportRules?: boolean } = {},
+): FhirIssue[] {
   const out: FhirIssue[] = [];
   switch (resource.resourceType) {
     case "Patient": {
@@ -395,6 +409,380 @@ export function checkRequired(resource: Resource, at: string): FhirIssue[] {
       }
       break;
     }
+    case "Condition":
+      out.push(...checkCondition(resource as Condition, at));
+      break;
+    case "Appointment":
+      out.push(...checkAppointment(resource as Appointment, at));
+      break;
+    case "Encounter":
+      out.push(...checkEncounter(resource as Encounter, at, options.exportRules === true));
+      break;
+    case "DocumentReference":
+      out.push(
+        ...checkDocumentReference(resource as DocumentReference, at, options.exportRules === true),
+      );
+      break;
+  }
+  return out;
+}
+
+const codeOf = (
+  cc: { coding?: { system?: string; code?: string }[] } | undefined,
+  system: string,
+) => cc?.coding?.find((c) => c.system === system)?.code;
+
+/** Period start not after end (R4 per-1), for instants and dateTimes. */
+function per1(p: { start?: string; end?: string } | undefined, where: string): FhirIssue[] {
+  if (!p?.start || !p.end) return [];
+  const a = Date.parse(p.start);
+  const b = Date.parse(p.end);
+  return !Number.isNaN(a) && !Number.isNaN(b) && a > b
+    ? [err("per-1", "invariant", "Period start is after its end (per-1).", where)]
+    : [];
+}
+
+function checkCondition(r: Condition, at: string): FhirIssue[] {
+  const out: FhirIssue[] = [];
+  if (!r.category?.some((c) => c.coding?.some((x) => x.code)))
+    out.push(
+      err(
+        "uscore.condition.category",
+        "required",
+        "US Core Condition needs a category.",
+        `${at}.category`,
+      ),
+    );
+  if (!r.code?.coding?.length && !r.code?.text)
+    out.push(
+      err("uscore.condition.code", "required", "US Core Condition needs a code.", `${at}.code`),
+    );
+  if (!r.subject)
+    out.push(
+      err("uscore.condition.subject", "required", "Condition needs a subject.", `${at}.subject`),
+    );
+  const clinical = codeOf(r.clinicalStatus, SYSTEMS.conditionClinical);
+  if (r.clinicalStatus && !hasCode(FHIR_CODES.conditionClinical, clinical))
+    out.push(
+      err(
+        "code.condition.clinicalStatus",
+        "code-invalid",
+        "clinicalStatus has no condition-clinical code.",
+        `${at}.clinicalStatus`,
+      ),
+    );
+  const verification = codeOf(r.verificationStatus, SYSTEMS.conditionVerification);
+  if (r.verificationStatus && !hasCode(FHIR_CODES.conditionVerification, verification))
+    out.push(
+      err(
+        "code.condition.verificationStatus",
+        "code-invalid",
+        "verificationStatus has no condition-ver-status code.",
+        `${at}.verificationStatus`,
+      ),
+    );
+  const abated =
+    r.abatementDateTime ??
+    r.abatementAge ??
+    r.abatementPeriod ??
+    r.abatementRange ??
+    r.abatementString;
+  if (abated && clinical && !["inactive", "resolved", "remission"].includes(clinical))
+    out.push(
+      err(
+        "con-4",
+        "invariant",
+        "A condition with an abatement must be inactive, resolved or in remission (con-4).",
+        `${at}.clinicalStatus`,
+      ),
+    );
+  if (verification === "entered-in-error" && r.clinicalStatus)
+    out.push(
+      err(
+        "con-5",
+        "invariant",
+        "A condition entered in error has no clinicalStatus (con-5).",
+        `${at}.clinicalStatus`,
+      ),
+    );
+  if (
+    !r.clinicalStatus &&
+    verification !== "entered-in-error" &&
+    r.category?.some((c) => c.coding?.some((x) => x.code === "problem-list-item"))
+  )
+    out.push(
+      warn(
+        "con-3",
+        "invariant",
+        "A problem-list item should have a clinicalStatus unless entered in error (con-3).",
+        `${at}.clinicalStatus`,
+      ),
+    );
+  return out;
+}
+
+function checkAppointment(r: Appointment, at: string): FhirIssue[] {
+  const out: FhirIssue[] = [];
+  if (!hasCode(FHIR_CODES.appointmentStatus, r.status))
+    out.push(
+      err(
+        "code.appointment.status",
+        "code-invalid",
+        "Appointment.status is missing or not an AppointmentStatus code.",
+        `${at}.status`,
+      ),
+    );
+  if (!r.participant?.length)
+    out.push(
+      err(
+        "appointment.participant",
+        "required",
+        "Appointment needs a participant.",
+        `${at}.participant`,
+      ),
+    );
+  r.participant?.forEach((p, k) => {
+    if (!hasCode(FHIR_CODES.participationStatus, p.status))
+      out.push(
+        err(
+          "code.appointment.participant.status",
+          "code-invalid",
+          "participant.status is missing or not a ParticipationStatus code.",
+          `${at}.participant[${k}].status`,
+        ),
+      );
+    if (!p.type?.length && !p.actor)
+      out.push(
+        err(
+          "app-1",
+          "invariant",
+          "Each participant needs a type or an actor (app-1).",
+          `${at}.participant[${k}]`,
+        ),
+      );
+  });
+  if (Boolean(r.start) !== Boolean(r.end))
+    out.push(
+      err(
+        "app-2",
+        "invariant",
+        "start and end are both present or both absent (app-2).",
+        `${at}.start`,
+      ),
+    );
+  if ((!r.start || !r.end) && !["proposed", "cancelled", "waitlist"].includes(r.status ?? ""))
+    out.push(
+      err(
+        "app-3",
+        "invariant",
+        "Only proposed, cancelled or waitlisted appointments may omit start and end (app-3).",
+        `${at}.start`,
+      ),
+    );
+  if (r.cancelationReason && !["cancelled", "noshow"].includes(r.status ?? ""))
+    out.push(
+      err(
+        "app-4",
+        "invariant",
+        "cancelationReason is only for cancelled and no-show appointments (app-4).",
+        `${at}.cancelationReason`,
+      ),
+    );
+  if (r.start && r.end && Date.parse(r.start) >= Date.parse(r.end))
+    out.push(
+      err(
+        "carepath.appointment.period",
+        "value",
+        "An appointment ends after it starts.",
+        `${at}.end`,
+      ),
+    );
+  return out;
+}
+
+function checkEncounter(r: Encounter, at: string, exportRules: boolean): FhirIssue[] {
+  const out: FhirIssue[] = [];
+  if (!hasCode(FHIR_CODES.encounterStatus, r.status))
+    out.push(
+      err(
+        "code.encounter.status",
+        "code-invalid",
+        "Encounter.status is missing or not an EncounterStatus code.",
+        `${at}.status`,
+      ),
+    );
+  if (!r.class?.code)
+    out.push(err("uscore.encounter.class", "required", "Encounter needs a class.", `${at}.class`));
+  if (!r.type?.some((t) => t.coding?.length || t.text))
+    out.push(
+      err("uscore.encounter.type", "required", "US Core Encounter needs a type.", `${at}.type`),
+    );
+  if (!r.subject)
+    out.push(
+      err(
+        "uscore.encounter.subject",
+        "required",
+        "US Core Encounter needs a subject.",
+        `${at}.subject`,
+      ),
+    );
+  out.push(...per1(r.period, `${at}.period`));
+  if (exportRules) {
+    if (r.class?.system !== SYSTEMS.v3ActCode || !["AMB", "VR"].includes(r.class.code ?? ""))
+      out.push(
+        err(
+          "carepath.encounter.class",
+          "business-rule",
+          "CarePath encounters are in-person (AMB) or video (VR) visits.",
+          `${at}.class`,
+        ),
+      );
+    if (!["in-progress", "finished", "entered-in-error"].includes(r.status ?? ""))
+      out.push(
+        err(
+          "carepath.encounter.occurred",
+          "business-rule",
+          "An Encounter records a visit that took place; planned or cancelled visits are Appointments.",
+          `${at}.status`,
+        ),
+      );
+    if (!r.period?.start)
+      out.push(
+        err(
+          "carepath.encounter.period",
+          "required",
+          "A visit that took place has a start.",
+          `${at}.period`,
+        ),
+      );
+  }
+  return out;
+}
+
+function checkDocumentReference(
+  r: DocumentReference,
+  at: string,
+  exportRules: boolean,
+): FhirIssue[] {
+  const out: FhirIssue[] = [];
+  if (!hasCode(FHIR_CODES.documentReferenceStatus, r.status))
+    out.push(
+      err(
+        "code.documentreference.status",
+        "code-invalid",
+        "DocumentReference.status is missing or not a DocumentReferenceStatus code.",
+        `${at}.status`,
+      ),
+    );
+  if (r.docStatus !== undefined && !hasCode(FHIR_CODES.compositionStatus, r.docStatus))
+    out.push(
+      err(
+        "code.documentreference.docStatus",
+        "code-invalid",
+        "docStatus is not a CompositionStatus code.",
+        `${at}.docStatus`,
+      ),
+    );
+  if (!r.type?.coding?.length && !r.type?.text)
+    out.push(
+      err(
+        "uscore.documentreference.type",
+        "required",
+        "US Core DocumentReference needs a type.",
+        `${at}.type`,
+      ),
+    );
+  if (!r.category?.some((c) => c.coding?.length))
+    out.push(
+      err(
+        "uscore.documentreference.category",
+        "required",
+        "US Core DocumentReference needs a category.",
+        `${at}.category`,
+      ),
+    );
+  if (!r.subject)
+    out.push(
+      err(
+        "uscore.documentreference.subject",
+        "required",
+        "US Core DocumentReference needs a subject.",
+        `${at}.subject`,
+      ),
+    );
+  if (!r.content?.length)
+    out.push(
+      err(
+        "uscore.documentreference.content",
+        "required",
+        "DocumentReference needs content.",
+        `${at}.content`,
+      ),
+    );
+  r.content?.forEach((c, k) => {
+    const where = `${at}.content[${k}].attachment`;
+    if (!c.attachment?.contentType)
+      out.push(
+        err(
+          "uscore.documentreference.contentType",
+          "required",
+          "US Core requires the attachment's MIME type.",
+          `${where}.contentType`,
+        ),
+      );
+    if (!c.attachment?.url && !c.attachment?.data)
+      out.push(
+        err("us-core-6", "invariant", "The attachment needs url or data (us-core-6).", where),
+      );
+  });
+  r.relatesTo?.forEach((x, k) => {
+    if (!hasCode(FHIR_CODES.documentRelationshipType, x.code))
+      out.push(
+        err(
+          "code.documentreference.relatesTo",
+          "code-invalid",
+          "relatesTo.code is not a DocumentRelationshipType code.",
+          `${at}.relatesTo[${k}].code`,
+        ),
+      );
+  });
+  if (!r.custodian)
+    out.push(
+      err(
+        "carepath.documentreference.custodian",
+        "required",
+        "US Core asks for a responsible organization; CarePath writes no Provenance, so custodian is required.",
+        `${at}.custodian`,
+      ),
+    );
+  if (exportRules) {
+    if (r.docStatus !== "final" && r.docStatus !== "amended")
+      out.push(
+        err(
+          "carepath.note.signed",
+          "business-rule",
+          "Only clinician-signed notes are exported (docStatus final or amended).",
+          `${at}.docStatus`,
+        ),
+      );
+    if (!r.authenticator)
+      out.push(
+        err(
+          "carepath.note.authenticator",
+          "required",
+          "An exported note names the clinician who signed it.",
+          `${at}.authenticator`,
+        ),
+      );
+    if (r.docStatus === "amended" && !r.relatesTo?.some((x) => x.code === "replaces"))
+      out.push(
+        err(
+          "carepath.note.amendment-replaces",
+          "business-rule",
+          "An amendment replaces the version before it (relatesTo replaces).",
+          `${at}.relatesTo`,
+        ),
+      );
   }
   return out;
 }

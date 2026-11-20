@@ -37,6 +37,10 @@ describe("evaluation", () => {
       ["Goal", data.goals],
       ["CarePlan", data.carePlans],
       ["Observation", data.observations],
+      ["Condition", data.conditions],
+      ["Appointment", data.appointments],
+      ["Encounter", data.encounters],
+      ["DocumentReference", data.documents],
     ];
     const rows = samples.map(([type, records]) => {
       let equal = 0;
@@ -44,9 +48,10 @@ describe("evaluation", () => {
       let stable = 0;
       for (const r of records) {
         const fhir = (mappers[type].toFhir as (x: unknown, c: ToFhirContext) => Resource)(r, ctx);
-        const errors = [...validateStructure(fhir, type), ...checkRequired(fhir, type)].filter(
-          isError,
-        );
+        const errors = [
+          ...validateStructure(fhir, type),
+          ...checkRequired(fhir, type, { exportRules: true }),
+        ].filter(isError);
         if (errors.length === 0) clean += 1;
         const back = mappers[type].fromFhir(fhir, {
           ...defaultFromContext,
@@ -134,6 +139,8 @@ describe("evaluation", () => {
         noStorableValueSkipped: rule("map.observation.value.skipped"),
         openPlanSkipped: rule("import.careplan.open-exists"),
         activityNotExercise: rule("map.careplan.activity.not-exercise"),
+        encounterClassSkipped: rule("map.encounter.class.skipped"),
+        conditionVerificationDefaulted: rule("map.condition.verification-defaulted"),
       });
     }
     const again = await planImport(

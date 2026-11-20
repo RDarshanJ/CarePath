@@ -1,7 +1,6 @@
 /**
  * Reference parsing, discovery and the allowed-target table (research HD section 4, "Key
- * reference rules", restricted to the fields CarePath writes or reads for batch 1; batch 2
- * resources add their rows here).
+ * reference rules", restricted to the fields CarePath writes or reads for batches 1 and 2).
  */
 
 export type ParsedReference =
@@ -187,6 +186,54 @@ export const ALLOWED_TARGETS: Record<string, Record<string, readonly string[]>> 
       "MolecularSequence",
     ],
   },
+  Condition: {
+    subject: ["Patient", "Group"],
+    encounter: ["Encounter"],
+    recorder: ["Practitioner", "PractitionerRole", "Patient", "RelatedPerson"],
+    asserter: ["Practitioner", "PractitionerRole", "Patient", "RelatedPerson"],
+    "stage.assessment": ["ClinicalImpression", "DiagnosticReport", "Observation"],
+  },
+  Appointment: {
+    "participant.actor": [
+      "Patient",
+      "Practitioner",
+      "PractitionerRole",
+      "RelatedPerson",
+      "Device",
+      "HealthcareService",
+      "Location",
+    ],
+    slot: ["Slot"],
+    basedOn: ["ServiceRequest"],
+    reasonReference: ["Condition", "Procedure", "Observation", "ImmunizationRecommendation"],
+  },
+  Encounter: {
+    subject: ["Patient", "Group"],
+    "participant.individual": ["Practitioner", "PractitionerRole", "RelatedPerson"],
+    appointment: ["Appointment"],
+    serviceProvider: ["Organization"],
+    reasonReference: ["Condition", "Procedure", "Observation", "ImmunizationRecommendation"],
+    "diagnosis.condition": ["Condition", "Procedure"],
+    partOf: ["Encounter"],
+    episodeOfCare: ["EpisodeOfCare"],
+    basedOn: ["ServiceRequest"],
+    "location.location": ["Location"],
+  },
+  DocumentReference: {
+    subject: ["Patient", "Practitioner", "Group", "Device"],
+    author: [
+      "Practitioner",
+      "PractitionerRole",
+      "Organization",
+      "Device",
+      "Patient",
+      "RelatedPerson",
+    ],
+    authenticator: ["Practitioner", "PractitionerRole", "Organization"],
+    custodian: ["Organization"],
+    "relatesTo.target": ["DocumentReference"],
+    "context.encounter": ["Encounter", "EpisodeOfCare"],
+  },
 };
 
 /** CarePath's own narrower rule: these fields must point at a Patient. */
@@ -194,4 +241,7 @@ export const PATIENT_SUBJECT_FIELDS: Record<string, string> = {
   CarePlan: "subject",
   Goal: "subject",
   Observation: "subject",
+  Condition: "subject",
+  Encounter: "subject",
+  DocumentReference: "subject",
 };

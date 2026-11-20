@@ -45,8 +45,10 @@ export function inBundleDuplicates(index: BundleIndex, types: readonly string[])
     if (!types.includes(type) || !isMappedType(type)) continue;
     const keys = new Set<string>();
     for (const id of e.resource.identifier ?? []) {
-      // Versions of one care plan share the plan identifier; the version identifier is unique.
-      if (type === "CarePlan" && parseIdentifierSystem(id.system)?.kind === "care-plan") continue;
+      // Versions of one care plan (or note) share the plan (note) identifier; the version
+      // identifier is unique.
+      const kind = parseIdentifierSystem(id.system)?.kind;
+      if (kind === "care-plan" || kind === "clinical-note") continue;
       if (id.system && id.value) keys.add(`${type}|id|${id.system}|${id.value}`);
     }
     const mapped = mappers[type as MappedType].fromFhir(e.resource, {
@@ -80,8 +82,9 @@ export function inBundleDuplicates(index: BundleIndex, types: readonly string[])
 /**
  * The three layers over a whole Bundle, for exports and standalone checks (import uses
  * planImport, which adds lookups in the caller's organization):
- *   1. structural: @medplum/core validateResource on each batch 1 resource;
- *   2. carepath: bundle rules, required US Core elements, codes, references (every reference
+ *   1. structural: @medplum/core validateResource on each mapped resource;
+ *   2. carepath: bundle rules, required US Core elements, codes, the export rules (visits that
+ *      took place, signed notes only), references (every reference
  *      must resolve inside the bundle), allowed targets, organization boundary;
  *   3. duplicate: identifiers and natural keys repeated inside the bundle.
  */
@@ -108,7 +111,7 @@ export function validateBundle(bundle: unknown, options: { orgSlug: string }): B
       continue;
     }
     issues.push(...validateStructure(e.resource as Resource, at));
-    issues.push(...checkRequired(e.resource as Resource, at));
+    issues.push(...checkRequired(e.resource as Resource, at, { exportRules: true }));
     issues.push(
       ...checkReferences(index, e.index, { mode: "export", orgSlug: options.orgSlug }).issues,
     );
