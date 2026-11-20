@@ -87,94 +87,59 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Front of knee aches after runs, 3 out of 10 after a 5K",
-      "mustMention": [
-        "3 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["3 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Cut running distance in half",
-      "mustMention": [
-        "in half"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["in half"],
+      "sourceTurns": [4]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Swelling after second run, gone by morning",
-      "mustMention": [
-        "gone by morning"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["gone by morning"],
+      "sourceTurns": [6]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Three sets of eight single-leg squats",
-      "mustMention": [
-        "three sets of eight"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "mustMention": ["three sets of eight"],
+      "sourceTurns": [8]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "Knee does not wake the patient at night",
-      "mustMention": [
-        "wake me up"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["wake me up"],
+      "sourceTurns": [10]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Keep runs under three miles for two weeks",
-      "mustMention": [
-        "under three miles"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["under three miles"],
+      "sourceTurns": [11]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "In-person visit in three weeks for a strength test",
-      "mustMention": [
-        "strength test"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["strength test"],
+      "sourceTurns": [11]
     },
     {
       "id": "f8",
       "section": "subjective",
       "statement": "Goal: run the half marathon in March",
-      "mustMention": [
-        "half marathon"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["half marathon"],
+      "sourceTurns": [13]
     }
   ],
-  "expectedMissing": [
-    "range_of_motion",
-    "strength"
-  ],
+  "expectedMissing": ["range_of_motion", "strength"],
   "injection": null
 }

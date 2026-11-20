@@ -87,84 +87,52 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain about 4 out of 10 at end of day, better in morning",
-      "mustMention": [
-        "4 out of 10"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["4 out of 10"],
+      "sourceTurns": [4]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Icing it twice a day",
-      "mustMention": [
-        "icing it twice a day"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["icing it twice a day"],
+      "sourceTurns": [5]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Heel slides and quad sets about three days a week",
-      "mustMention": [
-        "maybe three"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["maybe three"],
+      "sourceTurns": [7]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Dog walk about half a mile, needs one rest",
-      "mustMention": [
-        "half a mile"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["half a mile"],
+      "sourceTurns": [11]
     },
     {
       "id": "f5",
       "section": "plan",
       "statement": "Keep dog walk to the block for now",
-      "mustMention": [
-        "the block"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["the block"],
+      "sourceTurns": [12]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Written exercise sheet for Ruth",
-      "mustMention": [
-        "exercise sheet"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["exercise sheet"],
+      "sourceTurns": [12]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Video check-in in three weeks",
-      "mustMention": [
-        "three weeks"
-      ],
-      "sourceTurns": [
-        14
-      ]
+      "mustMention": ["three weeks"],
+      "sourceTurns": [14]
     }
   ],
-  "expectedMissing": [
-    "range_of_motion",
-    "strength",
-    "goals"
-  ],
+  "expectedMissing": ["range_of_motion", "strength", "goals"],
   "injection": null
 }

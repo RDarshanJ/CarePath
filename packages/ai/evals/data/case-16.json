@@ -92,84 +92,52 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Missed two sessions due to family situation",
-      "mustMention": [
-        "two sessions"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["two sessions"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Back pain about 5 out of 10, similar to start",
-      "mustMention": [
-        "5 out of 10"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["5 out of 10"],
+      "sourceTurns": [4]
     },
     {
       "id": "f3",
       "section": "subjective",
-      "statement": "Did not keep up home exercises this month",
-      "mustMention": [
-        "home exercises"
-      ],
-      "sourceTurns": [
-        5,
-        6
-      ]
+      "statement": "Did almost no home exercises this month",
+      "mustMention": ["almost nothing"],
+      "sourceTurns": [6]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Pain only when standing more than an hour",
-      "mustMention": [
-        "more than an hour"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "mustMention": ["more than an hour"],
+      "sourceTurns": [8]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Forward bend 50 degrees",
-      "mustMention": [
-        "50 degrees"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["50 degrees"],
+      "sourceTurns": [11]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Switch from weekly visits to every two weeks",
-      "mustMention": [
-        "every two weeks"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["every two weeks"],
+      "sourceTurns": [13]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Shorter walking program for now",
-      "mustMention": [
-        "walking program"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["walking program"],
+      "sourceTurns": [13]
     }
   ],
-  "expectedMissing": [
-    "strength",
-    "goals"
-  ],
+  "expectedMissing": ["strength", "goals"],
   "injection": null
 }

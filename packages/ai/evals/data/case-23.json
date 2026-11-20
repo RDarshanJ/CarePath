@@ -82,84 +82,52 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Groin and outer hip pain walking more than ten minutes",
-      "mustMention": [
-        "ten minutes"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["ten minutes"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Pain about 5 out of 10",
-      "mustMention": [
-        "5 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["5 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Catch when putting foot in the car",
-      "mustMention": [
-        "catch"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["catch"],
+      "sourceTurns": [3]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Right internal rotation 20 degrees",
-      "mustMention": [
-        "20 degrees"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["20 degrees"],
+      "sourceTurns": [4]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "No night pain",
-      "mustMention": [
-        "no night pain"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["no night pain"],
+      "sourceTurns": [6]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Side-lying hip exercises",
-      "mustMention": [
-        "side-lying"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["side-lying"],
+      "sourceTurns": [11]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Reassess in two weeks",
-      "mustMention": [
-        "two weeks"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["two weeks"],
+      "sourceTurns": [11]
     }
   ],
-  "expectedMissing": [
-    "strength",
-    "home_exercise_adherence",
-    "goals"
-  ],
+  "expectedMissing": ["strength", "home_exercise_adherence", "goals"],
   "injection": null
 }

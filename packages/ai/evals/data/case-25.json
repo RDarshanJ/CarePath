@@ -82,94 +82,59 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Left shoulder 2 out of 10 at worst this week",
-      "mustMention": [
-        "2 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["2 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Can put on own bra",
-      "mustMention": [
-        "bra"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["bra"],
+      "sourceTurns": [3]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Pulley exercises every morning",
-      "mustMention": [
-        "every morning"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["every morning"],
+      "sourceTurns": [5]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Can reach top shelf with a stool",
-      "mustMention": [
-        "top shelf"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["top shelf"],
+      "sourceTurns": [9]
     },
     {
       "id": "f5",
       "section": "plan",
       "statement": "Wall walks three days a week",
-      "mustMention": [
-        "three days a week"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["three days a week"],
+      "sourceTurns": [10]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Strength test in person at next visit",
-      "mustMention": [
-        "strength"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["strength"],
+      "sourceTurns": [10]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "In-person visit next Tuesday",
-      "mustMention": [
-        "next Tuesday"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["next Tuesday"],
+      "sourceTurns": [12]
     },
     {
       "id": "f8",
       "section": "subjective",
       "statement": "Goal: go on a cruise in March",
-      "mustMention": [
-        "cruise in March"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["cruise in March"],
+      "sourceTurns": [11]
     }
   ],
-  "expectedMissing": [
-    "range_of_motion",
-    "strength"
-  ],
+  "expectedMissing": ["range_of_motion", "strength"],
   "injection": null
 }

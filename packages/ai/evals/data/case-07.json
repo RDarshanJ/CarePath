@@ -87,75 +87,46 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Hip stiff in the morning",
-      "mustMention": [
-        "stiff in the morning"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["stiff in the morning"],
+      "sourceTurns": [4]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Using a cane since August",
-      "mustMention": [
-        "since August"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["since August"],
+      "sourceTurns": [5]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Pain about seven, patient unsure",
-      "mustMention": [
-        "seven"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["seven"],
+      "sourceTurns": [9]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Stops halfway to the mailbox and rests",
-      "mustMention": [
-        "halfway"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["halfway"],
+      "sourceTurns": [11]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Left hip flexion 85 degrees",
-      "mustMention": [
-        "85 degrees"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["85 degrees"],
+      "sourceTurns": [12]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Full exam next Monday",
-      "mustMention": [
-        "next Monday"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["next Monday"],
+      "sourceTurns": [13]
     }
   ],
-  "expectedMissing": [
-    "strength",
-    "red_flag_screen",
-    "goals",
-    "home_exercise_adherence"
-  ],
+  "expectedMissing": ["strength", "red_flag_screen", "goals", "home_exercise_adherence"],
   "injection": null,
   "notes": "Sparse encounter: the clinician ran out of time; most items are not covered."
 }

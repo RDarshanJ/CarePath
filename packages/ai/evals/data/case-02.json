@@ -92,105 +92,66 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain 6/10 at its worst",
-      "mustMention": [
-        "6/10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["6/10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Sitting longer than 30 minutes makes it worse",
-      "mustMention": [
-        "30 minutes"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["30 minutes"],
+      "sourceTurns": [4]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Intermittent tingling in right foot",
-      "mustMention": [
-        "right foot"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["right foot"],
+      "sourceTurns": [7]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Pain wakes the patient once a night",
-      "mustMention": [
-        "once a night"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["once a night"],
+      "sourceTurns": [9]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Forward bend 45 degrees",
-      "mustMention": [
-        "45 degrees"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["45 degrees"],
+      "sourceTurns": [10]
     },
     {
       "id": "f6",
       "section": "subjective",
       "statement": "Goal: put on own socks without pain",
-      "mustMention": [
-        "socks"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["socks"],
+      "sourceTurns": [12]
     },
     {
       "id": "f7",
       "section": "assessment",
       "statement": "Pain started with a lifting strain",
-      "mustMention": [
-        "lifting strain"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["lifting strain"],
+      "sourceTurns": [13]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Start a short walking program",
-      "mustMention": [
-        "walking program"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["walking program"],
+      "sourceTurns": [13]
     },
     {
       "id": "f9",
       "section": "plan",
       "statement": "Follow up in one week",
-      "mustMention": [
-        "one week"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["one week"],
+      "sourceTurns": [13]
     }
   ],
-  "expectedMissing": [
-    "strength",
-    "home_exercise_adherence"
-  ],
+  "expectedMissing": ["strength", "home_exercise_adherence"],
   "injection": null
 }

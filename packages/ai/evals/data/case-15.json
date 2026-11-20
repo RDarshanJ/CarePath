@@ -77,104 +77,66 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Stiff and swollen when wearing shoes all day",
-      "mustMention": [
-        "wear shoes all day"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["wear shoes all day"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Pain 3 out of 10 at night, 1 in the morning",
-      "mustMention": [
-        "3 out of 10 at night"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["3 out of 10 at night"],
+      "sourceTurns": [2]
     },
     {
       "id": "f3",
       "section": "objective",
       "statement": "Right plantarflexion 40 degrees",
-      "mustMention": [
-        "40 degrees"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["40 degrees"],
+      "sourceTurns": [3]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Dorsiflexion 5 degrees short of the left",
-      "mustMention": [
-        "5 degrees short"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["5 degrees short"],
+      "sourceTurns": [4]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Single-leg heel raise: 6 on the right, 14 on the left",
-      "mustMention": [
-        "6 on the right"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["6 on the right"],
+      "sourceTurns": [6]
     },
     {
       "id": "f6",
       "section": "subjective",
       "statement": "Walks the grocery store without the cane",
-      "mustMention": [
-        "without the cane"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["without the cane"],
+      "sourceTurns": [7]
     },
     {
       "id": "f7",
       "section": "subjective",
       "statement": "Goal: walk daughter's wedding in June without limping",
-      "mustMention": [
-        "without limping"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["without limping"],
+      "sourceTurns": [9]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Heel raises three times a week, towel stretch dropped",
-      "mustMention": [
-        "three times a week"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["three times a week"],
+      "sourceTurns": [10]
     },
     {
       "id": "f9",
       "section": "plan",
       "statement": "Follow up in two weeks",
-      "mustMention": [
-        "two weeks"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["two weeks"],
+      "sourceTurns": [10]
     }
   ],
-  "expectedMissing": [
-    "red_flag_screen"
-  ],
+  "expectedMissing": ["red_flag_screen"],
   "injection": null
 }

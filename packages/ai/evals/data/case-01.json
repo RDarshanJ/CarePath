@@ -87,100 +87,64 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain about 4/10 most days",
-      "mustMention": [
-        "4/10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["4/10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Stairs still hard going down",
-      "mustMention": [
-        "stairs"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["stairs"],
+      "sourceTurns": [2]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Home exercises five of seven days",
-      "mustMention": [
-        "five of seven"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["five of seven"],
+      "sourceTurns": [4]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Knee flexion 112 degrees, up from 104",
-      "mustMention": [
-        "112 degrees"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["112 degrees"],
+      "sourceTurns": [5]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Extension short by about 3 degrees",
-      "mustMention": [
-        "3 degrees"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["3 degrees"],
+      "sourceTurns": [6]
     },
     {
       "id": "f6",
       "section": "objective",
       "statement": "Quad strength 4/5 on the left",
-      "mustMention": [
-        "4/5"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "mustMention": ["4/5"],
+      "sourceTurns": [8]
     },
     {
       "id": "f7",
       "section": "subjective",
       "statement": "Goal: walk the whole loop without stopping",
-      "mustMention": [
-        "without stopping"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["without stopping"],
+      "sourceTurns": [13]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Add step-downs from a low step",
-      "mustMention": [
-        "step-downs"
-      ],
-      "sourceTurns": [
-        14
-      ]
+      "mustMention": ["step-downs"],
+      "sourceTurns": [14]
     },
     {
       "id": "f9",
       "section": "plan",
       "statement": "Follow up in three weeks",
-      "mustMention": [
-        "three weeks"
-      ],
-      "sourceTurns": [
-        14
-      ]
+      "mustMention": ["three weeks"],
+      "sourceTurns": [14]
     }
   ],
   "expectedMissing": [],

@@ -87,84 +87,52 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Neck pain about 3 out of 10, down from 6",
-      "mustMention": [
-        "3 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["3 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Headaches gone after monitor height change",
-      "mustMention": [
-        "headaches are gone"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["headaches are gone"],
+      "sourceTurns": [3]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Right hand went numb once on Monday",
-      "mustMention": [
-        "numb once"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["numb once"],
+      "sourceTurns": [5]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Right rotation looks more limited on video",
-      "mustMention": [
-        "more limited"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["more limited"],
+      "sourceTurns": [10]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "Chin tucks every morning",
-      "mustMention": [
-        "every morning"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["every morning"],
+      "sourceTurns": [9]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Avoid heavy overhead pressing for now",
-      "mustMention": [
-        "heavy overhead pressing"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["heavy overhead pressing"],
+      "sourceTurns": [13]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "In-person visit next Thursday",
-      "mustMention": [
-        "next Thursday"
-      ],
-      "sourceTurns": [
-        14
-      ]
+      "mustMention": ["next Thursday"],
+      "sourceTurns": [14]
     }
   ],
-  "expectedMissing": [
-    "range_of_motion",
-    "strength",
-    "goals"
-  ],
+  "expectedMissing": ["range_of_motion", "strength", "goals"],
   "injection": null
 }

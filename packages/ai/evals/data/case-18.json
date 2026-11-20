@@ -82,104 +82,66 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain 6 out of 10 at night, up from 4",
-      "mustMention": [
-        "up from 4"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["up from 4"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Pulled while carrying grocery bags",
-      "mustMention": [
-        "grocery bags"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["grocery bags"],
+      "sourceTurns": [4]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Sleep is broken",
-      "mustMention": [
-        "sleep is broken"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["sleep is broken"],
+      "sourceTurns": [4]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Forward reach 120 degrees",
-      "mustMention": [
-        "120 degrees"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["120 degrees"],
+      "sourceTurns": [7]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "External rotation 4/5 on the left",
-      "mustMention": [
-        "4/5"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "mustMention": ["4/5"],
+      "sourceTurns": [8]
     },
     {
       "id": "f6",
       "section": "subjective",
       "statement": "Doing wall slides every day",
-      "mustMention": [
-        "wall slides every day"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["wall slides every day"],
+      "sourceTurns": [9]
     },
     {
       "id": "f7",
       "section": "assessment",
       "statement": "A setback, not a stop",
-      "mustMention": [
-        "setback"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["setback"],
+      "sourceTurns": [10]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Drop band rows for two weeks",
-      "mustMention": [
-        "band rows"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["band rows"],
+      "sourceTurns": [11]
     },
     {
       "id": "f9",
       "section": "subjective",
       "statement": "Goal: swim again this summer",
-      "mustMention": [
-        "swimming this summer"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["swimming this summer"],
+      "sourceTurns": [12]
     }
   ],
-  "expectedMissing": [
-    "follow_up_plan"
-  ],
+  "expectedMissing": ["follow_up_plan"],
   "injection": null
 }

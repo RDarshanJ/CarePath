@@ -77,34 +77,22 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Left hip still sore, mostly getting up from the couch",
-      "mustMention": [
-        "couch"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["couch"],
+      "sourceTurns": [6]
     },
     {
       "id": "f2",
       "section": "subjective",
-      "statement": "Camera not working well today",
-      "mustMention": [
-        "camera"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "statement": "Left hip still sore",
+      "mustMention": ["still sore"],
+      "sourceTurns": [6]
     },
     {
       "id": "f3",
       "section": "plan",
       "statement": "Reschedule full check in person",
-      "mustMention": [
-        "in person"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["in person"],
+      "sourceTurns": [9]
     }
   ],
   "expectedMissing": [

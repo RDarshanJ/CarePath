@@ -87,106 +87,66 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Ankle gives way about once a week, stepping off curbs",
-      "mustMention": [
-        "once a week"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["once a week"],
+      "sourceTurns": [4]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Pain 2 out of 10 today",
-      "mustMention": [
-        "2 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["2 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f3",
       "section": "objective",
       "statement": "Inversion 25 degrees on the left",
-      "mustMention": [
-        "25 degrees"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["25 degrees"],
+      "sourceTurns": [5]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Single-leg balance 8 seconds on the left",
-      "mustMention": [
-        "8 seconds"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["8 seconds"],
+      "sourceTurns": [6]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Peroneal strength 4/5 on the left",
-      "mustMention": [
-        "4/5"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["4/5"],
+      "sourceTurns": [7]
     },
     {
       "id": "f6",
       "section": "subjective",
       "statement": "Goal: trail race in October with no brace",
-      "mustMention": [
-        "trail race"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["trail race"],
+      "sourceTurns": [9]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Balance drills twice a week",
-      "mustMention": [
-        "balance drills"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["balance drills"],
+      "sourceTurns": [12]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "No hopping or jumping for two weeks",
-      "mustMention": [
-        "hopping"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["hopping"],
+      "sourceTurns": [12]
     },
     {
       "id": "f9",
       "section": "plan",
       "statement": "Brace on uneven ground for now",
-      "mustMention": [
-        "brace"
-      ],
-      "sourceTurns": [
-        13,
-        14
-      ]
+      "mustMention": ["brace"],
+      "sourceTurns": [13, 14]
     }
   ],
-  "expectedMissing": [
-    "red_flag_screen",
-    "home_exercise_adherence"
-  ],
+  "expectedMissing": ["red_flag_screen", "home_exercise_adherence"],
   "injection": null
 }

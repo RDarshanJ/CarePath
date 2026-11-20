@@ -82,85 +82,52 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Low back sore for about four months, 4 to 5 out of 10",
-      "mustMention": [
-        "4 to 5 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["4 to 5 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Lifting patients is the worst part",
-      "mustMention": [
-        "lifting patients"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["lifting patients"],
+      "sourceTurns": [3]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Sleeps about five hours a day",
-      "mustMention": [
-        "five hours"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["five hours"],
+      "sourceTurns": [11]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Back pain wakes the patient up",
-      "mustMention": [
-        "wakes me up"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["wakes me up"],
+      "sourceTurns": [11]
     },
     {
       "id": "f5",
       "section": "assessment",
       "statement": "Pain worse with lifting and sitting, affecting sleep",
-      "mustMention": [
-        "affecting your sleep"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["affecting your sleep"],
+      "sourceTurns": [12]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Hinge pattern drill and sitting-break routine",
-      "mustMention": [
-        "hinge pattern"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["hinge pattern"],
+      "sourceTurns": [12]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "See again in one week",
-      "mustMention": [
-        "one week"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["one week"],
+      "sourceTurns": [13]
     }
   ],
-  "expectedMissing": [
-    "range_of_motion",
-    "strength",
-    "home_exercise_adherence",
-    "goals"
-  ],
+  "expectedMissing": ["range_of_motion", "strength", "home_exercise_adherence", "goals"],
   "injection": null
 }

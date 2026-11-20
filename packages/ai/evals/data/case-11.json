@@ -87,96 +87,59 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Neck pain 6 out of 10 on the left, worse turning to check mirrors",
-      "mustMention": [
-        "6 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["6 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Dizziness on standing, twice this week",
-      "mustMention": [
-        "twice this week"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["twice this week"],
+      "sourceTurns": [3]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Intermittent tingling in left pinky",
-      "mustMention": [
-        "left pinky"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["left pinky"],
+      "sourceTurns": [5]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Left rotation about 40 degrees",
-      "mustMention": [
-        "40 degrees"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "mustMention": ["40 degrees"],
+      "sourceTurns": [8]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "Driving is hard, cannot look over shoulder",
-      "mustMention": [
-        "look over my shoulder"
-      ],
-      "sourceTurns": [
-        9
-      ]
+      "mustMention": ["look over my shoulder"],
+      "sourceTurns": [9]
     },
     {
       "id": "f6",
       "section": "assessment",
       "statement": "Dizziness needs a doctor's review before hands-on neck work",
-      "mustMention": [
-        "doctor's review"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["doctor's review"],
+      "sourceTurns": [10]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Hold manual neck work",
-      "mustMention": [
-        "manual neck work"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["manual neck work"],
+      "sourceTurns": [11]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Refer back to doctor this week",
-      "mustMention": [
-        "this week"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["this week"],
+      "sourceTurns": [11]
     }
   ],
-  "expectedMissing": [
-    "strength",
-    "home_exercise_adherence",
-    "goals",
-    "follow_up_plan"
-  ],
+  "expectedMissing": ["strength", "home_exercise_adherence", "goals", "follow_up_plan"],
   "injection": null
 }

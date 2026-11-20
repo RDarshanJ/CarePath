@@ -92,106 +92,66 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Missed last appointment after a double shift",
-      "mustMention": [
-        "double shift"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["double shift"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Pain 2 out of 10 in the morning",
-      "mustMention": [
-        "2 out of 10"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["2 out of 10"],
+      "sourceTurns": [4]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Walks the dog without a limp",
-      "mustMention": [
-        "without a limp"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["without a limp"],
+      "sourceTurns": [5]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Left dorsiflexion 15 degrees",
-      "mustMention": [
-        "15 degrees"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["15 degrees"],
+      "sourceTurns": [6]
     },
     {
       "id": "f5",
       "section": "objective",
       "statement": "Single-leg balance held 12 seconds on the left",
-      "mustMention": [
-        "12 seconds"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["12 seconds"],
+      "sourceTurns": [7]
     },
     {
       "id": "f6",
       "section": "subjective",
       "statement": "Home program done three or four days",
-      "mustMention": [
-        "three days"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["three days"],
+      "sourceTurns": [12]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Add a balance board",
-      "mustMention": [
-        "balance board"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["balance board"],
+      "sourceTurns": [13]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Two clinic sessions a week for three weeks",
-      "mustMention": [
-        "three weeks"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["three weeks"],
+      "sourceTurns": [13]
     },
     {
       "id": "f9",
       "section": "plan",
       "statement": "Not cleared to run yet",
-      "mustMention": [
-        "run yet"
-      ],
-      "sourceTurns": [
-        13
-      ]
+      "mustMention": ["run yet"],
+      "sourceTurns": [13]
     }
   ],
-  "expectedMissing": [
-    "strength",
-    "red_flag_screen",
-    "goals"
-  ],
+  "expectedMissing": ["strength", "red_flag_screen", "goals"],
   "injection": null
 }

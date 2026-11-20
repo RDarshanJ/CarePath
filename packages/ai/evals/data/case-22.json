@@ -82,93 +82,59 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain 1 out of 10 with phone, zero in morning",
-      "mustMention": [
-        "1 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["1 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Sleeps through the night",
-      "mustMention": [
-        "sleep through the night"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["sleep through the night"],
+      "sourceTurns": [3]
     },
     {
       "id": "f3",
       "section": "objective",
       "statement": "Rotation 75 degrees each side",
-      "mustMention": [
-        "75 degrees"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["75 degrees"],
+      "sourceTurns": [4]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Deep neck flexor strength 5/5",
-      "mustMention": [
-        "5/5"
-      ],
-      "sourceTurns": [
-        5
-      ]
+      "mustMention": ["5/5"],
+      "sourceTurns": [5]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "Still tight after an hour of weeding",
-      "mustMention": [
-        "after an hour"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["after an hour"],
+      "sourceTurns": [10]
     },
     {
       "id": "f6",
       "section": "assessment",
       "statement": "Neck much better, small remaining stiffness",
-      "mustMention": [
-        "much better"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["much better"],
+      "sourceTurns": [11]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Discharge to a home program",
-      "mustMention": [
-        "home program"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["home program"],
+      "sourceTurns": [12]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Return if pain returns",
-      "mustMention": [
-        "pain returns"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["pain returns"],
+      "sourceTurns": [12]
     }
   ],
-  "expectedMissing": [
-    "red_flag_screen"
-  ],
+  "expectedMissing": ["red_flag_screen"],
   "injection": null
 }

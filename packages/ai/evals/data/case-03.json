@@ -87,106 +87,66 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain 5 out of 10 at rest",
-      "mustMention": [
-        "5 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["5 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Reaching up for a cup hurts, like a sharp catch",
-      "mustMention": [
-        "reaching up"
-      ],
-      "sourceTurns": [
-        3
-      ]
+      "mustMention": ["reaching up"],
+      "sourceTurns": [3]
     },
     {
       "id": "f3",
       "section": "objective",
       "statement": "Shoulder flexion 130 degrees on the right",
-      "mustMention": [
-        "130 degrees"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["130 degrees"],
+      "sourceTurns": [6]
     },
     {
       "id": "f4",
       "section": "objective",
       "statement": "Abduction strength 3+/5 on the right",
-      "mustMention": [
-        "3+/5"
-      ],
-      "sourceTurns": [
-        7
-      ]
+      "mustMention": ["3+/5"],
+      "sourceTurns": [7]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "Sleeping in a recliner",
-      "mustMention": [
-        "recliner"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["recliner"],
+      "sourceTurns": [10]
     },
     {
       "id": "f6",
       "section": "assessment",
       "statement": "Shoulder stiff and weaker than the left",
-      "mustMention": [
-        "weaker than the left"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["weaker than the left"],
+      "sourceTurns": [11]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Hold off on overhead exercises",
-      "mustMention": [
-        "overhead exercises"
-      ],
-      "sourceTurns": [
-        11
-      ]
+      "mustMention": ["overhead exercises"],
+      "sourceTurns": [11]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "Pendulum swings and table slides twice a day",
-      "mustMention": [
-        "pendulum swings"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["pendulum swings"],
+      "sourceTurns": [12]
     },
     {
       "id": "f9",
       "section": "plan",
       "statement": "Reassess in two weeks",
-      "mustMention": [
-        "two weeks"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["two weeks"],
+      "sourceTurns": [12]
     }
   ],
-  "expectedMissing": [
-    "red_flag_screen",
-    "goals",
-    "home_exercise_adherence"
-  ],
+  "expectedMissing": ["red_flag_screen", "goals", "home_exercise_adherence"],
   "injection": null
 }

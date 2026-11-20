@@ -82,95 +82,59 @@
       "id": "f1",
       "section": "subjective",
       "statement": "Pain 7 out of 10 yesterday, 5 this morning",
-      "mustMention": [
-        "7 out of 10"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["7 out of 10"],
+      "sourceTurns": [2]
     },
     {
       "id": "f2",
       "section": "subjective",
       "statement": "Gardening on Saturday triggered a flare",
-      "mustMention": [
-        "gardening"
-      ],
-      "sourceTurns": [
-        2
-      ]
+      "mustMention": ["gardening"],
+      "sourceTurns": [2]
     },
     {
       "id": "f3",
       "section": "subjective",
       "statement": "Deep ache in the groin when walking",
-      "mustMention": [
-        "deep ache"
-      ],
-      "sourceTurns": [
-        4
-      ]
+      "mustMention": ["deep ache"],
+      "sourceTurns": [4]
     },
     {
       "id": "f4",
       "section": "subjective",
       "statement": "Sit-to-stand exercises done only once this week",
-      "mustMention": [
-        "only once"
-      ],
-      "sourceTurns": [
-        6
-      ]
+      "mustMention": ["only once"],
+      "sourceTurns": [6]
     },
     {
       "id": "f5",
       "section": "subjective",
       "statement": "Getting in the car is hard",
-      "mustMention": [
-        "getting in the car"
-      ],
-      "sourceTurns": [
-        8
-      ]
+      "mustMention": ["getting in the car"],
+      "sourceTurns": [8]
     },
     {
       "id": "f6",
       "section": "plan",
       "statement": "Rest from gardening, walk on flat ground only",
-      "mustMention": [
-        "flat ground"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["flat ground"],
+      "sourceTurns": [10]
     },
     {
       "id": "f7",
       "section": "plan",
       "statement": "Lunges dropped for now",
-      "mustMention": [
-        "lunges"
-      ],
-      "sourceTurns": [
-        10
-      ]
+      "mustMention": ["lunges"],
+      "sourceTurns": [10]
     },
     {
       "id": "f8",
       "section": "plan",
       "statement": "In-person visit Wednesday at 10",
-      "mustMention": [
-        "wednesday"
-      ],
-      "sourceTurns": [
-        12
-      ]
+      "mustMention": ["wednesday"],
+      "sourceTurns": [12]
     }
   ],
-  "expectedMissing": [
-    "range_of_motion",
-    "strength",
-    "goals"
-  ],
+  "expectedMissing": ["range_of_motion", "strength", "goals"],
   "injection": null
 }
