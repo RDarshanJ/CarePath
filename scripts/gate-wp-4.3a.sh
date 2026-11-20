@@ -3,11 +3,12 @@
 # database carepath_wp43a_<pid> (checkpoint C2, section 6.3). Lints, type-checks and formats only the paths
 # the package owns, builds the web app, then runs two end-to-end stages with screenshots into
 # docs/screenshots/4.3a:
-#   1. Scenario E at 390 and 1440, the two-browser "That time was just taken" test, the keyboard pass,
-#      message send, and the existing patient and auth specs (their navigation assertions changed);
+#   1. Scenario E at 390 and 1440, the two-browser "That time was just taken" test, the keyboard pass and
+#      message send; then the existing patient and auth specs (their navigation assertions changed);
 #   2. the forced-failure messaging spec, with the API started with MESSAGE_FORCE_FAILURE=true.
 # Then `pnpm verify` (which also runs every spec, without screenshots and without the failure flag) and
-# a clean `git status`. Never stops the shared cluster.
+# a clean `git status` (the screenshot folder is excluded: its pictures change with the run, for example the
+# unread count, and are committed after the gate). Never stops the shared cluster.
 #   GATE_SKIP_VERIFY=1 scripts/gate-wp-4.3a.sh   skip the final `pnpm verify` (development loops only)
 #   GATE_E2E_ARGS="patient-scheduling"            narrow stage 1 (development loops only)
 set -uo pipefail
@@ -30,9 +31,11 @@ run pnpm --filter @carepath/web test
 run scripts/with-web-lock.sh pnpm --filter @carepath/web build
 export SCREENSHOT_DIR="$PWD/docs/screenshots/4.3a"
 mkdir -p "$SCREENSHOT_DIR"
-export E2E_ARGS="${GATE_E2E_ARGS:-patient-scheduling patient.spec auth.spec}"
+export E2E_ARGS="${GATE_E2E_ARGS:-patient-scheduling}"
 run scripts/with-web-lock.sh scripts/e2e.sh
 if [ -z "${GATE_E2E_ARGS:-}" ]; then
+  echo; echo "==> existing patient and auth specs (navigation changed), no screenshots"
+  SCREENSHOT_DIR="" E2E_ARGS="patient.spec auth.spec" run scripts/with-web-lock.sh scripts/e2e.sh
   echo; echo "==> forced delivery failure stage (API started with MESSAGE_FORCE_FAILURE=true)"
   export E2E_ARGS="patient-messaging-failure"
   MESSAGE_FORCE_FAILURE=true run scripts/with-web-lock.sh scripts/e2e.sh
@@ -42,6 +45,6 @@ if [ -z "${GATE_SKIP_VERIFY:-}" ]; then
   run pnpm verify
 fi
 echo; echo "==> git status"
-test -z "$(git status --porcelain)" || { git status --porcelain; echo "FAILED: working tree not clean" >&2; exit 1; }
+test -z "$(git status --porcelain -- . ':(exclude)docs/screenshots/4.3a')" || { git status --porcelain -- . ':(exclude)docs/screenshots/4.3a'; echo "FAILED: working tree not clean" >&2; exit 1; }
 echo "(clean)"
 echo; echo "WP 4.3a gate: PASSED"
