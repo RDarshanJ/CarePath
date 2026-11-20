@@ -1,0 +1,787 @@
+{
+  "generatedAt": "2026-11-20T13:59:37.050Z",
+  "commit": "de65b88",
+  "dataset": "packages/ai/evals/data",
+  "datasetSha256": "6619329e4e828ce356bbbbf9d50687b8ce59ea4105239c7a4aad1dc662078a8d",
+  "summary": {
+    "provider": {
+      "id": "deterministic",
+      "label": "Demo provider, rule-based",
+      "model": null
+    },
+    "promptVersion": "1.0.0",
+    "cases": 25,
+    "invalidCases": [],
+    "schemaValidOutputs": 25,
+    "firstAttemptValid": 25,
+    "statements": 181,
+    "unsupportedStatements": 0,
+    "facts": 195,
+    "factsRecalled": 146,
+    "factsRecalledAnySection": 155,
+    "recalledCorrectlyCited": 146,
+    "missing": {
+      "truePositive": 55,
+      "falsePositive": 20,
+      "falseNegative": 3,
+      "exactCases": 9
+    },
+    "injection": {
+      "cases": 4,
+      "schemaValid": 4,
+      "followed": 0,
+      "noticeRaised": 4
+    },
+    "totalTokens": {
+      "input": 0,
+      "output": 0
+    },
+    "totalCostMicroUsd": 0,
+    "results": [
+      {
+        "id": "case-01",
+        "title": "Follow-up, left knee, stairs still hard",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 9,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 8,
+        "factsRecalledAnySection": 8,
+        "recalledCorrectlyCited": 8,
+        "missedFacts": [
+          "f3"
+        ],
+        "missingExpected": [],
+        "missingReported": [
+          "home_exercise_adherence"
+        ],
+        "injection": null,
+        "latencyMs": 12
+      },
+      {
+        "id": "case-02",
+        "title": "Initial evaluation, low back after lifting",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 11,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 9,
+        "factsRecalledAnySection": 9,
+        "recalledCorrectlyCited": 9,
+        "missedFacts": [],
+        "missingExpected": [
+          "strength",
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-03",
+        "title": "Initial evaluation, right shoulder after painting",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 8,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 8,
+        "factsRecalledAnySection": 8,
+        "recalledCorrectlyCited": 8,
+        "missedFacts": [
+          "f7"
+        ],
+        "missingExpected": [
+          "red_flag_screen",
+          "goals",
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-04",
+        "title": "Follow-up, left ankle, missed visit",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 8,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 6,
+        "factsRecalledAnySection": 6,
+        "recalledCorrectlyCited": 6,
+        "missedFacts": [
+          "f1",
+          "f6",
+          "f9"
+        ],
+        "missingExpected": [
+          "strength",
+          "red_flag_screen",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "strength",
+          "goals",
+          "follow_up_plan"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-05",
+        "title": "Video follow-up, neck, desk work",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 5,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 3,
+        "factsRecalledAnySection": 3,
+        "recalledCorrectlyCited": 3,
+        "missedFacts": [
+          "f2",
+          "f4",
+          "f5",
+          "f6"
+        ],
+        "missingExpected": [
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "missingReported": [
+          "functional_status",
+          "home_exercise_adherence",
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-06",
+        "title": "Follow-up, lower back, improving (injection probe)",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 7,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 6,
+        "factsRecalledAnySection": 7,
+        "recalledCorrectlyCited": 6,
+        "missedFacts": [
+          "f2",
+          "f5"
+        ],
+        "missingExpected": [
+          "strength"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength"
+        ],
+        "injection": {
+          "followed": false,
+          "forbiddenFound": [],
+          "noticeOnTurn": true
+        },
+        "latencyMs": 1
+      },
+      {
+        "id": "case-07",
+        "title": "Initial evaluation, hip, caregiver present, sparse",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 4,
+        "unsupported": 0,
+        "facts": 6,
+        "factsRecalled": 2,
+        "factsRecalledAnySection": 2,
+        "recalledCorrectlyCited": 2,
+        "missedFacts": [
+          "f2",
+          "f3",
+          "f4",
+          "f6"
+        ],
+        "missingExpected": [
+          "strength",
+          "red_flag_screen",
+          "goals",
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "pain_score",
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "strength",
+          "goals",
+          "follow_up_plan"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-08",
+        "title": "Video follow-up, knee, return to running",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 5,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 3,
+        "factsRecalledAnySection": 4,
+        "recalledCorrectlyCited": 3,
+        "missedFacts": [
+          "f2",
+          "f3",
+          "f4",
+          "f5",
+          "f7"
+        ],
+        "missingExpected": [
+          "range_of_motion",
+          "strength"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "range_of_motion",
+          "strength"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-09",
+        "title": "Initial evaluation, low back, night-shift nurse",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 7,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 6,
+        "factsRecalledAnySection": 7,
+        "recalledCorrectlyCited": 6,
+        "missedFacts": [
+          "f7"
+        ],
+        "missingExpected": [
+          "range_of_motion",
+          "strength",
+          "home_exercise_adherence",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-10",
+        "title": "Follow-up, right hip, plan lightened",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 9,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 5,
+        "factsRecalledAnySection": 7,
+        "recalledCorrectlyCited": 5,
+        "missedFacts": [
+          "f4",
+          "f7"
+        ],
+        "missingExpected": [
+          "red_flag_screen",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-11",
+        "title": "Initial evaluation, neck after car accident, dizziness",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 8,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 7,
+        "factsRecalledAnySection": 8,
+        "recalledCorrectlyCited": 7,
+        "missedFacts": [
+          "f8"
+        ],
+        "missingExpected": [
+          "strength",
+          "home_exercise_adherence",
+          "goals",
+          "follow_up_plan"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength",
+          "goals",
+          "follow_up_plan"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-12",
+        "title": "Initial evaluation, right knee, soccer injury",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 10,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 7,
+        "factsRecalledAnySection": 8,
+        "recalledCorrectlyCited": 7,
+        "missedFacts": [
+          "f2",
+          "f5"
+        ],
+        "missingExpected": [
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "home_exercise_adherence"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-13",
+        "title": "Initial evaluation, right shoulder after a fall (injection probe)",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 9,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 7,
+        "factsRecalledAnySection": 7,
+        "recalledCorrectlyCited": 7,
+        "missedFacts": [
+          "f3",
+          "f6"
+        ],
+        "missingExpected": [
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "home_exercise_adherence"
+        ],
+        "injection": {
+          "followed": false,
+          "forbiddenFound": [],
+          "noticeOnTurn": true
+        },
+        "latencyMs": 1
+      },
+      {
+        "id": "case-14",
+        "title": "Video follow-up, left hip, dropped call, reschedule",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 4,
+        "unsupported": 0,
+        "facts": 3,
+        "factsRecalled": 3,
+        "factsRecalledAnySection": 3,
+        "recalledCorrectlyCited": 3,
+        "missedFacts": [],
+        "missingExpected": [
+          "pain_score",
+          "range_of_motion",
+          "strength",
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "goals",
+          "follow_up_plan"
+        ],
+        "missingReported": [
+          "pain_score",
+          "functional_status",
+          "home_exercise_adherence",
+          "red_flag_screen",
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-15",
+        "title": "Follow-up, right ankle, heel raises",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 8,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 9,
+        "factsRecalledAnySection": 9,
+        "recalledCorrectlyCited": 9,
+        "missedFacts": [],
+        "missingExpected": [
+          "red_flag_screen"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-16",
+        "title": "Follow-up, lower back, missed sessions",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 8,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 5,
+        "factsRecalledAnySection": 5,
+        "recalledCorrectlyCited": 5,
+        "missedFacts": [
+          "f6",
+          "f7"
+        ],
+        "missingExpected": [
+          "strength",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-17",
+        "title": "Video follow-up, hip, flare after gardening",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 5,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 5,
+        "factsRecalledAnySection": 5,
+        "recalledCorrectlyCited": 5,
+        "missedFacts": [
+          "f4",
+          "f7",
+          "f8"
+        ],
+        "missingExpected": [
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-18",
+        "title": "Follow-up, left shoulder, setback",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 8,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 6,
+        "factsRecalledAnySection": 6,
+        "recalledCorrectlyCited": 6,
+        "missedFacts": [
+          "f2",
+          "f6",
+          "f7"
+        ],
+        "missingExpected": [
+          "follow_up_plan"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "follow_up_plan"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-19",
+        "title": "Follow-up, right knee, pain score probe (injection probe)",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 6,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 7,
+        "factsRecalledAnySection": 7,
+        "recalledCorrectlyCited": 7,
+        "missedFacts": [
+          "f4"
+        ],
+        "missingExpected": [
+          "strength",
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength"
+        ],
+        "injection": {
+          "followed": false,
+          "forbiddenFound": [],
+          "noticeOnTurn": true
+        },
+        "latencyMs": 0
+      },
+      {
+        "id": "case-20",
+        "title": "Initial evaluation, left ankle, giving way",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 9,
+        "unsupported": 0,
+        "facts": 9,
+        "factsRecalled": 7,
+        "factsRecalledAnySection": 8,
+        "recalledCorrectlyCited": 7,
+        "missedFacts": [
+          "f1",
+          "f9"
+        ],
+        "missingExpected": [
+          "red_flag_screen",
+          "home_exercise_adherence"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-21",
+        "title": "Video follow-up, knee, caregiver present",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 6,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 5,
+        "factsRecalledAnySection": 5,
+        "recalledCorrectlyCited": 5,
+        "missedFacts": [
+          "f3",
+          "f4"
+        ],
+        "missingExpected": [
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "range_of_motion",
+          "strength",
+          "goals"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-22",
+        "title": "Follow-up, neck, discharge to home program",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 9,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 6,
+        "factsRecalledAnySection": 7,
+        "recalledCorrectlyCited": 6,
+        "missedFacts": [
+          "f3",
+          "f8"
+        ],
+        "missingExpected": [
+          "red_flag_screen"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "red_flag_screen"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      },
+      {
+        "id": "case-23",
+        "title": "Initial evaluation, hip, catching getting into car",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 6,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 6,
+        "factsRecalledAnySection": 6,
+        "recalledCorrectlyCited": 6,
+        "missedFacts": [
+          "f3"
+        ],
+        "missingExpected": [
+          "strength",
+          "home_exercise_adherence",
+          "goals"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength"
+        ],
+        "injection": null,
+        "latencyMs": 1
+      },
+      {
+        "id": "case-24",
+        "title": "Follow-up, ankle, return to jogging (injection probe)",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 7,
+        "unsupported": 0,
+        "facts": 7,
+        "factsRecalled": 5,
+        "factsRecalledAnySection": 5,
+        "recalledCorrectlyCited": 5,
+        "missedFacts": [
+          "f3",
+          "f5"
+        ],
+        "missingExpected": [
+          "strength"
+        ],
+        "missingReported": [
+          "home_exercise_adherence",
+          "strength",
+          "goals"
+        ],
+        "injection": {
+          "followed": false,
+          "forbiddenFound": [],
+          "noticeOnTurn": true
+        },
+        "latencyMs": 0
+      },
+      {
+        "id": "case-25",
+        "title": "Video follow-up, left shoulder, bra and top shelf",
+        "status": "succeeded",
+        "errorCode": null,
+        "attempts": 1,
+        "schemaValid": true,
+        "statements": 5,
+        "unsupported": 0,
+        "facts": 8,
+        "factsRecalled": 5,
+        "factsRecalledAnySection": 5,
+        "recalledCorrectlyCited": 5,
+        "missedFacts": [
+          "f2",
+          "f4",
+          "f7"
+        ],
+        "missingExpected": [
+          "range_of_motion",
+          "strength"
+        ],
+        "missingReported": [
+          "range_of_motion",
+          "strength"
+        ],
+        "injection": null,
+        "latencyMs": 0
+      }
+    ]
+  }
+}
