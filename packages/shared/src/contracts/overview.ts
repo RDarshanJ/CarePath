@@ -67,6 +67,20 @@ export const clinicianOverviewSchema = z
         publishedBy: personRefSchema,
       }),
     ),
+    /**
+     * AI generations of care-team patients that succeeded, have no decision yet and were not
+     * regenerated, oldest first (WP 5.2, CR-16). Machine data only.
+     */
+    aiDraftsAwaitingReview: workList(
+      z.object({
+        generationId: z.uuid(),
+        patient: overviewPatientSchema,
+        kind: z.enum(["progress_summary", "note_draft"]),
+        reviewState: z.enum(["unreviewed", "in_review"]),
+        createdAt: instantSchema,
+        unsupportedStatementCount: z.number().int().nullable(),
+      }),
+    ),
   })
   .meta({ id: "ClinicianOverview" });
 export type ClinicianOverview = z.infer<typeof clinicianOverviewSchema>;
