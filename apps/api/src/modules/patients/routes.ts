@@ -1,18 +1,11 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { patientHeaderSchema, patientIdParamsSchema } from "@carepath/shared/contracts";
-import { requirePatientRead } from "../../core/scope/patient-scope.js";
+import { recordPhiRead, requirePatientRead } from "../../core/scope/patient-scope.js";
 import { AppError, errorResponses } from "../../core/errors.js";
 import { findPatientHeader } from "./repo.js";
 
-const purposeByRole = {
-  patient: "patient_access",
-  physical_therapist: "treatment",
-  care_coordinator: "operations",
-  clinic_admin: "operations",
-} as const;
-
 export const patientRoutes: FastifyPluginAsyncZod = async (app) => {
-  const { db, audit } = app.deps;
+  const { db } = app.deps;
 
   app.get(
     "/patients/:patientId",
@@ -32,15 +25,7 @@ export const patientRoutes: FastifyPluginAsyncZod = async (app) => {
       const row = await findPatientHeader(db, ctx, patientId);
       if (!row) throw new AppError("not_found");
       // PRD section 13 and advisor plan revision 1: every record open is audited.
-      await audit.fromRequest(request, {
-        eventName: "phi.read",
-        action: "R",
-        outcome: "success",
-        resourceType: "Patient",
-        resourceId: row.id,
-        patientId: row.id,
-        purposeOfUse: purposeByRole[ctx.role],
-      });
+      await recordPhiRead(request, row.id, "Patient", row.id, { includePatient: true });
       return { ...row, birthDate: row.birthDate.toISOString().slice(0, 10) };
     },
   );

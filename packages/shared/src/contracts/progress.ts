@@ -16,8 +16,7 @@ import { instantSchema, localDateSchema } from "./common.js";
  */
 export const progressQuerySchema = z
   .object({ weeks: z.coerce.number().int().min(1).max(12).default(4) })
-  .strict()
-  .meta({ id: "ProgressQuery" });
+  .strict();
 export type ProgressQuery = z.input<typeof progressQuerySchema>;
 
 export const weeklyProgressSchema = z

@@ -17,7 +17,13 @@ import { healthRoutes } from "./core/health/routes.js";
 import { registerHttp } from "./core/http.js";
 import { loggerOptions, registerRequestLogging } from "./core/logging.js";
 import { registerOpenApi, registerOpenApiRoute } from "./core/openapi.js";
+import { carePlanRoutes } from "./modules/care-plans/routes.js";
+import { checkInRoutes } from "./modules/check-ins/routes.js";
+import { clinicRoutes } from "./modules/clinic/routes.js";
 import { patientRoutes } from "./modules/patients/routes.js";
+import { progressRoutes } from "./modules/progress/routes.js";
+import { sessionRoutes } from "./modules/sessions/routes.js";
+import { todayRoutes } from "./modules/today/routes.js";
 
 export interface BuildAppOptions {
   config?: Partial<AppConfig>;
@@ -75,6 +81,13 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(authRoutes);
   await app.register(roleRoutes);
   await app.register(patientRoutes);
+  // WP 3.1, delivery step 1: patient reads.
+  await app.register(todayRoutes);
+  await app.register(carePlanRoutes);
+  await app.register(sessionRoutes);
+  await app.register(checkInRoutes);
+  await app.register(progressRoutes);
+  await app.register(clinicRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();

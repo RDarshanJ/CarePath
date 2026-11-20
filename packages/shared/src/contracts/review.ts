@@ -170,8 +170,7 @@ export const reviewTaskQuerySchema = z
     ruleKey: reviewRuleKeySchema.optional(),
     cursor: z.string().max(200).optional(),
     limit: z.coerce.number().int().min(1).max(100).default(25),
-  })
-  .meta({ id: "ReviewTaskQuery" });
+  });
 export type ReviewTaskQuery = z.input<typeof reviewTaskQuerySchema>;
 
 export const reviewTaskPageSchema = pageOf(reviewTaskSchema)

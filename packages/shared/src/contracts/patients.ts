@@ -51,8 +51,7 @@ export const patientDirectoryQuerySchema = z
       .default("name"),
     cursor: z.string().max(200).optional(),
     limit: z.coerce.number().int().min(1).max(100).default(25),
-  })
-  .meta({ id: "PatientDirectoryQuery" });
+  });
 export type PatientDirectoryQuery = z.input<typeof patientDirectoryQuerySchema>;
 
 const directoryBase = {
