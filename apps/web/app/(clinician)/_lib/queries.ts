@@ -8,6 +8,7 @@ import {
   clinicianOverviewSchema,
   exerciseLibraryPageSchema,
   exerciseSessionPageSchema,
+  intakeStateSchema,
   patientCarePlanSchema,
   patientDirectoryPageSchema,
   patientHeaderSchema,
@@ -34,6 +35,7 @@ export const keys = {
   practitioners: ["clinician", "practitioners"] as const,
   header: (id: string) => ["clinician", "patient", id, "header"] as const,
   careTeam: (id: string) => ["clinician", "patient", id, "care-team"] as const,
+  intake: (id: string) => ["clinician", "patient", id, "intake"] as const,
   plan: (id: string) => ["clinician", "patient", id, "plan"] as const,
   versions: (id: string) => ["clinician", "patient", id, "versions"] as const,
   version: (id: string, versionId: string) =>
@@ -69,6 +71,7 @@ export const reads = {
   practitioners: () => api.get("/practitioners", practitionerListSchema),
   header: (id: string) => api.get(pid(id), patientHeaderSchema),
   careTeam: (id: string) => api.get(`${pid(id)}/care-team`, careTeamCardSchema),
+  intake: (id: string) => api.get(`${pid(id)}/intake`, intakeStateSchema),
   plan: (id: string) => api.get(`${pid(id)}/care-plan`, patientCarePlanSchema),
   versions: (id: string) => api.get(`${pid(id)}/care-plan/versions`, carePlanVersionListSchema),
   version: (id: string, versionId: string) =>

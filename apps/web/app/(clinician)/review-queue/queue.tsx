@@ -17,18 +17,26 @@ import {
   Field,
   Select,
   StatusChip,
+  Table,
+  TBody,
+  Td,
+  Th,
+  THead,
   Tag,
   Textarea,
+  Tr,
   useToast,
 } from "@carepath/ui";
 import {
   AppLink,
   Empty,
   ListSkeleton,
+  NOT_ON_CARE_TEAM_REASON,
   PageHeader,
   QueryError,
   Section,
   errorText,
+  taskStatusText,
 } from "../_components/common";
 import { useClinician } from "../_lib/context";
 import {
@@ -64,20 +72,27 @@ const ruleOptions = [
   })),
 ];
 
+/** "5 h" or "3 d" for a table cell; the full words are in the cell's title. */
+function compactAge(hours: number): string {
+  if (hours < 1) return "<1 h";
+  return hours < 48 ? `${hours} h` : `${Math.floor(hours / 24)} d`;
+}
+
+/** Status is shown only when the task is not open; an open task is the default and needs no label. */
 function TaskStatus({ task }: { task: ReviewTask }) {
   switch (task.status) {
     case "open":
-      return <StatusChip tone="warning">Open</StatusChip>;
+      return null;
     case "in_review":
       return (
         <StatusChip tone="info" icon="clock">
-          In review
+          {taskStatusText["in_review"]}
         </StatusChip>
       );
     case "resolved":
-      return <StatusChip tone="success">Resolved</StatusChip>;
+      return <StatusChip tone="success">{taskStatusText["resolved"]}</StatusChip>;
     default:
-      return <StatusChip tone="neutral">Dismissed</StatusChip>;
+      return <StatusChip tone="neutral">{taskStatusText["dismissed"]}</StatusChip>;
   }
 }
 
@@ -87,7 +102,7 @@ export function ReviewQueue() {
   const params = useSearchParams();
   const { timezone } = useClinician();
   const isWide = useMediaQuery("(min-width: 1280px)");
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const status = params.get("status") === "closed" ? "closed" : "active";
   const assigned = params.get("assigned") ?? "any";
@@ -127,6 +142,7 @@ export function ReviewQueue() {
   });
   const tasks = list.data?.pages.flatMap((p) => p.items) ?? [];
   const lastPage = list.data?.pages[0];
+  const total = lastPage?.total ?? tasks.length;
   const selected = tasks.find((t) => t.id === selectedId) ?? null;
   const filtersActive = assigned !== "any" || rule !== "any";
 
@@ -135,7 +151,7 @@ export function ReviewQueue() {
     if (isWide && !selectedId && tasks[0]) update({ task: tasks[0].id });
   }, [isWide, selectedId, tasks[0]?.id]);
 
-  function onListKey(e: KeyboardEvent<HTMLUListElement>) {
+  function onListKey(e: KeyboardEvent<HTMLTableSectionElement>) {
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     const buttons = Array.from(
       e.currentTarget.querySelectorAll<HTMLButtonElement>("button[data-task]"),
@@ -159,14 +175,14 @@ export function ReviewQueue() {
   }
 
   const detail = selected ? (
-    <TaskDetail key={selected.id} task={selected} onDone={afterAction} />
+    <TaskDetail key={selected.id} task={selected} onDone={afterAction} sticky={isWide} />
   ) : null;
 
   return (
     <div className="flex flex-col gap-4">
       <PageHeader
         title="Review queue"
-        description="Tasks created by clinic rules across the clinic. Every task says which rule created it, the value it read and where that came from. Rules are thresholds, not predictions: you decide what each one needs."
+        description="Every task in the clinic, whoever's caseload it is on. Each says which rule created it, the value it read and where that came from. Rules are thresholds, not predictions: you decide what each one needs."
       />
 
       <form
@@ -217,12 +233,30 @@ export function ReviewQueue() {
         <Section id="queue-empty" title="Review tasks">
           <Empty
             icon="check-circle"
-            title={status === "closed" ? "No closed tasks match" : "Nothing needs attention"}
+            title={
+              filtersActive
+                ? "No tasks match these filters"
+                : status === "closed"
+                  ? "No closed tasks yet"
+                  : "Nothing needs attention"
+            }
+            {...(filtersActive
+              ? {
+                  action: (
+                    <Button
+                      variant="secondary"
+                      onClick={() => update({ assigned: null, rule: null, task: null })}
+                    >
+                      Clear filters
+                    </Button>
+                  ),
+                }
+              : {})}
           >
-            {status === "closed"
-              ? "No resolved or dismissed tasks match these filters."
-              : filtersActive
-                ? "No open tasks match these filters. Clear a filter to see the rest."
+            {filtersActive
+              ? `No ${status === "closed" ? "resolved or dismissed" : "open"} tasks fit the filters you chose. Clear a filter to see the rest.`
+              : status === "closed"
+                ? "Nothing has been resolved or dismissed yet."
                 : "No open review tasks in the clinic."}{" "}
             Last checked {formatTime(lastPage?.lastCheckedAt ?? new Date().toISOString(), timezone)}{" "}
             {tzAbbreviation(lastPage?.lastCheckedAt ?? new Date().toISOString(), timezone)}
@@ -232,55 +266,72 @@ export function ReviewQueue() {
           </Empty>
         </Section>
       ) : (
-        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-5">
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-8">
           <Section
-            className="xl:col-span-2"
+            className="xl:col-span-5"
             id="queue"
             title="Tasks"
-            count={tasks.length}
-            description={`Highest priority first, then oldest. Last checked ${formatTime(lastPage?.lastCheckedAt ?? "", timezone)}.`}
+            count={total}
+            description={`Highest priority first, then oldest.${tasks.length < total ? ` Showing ${tasks.length} of ${total}.` : ""} Last checked ${formatTime(lastPage?.lastCheckedAt ?? "", timezone)}.`}
           >
-            <ul
-              ref={listRef}
-              onKeyDown={onListKey}
-              aria-label="Review tasks"
-              className="divide-y divide-border"
-            >
-              {tasks.map((t) => (
-                <li key={t.id}>
-                  <button
-                    type="button"
-                    data-task="true"
-                    aria-current={t.id === selectedId ? "true" : undefined}
-                    onClick={() => update({ task: t.id })}
-                    className={
-                      "flex w-full flex-col gap-1 border-l-2 px-4 py-2.5 text-left focus-visible:focus-ring hover:bg-surface-sunken " +
-                      (t.id === selectedId
-                        ? "border-primary bg-primary-subtle"
-                        : "border-transparent")
-                    }
-                  >
-                    <span className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-label font-semibold text-ink">
-                        {fullName(t.patient)}
-                      </span>
-                      <TaskStatus task={t} />
-                    </span>
-                    <span className="text-small text-ink">{t.explanation}</span>
-                    <span className="text-small text-ink-muted">Rule: {t.rule.name}</span>
-                    <span className="flex flex-wrap items-center gap-x-3 text-small text-ink-muted">
-                      <span className="tabular-nums">{formatAgeHours(t.ageHours)} old</span>
-                      <span>
-                        {t.assignedTo
-                          ? `Assigned to ${t.assignedTo.name.replace(/,.*$/, "")}`
-                          : "Unassigned"}
-                      </span>
-                      {t.kind === "administrative" ? <Tag>Administrative</Tag> : null}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div ref={listRef} className="p-2">
+              <Table caption="Review tasks">
+                <THead>
+                  <tr>
+                    <Th>Patient</Th>
+                    <Th>Why it appeared</Th>
+                    <Th numeric>Age</Th>
+                    <Th>Assigned to</Th>
+                  </tr>
+                </THead>
+                <TBody onKeyDown={onListKey}>
+                  {tasks.map((t) => (
+                    <Tr
+                      key={t.id}
+                      selected={t.id === selectedId}
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest("button")) return;
+                        update({ task: t.id });
+                      }}
+                    >
+                      <Td className="font-medium">
+                        <span className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            data-task="true"
+                            aria-current={t.id === selectedId ? "true" : undefined}
+                            onClick={() => update({ task: t.id })}
+                            className="rounded-control text-left text-primary underline underline-offset-2 focus-visible:focus-ring"
+                          >
+                            {fullName(t.patient)}
+                          </button>
+                          <TaskStatus task={t} />
+                          {t.kind === "administrative" ? <Tag>Administrative</Tag> : null}
+                        </span>
+                      </Td>
+                      <Td className="max-w-48 truncate" title={t.explanation}>
+                        {t.explanation}
+                      </Td>
+                      <Td
+                        numeric
+                        className="text-ink-muted"
+                        title={`${formatAgeHours(t.ageHours)} old`}
+                      >
+                        {compactAge(t.ageHours)}
+                      </Td>
+                      <Td>
+                        {t.assignedTo ? (
+                          t.assignedTo.name.replace(/,.*$/, "")
+                        ) : (
+                          <span className="text-ink-muted">Unassigned</span>
+                        )}
+                      </Td>
+                    </Tr>
+                  ))}
+                </TBody>
+              </Table>
+            </div>
             {list.hasNextPage ? (
               <div className="border-t border-border px-4 py-2">
                 <Button
@@ -336,7 +387,15 @@ function Filter({ label, id, children }: { label: string; id: string; children: 
 
 type NoteAction = "resolve" | "dismiss";
 
-function TaskDetail({ task, onDone }: { task: ReviewTask; onDone: (taskId: string) => void }) {
+function TaskDetail({
+  task,
+  onDone,
+  sticky,
+}: {
+  task: ReviewTask;
+  onDone: (taskId: string) => void;
+  sticky: boolean;
+}) {
   const { timezone, session, can } = useClinician();
   const qc = useQueryClient();
   const toast = useToast();
@@ -348,6 +407,10 @@ function TaskDetail({ task, onDone }: { task: ReviewTask; onDone: (taskId: strin
     (task.kind === "clinical" ? can("review_task.resolve") : can("review_task.resolve_admin"));
   const mine = !!task.assignedTo && task.assignedTo.userId === session.user.id;
   const checkInSource = task.sources.find((s) => s.type === "PatientCheckIn");
+  // CR-2: assigning and reviewing need care-team membership; closing needs it for clinical tasks only.
+  const teamBlocked = !task.onCareTeam;
+  const closeBlocked = teamBlocked && task.kind === "clinical";
+  const blockedDescribedBy = teamBlocked ? { "aria-describedby": "team-reason" } : {};
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["clinician"] });
   const fail = (e: unknown) => {
@@ -385,7 +448,7 @@ function TaskDetail({ task, onDone }: { task: ReviewTask; onDone: (taskId: strin
 
   return (
     <Section
-      className="xl:col-span-3"
+      className={sticky ? "xl:sticky xl:top-4 xl:col-span-3" : ""}
       id="detail"
       title={fullName(task.patient)}
       description={
@@ -474,42 +537,68 @@ function TaskDetail({ task, onDone }: { task: ReviewTask; onDone: (taskId: strin
               What you can do
             </h3>
             {mayAct ? (
-              <div className="flex flex-wrap gap-2">
-                {mine ? (
+              <>
+                <div className="flex flex-wrap gap-2">
+                  {mine ? (
+                    <Button
+                      variant="secondary"
+                      loading={assign.isPending}
+                      loadingLabel="Updating"
+                      disabled={teamBlocked}
+                      {...blockedDescribedBy}
+                      onClick={() => assign.mutate(null)}
+                    >
+                      Unassign
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      loading={assign.isPending}
+                      loadingLabel="Assigning"
+                      disabled={!session.practitionerId || teamBlocked}
+                      {...blockedDescribedBy}
+                      onClick={() => assign.mutate(session.practitionerId)}
+                    >
+                      Assign to me
+                    </Button>
+                  )}
+                  {checkInSource && can("clinical.write") ? (
+                    <Button
+                      variant="secondary"
+                      loading={acknowledge.isPending}
+                      loadingLabel="Marking"
+                      disabled={teamBlocked}
+                      {...blockedDescribedBy}
+                      onClick={() => acknowledge.mutate()}
+                    >
+                      Mark check-in reviewed
+                    </Button>
+                  ) : null}
+                  <Button
+                    disabled={closeBlocked}
+                    {...(closeBlocked ? { "aria-describedby": "team-reason" } : {})}
+                    onClick={() => setNoteAction("resolve")}
+                  >
+                    Resolve with a note
+                  </Button>
                   <Button
                     variant="secondary"
-                    loading={assign.isPending}
-                    loadingLabel="Updating"
-                    onClick={() => assign.mutate(null)}
+                    disabled={closeBlocked}
+                    {...(closeBlocked ? { "aria-describedby": "team-reason" } : {})}
+                    onClick={() => setNoteAction("dismiss")}
                   >
-                    Unassign
+                    Dismiss with a note
                   </Button>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    loading={assign.isPending}
-                    loadingLabel="Assigning"
-                    disabled={!session.practitionerId}
-                    onClick={() => assign.mutate(session.practitionerId)}
-                  >
-                    Assign to me
-                  </Button>
-                )}
-                {checkInSource && can("clinical.write") ? (
-                  <Button
-                    variant="secondary"
-                    loading={acknowledge.isPending}
-                    loadingLabel="Marking"
-                    onClick={() => acknowledge.mutate()}
-                  >
-                    Mark check-in reviewed
-                  </Button>
+                </div>
+                {teamBlocked ? (
+                  <p id="team-reason" className="max-w-prose text-body text-ink-muted">
+                    {closeBlocked
+                      ? "Assigning, marking the check-in reviewed, resolving and dismissing are unavailable."
+                      : "Assigning is unavailable."}{" "}
+                    {NOT_ON_CARE_TEAM_REASON}
+                  </p>
                 ) : null}
-                <Button onClick={() => setNoteAction("resolve")}>Resolve with a note</Button>
-                <Button variant="secondary" onClick={() => setNoteAction("dismiss")}>
-                  Dismiss with a note
-                </Button>
-              </div>
+              </>
             ) : (
               <p className="max-w-prose text-body text-ink-muted">
                 {task.kind === "administrative"

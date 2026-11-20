@@ -46,25 +46,24 @@ test("Scenario D: a threshold check-in becomes one task the clinician reviews an
   // Prioritised: the list is in the order the API ranks it (priority, then oldest).
   const ranked = await page.evaluate(async () => {
     const body = (await (await fetch("/api/review-tasks?limit=50")).json()) as {
-      items: { id: string; patient: { familyName: string }; rule: { name: string } }[];
+      items: { id: string; patient: { familyName: string }; explanation: string }[];
     };
-    return body.items.map((t) => `${t.patient.familyName} ${t.rule.name}`);
+    return body.items.map((t) => ({ family: t.patient.familyName, explanation: t.explanation }));
   });
-  const list = page.getByRole("list", { name: "Review tasks" });
+  const list = page.getByRole("table", { name: "Review tasks" });
   await expect(list.getByRole("button")).toHaveCount(ranked.length);
   const shown = await list
-    .getByRole("button")
+    .locator("tbody tr")
     .evaluateAll((els) => els.map((el) => el.textContent ?? ""));
   ranked.forEach((expected, i) => {
-    const [family, ...rule] = expected.split(" ");
-    expect(shown[i]).toContain(family);
-    expect(shown[i]).toContain(rule.join(" "));
+    expect(shown[i]).toContain(expected.family);
+    expect(shown[i]).toContain(expected.explanation);
   });
 
   // The new task: one, for Noel, with the rule's own explanation.
-  const mine = list.getByRole("button", { name: /Noel Noaipatient.*Reported pain 7 of 10/ });
-  await expect(mine).toHaveCount(1);
-  await mine.click();
+  const mineRow = list.getByRole("row", { name: /Noel Noaipatient.*Reported pain 7 of 10/ });
+  await expect(mineRow).toHaveCount(1);
+  await mineRow.getByRole("button").click();
 
   const why = page
     .getByRole("heading", { level: 3, name: "Why this appeared" })
@@ -95,8 +94,9 @@ test("Scenario D: a threshold check-in becomes one task the clinician reviews an
 
   // Take the task, mark the check-in reviewed, then resolve with a note.
   await page
-    .getByRole("list", { name: "Review tasks" })
-    .getByRole("button", { name: /Noel Noaipatient.*Reported pain 7 of 10/ })
+    .getByRole("table", { name: "Review tasks" })
+    .getByRole("row", { name: /Noel Noaipatient.*Reported pain 7 of 10/ })
+    .getByRole("button")
     .click();
   await page.getByRole("button", { name: "Assign to me" }).click();
   await expect(page.getByText("Task assigned to you", { exact: true }).first()).toBeVisible();
@@ -117,16 +117,18 @@ test("Scenario D: a threshold check-in becomes one task the clinician reviews an
   // It left the open queue (AC-D5) and kept its history with resolver and time.
   await expect(
     page
-      .getByRole("list", { name: "Review tasks" })
-      .getByRole("button", { name: /Noel Noaipatient.*Reported pain 7 of 10/ }),
+      .getByRole("table", { name: "Review tasks" })
+      .getByRole("row", { name: /Noel Noaipatient.*Reported pain 7 of 10/ }),
   ).toHaveCount(0);
   await page.getByLabel("Show").click();
   await page.getByRole("option", { name: "Resolved and dismissed" }).click();
   const closed = page
-    .getByRole("list", { name: "Review tasks" })
-    .getByRole("button", { name: /Noel Noaipatient.*Reported pain 7 of 10/ });
+    .getByRole("table", { name: "Review tasks" })
+    .getByRole("row", { name: /Noel Noaipatient.*Reported pain 7 of 10/ });
   await expect(closed).toBeVisible();
-  await closed.click();
+  // A closed task shows its status in words; the raw enum never appears.
+  await expect(closed.getByText("Resolved", { exact: true })).toBeVisible();
+  await closed.getByRole("button").click();
   await expect(page.getByRole("heading", { level: 3, name: "Resolved" })).toBeVisible();
   await expect(page.getByText("Note: Called the patient.")).toBeVisible();
   await expect(page.getByText("Terry Demotherapist").first()).toBeVisible();
@@ -134,9 +136,10 @@ test("Scenario D: a threshold check-in becomes one task the clinician reviews an
 
   // Empty state names the last check (AC-D6): nothing is assigned to a fresh filter.
   await page.goto("/review-queue?assigned=unassigned&rule=missing_intake&status=closed");
-  await expect(page.getByRole("heading", { name: "No closed tasks match" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No tasks match these filters" })).toBeVisible();
   await page.goto("/review-queue?assigned=me&rule=missing_intake");
-  await expect(page.getByRole("heading", { name: "Nothing needs attention" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No tasks match these filters" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Clear filters" }).last()).toBeVisible();
   await expect(page.getByText(/Last checked \d{1,2}:\d{2}/)).toBeVisible();
   await expectNoSeriousViolations(page, "empty review queue");
   await screenshot(page, "review-queue-empty", 1440);

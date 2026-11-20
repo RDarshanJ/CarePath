@@ -233,15 +233,36 @@ export function ReviewedChip({ reviewedAt }: { reviewedAt: string | null }) {
   );
 }
 
-export function EmptyDirectory({ filtered }: { filtered: boolean }) {
+export function EmptyDirectory({ filtered, onClear }: { filtered: boolean; onClear?: () => void }) {
   return (
     <EmptyState
       icon="users"
       title={filtered ? "No patients match these filters" : "No patients yet"}
+      {...(filtered && onClear
+        ? {
+            action: (
+              <Button variant="secondary" onClick={onClear}>
+                Clear filters
+              </Button>
+            ),
+          }
+        : {})}
     >
       {filtered
-        ? "Nothing in the directory fits the search and filters. Clear a filter or check the spelling."
+        ? "No patient fits the search and filters together. Clear a filter or check the spelling."
         : "Patients appear here once they finish onboarding."}
     </EmptyState>
   );
 }
+
+/** Review task status in words. The API enum never reaches the screen. */
+export const taskStatusText: Record<string, string> = {
+  open: "Open",
+  in_review: "In review",
+  resolved: "Resolved",
+  dismissed: "Dismissed",
+};
+
+/** Why an action is unavailable to a clinician who is not on the patient's care team (CR-2). */
+export const NOT_ON_CARE_TEAM_REASON =
+  "You are not on this patient's care team. Only care-team members can do this. Ask the primary therapist to add you.";

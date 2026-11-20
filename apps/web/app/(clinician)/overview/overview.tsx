@@ -119,14 +119,15 @@ function OpenTasks({ data }: { data: ClinicianOverview }) {
   return (
     <Section
       id="tasks"
-      title="Review queue"
+      title="Your review tasks"
       count={list.count}
-      description="Open and in-review tasks across the clinic, highest priority first. Each one is created by a clinic rule, and you decide what it needs."
+      description="Open and in-review tasks for patients on your caseload, highest priority first. Each one is created by a clinic rule, and you decide what it needs."
       actions={<AppLink href="/review-queue">Open the clinic review queue</AppLink>}
     >
       {list.items.length === 0 ? (
         <Empty icon="clipboard" title="Nothing needs attention">
-          No open review tasks in the clinic. Checked at {formatTime(data.generatedAt, timezone)}.
+          No open review tasks for patients on your caseload. Checked at{" "}
+          {formatTime(data.generatedAt, timezone)}.
         </Empty>
       ) : (
         <WorkList
@@ -147,9 +148,7 @@ function OpenTasks({ data }: { data: ClinicianOverview }) {
                   <StatusChip tone="info" icon="clock">
                     In review
                   </StatusChip>
-                ) : (
-                  <StatusChip tone="warning">Open</StatusChip>
-                )}
+                ) : null}
                 <span className="tabular-nums">{formatAgeHours(t.ageHours)} old</span>
               </div>
             </li>
@@ -230,7 +229,7 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
   );
 }
 
-/** Visits today come from the patient directory (next visit on today's date in the clinic zone). */
+/** Next visits today (CR-1, until WP 4.1) come from the patient directory (next visit on today's date in the clinic zone). */
 function VisitsToday({ today }: { today: string }) {
   const { timezone, session } = useClinician();
   const query = qs({
@@ -252,7 +251,12 @@ function VisitsToday({ today }: { today: string }) {
   );
   rows.sort((a, b) => a.at.localeCompare(b.at));
   return (
-    <Section id="visits" title="Visits today" {...(visits.data ? { count: rows.length } : {})}>
+    <Section
+      id="visits"
+      title="Next visits today"
+      description="Each caseload patient's next booked visit, when it falls today."
+      {...(visits.data ? { count: rows.length } : {})}
+    >
       {visits.isError ? (
         <div className="p-4">
           <QueryError error={visits.error} onRetry={() => void visits.refetch()} />
@@ -262,8 +266,8 @@ function VisitsToday({ today }: { today: string }) {
           <ListSkeleton rows={2} label="Loading visits" />
         </div>
       ) : rows.length === 0 ? (
-        <Empty icon="calendar" title="No visits today">
-          None of your patients has a visit booked for {formatLocalDate(today)}.
+        <Empty icon="calendar" title="No next visits today">
+          None of your patients has a next visit on {formatLocalDate(today)}.
         </Empty>
       ) : (
         <ul className="divide-y divide-border">

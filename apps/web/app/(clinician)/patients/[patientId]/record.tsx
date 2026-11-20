@@ -10,6 +10,7 @@ import { ApiError } from "../../../../lib/api/errors";
 import {
   AppLink,
   ListSkeleton,
+  NOT_ON_CARE_TEAM_REASON,
   PageHeader,
   PatientStatusTag,
   QueryError,
@@ -84,9 +85,20 @@ export function PatientRecord({ patientId }: { patientId: string }) {
         team={team.map((m) => `${m.name.replace(/,.*$/, "")} (${m.roleLabel.toLowerCase()})`)}
       >
         {can("clinical.write") ? (
-          <Button asChild>
-            <NextLink href={`/patients/${patient.id}/plan`}>Open care plan builder</NextLink>
-          </Button>
+          patient.onCareTeam === false ? (
+            <>
+              <p id="builder-team-reason" className="max-w-xs text-small text-ink-muted">
+                {NOT_ON_CARE_TEAM_REASON}
+              </p>
+              <Button disabled aria-describedby="builder-team-reason">
+                Open care plan builder
+              </Button>
+            </>
+          ) : (
+            <Button asChild>
+              <NextLink href={`/patients/${patient.id}/plan`}>Open care plan builder</NextLink>
+            </Button>
+          )
         ) : null}
       </RecordHeader>
 

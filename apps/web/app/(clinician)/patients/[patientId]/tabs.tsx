@@ -34,8 +34,11 @@ import {
   QueryError,
   ReviewedChip,
   Section,
+  NOT_ON_CARE_TEAM_REASON,
   errorText,
+  taskStatusText,
 } from "../../_components/common";
+import { IntakeSection } from "../../_components/intake";
 import { PlanView } from "../../_components/plan-view";
 import { useClinician } from "../../_lib/context";
 import {
@@ -115,7 +118,11 @@ export function OverviewTab({ patientId }: { patientId: string }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div
+        role="group"
+        aria-label="Summary"
+        className="grid grid-cols-1 gap-px overflow-hidden rounded-container border border-border bg-border sm:grid-cols-2 xl:grid-cols-4"
+      >
         <Fact title="Care plan" loading={plan.isPending} error={plan.error}>
           {plan.data?.plan ? (
             <>
@@ -179,16 +186,23 @@ export function OverviewTab({ patientId }: { patientId: string }) {
             <p className="text-body text-ink-muted">Nothing needs attention for this patient.</p>
           ) : (
             <ul className="flex flex-col gap-1">
-              {openTasks.map((t) => (
+              {openTasks.slice(0, 3).map((t) => (
                 <li key={t.id} className="text-small">
                   <AppLink href={`/review-queue?task=${t.id}`}>{t.rule.name}</AppLink>
                   <span className="text-ink-muted">, {formatAgeHours(t.ageHours)} old</span>
                 </li>
               ))}
+              {openTasks.length > 3 ? (
+                <li className="text-small text-ink-muted">
+                  and {openTasks.length - 3} more in the review queue
+                </li>
+              ) : null}
             </ul>
           )}
         </Fact>
       </div>
+
+      <IntakeSection patientId={patientId} />
 
       <Section
         id="timeline"
@@ -242,10 +256,7 @@ function Fact({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      aria-label={title}
-      className="flex flex-col gap-1.5 rounded-container border border-border bg-surface p-4"
-    >
+    <section aria-label={title} className="flex min-w-0 flex-col gap-1 bg-surface px-4 py-3">
       <h2 className="text-label font-semibold text-ink-muted">{title}</h2>
       {error ? (
         <QueryError error={error} />
@@ -317,7 +328,7 @@ function TimelineRow({ item, patientId }: { item: TimelineItem; patientId: strin
     case "review_task":
       label = "Review task";
       body = <AppLink href={`/review-queue?task=${item.id}`}>{item.explanation}</AppLink>;
-      chip = <Tag>{item.status.replace("_", " ")}</Tag>;
+      chip = <Tag>{taskStatusText[item.status] ?? "Unknown"}</Tag>;
       break;
   }
   return (
@@ -677,6 +688,12 @@ export function CheckInsTab({
   const qc = useQueryClient();
   const toast = useToast();
   const list = usePaged<CheckIn>(keys.checkIns(patientId), (c) => reads.checkIns(patientId, c));
+  const header = useQuery({
+    queryKey: keys.header(patientId),
+    queryFn: () => reads.header(patientId),
+  });
+  // CR-2: reviewing a check-in is a clinical write, so it needs care-team membership.
+  const notOnTeam = header.data?.onCareTeam === false;
   const review = useMutation({
     mutationFn: (checkInId: string) => writes.reviewCheckIn(patientId, checkInId),
     onSuccess: () => {
@@ -724,6 +741,11 @@ export function CheckInsTab({
         </Empty>
       ) : (
         <div className="p-3">
+          {notOnTeam ? (
+            <p id="check-in-team-reason" className="mb-2 text-small text-ink-muted">
+              Marking a check-in reviewed is unavailable. {NOT_ON_CARE_TEAM_REASON}
+            </p>
+          ) : null}
           <Table caption="Check-ins, newest first">
             <THead>
               <tr>
@@ -770,6 +792,8 @@ export function CheckInsTab({
                         aria-label={`Mark reviewed: check-in from ${formatDateTime(c.submittedAt, timezone)}`}
                         loading={review.isPending && review.variables === c.id}
                         loadingLabel="Marking"
+                        disabled={notOnTeam}
+                        {...(notOnTeam ? { "aria-describedby": "check-in-team-reason" } : {})}
                         onClick={() => review.mutate(c.id)}
                       >
                         Mark reviewed

@@ -23,10 +23,12 @@ import {
   AppLink,
   Empty,
   ListSkeleton,
+  NOT_ON_CARE_TEAM_REASON,
   PageHeader,
   QueryError,
   Section,
 } from "../../../_components/common";
+import { IntakeDrawerButton } from "../../../_components/intake";
 import { PlanView } from "../../../_components/plan-view";
 import { useClinician } from "../../../_lib/context";
 import { formatTime, fullName } from "../../../_lib/format";
@@ -116,6 +118,22 @@ export function PlanBuilder({ patientId }: { patientId: string }) {
       <div className="flex flex-col gap-4">
         <PageHeader title="Care plan builder" eyebrow={crumbs} />
         <QueryError error={plan.error} onRetry={() => void plan.refetch()} />
+      </div>
+    );
+  }
+  if (header.data?.onCareTeam === false) {
+    // CR-2: every plan save would be refused, so the builder is not offered.
+    return (
+      <div className="flex flex-col gap-4">
+        <PageHeader
+          title={`Care plan for ${patientName}`}
+          eyebrow={crumbs}
+          actions={<IntakeDrawerButton patientId={patientId} patientName={patientName} />}
+        />
+        <Banner tone="warning" title="Editing this plan is unavailable">
+          {NOT_ON_CARE_TEAM_REASON} You can read the current plan on the{" "}
+          <AppLink href={`/patients/${patientId}?tab=plan`}>patient&apos;s record</AppLink>.
+        </Banner>
       </div>
     );
   }
@@ -383,6 +401,7 @@ function Builder({
             ? `The patient sees version ${currentVersion} until you publish version ${nextVersion}. Edits save automatically as a draft that only clinicians can see.`
             : "This patient has no published plan yet. Edits save automatically as a draft that only clinicians can see."
         }
+        actions={<IntakeDrawerButton patientId={patientId} patientName={patientName} />}
       />
 
       <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 rounded-container border border-border bg-surface px-4 py-2">
@@ -393,7 +412,17 @@ function Builder({
               Add exercises
             </Button>
           ) : null}
-          <Button ref={publishButtonRef} onClick={() => void openPublish()}>
+          {state.items.length === 0 ? (
+            <span id="publish-reason" className="text-small text-ink-muted">
+              Add at least one exercise to publish.
+            </span>
+          ) : null}
+          <Button
+            ref={publishButtonRef}
+            disabled={state.items.length === 0}
+            {...(state.items.length === 0 ? { "aria-describedby": "publish-reason" } : {})}
+            onClick={() => void openPublish()}
+          >
             Review and publish version {nextVersion}
           </Button>
         </div>

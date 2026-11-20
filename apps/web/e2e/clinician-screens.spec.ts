@@ -23,7 +23,9 @@ test("clinician screens: content, axe and screenshots at 1440 and 1024", async (
       name: "overview",
       url: "/overview",
       ready: async () => {
-        await expect(page.getByRole("heading", { level: 2, name: /Review queue/ })).toBeVisible();
+        await expect(
+          page.getByRole("heading", { level: 2, name: /Your review tasks/ }),
+        ).toBeVisible();
         await expect(
           page.getByRole("heading", { level: 2, name: /Check-ins not yet reviewed/ }),
         ).toBeVisible();
@@ -60,6 +62,10 @@ test("clinician screens: content, axe and screenshots at 1440 and 1024", async (
           page.getByRole("heading", { level: 1, name: /Dana Demopatient/ }),
         ).toBeVisible();
         await expect(page.getByRole("heading", { level: 2, name: "Timeline" })).toBeVisible();
+        await expect(
+          page.getByRole("heading", { level: 2, name: "What the patient told us at intake" }),
+        ).toBeVisible();
+        await expect(page.getByText("Pain (patient-reported)").first()).toBeVisible();
         await expect(
           page
             .getByRole("list")
@@ -116,15 +122,14 @@ test("clinician screens: content, axe and screenshots at 1440 and 1024", async (
       name: "review-queue",
       url: "/review-queue",
       ready: async (width) => {
-        await expect(page.getByRole("list", { name: "Review tasks" })).toBeVisible();
+        const table = page.getByRole("table", { name: "Review tasks" });
+        await expect(table).toBeVisible();
         if (width < 1280) {
           // Below 1280 the task opens as a side panel instead of a second column.
-          await page
-            .getByRole("list", { name: "Review tasks" })
-            .getByRole("button")
-            .first()
-            .click();
+          await table.getByRole("button").first().click();
           await expect(page.getByRole("dialog")).toBeVisible();
+          // The selection is in the address before axe runs, so the page title has settled.
+          await expect(page).toHaveURL(/task=/);
         }
         await expect(
           page.getByRole("heading", { level: 3, name: "Why this appeared" }),
@@ -139,6 +144,9 @@ test("clinician screens: content, axe and screenshots at 1440 and 1024", async (
     for (const stop of stops) {
       await page.goto(stop.url);
       await stop.ready(width);
+      // Client navigation updates the document title after the screen paints. Axe's document-title
+      // rule must not race it: wait for the title this screen is expected to have.
+      await expect(page).toHaveTitle(/\| CarePath$/);
       await expect(
         page.getByText("Demonstration product. Synthetic data. Not for clinical use."),
       ).toBeVisible();
@@ -172,4 +180,53 @@ test("clinician screens: content, axe and screenshots at 1440 and 1024", async (
   await screenshot(page, "plan-builder-library", 1024);
   await page.keyboard.press("Escape");
   await expect(library).toBeHidden();
+
+  // "See intake" opens the patient's intake in a drawer from the builder.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`/patients/${dana}/plan`);
+  await page.getByRole("button", { name: "See intake" }).click();
+  const drawer = page.getByRole("dialog", { name: /Intake for Dana Demopatient/ });
+  await expect(drawer).toBeVisible();
+  await expect(drawer.getByText("Main goal")).toBeVisible();
+  await expect(drawer.getByText("Pain (patient-reported)")).toBeVisible();
+  await expect(page).toHaveTitle(/\| CarePath$/);
+  await expectNoSeriousViolations(page, "plan builder intake drawer");
+  await screenshot(page, "plan-builder-intake", 1440);
+});
+
+test("review queue: 36 px rows, status only when not open, care-team actions unavailable", async ({
+  page,
+}) => {
+  await signInClinician(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/review-queue");
+  const table = page.getByRole("table", { name: "Review tasks" });
+  await expect(table).toBeVisible();
+
+  // Rows are 36 px.
+  const row = table.getByRole("row").nth(1);
+  const box = await row.boundingBox();
+  expect(box?.height).toBeLessThanOrEqual(36.5);
+
+  // The count is the API total, and an open task carries no status chip.
+  const summary = await page.evaluate(async () => {
+    const body = (await (await fetch("/api/review-tasks?limit=100")).json()) as {
+      total: number;
+      items: { id: string; onCareTeam: boolean; kind: string; status: string }[];
+    };
+    return body;
+  });
+  await expect(page.getByRole("heading", { level: 2, name: "Tasks" })).toContainText(
+    String(summary.total),
+  );
+  await expect(table.getByText("Open", { exact: true })).toHaveCount(0);
+
+  // A clinical task for a patient outside the care team: the actions are unavailable, with the reason.
+  const outside = summary.items.find((t) => !t.onCareTeam && t.kind === "clinical");
+  if (outside) {
+    await page.goto(`/review-queue?task=${outside.id}`);
+    await expect(page.getByRole("button", { name: "Resolve with a note" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: /Assign to me|Unassign/ })).toBeDisabled();
+    await expect(page.getByText(/You are not on this patient's care team/)).toBeVisible();
+  }
 });

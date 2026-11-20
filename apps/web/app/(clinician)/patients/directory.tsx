@@ -184,6 +184,15 @@ export function Directory() {
     (v) => v && v !== "any",
   );
 
+  const total = result.data?.total ?? rows.length;
+  const first = page * Number(limit) + 1;
+  const rangeText =
+    rows.length === 0
+      ? "No patients"
+      : rows.length === 1 && first === 1 && total === 1
+        ? "1 patient"
+        : `Patients ${first} to ${first + rows.length - 1} of ${total}${filtersActive ? " matching" : ""}`;
+
   function sortProps(field: "name" | "lastActivity" | "status") {
     const current: "ascending" | "descending" | "none" =
       sort === field ? "ascending" : sort === `-${field}` ? "descending" : "none";
@@ -287,7 +296,13 @@ export function Directory() {
       ) : !result.data ? (
         <ListSkeleton rows={8} label="Loading patients" />
       ) : rows.length === 0 ? (
-        <EmptyDirectory filtered={filtersActive} />
+        <EmptyDirectory
+          filtered={filtersActive}
+          onClear={() => {
+            setSearch("");
+            router.replace(pathname, { scroll: false });
+          }}
+        />
       ) : (
         <>
           <div
@@ -361,8 +376,7 @@ export function Directory() {
             className="flex flex-wrap items-center justify-between gap-3"
           >
             <p role="status" className="text-small text-ink-muted tabular-nums">
-              Page {page + 1}, {rows.length} {rows.length === 1 ? "patient" : "patients"} shown
-              {nextCursor ? ", more on the next page" : ", end of the list"}
+              {rangeText}
             </p>
             <div className="flex items-center gap-2">
               <div className="w-36">
