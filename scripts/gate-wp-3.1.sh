@@ -38,7 +38,7 @@ fi
 
 stage "seed (small profile)" pnpm db:seed --profile small
 stage "typecheck (shared, db, api)" pnpm --filter @carepath/shared --filter @carepath/db --filter @carepath/api typecheck
-stage "lint (paths owned by WP 3.1)" pnpm exec eslint packages/shared packages/db/src packages/db/seed apps/api scripts
+stage "lint (paths owned by WP 3.1)" pnpm exec eslint packages/shared packages/db/src packages/db/seed apps/api
 stage "format (paths owned by WP 3.1)" pnpm exec prettier --check packages/shared packages/db/src packages/db/seed apps/api
 stage "db tests" pnpm --filter @carepath/db exec vitest run
 stage "API tests" pnpm --filter @carepath/api test

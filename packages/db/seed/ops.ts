@@ -3,6 +3,7 @@
  * and audit events. Tasks are derived from the generated check-ins, schedules and intake rows,
  * so each explanation and evidence reference matches data that exists.
  */
+import { intakeSteps } from "@carepath/shared/contracts";
 import type { Tables } from "./types.js";
 import { D, H, MIN, iso, type Ctx, type PatientInfo, type VersionInfo } from "./ctx.js";
 import type { UnreadMessage } from "./comms.js";
@@ -46,8 +47,6 @@ const rules = [
     params: { thresholdDays: 3 },
   },
 ] as const;
-
-const intakeSteps = ["about-you", "reason-for-care", "pain", "history", "consent"];
 
 type TaskRow = Tables["ReviewTask"][number];
 
@@ -133,7 +132,16 @@ export function buildOps(ctx: Ctx, unread: UnreadMessage[]): void {
       for (const c of p.checkIns) {
         const age = ctx.anchorMs - c.submittedAtMs;
         if (c.painScore >= 7) {
-          const evidence = [{ type: "PatientCheckIn", id: c.id, field: "painScore" }];
+          const evidence = [
+            {
+              type: "PatientCheckIn",
+              id: c.id,
+              field: "painScore",
+              value: c.painScore,
+              threshold: 7,
+              unit: "of 10",
+            },
+          ];
           const text = `Reported pain ${c.painScore} of 10. Clinic rule: 7 or higher.`;
           const base = { dueAt: iso(c.submittedAtMs + 24 * H) };
           if (age <= 5 * D) {
@@ -183,7 +191,16 @@ export function buildOps(ctx: Ctx, unread: UnreadMessage[]): void {
             "unreviewed_checkin",
             `checkin:${c.id}`,
             `Not reviewed for ${hours} hours. Clinic rule: 48.`,
-            [{ type: "PatientCheckIn", id: c.id, field: "submittedAt" }],
+            [
+              {
+                type: "PatientCheckIn",
+                id: c.id,
+                field: "submittedAt",
+                value: hours,
+                threshold: 48,
+                unit: "hours",
+              },
+            ],
             c.submittedAtMs + 48 * H,
           );
         }
@@ -215,7 +232,16 @@ export function buildOps(ctx: Ctx, unread: UnreadMessage[]): void {
             "missed_sessions",
             `window:${new Date(ctx.anchorMs).toISOString().slice(0, 10)}`,
             `Missed ${missed} sessions in 7 days. Clinic rule: 2 or more.`,
-            [{ type: "CarePlanVersion", id: version.id, field: "daysOfWeek" }],
+            [
+              {
+                type: "CarePlanVersion",
+                id: version.id,
+                field: "daysOfWeek",
+                value: missed,
+                threshold: 2,
+                unit: "sessions",
+              },
+            ],
             ctx.anchorMs - rng.int(1, 6) * H,
           );
         }
@@ -224,14 +250,28 @@ export function buildOps(ctx: Ctx, unread: UnreadMessage[]): void {
     if (p.status === "intake_incomplete" && ctx.anchorMs - p.createdAtMs >= 3 * D) {
       const row = t.IntakeAssessment.find((x) => x.patientId === p.id);
       if (row) {
-        const missing = intakeSteps.slice(intakeSteps.indexOf(row.currentStep)).join(", ");
+        // Steps before review not yet answered, as the API's missing_intake rule reports them.
+        const answered = row.answers as Record<string, unknown>;
+        const missing = intakeSteps
+          .filter((s) => s !== "review" && answered[s] === undefined)
+          .map((s) => s.replace(/_/g, " "))
+          .join(", ");
         const days = Math.floor((ctx.anchorMs - p.createdAtMs) / D);
         task(
           p,
           "missing_intake",
           `intake:${row.id}`,
           `Intake incomplete for ${days} days. Missing: ${missing}.`,
-          [{ type: "IntakeAssessment", id: row.id, field: "currentStep" }],
+          [
+            {
+              type: "IntakeAssessment",
+              id: row.id,
+              field: "currentStep",
+              value: days,
+              threshold: 3,
+              unit: "days",
+            },
+          ],
           ctx.anchorMs - rng.int(1, 6) * H,
         );
       }
@@ -250,7 +290,16 @@ export function buildOps(ctx: Ctx, unread: UnreadMessage[]): void {
         "upcoming_followup",
         `appointment:${a.id}`,
         `Follow-up in ${hours} hours. Clinic rule: within 48.`,
-        [{ type: "Appointment", id: a.id, field: "startsAt" }],
+        [
+          {
+            type: "Appointment",
+            id: a.id,
+            field: "startsAt",
+            value: hours,
+            threshold: 48,
+            unit: "hours",
+          },
+        ],
         ctx.anchorMs - 2 * H,
       );
     }

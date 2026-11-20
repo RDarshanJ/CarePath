@@ -2,13 +2,13 @@ import { hashPassword, verifyPassword } from "@carepath/shared/password";
 import type { FastifyRequest } from "fastify";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
-import { isPermission, type RoleKey } from "../authz/permissions.js";
+import type { RoleKey } from "../authz/permissions.js";
 import { requireCtx } from "../context.js";
 import { withTx } from "../db/tx.js";
 import { AppError, errorResponses } from "../errors.js";
-import { loginBodySchema, sessionInfoSchema, type SessionInfo } from "@carepath/shared/contracts";
+import { loginBodySchema, sessionInfoSchema } from "@carepath/shared/contracts";
+import { openSession, setSessionCookie, toSessionInfo } from "./issue.js";
 import {
-  createSession,
   findSessionByTokenHash,
   findUserForLogin,
   recordLogin,
@@ -16,13 +16,7 @@ import {
   revokeSessionByTokenHash,
   type SessionRow,
 } from "./repo.js";
-import {
-  cookieOptions,
-  csrfTokenFor,
-  evaluateSession,
-  hashToken,
-  newSessionToken,
-} from "./session.js";
+import { evaluateSession, hashToken } from "./session.js";
 
 let dummyHash: Promise<string> | undefined;
 /** Unknown emails still pay for one scrypt run, so timing does not reveal which accounts exist. */
@@ -34,28 +28,7 @@ function dummyPasswordHash(): Promise<string> {
 export const authRoutes: FastifyPluginAsyncZod = async (app) => {
   const { config, db, audit, now } = app.deps;
 
-  function toSessionInfo(row: SessionRow, idleExpiresAt: Date): SessionInfo {
-    return {
-      user: {
-        id: row.membership.user.id,
-        displayName: row.membership.user.displayName,
-        email: row.membership.user.email,
-      },
-      organization: {
-        id: row.organization.id,
-        name: row.organization.name,
-        slug: row.organization.slug,
-      },
-      role: row.membership.role.key as RoleKey,
-      permissions: row.membership.role.permissions.filter(isPermission),
-      patientId:
-        row.membership.role.key === "patient" ? (row.membership.patient?.id ?? null) : null,
-      practitionerId: row.membership.practitioner?.id ?? null,
-      csrfToken: csrfTokenFor(config, row.id),
-      expiresAt: row.expiresAt.toISOString(),
-      idleExpiresAt: idleExpiresAt.toISOString(),
-    };
-  }
+  const sessionInfo = (row: SessionRow, idle: Date) => toSessionInfo(config, row, idle);
 
   async function failLogin(request: FastifyRequest, userId: string | null, detailCode: string) {
     // No email in the event: an unknown address may be a typo of someone else's.
@@ -126,43 +99,31 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       }
 
       const at = now();
-      const token = newSessionToken();
-      const expiresAt = new Date(at.getTime() + config.session.absoluteTimeoutMs);
       // Session, last-login time and the audit event commit together (checkpoint C1, M4).
-      const { row, state } = await withTx(request, async ({ tx, audit }) => {
+      const opened = await withTx(request, async ({ tx, audit }) => {
         // Rotation: a session presented with the login request is ended, never reused.
         const presented = request.cookies[config.cookie.name];
         if (presented) await revokeSessionByTokenHash(tx, hashToken(presented), at);
-        await createSession(tx, {
-          orgId: membership.organizationId,
+        const session = await openSession(tx, config, request, {
           userId: user.id,
-          tokenHash: hashToken(token),
+          orgId: membership.organizationId,
           now: at,
-          expiresAt,
-          userAgent: request.headers["user-agent"] ?? null,
         });
         await recordLogin(tx, user.id, at);
-        const row = await findSessionByTokenHash(tx, hashToken(token));
-        const state = row ? evaluateSession(config, row, at) : null;
-        if (!row || !state?.ok) throw new Error("session was not readable after creation");
         await audit({
           eventName: "auth.login",
           action: "E",
           outcome: "success",
-          orgId: row.organizationId,
+          orgId: session.row.organizationId,
           actorUserId: user.id,
-          actorRole: row.membership.role.key as RoleKey,
+          actorRole: session.row.membership.role.key as RoleKey,
           resourceType: "AuthSession",
-          resourceId: row.id,
+          resourceId: session.row.id,
         });
-        return { row, state };
+        return session;
       });
-      reply.setCookie(
-        config.cookie.name,
-        token,
-        cookieOptions(config, Math.floor(config.session.absoluteTimeoutMs / 1000)),
-      );
-      return toSessionInfo(row, state.idleExpiresAt);
+      setSessionCookie(config, reply, opened.token);
+      return sessionInfo(opened.row, opened.idleExpiresAt);
     },
   );
 
@@ -210,7 +171,7 @@ export const authRoutes: FastifyPluginAsyncZod = async (app) => {
       const row = await findSessionByTokenHash(db, hashToken(token));
       const state = row ? evaluateSession(config, row, now()) : null;
       if (!row || !state?.ok) throw new AppError("unauthenticated");
-      return toSessionInfo(row, state.idleExpiresAt);
+      return sessionInfo(row, state.idleExpiresAt);
     },
   );
 };

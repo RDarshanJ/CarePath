@@ -307,3 +307,15 @@ export async function setPatientCreatedAt(db: Db, patientId: string, at: Date) {
 export async function checkInRow(db: Db, id: string) {
   return db.patientCheckIn.findUniqueOrThrow({ where: { id } });
 }
+
+export async function userByEmail(db: Db, email: string) {
+  return db.user.findUnique({ where: { email } });
+}
+
+export async function enrollmentCodeByHash(db: Db, codeHash: string) {
+  return db.enrollmentCode.findUnique({ where: { codeHash } });
+}
+
+export async function patientRow(db: Db, id: string) {
+  return db.patient.findUniqueOrThrow({ where: { id } });
+}

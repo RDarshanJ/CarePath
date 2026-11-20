@@ -15,6 +15,7 @@ import {
   type PatientInfo,
   type TherapistInfo,
 } from "./ctx.js";
+import { intakeSteps } from "@carepath/shared/contracts";
 import { clinicNames, clinicZones, familyNames, givenNames, regimens } from "./data/text.js";
 import type { DemoAccount } from "./types.js";
 
@@ -563,18 +564,64 @@ function buildConsents(
   }
 }
 
-const intakeSteps = ["about-you", "reason-for-care", "pain", "history", "consent"] as const;
+/**
+ * Intake answers in the IntakeAnswers contract shape (packages/shared/src/contracts/intake.ts),
+ * keyed by step. An in-progress intake holds the steps before its current step.
+ */
+const inProgressSteps = intakeSteps.slice(0, 7);
+
+function intakeAnswersUpTo(
+  p: PatientInfo,
+  stepIndex: number,
+  pain: number | null,
+): Record<string, unknown> {
+  const all: Record<string, unknown> = {
+    personal_information: {
+      givenName: p.givenName,
+      familyName: p.familyName,
+      birthDate: p.row.birthDate,
+      phone: p.row.phone ?? null,
+      preferredLanguage: p.row.preferredLanguage === "es" ? "es" : "en",
+    },
+    primary_goal: { goal: p.regimen.reason },
+    body_area: { bodyArea: p.regimen.area, side: "not_applicable" },
+    pain_levels:
+      pain === null
+        ? undefined
+        : {
+            current: pain,
+            worstLastWeek: Math.min(10, pain + 2),
+            bestLastWeek: Math.max(0, pain - 2),
+          },
+    activity_limitations: { limitations: ["walking", "stairs"], other: null },
+    clinician_preferences: {
+      genderPreference: "no_preference",
+      languagePreference: "no_preference",
+      notes: null,
+    },
+    appointment_availability: { days: [1, 3, 5], times: ["morning"] },
+    consent: {
+      treatmentAndDataUse: true,
+      aiAssistedFeatures: p.aiConsent,
+      textVersion: "2026-11-01",
+    },
+    review: { confirmed: true },
+  };
+  const out: Record<string, unknown> = {};
+  intakeSteps.slice(0, stepIndex).forEach((step) => {
+    if (all[step] !== undefined) out[step] = all[step];
+  });
+  return out;
+}
 
 function buildIntake(ctx: Ctx, p: PatientInfo, rng: ReturnType<Ctx["rng"]["fork"]>): void {
   const { t } = ctx;
   const id = ctx.id("intake", p.id);
   if (p.status === "intake_incomplete") {
-    const step = p.persona === "intake" ? "pain" : rng.pick(intakeSteps);
+    const step = p.persona === "intake" ? "pain_levels" : rng.pick(inProgressSteps);
     const stepIndex = intakeSteps.indexOf(step);
-    const answers: Record<string, unknown> = {};
-    if (stepIndex >= 1) answers.reasonForCare = p.regimen.reason;
-    if (stepIndex >= 2) answers.bodyArea = p.regimen.area;
-    if (stepIndex >= 3) answers.painScore = rng.int(3, 7);
+    const pain = rng.int(3, 7);
+    const answers = intakeAnswersUpTo(p, stepIndex, pain);
     const saved = p.createdAtMs + rng.int(10, 90) * MIN;
     t.IntakeAssessment.push({
       id,
@@ -583,9 +630,9 @@ function buildIntake(ctx: Ctx, p: PatientInfo, rng: ReturnType<Ctx["rng"]["fork"
       status: "in_progress",
       currentStep: step,
       answers: answers as never,
-      reasonForCare: stepIndex >= 1 ? p.regimen.reason : null,
-      bodyArea: stepIndex >= 2 ? p.regimen.area : null,
-      painScore: stepIndex >= 3 ? (answers.painScore as number) : null,
+      reasonForCare: stepIndex > 1 ? p.regimen.reason : null,
+      bodyArea: stepIndex > 2 ? p.regimen.area : null,
+      painScore: stepIndex > 3 ? pain : null,
       startedAt: iso(p.createdAtMs),
       submittedAt: null,
       reviewedAt: null,
@@ -603,14 +650,8 @@ function buildIntake(ctx: Ctx, p: PatientInfo, rng: ReturnType<Ctx["rng"]["fork"
     patientId: p.id,
     status: reviewed === null ? "submitted" : "reviewed",
     currentStep: "review",
-    answers: (sparse
-      ? { reasonForCare: p.regimen.reason }
-      : {
-          reasonForCare: p.regimen.reason,
-          bodyArea: p.regimen.area,
-          painScore,
-          priorTreatment: "none",
-        }) as never,
+    // Sparse records (entered before the current intake form) lack the pain step.
+    answers: intakeAnswersUpTo(p, intakeSteps.length, painScore) as never,
     reasonForCare: p.regimen.reason,
     bodyArea: sparse ? null : p.regimen.area,
     painScore,

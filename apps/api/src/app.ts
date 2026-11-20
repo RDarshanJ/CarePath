@@ -19,6 +19,10 @@ import { loggerOptions, registerRequestLogging } from "./core/logging.js";
 import { registerOpenApi, registerOpenApiRoute } from "./core/openapi.js";
 import { carePlanDraftRoutes } from "./modules/care-plans/draft-routes.js";
 import { carePlanRoutes } from "./modules/care-plans/routes.js";
+import { careTeamRoutes } from "./modules/care-team/routes.js";
+import { consentRoutes } from "./modules/consents/routes.js";
+import { intakeRoutes } from "./modules/intake/routes.js";
+import { onboardingRoutes } from "./modules/onboarding/routes.js";
 import { checkInRoutes } from "./modules/check-ins/routes.js";
 import { checkInWriteRoutes } from "./modules/check-ins/write-routes.js";
 import { clinicRoutes } from "./modules/clinic/routes.js";
@@ -108,6 +112,11 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(carePlanDraftRoutes);
   // Step 5: review task actions, check-in reviewed, review rules.
   await app.register(reviewActionRoutes);
+  // Step 6: onboarding, intake, consents, practitioners, care-team assignment.
+  await app.register(onboardingRoutes);
+  await app.register(intakeRoutes);
+  await app.register(consentRoutes);
+  await app.register(careTeamRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();
