@@ -25,6 +25,7 @@ Authority order: `docs/decisions/advisor-plan.md` overrides `docs/BRIEF.md` wher
 - Typecheck / lint / test / build: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`
 - Format: `pnpm format`
 - Database (native, port 54329, data in `.data/pg`): `scripts/db.sh start|stop|reset|status`
+- Seed: `pnpm db:seed [--profile small|full] [--check]` replaces all tenant data with deterministic synthetic data (demo logins in `docs/demo-accounts.md`).
 - Full gate: `pnpm verify` (db start, typecheck, lint, tests, build, teardown). Stages not yet implemented print as SKIPPED with the WP that adds them.
 - No Docker daemon in the build environment: `docker-compose.yml` is unverified.
 - Servers do not survive between turns. Every gate is one command that starts what it needs, tests, and tears down.

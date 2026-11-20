@@ -29,7 +29,7 @@ skip() {
 
 stage "db start" scripts/db.sh start
 stage "migrate" pnpm db:migrate
-skip "seed (small profile)" "WP 2.6"
+stage "seed (small profile)" pnpm db:seed --profile small
 stage "typecheck" pnpm typecheck
 stage "lint" pnpm lint
 stage "unit + API tests" pnpm test

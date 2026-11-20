@@ -13,7 +13,8 @@
     "migrate:create": "tsx scripts/schema-engine.ts create",
     "migrate:check": "tsx scripts/schema-engine.ts check",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "tsx scripts/schema-engine.ts deploy && tsx scripts/schema-engine.ts check && vitest run"
+    "test": "tsx scripts/schema-engine.ts deploy && tsx scripts/schema-engine.ts check && vitest run",
+    "seed": "tsx seed/cli.ts"
   },
   "devDependencies": {
     "@carepath/config": "workspace:*",
@@ -29,10 +30,12 @@
   "dependencies": {
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
-    "pg": "8.23.1"
+    "pg": "8.23.1",
+    "@carepath/shared": "workspace:*"
   },
   "exports": {
     ".": "./src/index.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./seed": "./seed/index.ts"
   }
 }

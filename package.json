@@ -17,7 +17,8 @@
     "db:stop": "scripts/db.sh stop",
     "db:reset": "scripts/db.sh reset",
     "db:migrate": "pnpm --filter @carepath/db migrate:deploy",
-    "verify": "scripts/verify.sh"
+    "verify": "scripts/verify.sh",
+    "db:seed": "pnpm --filter @carepath/db seed"
   },
   "devDependencies": {
     "@carepath/config": "workspace:*",
