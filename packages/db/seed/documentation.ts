@@ -3,7 +3,7 @@
  * generations behind some drafts, and AI progress summaries. All text is synthetic.
  */
 import { MIN, iso, type ApptInfo, type Ctx, type PatientInfo } from "./ctx.js";
-import { aiProviderLabel } from "./data/text.js";
+import { approvalRow, seedNoteDraft } from "./ai.js";
 
 const typeInfo: Record<ApptInfo["type"], readonly [string, string]> = {
   initial_evaluation: ["PT-INIT-EVAL", "Physical therapy initial evaluation"],
@@ -35,13 +35,14 @@ function soap(p: PatientInfo, atMs: number, visitPain: number, rom: number) {
   };
 }
 
-function transcript(p: PatientInfo, atMs: number): string {
+function transcript(p: PatientInfo, atMs: number, rom: number): string {
   const f = facts(p, atMs);
   return [
     `Therapist: Hello ${p.givenName}, how have the exercises been going?`,
     `Patient: I have done ${f.sessions} sessions in the last two weeks.${f.pain !== null ? ` My pain is usually around ${f.pain} out of 10.` : ""}`,
     "Therapist: Did any exercise feel worse than before?",
     `Patient: No, the ${p.regimen.area} exercises felt about the same.`,
+    `Therapist: I measured ${p.regimen.area} range of movement at ${rom} degrees today.`,
     "Therapist: Good. We will keep the current plan, and I will leave a note for you on your Today screen.",
     "Patient: Okay, thank you.",
     "(Synthetic transcript for demonstration.)",
@@ -80,6 +81,10 @@ export function buildDocumentation(ctx: Ctx): void {
     const th = a.therapist;
     const [typeCode, typeDisplay] = typeInfo[a.type];
     const encounterId = ctx.id("encounter", a.id);
+    const f = facts(p, a.startMs);
+    const visitPain = Math.max(0, Math.min(10, (f.pain ?? 4) + rng.int(-1, 1)));
+    const rom = rng.int(70, 150);
+    const transcriptText = transcript(p, a.startMs, rom);
     t.Encounter.push({
       id: encounterId,
       organizationId: p.org.id,
@@ -92,13 +97,10 @@ export function buildDocumentation(ctx: Ctx): void {
       status: "finished",
       startedAt: iso(a.startMs),
       endedAt: iso(a.endMs),
-      transcript: transcript(p, a.startMs),
+      transcript: transcriptText,
       createdAt: iso(a.startMs),
       updatedAt: iso(a.endMs),
     });
-    const f = facts(p, a.startMs);
-    const visitPain = Math.max(0, Math.min(10, (f.pain ?? 4) + rng.int(-1, 1)));
-    const rom = rng.int(70, 150);
     t.Observation.push(
       {
         id: ctx.id("observation", `${encounterId}/pain`),
@@ -162,6 +164,9 @@ export function buildDocumentation(ctx: Ctx): void {
       currentVersionId: null,
       signedAt: null,
       signedByPractitionerId: null,
+      enteredInErrorAt: null,
+      enteredInErrorReason: null,
+      enteredInErrorByUserId: null,
       createdAt: iso(created),
       updatedAt: iso(created),
     });
@@ -195,56 +200,26 @@ export function buildDocumentation(ctx: Ctx): void {
     let lastVersionId: string;
     let lastAt = created;
     if (fromAi) {
+      // The demo provider's draft from this visit's synthetic transcript, approved by the
+      // therapist (creating the note's first version), then rewritten by the therapist.
       aiDrafts += 1;
-      const genId = ctx.id("ai-generation", `${noteId}/draft`);
-      const aiText = {
-        ...content,
-        assessment:
-          "Participation matches the plan. Draft generated from the visit transcript; clinician review required.",
-      };
-      t.AIGeneration.push({
-        id: genId,
-        organizationId: p.org.id,
-        patientId: p.id,
-        kind: "note_draft",
-        provider: "demo",
-        providerLabel: aiProviderLabel,
-        model: null,
-        promptKey: "note.soap",
-        promptVersion: "1",
-        status: "succeeded",
-        input: {
-          sourceRefs: [{ type: "Encounter", id: encounterId, field: "transcript" }],
-          redacted: true,
-        },
-        output: aiText,
-        error: null,
-        inputTokens: null,
-        outputTokens: null,
-        costMicroUsd: null,
-        latencyMs: 40,
-        unsupportedStatementCount: 0,
-        requestedByUserId: th.userId,
-        createdAt: iso(created),
-        completedAt: iso(created + 1000),
-      });
-      addVersion("ai_draft", aiText, created + 1000, genId, null);
+      const gen = seedNoteDraft(
+        ctx,
+        p,
+        th.userId,
+        { id: encounterId, type: a.type },
+        transcriptText,
+        created,
+      );
+      t.AIGeneration.push(gen.row);
+      t.AIReview.push(approvalRow(ctx, p, gen.id, th.userId, gen.draft, noteId, created + 2 * MIN));
+      addVersion("ai_draft", gen.soap, created + 2 * MIN, gen.id, null);
       lastAt = created + 8 * MIN;
       const edited = {
         ...content,
         plan: `${content.plan} Therapist edit: confirmed with the patient at the visit.`,
       };
       lastVersionId = addVersion("clinician", edited, lastAt, null, null);
-      t.AIReview.push({
-        id: ctx.id("ai-review", genId),
-        organizationId: p.org.id,
-        generationId: genId,
-        reviewerUserId: th.userId,
-        decision: "approved_with_edits",
-        editedOutput: edited,
-        reason: null,
-        createdAt: iso(lastAt),
-      });
     } else {
       lastVersionId = addVersion("clinician", content, created + 2 * MIN, null, null);
       lastAt = created + 2 * MIN;
@@ -302,102 +277,32 @@ export function buildDocumentation(ctx: Ctx): void {
       });
     }
   }
+  // WP 5.2, Scenario F: patient.demo's visit two days before the anchor, with therapist.demo,
+  // a synthetic transcript and no note yet, so a SOAP draft can be requested from it.
+  const demo = ctx.patients.find((p) => p.persona === "demo");
+  if (demo?.therapist && demo.aiConsent) {
+    const startMs = ctx.anchorMs - 2 * 86_400_000 - 3 * 3_600_000;
+    t.Encounter.push({
+      id: ctx.id("encounter", `${demo.id}/scenario-f`),
+      organizationId: demo.org.id,
+      patientId: demo.id,
+      practitionerId: demo.therapist.practitionerId,
+      appointmentId: null,
+      class: "AMB",
+      typeCode: typeInfo.follow_up[0],
+      typeDisplay: typeInfo.follow_up[1],
+      status: "finished",
+      startedAt: iso(startMs),
+      endedAt: iso(startMs + 45 * MIN),
+      transcript: transcript(demo, startMs, 112),
+      createdAt: iso(startMs),
+      updatedAt: iso(startMs + 45 * MIN),
+    });
+  }
   ctx.post.push({ kind: "update", table: "ClinicalNote", rows: noteCurrent });
   if (noteSigned.length) ctx.post.push({ kind: "update", table: "ClinicalNote", rows: noteSigned });
   if (amendRows.length) {
     ctx.post.push({ kind: "insert", table: "ClinicalNoteVersion", rows: amendRows });
     ctx.post.push({ kind: "update", table: "ClinicalNote", rows: amendCurrent });
   }
-
-  // ---- AI progress summaries ------------------------------------------------------------
-  const eligible = ctx.patients.filter(
-    (p) => p.status === "active" && p.aiConsent && p.therapist && p.checkIns.length >= 3,
-  );
-  const wanted = Math.max(2, Math.round(profile.encounters / 2));
-  const picks = rng.shuffle(eligible).slice(0, wanted);
-  picks.forEach((p, i) => {
-    const th = p.therapist!;
-    const windowStart = ctx.anchorMs - 14 * 86_400_000;
-    const recentSessions = p.sessions.filter(
-      (s) => s.status === "completed" && s.startedAtMs >= windowStart,
-    );
-    const recentCheckIns = p.checkIns.filter((c) => c.submittedAtMs >= windowStart);
-    const createdAt = ctx.anchorMs - (i + 1) * 5 * 3_600_000;
-    const id = ctx.id("ai-generation", `${p.id}/summary`);
-    const base = {
-      id,
-      organizationId: p.org.id,
-      patientId: p.id,
-      kind: "progress_summary" as const,
-      provider: "demo",
-      providerLabel: aiProviderLabel,
-      model: null,
-      promptKey: "summary.progress",
-      promptVersion: "1",
-      requestedByUserId: th.userId,
-      createdAt: iso(createdAt),
-      input: {
-        windowDays: 14,
-        sourceRefs: [
-          ...recentSessions.map((s) => ({ type: "ExerciseSession", id: s.id })),
-          ...recentCheckIns.map((c) => ({ type: "PatientCheckIn", id: c.id })),
-        ],
-      },
-      inputTokens: null,
-      outputTokens: null,
-      costMicroUsd: null,
-    };
-    if (i === 1) {
-      t.AIGeneration.push({
-        ...base,
-        status: "failed",
-        output: null,
-        error: "Demo provider timeout after 20000 ms (simulated).",
-        latencyMs: 20000,
-        unsupportedStatementCount: null,
-        completedAt: iso(createdAt + 20_000),
-      });
-      return;
-    }
-    const pains = recentCheckIns.map((c) => c.painScore);
-    const output = {
-      summary: `${recentSessions.length} completed sessions in the last 14 days.`,
-      statements: [
-        {
-          text: `Completed ${recentSessions.length} sessions in the last 14 days.`,
-          sourceRefs: recentSessions.map((s) => ({ type: "ExerciseSession", id: s.id })),
-        },
-        ...(pains.length
-          ? [
-              {
-                text: `Reported pain ranged from ${Math.min(...pains)} to ${Math.max(...pains)} out of 10 (patient-reported).`,
-                sourceRefs: recentCheckIns.map((c) => ({ type: "PatientCheckIn", id: c.id })),
-              },
-            ]
-          : []),
-      ],
-      missingInformation: pains.length ? [] : ["No check-ins in the last 14 days."],
-    };
-    t.AIGeneration.push({
-      ...base,
-      status: "succeeded",
-      output,
-      error: null,
-      latencyMs: 35,
-      unsupportedStatementCount: 0,
-      completedAt: iso(createdAt + 1000),
-    });
-    if (i !== 0) {
-      t.AIReview.push({
-        id: ctx.id("ai-review", id),
-        organizationId: p.org.id,
-        generationId: id,
-        reviewerUserId: th.userId,
-        decision: "approved",
-        editedOutput: null,
-        reason: null,
-        createdAt: iso(createdAt + 20 * MIN),
-      });
-    }
-  });
 }

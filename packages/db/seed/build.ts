@@ -2,6 +2,7 @@
  * Pure dataset generator: profile + seed + anchor in, rows out. No database, no clock, no
  * platform randomness, so the same inputs always return the same rows (tested through a content hash).
  */
+import { buildAiSummaries } from "./ai.js";
 import { buildActivity } from "./activity.js";
 import { buildCarePlans, buildExercises } from "./careplans.js";
 import { buildConversations } from "./comms.js";
@@ -36,6 +37,8 @@ export function buildDataset(profile: SeedProfile, options: BuildOptions): Datas
   buildScheduling(ctx);
   buildDocumentation(ctx);
   const unread = buildConversations(ctx);
+  // After messages: summaries read the seeded threads (WP 5.2).
+  buildAiSummaries(ctx);
   buildOps(ctx, unread);
 
   return {
