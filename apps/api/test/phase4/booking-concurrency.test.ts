@@ -39,7 +39,8 @@ beforeAll(async () => {
   await createClinicalFixture(db, org, NOW);
   patients = await extraPatients(db, org, PARALLEL);
   coordinator = await login(app, org.coordinator.email);
-  const port = Number(process.env["API_PORT"] ?? 0);
+  // Always an ephemeral port: concurrent gates share API_PORT values (e.g. 4090 for every pnpm verify).
+  const port = 0;
   await app.listen({ host: "127.0.0.1", port });
   const address = app.server.address();
   if (!address || typeof address === "string") throw new Error("server has no port");
