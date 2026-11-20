@@ -3,11 +3,17 @@
  * organization (ADR-8); ids from a bundle are only ever looked up inside it.
  */
 import {
+  encounterTypeColumn,
+  encounterTypeFromColumn,
   identifierSystem,
   naturalKey,
+  signedNoteDocuments,
   parseIdentifierSystem,
   SYSTEMS,
+  type AppointmentRecord,
   type CarePlanRecord,
+  type ConditionRecord,
+  type EncounterRecord,
   type GoalRecord,
   type ImportLookup,
   type ImportPlan,
@@ -76,6 +82,7 @@ const goalSelect = {
   targetUnit: true,
   startDate: true,
   dueDate: true,
+  addressesConditionId: true,
 } as const;
 function toGoal(g: {
   id: string;
@@ -89,6 +96,7 @@ function toGoal(g: {
   targetUnit: string | null;
   startDate: Date | null;
   dueDate: Date | null;
+  addressesConditionId: string | null;
 }): GoalRecord {
   return {
     id: g.id,
@@ -102,6 +110,7 @@ function toGoal(g: {
     targetUnit: g.targetUnit,
     startDate: day(g.startDate),
     dueDate: day(g.dueDate),
+    addressesConditionId: g.addressesConditionId,
   };
 }
 
@@ -119,6 +128,7 @@ const observationSelect = {
   dataAbsentReason: true,
   performerType: true,
   performerPractitionerId: true,
+  encounterId: true,
   effectiveAt: true,
   recordedAt: true,
 } as const;
@@ -136,6 +146,7 @@ function toObservation(o: {
   dataAbsentReason: string | null;
   performerType: ObservationRecord["performerType"];
   performerPractitionerId: string | null;
+  encounterId: string | null;
   effectiveAt: Date;
   recordedAt: Date;
 }): ObservationRecord {
@@ -147,10 +158,92 @@ function toObservation(o: {
   };
 }
 
+const conditionSelect = {
+  id: true,
+  patientId: true,
+  encounterId: true,
+  codeSystem: true,
+  code: true,
+  display: true,
+  category: true,
+  clinicalStatus: true,
+  verificationStatus: true,
+  bodySite: true,
+  onsetDate: true,
+  abatementDate: true,
+  recordedByPractitionerId: true,
+  note: true,
+  recordedAt: true,
+} as const;
+function toCondition(c: {
+  id: string;
+  patientId: string;
+  encounterId: string | null;
+  codeSystem: string;
+  code: string;
+  display: string;
+  category: ConditionRecord["category"];
+  clinicalStatus: ConditionRecord["clinicalStatus"];
+  verificationStatus: ConditionRecord["verificationStatus"];
+  bodySite: string | null;
+  onsetDate: Date | null;
+  abatementDate: Date | null;
+  recordedByPractitionerId: string | null;
+  note: string | null;
+  recordedAt: Date;
+}): ConditionRecord {
+  return {
+    ...c,
+    onsetDate: day(c.onsetDate),
+    abatementDate: day(c.abatementDate),
+    recordedAt: c.recordedAt.toISOString(),
+  };
+}
+
+const encounterSelect = {
+  id: true,
+  patientId: true,
+  practitionerId: true,
+  appointmentId: true,
+  class: true,
+  typeCode: true,
+  typeDisplay: true,
+  status: true,
+  startedAt: true,
+  endedAt: true,
+} as const;
+function toEncounter(e: {
+  id: string;
+  patientId: string;
+  practitionerId: string;
+  appointmentId: string | null;
+  class: EncounterRecord["class"];
+  typeCode: string;
+  typeDisplay: string;
+  status: EncounterRecord["status"];
+  startedAt: Date;
+  endedAt: Date | null;
+}): EncounterRecord {
+  return {
+    id: e.id,
+    patientId: e.patientId,
+    practitionerId: e.practitionerId,
+    appointmentId: e.appointmentId,
+    class: e.class,
+    ...encounterTypeFromColumn(e.typeCode),
+    typeDisplay: e.typeDisplay,
+    status: e.status,
+    startedAt: e.startedAt.toISOString(),
+    endedAt: e.endedAt?.toISOString() ?? null,
+  };
+}
+
 /**
- * One patient's batch 1 record. Every published version of every plan becomes a CarePlan; the
- * plan's goals are listed on its latest version. Only practitioners that a plan version or an
- * observation names are included, so the bundle has no unreferenced clinicians.
+ * One patient's record (batches 1 and 2). Every published version of every plan becomes a CarePlan; the
+ * plan's goals are listed on its latest version. Every condition, appointment and encounter of
+ * the patient is included; clinical notes only as their signed versions (signedNoteDocuments),
+ * so drafts never leave CarePath. Only practitioners that another record names are included, so
+ * the bundle has no unreferenced clinicians.
  */
 export async function loadPatientExport(
   db: DbClient,
@@ -168,52 +261,122 @@ export async function loadPatientExport(
     }),
   ]);
   if (!org || !patient) return null;
-  const [plans, goals, observations] = await Promise.all([
-    db.carePlan.findMany({
-      where: { organizationId: ctx.orgId, patientId },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-      select: {
-        id: true,
-        status: true,
-        versions: {
-          orderBy: { versionNumber: "asc" },
-          select: {
-            id: true,
-            versionNumber: true,
-            title: true,
-            instructions: true,
-            changeNoteForPatient: true,
-            publishedByPractitionerId: true,
-            publishedAt: true,
-            assignments: {
-              orderBy: { position: "asc" },
-              select: {
-                sets: true,
-                reps: true,
-                holdSeconds: true,
-                durationSeconds: true,
-                restSeconds: true,
-                daysOfWeek: true,
-                timesPerDay: true,
-                instructions: true,
-                exercise: { select: { slug: true, name: true } },
+  const [plans, goals, observations, conditions, appointments, encounters, notes] =
+    await Promise.all([
+      db.carePlan.findMany({
+        where: { organizationId: ctx.orgId, patientId },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        select: {
+          id: true,
+          status: true,
+          versions: {
+            orderBy: { versionNumber: "asc" },
+            select: {
+              id: true,
+              versionNumber: true,
+              title: true,
+              instructions: true,
+              changeNoteForPatient: true,
+              publishedByPractitionerId: true,
+              publishedAt: true,
+              assignments: {
+                orderBy: { position: "asc" },
+                select: {
+                  sets: true,
+                  reps: true,
+                  holdSeconds: true,
+                  durationSeconds: true,
+                  restSeconds: true,
+                  daysOfWeek: true,
+                  timesPerDay: true,
+                  instructions: true,
+                  exercise: { select: { slug: true, name: true } },
+                },
               },
             },
           },
         },
-      },
+      }),
+      db.goal.findMany({
+        where: { organizationId: ctx.orgId, patientId },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+        select: goalSelect,
+      }),
+      db.observation.findMany({
+        where: { organizationId: ctx.orgId, patientId },
+        orderBy: [{ effectiveAt: "asc" }, { id: "asc" }],
+        select: observationSelect,
+      }),
+      db.condition.findMany({
+        where: { organizationId: ctx.orgId, patientId },
+        orderBy: [{ recordedAt: "asc" }, { id: "asc" }],
+        select: conditionSelect,
+      }),
+      db.appointment.findMany({
+        where: { organizationId: ctx.orgId, patientId },
+        orderBy: [{ startsAt: "asc" }, { id: "asc" }],
+        select: {
+          id: true,
+          patientId: true,
+          practitionerId: true,
+          type: true,
+          status: true,
+          startsAt: true,
+          endsAt: true,
+          bookedTimezone: true,
+          reason: true,
+          cancellationReason: true,
+          createdAt: true,
+        },
+      }),
+      db.encounter.findMany({
+        where: { organizationId: ctx.orgId, patientId },
+        orderBy: [{ startedAt: "asc" }, { id: "asc" }],
+        select: encounterSelect,
+      }),
+      // Notes that were signed at some point; drafts are not read at all.
+      db.clinicalNote.findMany({
+        where: { organizationId: ctx.orgId, patientId, signedAt: { not: null } },
+        orderBy: [{ signedAt: "asc" }, { id: "asc" }],
+        select: {
+          id: true,
+          patientId: true,
+          encounterId: true,
+          authorPractitionerId: true,
+          noteType: true,
+          status: true,
+          signedAt: true,
+          signedByPractitionerId: true,
+          versions: {
+            orderBy: { versionNumber: "asc" },
+            select: {
+              id: true,
+              versionNumber: true,
+              subjective: true,
+              objective: true,
+              assessment: true,
+              plan: true,
+              isAmendment: true,
+              amendmentReason: true,
+              createdAt: true,
+            },
+          },
+        },
+      }),
+    ]);
+  const appointmentRecords: AppointmentRecord[] = appointments.map((a) => ({
+    ...a,
+    startsAt: a.startsAt.toISOString(),
+    endsAt: a.endsAt.toISOString(),
+    createdAt: a.createdAt.toISOString(),
+  }));
+  const documents = notes.flatMap((n) =>
+    signedNoteDocuments({
+      ...n,
+      signedAt: n.signedAt?.toISOString() ?? null,
+      versions: n.versions.map((v) => ({ ...v, createdAt: v.createdAt.toISOString() })),
     }),
-    db.goal.findMany({
-      where: { organizationId: ctx.orgId, patientId },
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
-      select: goalSelect,
-    }),
-    db.observation.findMany({
-      where: { organizationId: ctx.orgId, patientId },
-      orderBy: [{ effectiveAt: "asc" }, { id: "asc" }],
-      select: observationSelect,
-    }),
-  ]);
+  );
   const carePlans: CarePlanRecord[] = plans.flatMap((plan) =>
     plan.versions.map((v, i) => {
       const latest = i === plan.versions.length - 1;
@@ -248,6 +411,10 @@ export async function loadPatientExport(
   const practitionerIds = new Set<string>([
     ...carePlans.map((c) => c.authorPractitionerId),
     ...observations.flatMap((o) => (o.performerPractitionerId ? [o.performerPractitionerId] : [])),
+    ...conditions.flatMap((c) => (c.recordedByPractitionerId ? [c.recordedByPractitionerId] : [])),
+    ...appointments.map((a) => a.practitionerId),
+    ...encounters.map((e) => e.practitionerId),
+    ...documents.flatMap((d) => [d.authorPractitionerId, d.signerPractitionerId]),
   ]);
   const practitioners = await db.practitioner.findMany({
     where: { organizationId: ctx.orgId, id: { in: [...practitionerIds] } },
@@ -261,6 +428,10 @@ export async function loadPatientExport(
     carePlans,
     goals: goals.map(toGoal),
     observations: observations.map(toObservation),
+    conditions: conditions.map(toCondition),
+    appointments: appointmentRecords,
+    encounters: encounters.map(toEncounter),
+    documents,
   };
 }
 
@@ -287,8 +458,15 @@ export function importLookup(db: DbClient, ctx: Scope, orgSlug: string): ImportL
           return (await db.observation.count({ where: by })) > 0;
         case "CarePlan":
           return (await db.carePlanVersion.count({ where: by })) > 0;
+        case "Encounter":
+          return (await db.encounter.count({ where: by })) > 0;
+        case "Condition":
+          return (await db.condition.count({ where: by })) > 0;
         case "Organization":
           return id === ctx.orgId;
+        default:
+          // Appointment and DocumentReference are export only; import never looks them up.
+          return false;
       }
     },
     async byIdentifier(type, system, value) {
@@ -382,7 +560,23 @@ export function importLookup(db: DbClient, ctx: Scope, orgSlug: string): ImportL
             }),
           );
         }
-        case "Organization":
+        case "Encounter": {
+          const e = record as EncounterRecord;
+          const rows = await db.encounter.findMany({
+            where: { ...where, patientId: e.patientId, startedAt: new Date(e.startedAt) },
+            select: encounterSelect,
+          });
+          return match(rows, (r) => r.id, toEncounter);
+        }
+        case "Condition": {
+          const c = record as ConditionRecord;
+          const rows = await db.condition.findMany({
+            where: { ...where, patientId: c.patientId, code: c.code },
+            select: conditionSelect,
+          });
+          return match(rows, (r) => r.id, toCondition);
+        }
+        default:
           return null;
       }
     },
@@ -408,7 +602,8 @@ export async function organizationSlug(db: DbClient, ctx: Scope): Promise<string
 }
 
 /**
- * Writes an import plan inside the caller's transaction. Plans are inserted as drafts, given
+ * Writes an import plan inside the caller's transaction, referenced rows first: practitioners,
+ * patients, care plans, encounters, conditions, goals, observations. Plans are inserted as drafts, given
  * their versions in order, then moved through the status trigger (draft -> active -> final
  * status) the way the seed does. Closed plans go first because the database allows one open plan
  * per patient. Imported patients have no login and no care team yet, so their status is
@@ -510,6 +705,35 @@ export async function persistImport(tx: DbTx, ctx: Scope, plan: ImportPlan): Pro
     if (p.status !== "active")
       await tx.carePlan.update({ where: { id: p.id }, data: { status: p.status } });
   }
+  if (c.encounters.length) {
+    await tx.encounter.createMany({
+      data: c.encounters.map((e) => ({
+        id: e.id,
+        organizationId: org,
+        patientId: e.patientId,
+        practitionerId: e.practitionerId,
+        appointmentId: e.appointmentId,
+        class: e.class,
+        typeCode: encounterTypeColumn(e),
+        typeDisplay: e.typeDisplay,
+        status: e.status,
+        startedAt: new Date(e.startedAt),
+        endedAt: e.endedAt ? new Date(e.endedAt) : null,
+      })),
+    });
+  }
+  if (c.conditions.length) {
+    await tx.condition.createMany({
+      data: c.conditions.map((x) => ({
+        ...x,
+        organizationId: org,
+        onsetDate: x.onsetDate ? new Date(`${x.onsetDate}T00:00:00Z`) : null,
+        abatementDate: x.abatementDate ? new Date(`${x.abatementDate}T00:00:00Z`) : null,
+        // No recordedDate in the source: the database records the import time.
+        recordedAt: x.recordedAt ? new Date(x.recordedAt) : undefined,
+      })),
+    });
+  }
   if (c.goals.length) {
     await tx.goal.createMany({
       data: c.goals.map((g) => ({
@@ -526,6 +750,7 @@ export async function persistImport(tx: DbTx, ctx: Scope, plan: ImportPlan): Pro
         targetUnit: g.targetUnit,
         startDate: g.startDate ? new Date(`${g.startDate}T00:00:00Z`) : null,
         dueDate: g.dueDate ? new Date(`${g.dueDate}T00:00:00Z`) : null,
+        addressesConditionId: g.addressesConditionId,
       })),
     });
   }

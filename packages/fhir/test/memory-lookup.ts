@@ -8,6 +8,8 @@ import {
   parseIdentifierSystem,
   SYSTEMS,
   type CarePlanRecord,
+  type ConditionRecord,
+  type EncounterRecord,
   type GoalRecord,
   type ImportLookup,
   type ImportPlan,
@@ -24,6 +26,8 @@ export class MemoryOrg implements ImportLookup {
   versions: CarePlanRecord[] = [];
   plans: { id: string; patientId: string; status: string }[] = [];
   observations: ObservationRecord[] = [];
+  encounters: EncounterRecord[] = [];
+  conditions: ConditionRecord[] = [];
   exercises = new Set<string>(["quad-sets", "walk"]);
 
   constructor(
@@ -36,6 +40,8 @@ export class MemoryOrg implements ImportLookup {
     this.patients.push(...plan.creates.patients);
     this.goals.push(...plan.creates.goals);
     this.observations.push(...plan.creates.observations);
+    this.encounters.push(...plan.creates.encounters);
+    this.conditions.push(...plan.creates.conditions);
     for (const p of plan.creates.carePlans) {
       this.plans.push({ id: p.id, patientId: p.patientId, status: p.status });
       this.versions.push(...p.versions);
@@ -54,7 +60,11 @@ export class MemoryOrg implements ImportLookup {
               ? this.observations
               : type === "CarePlan"
                 ? this.versions
-                : [];
+                : type === "Encounter"
+                  ? this.encounters
+                  : type === "Condition"
+                    ? this.conditions
+                    : [];
     return list.some((r) => (r.id ?? r.versionId) === id);
   }
 
@@ -80,6 +90,8 @@ export class MemoryOrg implements ImportLookup {
       Goal: this.goals.map((r) => ({ id: r.id, rec: r })),
       Observation: this.observations.map((r) => ({ id: r.id, rec: r })),
       CarePlan: this.versions.map((r) => ({ id: r.versionId, rec: r })),
+      Encounter: this.encounters.map((r) => ({ id: r.id, rec: r })),
+      Condition: this.conditions.map((r) => ({ id: r.id, rec: r })),
     };
     return (table[type] ?? []).find((x) => naturalKey(type, x.rec as never) === key)?.id ?? null;
   }

@@ -3,8 +3,14 @@
  * CarePath checks itself (Medplum's validateResource does not reject a wrong code in a required
  * binding; measured in docs/evaluation/fhir-validation.md).
  */
+import { SYSTEMS } from "./config.js";
 import type {
+  AppointmentStatus,
   CarePlanStatus,
+  ConditionCategory,
+  ConditionClinicalStatus,
+  ConditionVerificationStatus,
+  EncounterStatus,
   GoalLifecycleStatus,
   ObservationCategory,
   ObservationStatus,
@@ -57,6 +63,45 @@ export const FHIR_CODES = {
     "entered-in-error",
     "unknown",
   ],
+  /** condition-clinical, flattened (recurrence and relapse sit under active, the rest under inactive). */
+  conditionClinical: ["active", "recurrence", "relapse", "inactive", "remission", "resolved"],
+  /** condition-ver-status, flattened (provisional and differential sit under unconfirmed). */
+  conditionVerification: [
+    "unconfirmed",
+    "provisional",
+    "differential",
+    "confirmed",
+    "refuted",
+    "entered-in-error",
+  ],
+  appointmentStatus: [
+    "proposed",
+    "pending",
+    "booked",
+    "arrived",
+    "fulfilled",
+    "cancelled",
+    "noshow",
+    "entered-in-error",
+    "checked-in",
+    "waitlist",
+  ],
+  participationStatus: ["accepted", "declined", "tentative", "needs-action"],
+  encounterStatus: [
+    "planned",
+    "arrived",
+    "triaged",
+    "in-progress",
+    "onleave",
+    "finished",
+    "cancelled",
+    "entered-in-error",
+    "unknown",
+  ],
+  documentReferenceStatus: ["current", "superseded", "entered-in-error"],
+  /** composition-status, the binding of DocumentReference.docStatus. */
+  compositionStatus: ["preliminary", "final", "amended", "entered-in-error"],
+  documentRelationshipType: ["replaces", "transforms", "signs", "appends"],
   bundleType: [
     "document",
     "message",
@@ -172,4 +217,101 @@ export function isValidNpi(npi: string): boolean {
     sum += d;
   }
   return sum % 10 === 0;
+}
+
+/** Condition category: two codes from R4 condition-category, health-concern from US Core. */
+export function conditionCategoryToFhir(c: ConditionCategory): { system: string; code: string } {
+  return c === "health_concern"
+    ? { system: SYSTEMS.usCoreConditionCategory, code: "health-concern" }
+    : { system: SYSTEMS.conditionCategory, code: hyphen(c) };
+}
+export function conditionCategoryFromFhir(c: string | undefined): ConditionCategory | null {
+  const v = underscore(c ?? "");
+  return (
+    (["problem_list_item", "encounter_diagnosis", "health_concern"] as const).find(
+      (x) => x === v,
+    ) ?? null
+  );
+}
+
+export function conditionClinicalFromFhir(c: string | undefined): ConditionClinicalStatus | null {
+  return (
+    (["active", "recurrence", "relapse", "inactive", "remission", "resolved"] as const).find(
+      (x) => x === c,
+    ) ?? null
+  );
+}
+
+export const conditionVerificationToFhir = (v: ConditionVerificationStatus) => hyphen(v);
+export function conditionVerificationFromFhir(
+  c: string | undefined,
+): ConditionVerificationStatus | null {
+  const v = underscore(c ?? "");
+  return (
+    (
+      [
+        "unconfirmed",
+        "provisional",
+        "differential",
+        "confirmed",
+        "refuted",
+        "entered_in_error",
+      ] as const
+    ).find((x) => x === v) ?? null
+  );
+}
+
+/**
+ * Appointment status (research HD section 3.1). Both cancellations are `cancelled`; who cancelled
+ * travels in cancelationReason (pat or prov from appointment-cancellation-reason).
+ */
+export function appointmentStatusToFhir(s: AppointmentStatus): string {
+  switch (s) {
+    case "requested":
+      return "proposed";
+    case "booked":
+      return "booked";
+    case "checked_in":
+      return "checked-in";
+    case "in_progress":
+      return "arrived";
+    case "completed":
+      return "fulfilled";
+    case "cancelled_by_patient":
+    case "cancelled_by_clinic":
+      return "cancelled";
+    case "no_show":
+      return "noshow";
+  }
+}
+/** `cancelled` needs the cancelling party; the caller passes the cancelationReason code. */
+export function appointmentStatusFromFhir(
+  s: string | undefined,
+  cancelledBy: string | undefined,
+): AppointmentStatus | null {
+  switch (s) {
+    case "proposed":
+    case "pending":
+      return "requested";
+    case "booked":
+      return "booked";
+    case "checked-in":
+      return "checked_in";
+    case "arrived":
+      return "in_progress";
+    case "fulfilled":
+      return "completed";
+    case "cancelled":
+      return cancelledBy === "pat" ? "cancelled_by_patient" : "cancelled_by_clinic";
+    case "noshow":
+      return "no_show";
+    default:
+      return null;
+  }
+}
+
+export const encounterStatusToFhir = (s: EncounterStatus) => hyphen(s);
+export function encounterStatusFromFhir(s: string | undefined): EncounterStatus | null {
+  const v = underscore(s ?? "");
+  return (["in_progress", "finished", "entered_in_error"] as const).find((x) => x === v) ?? null;
 }

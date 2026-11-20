@@ -24,7 +24,7 @@ const rules = (p: ImportPlan, sev?: string) =>
   p.issues.filter((i) => !sev || i.severity === sev).map((i) => i.rule);
 
 describe("import of a CarePath export into another organization", () => {
-  it("creates every batch 1 record with new ids and remapped references", async () => {
+  it("creates every importable record with new ids and remapped references", async () => {
     const org = new MemoryOrg("0b6c2f6e-0000-4000-8000-0000000000aa", "importing-clinic");
     const plan = await planImport(exported(), opts(org));
     expect(plan.issues.filter(isError)).toEqual([]);
@@ -36,7 +36,30 @@ describe("import of a CarePath export into another organization", () => {
       c.goals.length,
       c.observations.length,
       c.carePlans.length,
-    ]).toEqual([2, 1, 2, 5, 1]);
+      c.encounters.length,
+      c.conditions.length,
+    ]).toEqual([2, 1, 2, 5, 1, 2, 3]);
+    // Links point at the new records: observation and condition to the new encounter, the goal
+    // to the new condition.
+    const encIds = new Set(c.encounters.map((e) => e.id));
+    const condIds = new Set(c.conditions.map((x) => x.id));
+    expect(encIds.has(ids.encClinic)).toBe(false);
+    expect(
+      c.observations.filter((o) => o.encounterId).every((o) => encIds.has(o.encounterId!)),
+    ).toBe(true);
+    expect(c.observations.filter((o) => o.encounterId).length).toBe(2);
+    expect(c.conditions.filter((x) => x.encounterId).every((x) => encIds.has(x.encounterId!))).toBe(
+      true,
+    );
+    expect(
+      c.goals
+        .filter((g) => g.addressesConditionId)
+        .every((g) => condIds.has(g.addressesConditionId!)),
+    ).toBe(true);
+    expect(c.encounters.every((e) => e.appointmentId === null)).toBe(true);
+    // Appointments and signed notes are exported, never imported.
+    expect(plan.counts["Appointment"]!.skipped).toBe(6);
+    expect(plan.counts["DocumentReference"]!.skipped).toBe(3);
     const patientId = c.patients[0]!.id;
     expect(patientId).not.toBe(ids.patient);
     expect(c.observations.every((o) => o.patientId === patientId)).toBe(true);
@@ -73,7 +96,8 @@ describe("import of a CarePath export into another organization", () => {
         again.creates.carePlans.length,
     ).toBe(0);
     expect(rules(again, "error").every((r) => r === "dup.existing")).toBe(true);
-    expect(rules(again, "error").length).toBe(2 + 1 + 2 + 2 + 5);
+    // practitioners, patient, care plan versions, goals, observations, encounters, conditions
+    expect(rules(again, "error").length).toBe(2 + 1 + 2 + 2 + 5 + 2 + 3);
     const skipped = await planImport(exported(), opts(org, "skip"));
     expect(skipped.status).toBe(200);
     org.apply(skipped);
@@ -124,9 +148,16 @@ describe("Synthea fixtures", () => {
       expect(plan.creates.patients.length).toBe(1);
       const nonAllowed = bundle.entry.filter(
         (e: { resource: { resourceType: string } }) =>
-          !["Patient", "Practitioner", "Organization", "CarePlan", "Goal", "Observation"].includes(
-            e.resource.resourceType,
-          ),
+          ![
+            "Patient",
+            "Practitioner",
+            "Organization",
+            "CarePlan",
+            "Goal",
+            "Observation",
+            "Encounter",
+            "Condition",
+          ].includes(e.resource.resourceType),
       ).length;
       expect(plan.issues.filter((i) => i.rule === "import.skipped-type").length).toBe(nonAllowed);
       expect(plan.issues.some((i) => i.rule === "import.derived-practitioner")).toBe(true);
@@ -135,6 +166,19 @@ describe("Synthea fixtures", () => {
       expect(plan.creates.observations.every((o) => known.has(o.performerPractitionerId!))).toBe(
         true,
       );
+      // Ambulatory and video visits are imported; inpatient and emergency visits are skipped.
+      expect(plan.creates.encounters.length).toBeGreaterThan(0);
+      expect(plan.creates.encounters.every((e) => known.has(e.practitionerId))).toBe(true);
+      expect(plan.creates.encounters.every((e) => e.typeSystem === "http://snomed.info/sct")).toBe(
+        true,
+      );
+      expect(plan.creates.conditions.length).toBeGreaterThan(0);
+      const encIds = new Set(plan.creates.encounters.map((e) => e.id));
+      expect(
+        [...plan.creates.conditions, ...plan.creates.observations]
+          .filter((x) => x.encounterId)
+          .every((x) => encIds.has(x.encounterId!)),
+      ).toBe(true);
       org.apply(plan);
     }
     const again = await planImport(synthea("patient-1.json"), opts(org));
@@ -144,7 +188,9 @@ describe("Synthea fixtures", () => {
     expect(
       skip.creates.observations.length +
         skip.creates.patients.length +
-        skip.creates.carePlans.length,
+        skip.creates.carePlans.length +
+        skip.creates.encounters.length +
+        skip.creates.conditions.length,
     ).toBe(0);
   });
 

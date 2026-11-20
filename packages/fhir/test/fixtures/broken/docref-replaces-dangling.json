@@ -1,0 +1,1622 @@
+{
+  "description": "An amendment replacing a version that is not in the bundle.",
+  "mode": "validate",
+  "expect": {
+    "rule": "ref.dangling",
+    "layer": "carepath"
+  },
+  "bundle": {
+    "resourceType": "Bundle",
+    "type": "collection",
+    "timestamp": "2026-11-19T16:00:00.000Z",
+    "entry": [
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+        "resource": {
+          "resourceType": "Organization",
+          "id": "0b6c2f6e-0000-4000-8000-000000000001",
+          "identifier": [
+            {
+              "system": "urn:carepath:organization",
+              "value": "fixture-clinic"
+            }
+          ],
+          "active": true,
+          "name": "Fixture Clinic (synthetic)",
+          "telecom": [
+            {
+              "system": "phone",
+              "value": "555-0100",
+              "use": "work"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+        "resource": {
+          "resourceType": "Practitioner",
+          "id": "0b6c2f6e-0000-4000-8000-000000000020",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:staff",
+              "value": "STAFF-7"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/us-npi",
+              "value": "1234567893"
+            }
+          ],
+          "active": true,
+          "name": [
+            {
+              "use": "official",
+              "family": "Therapist",
+              "given": ["Ana"]
+            }
+          ],
+          "qualification": [
+            {
+              "code": {
+                "text": "PT, DPT"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000021",
+        "resource": {
+          "resourceType": "Practitioner",
+          "id": "0b6c2f6e-0000-4000-8000-000000000021",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:staff",
+              "value": "STAFF-8"
+            }
+          ],
+          "active": false,
+          "name": [
+            {
+              "use": "official",
+              "family": "Second",
+              "given": ["Lee"]
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+        "resource": {
+          "resourceType": "Patient",
+          "id": "0b6c2f6e-0000-4000-8000-000000000010",
+          "identifier": [
+            {
+              "type": {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                    "code": "MR",
+                    "display": "Medical record number"
+                  }
+                ]
+              },
+              "system": "urn:carepath:fixture-clinic:mrn",
+              "value": "SYN-000123"
+            }
+          ],
+          "active": true,
+          "name": [
+            {
+              "use": "official",
+              "family": "Example",
+              "given": ["Robin"]
+            }
+          ],
+          "telecom": [
+            {
+              "system": "phone",
+              "value": "555-0123"
+            },
+            {
+              "system": "email",
+              "value": "robin.example@carepath.test"
+            }
+          ],
+          "gender": "female",
+          "birthDate": "1961-04-02",
+          "communication": [
+            {
+              "language": {
+                "coding": [
+                  {
+                    "system": "urn:ietf:bcp:47",
+                    "code": "en"
+                  }
+                ]
+              }
+            }
+          ],
+          "managingOrganization": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+            "type": "Organization"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000070",
+        "resource": {
+          "resourceType": "Appointment",
+          "id": "0b6c2f6e-0000-4000-8000-000000000070",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:booked-timezone",
+              "valueString": "America/Phoenix"
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:appointment",
+              "value": "0b6c2f6e-0000-4000-8000-000000000070"
+            }
+          ],
+          "status": "fulfilled",
+          "appointmentType": {
+            "coding": [
+              {
+                "system": "urn:carepath:appointment-type",
+                "code": "follow_up",
+                "display": "Follow-up visit"
+              }
+            ]
+          },
+          "reasonCode": [
+            {
+              "text": "Knee review"
+            }
+          ],
+          "start": "2026-11-10T16:00:00.000Z",
+          "end": "2026-11-10T16:45:00.000Z",
+          "created": "2026-11-01T18:00:00.000Z",
+          "participant": [
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+                "type": "Patient"
+              },
+              "required": "required",
+              "status": "accepted"
+            },
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+                "type": "Practitioner"
+              },
+              "required": "required",
+              "status": "accepted"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000071",
+        "resource": {
+          "resourceType": "Appointment",
+          "id": "0b6c2f6e-0000-4000-8000-000000000071",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:booked-timezone",
+              "valueString": "America/Phoenix"
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:appointment",
+              "value": "0b6c2f6e-0000-4000-8000-000000000071"
+            }
+          ],
+          "status": "cancelled",
+          "cancelationReason": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/appointment-cancellation-reason",
+                "code": "pat",
+                "display": "Patient"
+              }
+            ],
+            "text": "Travel"
+          },
+          "appointmentType": {
+            "coding": [
+              {
+                "system": "urn:carepath:appointment-type",
+                "code": "follow_up",
+                "display": "Follow-up visit"
+              }
+            ]
+          },
+          "start": "2026-11-03T16:00:00.000Z",
+          "end": "2026-11-03T16:45:00.000Z",
+          "created": "2026-10-20T18:00:00.000Z",
+          "participant": [
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+                "type": "Patient"
+              },
+              "required": "required",
+              "status": "declined"
+            },
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+                "type": "Practitioner"
+              },
+              "required": "required",
+              "status": "accepted"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000072",
+        "resource": {
+          "resourceType": "Appointment",
+          "id": "0b6c2f6e-0000-4000-8000-000000000072",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:booked-timezone",
+              "valueString": "America/Phoenix"
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:appointment",
+              "value": "0b6c2f6e-0000-4000-8000-000000000072"
+            }
+          ],
+          "status": "booked",
+          "appointmentType": {
+            "coding": [
+              {
+                "system": "urn:carepath:appointment-type",
+                "code": "video_follow_up",
+                "display": "Video follow-up visit"
+              }
+            ]
+          },
+          "start": "2026-11-24T17:00:00.000Z",
+          "end": "2026-11-24T17:30:00.000Z",
+          "created": "2026-11-11T09:30:00.000Z",
+          "participant": [
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+                "type": "Patient"
+              },
+              "required": "required",
+              "status": "accepted"
+            },
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000021",
+                "type": "Practitioner"
+              },
+              "required": "required",
+              "status": "accepted"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000073",
+        "resource": {
+          "resourceType": "Appointment",
+          "id": "0b6c2f6e-0000-4000-8000-000000000073",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:booked-timezone",
+              "valueString": "America/Phoenix"
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:appointment",
+              "value": "0b6c2f6e-0000-4000-8000-000000000073"
+            }
+          ],
+          "status": "noshow",
+          "cancelationReason": {
+            "text": "No contact before the visit"
+          },
+          "appointmentType": {
+            "coding": [
+              {
+                "system": "urn:carepath:appointment-type",
+                "code": "follow_up",
+                "display": "Follow-up visit"
+              }
+            ]
+          },
+          "start": "2026-10-27T16:00:00.000Z",
+          "end": "2026-10-27T16:45:00.000Z",
+          "created": "2026-10-15T18:00:00.000Z",
+          "participant": [
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+                "type": "Patient"
+              },
+              "required": "required",
+              "status": "accepted"
+            },
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+                "type": "Practitioner"
+              },
+              "required": "required",
+              "status": "accepted"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000074",
+        "resource": {
+          "resourceType": "Appointment",
+          "id": "0b6c2f6e-0000-4000-8000-000000000074",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:booked-timezone",
+              "valueString": "America/Phoenix"
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:appointment",
+              "value": "0b6c2f6e-0000-4000-8000-000000000074"
+            }
+          ],
+          "status": "cancelled",
+          "cancelationReason": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/appointment-cancellation-reason",
+                "code": "prov",
+                "display": "Provider"
+              }
+            ]
+          },
+          "appointmentType": {
+            "coding": [
+              {
+                "system": "urn:carepath:appointment-type",
+                "code": "initial_evaluation",
+                "display": "Initial evaluation"
+              }
+            ]
+          },
+          "start": "2026-09-29T16:00:00.000Z",
+          "end": "2026-09-29T17:00:00.000Z",
+          "created": "2026-09-20T18:00:00.000Z",
+          "participant": [
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+                "type": "Patient"
+              },
+              "required": "required",
+              "status": "accepted"
+            },
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+                "type": "Practitioner"
+              },
+              "required": "required",
+              "status": "declined"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000075",
+        "resource": {
+          "resourceType": "Appointment",
+          "id": "0b6c2f6e-0000-4000-8000-000000000075",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:booked-timezone",
+              "valueString": "America/Phoenix"
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:appointment",
+              "value": "0b6c2f6e-0000-4000-8000-000000000075"
+            }
+          ],
+          "status": "proposed",
+          "appointmentType": {
+            "coding": [
+              {
+                "system": "urn:carepath:appointment-type",
+                "code": "follow_up",
+                "display": "Follow-up visit"
+              }
+            ]
+          },
+          "reasonCode": [
+            {
+              "text": "Next review"
+            }
+          ],
+          "start": "2026-12-01T16:00:00.000Z",
+          "end": "2026-12-01T16:45:00.000Z",
+          "created": "2026-11-18T10:00:00.000Z",
+          "participant": [
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+                "type": "Patient"
+              },
+              "required": "required",
+              "status": "accepted"
+            },
+            {
+              "actor": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+                "type": "Practitioner"
+              },
+              "required": "required",
+              "status": "needs-action"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000080",
+        "resource": {
+          "resourceType": "Encounter",
+          "id": "0b6c2f6e-0000-4000-8000-000000000080",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:encounter",
+              "value": "0b6c2f6e-0000-4000-8000-000000000080"
+            }
+          ],
+          "status": "finished",
+          "class": {
+            "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+            "code": "AMB",
+            "display": "ambulatory"
+          },
+          "type": [
+            {
+              "coding": [
+                {
+                  "system": "urn:carepath:encounter-type",
+                  "code": "PT-FOLLOW-UP",
+                  "display": "Physical therapy follow-up visit"
+                }
+              ],
+              "text": "Physical therapy follow-up visit"
+            }
+          ],
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "participant": [
+            {
+              "individual": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+                "type": "Practitioner"
+              }
+            }
+          ],
+          "appointment": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000070",
+              "type": "Appointment"
+            }
+          ],
+          "period": {
+            "start": "2026-11-10T16:02:00.000Z",
+            "end": "2026-11-10T16:44:00.000Z"
+          },
+          "serviceProvider": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+            "type": "Organization"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000081",
+        "resource": {
+          "resourceType": "Encounter",
+          "id": "0b6c2f6e-0000-4000-8000-000000000081",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:encounter",
+              "value": "0b6c2f6e-0000-4000-8000-000000000081"
+            }
+          ],
+          "status": "in-progress",
+          "class": {
+            "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+            "code": "VR",
+            "display": "virtual"
+          },
+          "type": [
+            {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "185389009",
+                  "display": "Follow-up visit (procedure)"
+                }
+              ],
+              "text": "Follow-up visit (procedure)"
+            }
+          ],
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "participant": [
+            {
+              "individual": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000021",
+                "type": "Practitioner"
+              }
+            }
+          ],
+          "period": {
+            "start": "2026-11-15T09:30:00.000Z"
+          },
+          "serviceProvider": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+            "type": "Organization"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000060",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "0b6c2f6e-0000-4000-8000-000000000060",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:condition",
+              "value": "0b6c2f6e-0000-4000-8000-000000000060"
+            }
+          ],
+          "clinicalStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "active"
+              }
+            ]
+          },
+          "verificationStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                "code": "confirmed"
+              }
+            ]
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                  "code": "problem-list-item"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "urn:carepath:synthetic-condition",
+                "code": "knee-pain-after-surgery",
+                "display": "Knee pain after surgery (synthetic)"
+              }
+            ],
+            "text": "Knee pain after surgery (synthetic)"
+          },
+          "bodySite": [
+            {
+              "text": "Left knee"
+            }
+          ],
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "onsetDateTime": "2026-08-12",
+          "recordedDate": "2026-10-01T15:30:00.000Z",
+          "recorder": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+            "type": "Practitioner"
+          },
+          "note": [
+            {
+              "text": "Recorded at intake."
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000061",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "0b6c2f6e-0000-4000-8000-000000000061",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:condition",
+              "value": "0b6c2f6e-0000-4000-8000-000000000061"
+            }
+          ],
+          "clinicalStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                "code": "resolved"
+              }
+            ]
+          },
+          "verificationStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                "code": "confirmed"
+              }
+            ]
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                  "code": "encounter-diagnosis"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "444814009",
+                "display": "Viral sinusitis (disorder)"
+              }
+            ],
+            "text": "Viral sinusitis (disorder)"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "encounter": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000080",
+            "type": "Encounter"
+          },
+          "onsetDateTime": "2026-11-01",
+          "abatementDateTime": "2026-11-09",
+          "recordedDate": "2026-11-10T16:30:00.000Z"
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000062",
+        "resource": {
+          "resourceType": "Condition",
+          "id": "0b6c2f6e-0000-4000-8000-000000000062",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:condition",
+              "value": "0b6c2f6e-0000-4000-8000-000000000062"
+            }
+          ],
+          "verificationStatus": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                "code": "entered-in-error"
+              }
+            ]
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/core/CodeSystem/condition-category",
+                  "code": "health-concern"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "urn:carepath:synthetic-condition",
+                "code": "hip-pain",
+                "display": "Hip pain (synthetic)"
+              }
+            ],
+            "text": "Hip pain (synthetic)"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "recordedDate": "2026-10-02T12:00:00.000Z",
+          "recorder": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000021",
+            "type": "Practitioner"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000040",
+        "resource": {
+          "resourceType": "Goal",
+          "id": "0b6c2f6e-0000-4000-8000-000000000040",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:goal",
+              "value": "0b6c2f6e-0000-4000-8000-000000000040"
+            }
+          ],
+          "lifecycleStatus": "active",
+          "achievementStatus": {
+            "text": "in-progress"
+          },
+          "description": {
+            "text": "Climb one flight of stairs without stopping"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "startDate": "2026-10-01",
+          "target": [
+            {
+              "measure": {
+                "coding": [
+                  {
+                    "system": "urn:carepath:goal-measure",
+                    "code": "flights"
+                  }
+                ]
+              },
+              "detailQuantity": {
+                "value": 1,
+                "unit": "flights"
+              },
+              "dueDate": "2026-11-26"
+            }
+          ],
+          "addresses": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000060",
+              "type": "Condition"
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000041",
+        "resource": {
+          "resourceType": "Goal",
+          "id": "0b6c2f6e-0000-4000-8000-000000000041",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:goal",
+              "value": "0b6c2f6e-0000-4000-8000-000000000041"
+            }
+          ],
+          "lifecycleStatus": "on-hold",
+          "description": {
+            "text": "Walk for 20 minutes"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "startDate": "2026-10-01"
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000031",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "0b6c2f6e-0000-4000-8000-000000000031",
+          "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Knee strengthening (version 1)</p><p>Warm up for five minutes first.</p><p>Quad sets: 2 sets, 10 reps, hold 5 s</p></div>"
+          },
+          "extension": [
+            {
+              "url": "urn:carepath:extension:care-plan-version-number",
+              "valueInteger": 1
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:care-plan",
+              "value": "0b6c2f6e-0000-4000-8000-000000000030"
+            },
+            {
+              "system": "urn:carepath:fixture-clinic:care-plan-version",
+              "value": "0b6c2f6e-0000-4000-8000-000000000031"
+            }
+          ],
+          "status": "revoked",
+          "intent": "plan",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
+                  "code": "assess-plan"
+                }
+              ]
+            }
+          ],
+          "title": "Knee strengthening",
+          "description": "Warm up for five minutes first.",
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "created": "2026-10-01T15:00:00.000Z",
+          "author": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+            "type": "Practitioner"
+          },
+          "goal": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000040",
+              "type": "Goal"
+            }
+          ],
+          "activity": [
+            {
+              "extension": [
+                {
+                  "url": "urn:carepath:extension:exercise-dose",
+                  "extension": [
+                    {
+                      "url": "sets",
+                      "valueInteger": 2
+                    },
+                    {
+                      "url": "reps",
+                      "valueInteger": 10
+                    },
+                    {
+                      "url": "holdSeconds",
+                      "valueInteger": 5
+                    },
+                    {
+                      "url": "restSeconds",
+                      "valueInteger": 30
+                    }
+                  ]
+                }
+              ],
+              "detail": {
+                "kind": "ServiceRequest",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "urn:carepath:exercise",
+                      "code": "quad-sets",
+                      "display": "Quad sets"
+                    }
+                  ],
+                  "text": "Quad sets"
+                },
+                "status": "stopped",
+                "scheduledTiming": {
+                  "repeat": {
+                    "frequency": 1,
+                    "period": 1,
+                    "periodUnit": "d",
+                    "dayOfWeek": ["mon", "wed", "fri"]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000032",
+        "resource": {
+          "resourceType": "CarePlan",
+          "id": "0b6c2f6e-0000-4000-8000-000000000032",
+          "text": {
+            "status": "generated",
+            "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Knee strengthening (version 2)</p><p>Quad sets: 3 sets, 10 reps, hold 5 s</p><p>Walk: 600 s</p></div>"
+          },
+          "extension": [
+            {
+              "url": "urn:carepath:extension:care-plan-version-number",
+              "valueInteger": 2
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:care-plan",
+              "value": "0b6c2f6e-0000-4000-8000-000000000030"
+            },
+            {
+              "system": "urn:carepath:fixture-clinic:care-plan-version",
+              "value": "0b6c2f6e-0000-4000-8000-000000000032"
+            }
+          ],
+          "status": "active",
+          "intent": "plan",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
+                  "code": "assess-plan"
+                }
+              ]
+            }
+          ],
+          "title": "Knee strengthening",
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "created": "2026-10-15T15:00:00.000Z",
+          "author": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000021",
+            "type": "Practitioner"
+          },
+          "replaces": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000031",
+              "type": "CarePlan"
+            }
+          ],
+          "goal": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000040",
+              "type": "Goal"
+            },
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000041",
+              "type": "Goal"
+            }
+          ],
+          "note": [
+            {
+              "text": "Added a short walk on weekdays."
+            }
+          ],
+          "activity": [
+            {
+              "extension": [
+                {
+                  "url": "urn:carepath:extension:exercise-dose",
+                  "extension": [
+                    {
+                      "url": "sets",
+                      "valueInteger": 3
+                    },
+                    {
+                      "url": "reps",
+                      "valueInteger": 10
+                    },
+                    {
+                      "url": "holdSeconds",
+                      "valueInteger": 5
+                    },
+                    {
+                      "url": "restSeconds",
+                      "valueInteger": 45
+                    }
+                  ]
+                }
+              ],
+              "detail": {
+                "kind": "ServiceRequest",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "urn:carepath:exercise",
+                      "code": "quad-sets",
+                      "display": "Quad sets"
+                    }
+                  ],
+                  "text": "Quad sets"
+                },
+                "status": "scheduled",
+                "description": "Keep the knee straight.",
+                "scheduledTiming": {
+                  "repeat": {
+                    "frequency": 2,
+                    "period": 1,
+                    "periodUnit": "d",
+                    "dayOfWeek": ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
+                  }
+                }
+              }
+            },
+            {
+              "extension": [
+                {
+                  "url": "urn:carepath:extension:exercise-dose",
+                  "extension": [
+                    {
+                      "url": "durationSeconds",
+                      "valueInteger": 600
+                    },
+                    {
+                      "url": "restSeconds",
+                      "valueInteger": 0
+                    }
+                  ]
+                }
+              ],
+              "detail": {
+                "kind": "ServiceRequest",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "urn:carepath:exercise",
+                      "code": "walk",
+                      "display": "Walk"
+                    }
+                  ],
+                  "text": "Walk"
+                },
+                "status": "scheduled",
+                "scheduledTiming": {
+                  "repeat": {
+                    "frequency": 1,
+                    "period": 1,
+                    "periodUnit": "d",
+                    "dayOfWeek": ["mon", "tue", "wed", "thu", "fri"]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000050",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "0b6c2f6e-0000-4000-8000-000000000050",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:observation",
+              "value": "0b6c2f6e-0000-4000-8000-000000000050"
+            }
+          ],
+          "status": "final",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                  "code": "survey"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "72514-3",
+                "display": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+              }
+            ],
+            "text": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "effectiveDateTime": "2026-11-18T14:00:00.000Z",
+          "issued": "2026-11-18T14:01:00.000Z",
+          "performer": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+              "type": "Patient"
+            }
+          ],
+          "valueQuantity": {
+            "value": 4,
+            "unit": "{score}",
+            "system": "http://unitsofmeasure.org",
+            "code": "{score}"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000051",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "0b6c2f6e-0000-4000-8000-000000000051",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:observation",
+              "value": "0b6c2f6e-0000-4000-8000-000000000051"
+            }
+          ],
+          "status": "amended",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                  "code": "survey"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "72514-3",
+                "display": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+              }
+            ],
+            "text": "Pain severity - 0-10 verbal numeric rating [Score] - Reported"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "encounter": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000080",
+            "type": "Encounter"
+          },
+          "effectiveDateTime": "2026-11-10T16:10:00.000Z",
+          "issued": "2026-11-10T16:12:00.000Z",
+          "performer": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+              "type": "Practitioner"
+            }
+          ],
+          "valueQuantity": {
+            "value": 6,
+            "unit": "{score}",
+            "system": "http://unitsofmeasure.org",
+            "code": "{score}"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000052",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "0b6c2f6e-0000-4000-8000-000000000052",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:observation",
+              "value": "0b6c2f6e-0000-4000-8000-000000000052"
+            }
+          ],
+          "status": "final",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                  "code": "exam"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "urn:carepath:observation-code",
+                "code": "range-of-movement",
+                "display": "Range of movement, knee (synthetic)"
+              }
+            ],
+            "text": "Range of movement, knee (synthetic)"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "encounter": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000080",
+            "type": "Encounter"
+          },
+          "effectiveDateTime": "2026-11-10T16:20:00.000Z",
+          "issued": "2026-11-10T16:22:00.000Z",
+          "performer": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+              "type": "Practitioner"
+            }
+          ],
+          "valueQuantity": {
+            "value": 112.5,
+            "unit": "deg",
+            "system": "http://unitsofmeasure.org",
+            "code": "deg"
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000053",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "0b6c2f6e-0000-4000-8000-000000000053",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:observation",
+              "value": "0b6c2f6e-0000-4000-8000-000000000053"
+            }
+          ],
+          "status": "final",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                  "code": "activity"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "urn:carepath:observation-code",
+                "code": "session-difficulty",
+                "display": "Session difficulty (synthetic)"
+              }
+            ],
+            "text": "Session difficulty (synthetic)"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "effectiveDateTime": "2026-11-17T09:00:00.000Z",
+          "issued": "2026-11-17T09:00:00.000Z",
+          "performer": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+              "type": "Patient"
+            }
+          ],
+          "valueString": "harder than expected"
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000054",
+        "resource": {
+          "resourceType": "Observation",
+          "id": "0b6c2f6e-0000-4000-8000-000000000054",
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:observation",
+              "value": "0b6c2f6e-0000-4000-8000-000000000054"
+            }
+          ],
+          "status": "entered-in-error",
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                  "code": "vital-signs"
+                }
+              ]
+            }
+          ],
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "8867-4",
+                "display": "Heart rate"
+              }
+            ],
+            "text": "Heart rate"
+          },
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "effectiveDateTime": "2026-11-10T16:05:00.000Z",
+          "issued": "2026-11-10T16:06:00.000Z",
+          "performer": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000021",
+              "type": "Practitioner"
+            }
+          ],
+          "dataAbsentReason": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason",
+                "code": "asked-declined"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000097",
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "0b6c2f6e-0000-4000-8000-000000000097",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:clinical-note-version-number",
+              "valueInteger": 1
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:clinical-note-version",
+              "value": "0b6c2f6e-0000-4000-8000-000000000097"
+            },
+            {
+              "system": "urn:carepath:fixture-clinic:clinical-note",
+              "value": "0b6c2f6e-0000-4000-8000-000000000096"
+            }
+          ],
+          "status": "entered-in-error",
+          "docStatus": "final",
+          "type": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "34117-2",
+                "display": "History and physical note"
+              }
+            ],
+            "text": "History and physical note"
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+                  "code": "clinical-note",
+                  "display": "Clinical Note"
+                }
+              ]
+            }
+          ],
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "date": "2026-10-01T16:00:00.000Z",
+          "author": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+              "type": "Practitioner"
+            }
+          ],
+          "authenticator": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+            "type": "Practitioner"
+          },
+          "custodian": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+            "type": "Organization"
+          },
+          "content": [
+            {
+              "attachment": {
+                "contentType": "text/plain; charset=utf-8",
+                "language": "en",
+                "data": "U3ViamVjdGl2ZToKUGF0aWVudCByZXBvcnRzIDAgaG9tZSBzZXNzaW9ucyB0aGlzIHdlZWsuIEtuZWUgZmVlbHMgc3RpZmYgaW4gdGhlIG1vcm5pbmcuCgpPYmplY3RpdmU6CktuZWUgZmxleGlvbiAxMTIgZGVncmVlcyAoc3ludGhldGljKS4KUGFpbiA0IG9mIDEwIGF0IHJlc3QuCgpBc3Nlc3NtZW50OgpQcm9ncmVzc2luZyBhcyBwbGFubmVkLiBTeW50aGV0aWMgZXhhbXBsZSwgbm90IGEgY2xpbmljYWwgYXNzZXNzbWVudC4KClBsYW46CkNvbnRpbnVlIHRoZSBwbGFuOyByZXZpZXcgaW4gdHdvIHdlZWtzLg==",
+                "title": "History and physical note, version 1",
+                "creation": "2026-10-01T16:00:00.000Z"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000092",
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "0b6c2f6e-0000-4000-8000-000000000092",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:clinical-note-version-number",
+              "valueInteger": 2
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:clinical-note-version",
+              "value": "0b6c2f6e-0000-4000-8000-000000000092"
+            },
+            {
+              "system": "urn:carepath:fixture-clinic:clinical-note",
+              "value": "0b6c2f6e-0000-4000-8000-000000000090"
+            }
+          ],
+          "status": "superseded",
+          "docStatus": "final",
+          "type": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "11506-3",
+                "display": "Progress note"
+              }
+            ],
+            "text": "Progress note"
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+                  "code": "clinical-note",
+                  "display": "Clinical Note"
+                }
+              ]
+            }
+          ],
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "date": "2026-11-10T17:30:00.000Z",
+          "author": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+              "type": "Practitioner"
+            }
+          ],
+          "authenticator": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+            "type": "Practitioner"
+          },
+          "custodian": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+            "type": "Organization"
+          },
+          "content": [
+            {
+              "attachment": {
+                "contentType": "text/plain; charset=utf-8",
+                "language": "en",
+                "data": "U3ViamVjdGl2ZToKUGF0aWVudCByZXBvcnRzIDMgaG9tZSBzZXNzaW9ucyB0aGlzIHdlZWsuIEtuZWUgZmVlbHMgc3RpZmYgaW4gdGhlIG1vcm5pbmcuCgpPYmplY3RpdmU6CktuZWUgZmxleGlvbiAxMTIgZGVncmVlcyAoc3ludGhldGljKS4KUGFpbiA0IG9mIDEwIGF0IHJlc3QuCgpBc3Nlc3NtZW50OgpQcm9ncmVzc2luZyBhcyBwbGFubmVkLiBTeW50aGV0aWMgZXhhbXBsZSwgbm90IGEgY2xpbmljYWwgYXNzZXNzbWVudC4KClBsYW46CkNvbnRpbnVlIHRoZSBwbGFuOyByZXZpZXcgaW4gdHdvIHdlZWtzLg==",
+                "title": "Progress note, version 2",
+                "creation": "2026-11-10T17:30:00.000Z"
+              }
+            }
+          ],
+          "context": {
+            "encounter": [
+              {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000080",
+                "type": "Encounter"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "fullUrl": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000093",
+        "resource": {
+          "resourceType": "DocumentReference",
+          "id": "0b6c2f6e-0000-4000-8000-000000000093",
+          "extension": [
+            {
+              "url": "urn:carepath:extension:clinical-note-version-number",
+              "valueInteger": 3
+            },
+            {
+              "url": "urn:carepath:extension:amendment-reason",
+              "valueString": "Corrected the number of home sessions."
+            }
+          ],
+          "identifier": [
+            {
+              "system": "urn:carepath:fixture-clinic:clinical-note-version",
+              "value": "0b6c2f6e-0000-4000-8000-000000000093"
+            },
+            {
+              "system": "urn:carepath:fixture-clinic:clinical-note",
+              "value": "0b6c2f6e-0000-4000-8000-000000000090"
+            }
+          ],
+          "status": "current",
+          "docStatus": "amended",
+          "type": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "11506-3",
+                "display": "Progress note"
+              }
+            ],
+            "text": "Progress note"
+          },
+          "category": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+                  "code": "clinical-note",
+                  "display": "Clinical Note"
+                }
+              ]
+            }
+          ],
+          "subject": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000010",
+            "type": "Patient"
+          },
+          "date": "2026-11-11T09:00:00.000Z",
+          "author": [
+            {
+              "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+              "type": "Practitioner"
+            }
+          ],
+          "authenticator": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000020",
+            "type": "Practitioner"
+          },
+          "custodian": {
+            "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000001",
+            "type": "Organization"
+          },
+          "relatesTo": [
+            {
+              "code": "replaces",
+              "target": {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-0000000000ee",
+                "type": "DocumentReference"
+              }
+            }
+          ],
+          "content": [
+            {
+              "attachment": {
+                "contentType": "text/plain; charset=utf-8",
+                "language": "en",
+                "data": "U3ViamVjdGl2ZToKUGF0aWVudCByZXBvcnRzIDQgaG9tZSBzZXNzaW9ucyB0aGlzIHdlZWsuIEtuZWUgZmVlbHMgc3RpZmYgaW4gdGhlIG1vcm5pbmcuCgpPYmplY3RpdmU6CktuZWUgZmxleGlvbiAxMTIgZGVncmVlcyAoc3ludGhldGljKS4KUGFpbiA0IG9mIDEwIGF0IHJlc3QuCgpBc3Nlc3NtZW50OgpQcm9ncmVzc2luZyBhcyBwbGFubmVkLiBTeW50aGV0aWMgZXhhbXBsZSwgbm90IGEgY2xpbmljYWwgYXNzZXNzbWVudC4KClBsYW46CkNvbnRpbnVlIHRoZSBwbGFuOyByZXZpZXcgaW4gdHdvIHdlZWtzLg==",
+                "title": "Progress note, version 3",
+                "creation": "2026-11-11T09:00:00.000Z"
+              }
+            }
+          ],
+          "context": {
+            "encounter": [
+              {
+                "reference": "urn:uuid:0b6c2f6e-0000-4000-8000-000000000080",
+                "type": "Encounter"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

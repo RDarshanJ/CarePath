@@ -1,12 +1,15 @@
 import type { Practitioner } from "@medplum/fhirtypes";
 import { identifierSystem, SYSTEMS } from "../config.js";
+import { isValidNpi } from "../codes.js";
 import type { PractitionerRecord } from "../types.js";
 import { identifierValue, mapIssue, type MapResult, type ToFhirContext } from "./common.js";
 
 /**
  * Practitioner (US Core mandatory: identifier, name). Only clinicians have a Practitioner row,
  * so administrative staff are never exported as clinical actors. The NPI identifier is written
- * only when the row has one (synthetic staff usually do not).
+ * only when the row has one that passes the check digit (us-core-17): a stored value that fails
+ * it is not an NPI, so it is left out rather than sent under the NPI system (WP 5.4b found the
+ * seed's fictitious `9…` values fail it; the staff identifier still identifies the clinician).
  */
 export function practitionerToFhir(p: PractitionerRecord, ctx: ToFhirContext): Practitioner {
   return {
@@ -14,7 +17,7 @@ export function practitionerToFhir(p: PractitionerRecord, ctx: ToFhirContext): P
     id: p.id,
     identifier: [
       { system: identifierSystem(ctx.orgSlug, "staff"), value: p.staffId },
-      ...(p.npi ? [{ system: SYSTEMS.npi, value: p.npi }] : []),
+      ...(p.npi && isValidNpi(p.npi) ? [{ system: SYSTEMS.npi, value: p.npi }] : []),
     ],
     active: p.active,
     name: [{ use: "official", family: p.familyName, given: [p.givenName] }],

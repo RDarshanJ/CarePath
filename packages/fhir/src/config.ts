@@ -19,6 +19,20 @@ export const SYSTEMS = {
   observationCategory: "http://terminology.hl7.org/CodeSystem/observation-category",
   dataAbsentReason: "http://terminology.hl7.org/CodeSystem/data-absent-reason",
   carePlanCategory: "http://hl7.org/fhir/us/core/CodeSystem/careplan-category",
+  conditionClinical: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+  conditionVerification: "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+  conditionCategory: "http://terminology.hl7.org/CodeSystem/condition-category",
+  /** US Core's code system for `health-concern`; not in the R4 definitions here, so unverified. */
+  usCoreConditionCategory: "http://hl7.org/fhir/us/core/CodeSystem/condition-category",
+  v3ActCode: "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+  appointmentCancellationReason:
+    "http://terminology.hl7.org/CodeSystem/appointment-cancellation-reason",
+  /** US Core DocumentReference category (`clinical-note`); not in the R4 definitions, unverified. */
+  usCoreDocumentReferenceCategory:
+    "http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category",
+  /** Local code systems: CarePath appointment and visit types (no verified standard codes). */
+  appointmentType: "urn:carepath:appointment-type",
+  encounterType: "urn:carepath:encounter-type",
   /** Local code system for exercises in the organization library (no verified standard codes). */
   exercise: "urn:carepath:exercise",
   /** Organization identifiers: value is the organization slug. */
@@ -29,7 +43,17 @@ export const SYSTEMS = {
 
 /** Business identifier systems scoped to one organization: urn:carepath:<org-slug>:<kind>. */
 export type IdentifierKind =
-  "mrn" | "staff" | "care-plan" | "care-plan-version" | "goal" | "observation";
+  | "mrn"
+  | "staff"
+  | "care-plan"
+  | "care-plan-version"
+  | "goal"
+  | "observation"
+  | "condition"
+  | "appointment"
+  | "encounter"
+  | "clinical-note"
+  | "clinical-note-version";
 
 export function identifierSystem(orgSlug: string, kind: IdentifierKind): string {
   return `urn:carepath:${orgSlug}:${kind}`;
@@ -48,6 +72,11 @@ export function parseIdentifierSystem(
     "care-plan-version",
     "goal",
     "observation",
+    "condition",
+    "appointment",
+    "encounter",
+    "clinical-note",
+    "clinical-note-version",
   ];
   const kind = kinds.find((k) => k === m[2]);
   return kind ? { orgSlug: m[1]!, kind } : null;
@@ -57,4 +86,7 @@ export function parseIdentifierSystem(
 export const EXTENSIONS = {
   carePlanVersionNumber: "urn:carepath:extension:care-plan-version-number",
   exerciseDose: "urn:carepath:extension:exercise-dose",
+  bookedTimezone: "urn:carepath:extension:booked-timezone",
+  noteVersionNumber: "urn:carepath:extension:clinical-note-version-number",
+  amendmentReason: "urn:carepath:extension:amendment-reason",
 } as const;

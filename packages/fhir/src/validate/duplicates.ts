@@ -6,9 +6,14 @@
  *   Goal: patient + description + start date
  *   CarePlan: patient + title + published time + version number
  *   Observation: patient + code + effective time + value
+ *   Condition: patient + code system + code + onset date + recorded time
+ *   Appointment: patient + practitioner + start + created time
+ *   Encounter: patient + start + class + type
+ *   DocumentReference: patient + note type + signature time + SHA-256 of the SOAP text
  * Keys are computed from mapped records, so the importer can compare an incoming record with
  * rows already stored through the same function.
  */
+import { encounterTypeColumn, noteHash } from "../mappers/index.js";
 import type { MappedType, RecordByType } from "../types.js";
 
 const norm = (s: string | null | undefined) => (s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
@@ -43,6 +48,22 @@ export function naturalKey<T extends MappedType>(type: T, r: RecordByType[T]): s
           ? Number(o.valueQuantity).toFixed(2)
           : (o.valueString ?? `absent:${o.dataAbsentReason ?? ""}`);
       return `observation|${o.patientId}|${o.codeSystem}|${o.code}|${o.effectiveAt}|${norm(value)}`;
+    }
+    case "Condition": {
+      const c = r as RecordByType["Condition"];
+      return `condition|${c.patientId}|${c.codeSystem}|${c.code}|${c.onsetDate ?? ""}|${c.recordedAt ?? ""}`;
+    }
+    case "Appointment": {
+      const a = r as RecordByType["Appointment"];
+      return `appointment|${a.patientId}|${a.practitionerId}|${a.startsAt}|${a.createdAt}`;
+    }
+    case "Encounter": {
+      const e = r as RecordByType["Encounter"];
+      return `encounter|${e.patientId}|${e.startedAt}|${e.class}|${encounterTypeColumn(e)}`;
+    }
+    case "DocumentReference": {
+      const d = r as RecordByType["DocumentReference"];
+      return `documentreference|${d.patientId}|${d.noteType}|${d.signedAt}|${noteHash(d)}`;
     }
   }
   return `${type}|unknown`;

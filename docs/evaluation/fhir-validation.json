@@ -41,14 +41,92 @@
       "passLayers": 5,
       "recordEqual": 5,
       "fhirStable": 5
+    },
+    {
+      "type": "Condition",
+      "records": 3,
+      "passLayers": 3,
+      "recordEqual": 3,
+      "fhirStable": 3
+    },
+    {
+      "type": "Appointment",
+      "records": 6,
+      "passLayers": 6,
+      "recordEqual": 6,
+      "fhirStable": 6
+    },
+    {
+      "type": "Encounter",
+      "records": 2,
+      "passLayers": 2,
+      "recordEqual": 2,
+      "fhirStable": 2
+    },
+    {
+      "type": "DocumentReference",
+      "records": 3,
+      "passLayers": 3,
+      "recordEqual": 3,
+      "fhirStable": 3
     }
   ],
   "sampleBundle": {
-    "entries": 13,
+    "entries": 27,
     "errors": 0,
     "warnings": 0
   },
   "broken": [
+    {
+      "fixture": "appointment-cancel-reason-while-booked",
+      "expectedRule": "app-4",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "appointment-missing-participant",
+      "expectedRule": "appointment.participant",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "appointment-participant-actor-goal",
+      "expectedRule": "ref.target-type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "appointment-start-without-end",
+      "expectedRule": "app-2",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 2,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "appointment-status-not-a-code",
+      "expectedRule": "code.appointment.status",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
     {
       "fixture": "bundle-duplicate-fullurl",
       "expectedRule": "bdl-7",
@@ -160,6 +238,186 @@
       "status": null
     },
     {
+      "fixture": "condition-abatement-while-active",
+      "expectedRule": "con-4",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "condition-clinical-status-not-a-code",
+      "expectedRule": "code.condition.clinicalStatus",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "condition-entered-in-error-with-clinical-status",
+      "expectedRule": "con-5",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "condition-missing-category",
+      "expectedRule": "uscore.condition.category",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-amendment-without-replaces",
+      "expectedRule": "carepath.note.amendment-replaces",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-attachment-without-data",
+      "expectedRule": "us-core-6",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-missing-content-type",
+      "expectedRule": "uscore.documentreference.contentType",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-missing-custodian",
+      "expectedRule": "carepath.documentreference.custodian",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-preliminary-draft",
+      "expectedRule": "carepath.note.signed",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-relates-to-observation",
+      "expectedRule": "ref.target-type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-replaces-dangling",
+      "expectedRule": "ref.dangling",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "docref-status-not-a-code",
+      "expectedRule": "code.documentreference.status",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "encounter-emergency-class",
+      "expectedRule": "carepath.encounter.class",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "encounter-missing-class",
+      "expectedRule": "r4.structure",
+      "detected": true,
+      "structuralErrors": 1,
+      "carepathErrors": 2,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "encounter-missing-type",
+      "expectedRule": "uscore.encounter.type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "encounter-participant-patient",
+      "expectedRule": "ref.target-type",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "encounter-period-reversed",
+      "expectedRule": "per-1",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
+      "fixture": "encounter-planned",
+      "expectedRule": "carepath.encounter.occurred",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": null
+    },
+    {
       "fixture": "goal-missing-description",
       "expectedRule": "uscore.goal.description",
       "detected": true,
@@ -178,6 +436,16 @@
       "duplicateErrors": 0,
       "importErrors": 0,
       "status": null
+    },
+    {
+      "fixture": "import-encounter-practitioner-unknown",
+      "expectedRule": "ref.unresolved",
+      "detected": true,
+      "structuralErrors": 0,
+      "carepathErrors": 1,
+      "duplicateErrors": 0,
+      "importErrors": 0,
+      "status": 422
     },
     {
       "fixture": "import-patient-exists",
@@ -386,7 +654,9 @@
         "laboratorySkipped": 0,
         "noStorableValueSkipped": 0,
         "openPlanSkipped": 0,
-        "activityNotExercise": 0
+        "activityNotExercise": 0,
+        "encounterClassSkipped": 0,
+        "conditionVerificationDefaulted": 0
       },
       {
         "file": "patient-1.json",
@@ -400,15 +670,15 @@
             "invalid": 0
           },
           "Encounter": {
-            "created": 0,
+            "created": 15,
             "duplicate": 0,
-            "skipped": 18,
+            "skipped": 3,
             "invalid": 0
           },
           "Condition": {
-            "created": 0,
+            "created": 16,
             "duplicate": 0,
-            "skipped": 16,
+            "skipped": 0,
             "invalid": 0
           },
           "Device": {
@@ -461,12 +731,14 @@
           }
         },
         "errors": 0,
-        "skippedTypeIssues": 56,
+        "skippedTypeIssues": 22,
         "derivedPractitioner": 49,
         "laboratorySkipped": 36,
         "noStorableValueSkipped": 2,
         "openPlanSkipped": 1,
-        "activityNotExercise": 4
+        "activityNotExercise": 4,
+        "encounterClassSkipped": 3,
+        "conditionVerificationDefaulted": 0
       },
       {
         "file": "patient-2.json",
@@ -480,15 +752,15 @@
             "invalid": 0
           },
           "Encounter": {
-            "created": 0,
+            "created": 15,
             "duplicate": 0,
-            "skipped": 16,
+            "skipped": 1,
             "invalid": 0
           },
           "Condition": {
-            "created": 0,
+            "created": 17,
             "duplicate": 0,
-            "skipped": 17,
+            "skipped": 0,
             "invalid": 0
           },
           "CareTeam": {
@@ -553,12 +825,14 @@
           }
         },
         "errors": 0,
-        "skippedTypeIssues": 69,
+        "skippedTypeIssues": 36,
         "derivedPractitioner": 24,
         "laboratorySkipped": 10,
         "noStorableValueSkipped": 2,
         "openPlanSkipped": 1,
-        "activityNotExercise": 6
+        "activityNotExercise": 6,
+        "encounterClassSkipped": 1,
+        "conditionVerificationDefaulted": 0
       },
       {
         "file": "patient-3.json",
@@ -572,15 +846,15 @@
             "invalid": 0
           },
           "Encounter": {
-            "created": 0,
+            "created": 17,
             "duplicate": 0,
-            "skipped": 20,
+            "skipped": 3,
             "invalid": 0
           },
           "Condition": {
-            "created": 0,
+            "created": 21,
             "duplicate": 0,
-            "skipped": 21,
+            "skipped": 0,
             "invalid": 0
           },
           "Device": {
@@ -645,17 +919,19 @@
           }
         },
         "errors": 0,
-        "skippedTypeIssues": 81,
+        "skippedTypeIssues": 40,
         "derivedPractitioner": 62,
         "laboratorySkipped": 41,
         "noStorableValueSkipped": 2,
         "openPlanSkipped": 3,
-        "activityNotExercise": 13
+        "activityNotExercise": 13,
+        "encounterClassSkipped": 3,
+        "conditionVerificationDefaulted": 0
       }
     ],
     "reimportPatient1": {
       "status": 409,
-      "duplicates": 11
+      "duplicates": 42
     }
   }
 }

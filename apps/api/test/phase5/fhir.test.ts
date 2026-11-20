@@ -15,15 +15,17 @@ import {
 import { createClinicalFixture } from "../support/fixtures/repo.js";
 import {
   addGoal,
+  addVisitAndNotes,
   auditEvents,
   copyExercises,
   fhirCounts,
+  importedLinks,
   importedPlans,
   orgSlug,
 } from "../support/fhir/repo.js";
 
 /**
- * WP 5.4: FHIR export and import through the API. Export: authorized roles only, a valid
+ * WP 5.4 and 5.4b: FHIR export and import through the API. Export: authorized roles only, a valid
  * collection Bundle with zero dangling references, audited. Import: admin only, into the caller's
  * organization, 400/409/422 with an itemised OperationOutcome and nothing written on failure,
  * the change and its audit event in one transaction, duplicates detected on re-import.
@@ -63,6 +65,7 @@ let orgA: OrgFixture;
 let orgB: OrgFixture;
 let orgC: OrgFixture;
 let exportedA: Record<string, unknown>;
+let visit: Awaited<ReturnType<typeof addVisitAndNotes>>;
 
 type Issue = {
   severity: string;
@@ -77,10 +80,16 @@ const countOf = (bundle: Record<string, unknown>, type: string) =>
 const rulesOf = (body: { issue: Issue[] }, severity = "error") =>
   body.issue.filter((i) => i.severity === severity).map((i) => i.details?.coding?.[0]?.code);
 
+/** One login per account for the whole file: the login rate limit counts every attempt. */
+const sessions = new Map<string, ReturnType<typeof login>>();
+function session(email: string) {
+  if (!sessions.has(email)) sessions.set(email, login(app, email));
+  return sessions.get(email)!;
+}
 async function exportAs(email: string, patientId: string) {
   return as(
     app,
-    await login(app, email),
+    await session(email),
   )({ method: "GET", url: `/patients/${patientId}/fhir/export` });
 }
 async function importAs(
@@ -91,7 +100,7 @@ async function importAs(
 ) {
   return as(
     app,
-    await login(app, email),
+    await session(email),
   )({
     method: "POST",
     url: `/fhir/import${query}`,
@@ -106,9 +115,10 @@ beforeAll(async () => {
   orgB = await createOrgFixture(db);
   orgC = await createOrgFixture(db);
   const fx = await createClinicalFixture(db, orgA, NOW);
-  await addGoal(db, orgA.orgId, orgA.patient.patientId, fx.carePlanId);
+  visit = await addVisitAndNotes(db, orgA.orgId, orgA.patient.patientId, orgA.therapist, NOW);
+  await addGoal(db, orgA.orgId, orgA.patient.patientId, fx.carePlanId, visit.conditionId);
   // Two pain check-ins through the API, so the export carries patient-reported Observations.
-  const p = as(app, await login(app, orgA.patient.email));
+  const p = as(app, await session(orgA.patient.email));
   for (const painScore of [3, 5]) {
     const res = await p({
       method: "POST",
@@ -136,7 +146,18 @@ describe("export", () => {
     const types = bundle.entry.map(
       (e: { resource: { resourceType: string } }) => e.resource.resourceType,
     );
-    for (const t of ["Organization", "Practitioner", "Patient", "Goal", "CarePlan", "Observation"])
+    for (const t of [
+      "Organization",
+      "Practitioner",
+      "Patient",
+      "Goal",
+      "CarePlan",
+      "Observation",
+      "Condition",
+      "Appointment",
+      "Encounter",
+      "DocumentReference",
+    ])
       expect(types).toContain(t);
     expect(types.filter((t: string) => t === "CarePlan").length).toBe(2);
     expect(types.filter((t: string) => t === "Observation").length).toBeGreaterThanOrEqual(2);
@@ -154,6 +175,26 @@ describe("export", () => {
     expect(refs).toBeGreaterThan(5);
     expect(validateBundle(bundle, { orgSlug: await orgSlug(db, orgA.orgId) }).valid).toBe(true);
     expect(JSON.stringify(bundle)).not.toContain('"meta"');
+
+    // Signed notes only: the signed version and its amendment, never the draft note.
+    const docs = bundle.entry
+      .map((e: { resource: Record<string, unknown> }) => e.resource)
+      .filter((r: { resourceType: string }) => r.resourceType === "DocumentReference");
+    expect(docs.map((d: { id: string }) => d.id)).toEqual(visit.signedVersionIds);
+    expect(docs.map((d: { status: string; docStatus: string }) => [d.status, d.docStatus])).toEqual(
+      [
+        ["superseded", "final"],
+        ["current", "amended"],
+      ],
+    );
+    expect(JSON.stringify(docs[1].relatesTo)).toContain(visit.signedVersionIds[0]);
+    expect(JSON.stringify(bundle)).not.toContain(visit.draftNoteId);
+    expect(JSON.stringify(bundle)).not.toContain(visit.draftVersionId);
+    const encounter = bundle.entry.find(
+      (e: { resource: { resourceType: string } }) => e.resource.resourceType === "Encounter",
+    ).resource;
+    expect(encounter.class.code).toBe("AMB");
+    expect(JSON.stringify(encounter.appointment)).toContain(visit.appointmentId);
 
     const events = await auditEventsForRequest(db, res.headers["x-request-id"] as string);
     expect(events.map((e) => [e.eventName, e.action, e.purposeOfUse])).toEqual([
@@ -194,6 +235,11 @@ describe("import", () => {
     expect(rulesOf(report.outcome)).toEqual([]);
     expect(report.counts.Patient.created).toBe(1);
     expect(report.counts.Organization.skipped).toBe(1);
+    // Appointments and signed notes are exported, never imported.
+    expect(report.counts.Appointment.skipped).toBe(countOf(exportedA, "Appointment"));
+    expect(report.counts.DocumentReference.skipped).toBe(2);
+    expect(report.counts.Encounter.created).toBe(1);
+    expect(report.counts.Condition.created).toBe(1);
     const after = await fhirCounts(db, orgB.orgId);
     expect({
       patients: after.patients - before.patients,
@@ -201,13 +247,28 @@ describe("import", () => {
       versions: after.versions - before.versions,
       goals: after.goals - before.goals,
       observations: after.observations - before.observations,
+      encounters: after.encounters - before.encounters,
+      conditions: after.conditions - before.conditions,
+      appointments: after.appointments - before.appointments,
+      notes: after.notes - before.notes,
     }).toEqual({
       patients: 1,
       carePlans: 1,
       versions: 2,
       goals: countOf(exportedA, "Goal"),
       observations: countOf(exportedA, "Observation"),
+      encounters: 1,
+      conditions: 1,
+      appointments: 0,
+      notes: 0,
     });
+    const newPatient = report.entries.find(
+      (e: { resourceType: string; action: string }) =>
+        e.resourceType === "Patient" && e.action === "create",
+    ).id;
+    const links = await importedLinks(db, orgB.orgId, [newPatient]);
+    expect([links.conditions, links.goals]).toEqual([1, 1]);
+    expect(links.encounters).toEqual([{ typeCode: "PT-FOLLOW-UP", class: "AMB" }]);
     expect(after.assignments - before.assignments).toBeGreaterThan(0);
     const created = report.entries.filter((e: { action: string }) => e.action === "create");
     for (const e of created) expect(JSON.stringify(exportedA)).not.toContain(e.id);
@@ -247,6 +308,9 @@ describe("import", () => {
     ["careplan-subject-practitioner", 422, "ref.target-type"],
     ["observation-dangling-subject", 422, "ref.unresolved"],
     ["practitioner-npi-check-digit", 422, "us-core-17"],
+    ["condition-missing-category", 422, "uscore.condition.category"],
+    ["encounter-missing-class", 400, "r4.structure"],
+    ["import-encounter-practitioner-unknown", 422, "ref.unresolved"],
   ] as const)(
     "rejects %s with %i and an itemised OperationOutcome, writing nothing",
     async (name, status, rule) => {
@@ -320,6 +384,10 @@ describe("Synthea fixtures through the API", () => {
     }
     const counts = await fhirCounts(db, orgS.orgId);
     expect(counts.patients - 2).toBe(3);
+    // Ambulatory and video visits and their diagnoses are imported; SNOMED visit types keep
+    // their system in the type column.
+    expect(counts.encounters).toBe(47);
+    expect(counts.conditions).toBe(54);
     const again = await importAs(
       orgS.admin.email,
       synthea("patient-1.json"),

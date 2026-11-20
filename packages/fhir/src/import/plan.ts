@@ -1,7 +1,8 @@
 /**
  * Import planning: validates a Bundle with the three layers, resolves references (inside the
  * bundle, Synthea-style conditional references, and existing records of the caller's
- * organization through `ImportLookup`), maps batch 1 resources to CarePath records, detects
+ * organization through `ImportLookup`), maps the import types (IMPORT_TYPES: batch 1 plus
+ * Encounter and Condition) to CarePath records, detects
  * duplicates, and returns what to create plus an itemised report. It writes nothing: the API
  * persists `plan.creates` in one transaction. Pure apart from the lookups it is given.
  *
@@ -17,9 +18,14 @@ import { chosenPatientIdentifier } from "../mappers/patient.js";
 import { mappers, type MapperContext, type ResolvedRef } from "../mappers/index.js";
 import { parseReference } from "../references.js";
 import {
+  IMPORT_TYPES,
+  isImportType,
   isMappedType,
   type CarePlanRecord,
+  type ConditionRecord,
+  type EncounterRecord,
   type GoalRecord,
+  type ImportType,
   type MappedType,
   type ObservationRecord,
   type PatientRecord,
@@ -93,12 +99,14 @@ export interface ImportPlan {
     carePlans: PlannedCarePlan[];
     goals: (GoalRecord & { carePlanId: string | null })[];
     observations: ObservationRecord[];
+    encounters: EncounterRecord[];
+    conditions: ConditionRecord[];
   };
   counts: Record<string, { created: number; duplicate: number; skipped: number; invalid: number }>;
 }
 
 /** Processing order: referenced types before the types that reference them. */
-const ORDER: MappedType[] = ["Practitioner", "Patient", "Goal", "CarePlan", "Observation"];
+const ORDER: readonly ImportType[] = IMPORT_TYPES;
 
 interface EntryState {
   entry: IndexedEntry;
@@ -124,7 +132,15 @@ function emptyPlan(status: ImportPlan["status"], issues: FhirIssue[]): ImportPla
     status,
     issues,
     entries: [],
-    creates: { practitioners: [], patients: [], carePlans: [], goals: [], observations: [] },
+    creates: {
+      practitioners: [],
+      patients: [],
+      carePlans: [],
+      goals: [],
+      observations: [],
+      encounters: [],
+      conditions: [],
+    },
     counts: {},
   };
 }
@@ -163,7 +179,7 @@ export async function planImport(bundle: unknown, options: ImportOptions): Promi
   // 1. Allow-list, organizations, structure, required elements, references.
   for (const s of states.values()) {
     const i = s.entry.index;
-    if (!isMappedType(s.type)) {
+    if (!isImportType(s.type) && s.type !== "Organization") {
       s.action = "skipped";
       issues.push(
         issue(
@@ -171,7 +187,9 @@ export async function planImport(bundle: unknown, options: ImportOptions): Promi
           "information",
           "not-supported",
           "import.skipped-type",
-          `${s.type} is not imported (allowed: ${["Organization", ...ORDER].join(", ")}).`,
+          isMappedType(s.type)
+            ? `${s.type} is exported but not imported: ${s.type === "Appointment" ? "appointments are booked through scheduling" : "a note is signed by its author inside CarePath"}.`
+            : `${s.type} is not imported (allowed: ${["Organization", ...ORDER].join(", ")}).`,
           at(i),
         ),
       );
@@ -252,7 +270,7 @@ export async function planImport(bundle: unknown, options: ImportOptions): Promi
       if (target.type === "Organization")
         return target.finalId ? { type: "Organization", id: target.finalId } : null;
       if (
-        !isMappedType(target.type) ||
+        !isImportType(target.type) ||
         target.blocked ||
         target.action === "invalid" ||
         !target.finalId
@@ -339,6 +357,8 @@ export async function planImport(bundle: unknown, options: ImportOptions): Promi
       if (type === "Patient") plan.creates.patients.push(r as PatientRecord);
       if (type === "Goal") plan.creates.goals.push({ ...(r as GoalRecord), carePlanId: null });
       if (type === "Observation") plan.creates.observations.push(r as ObservationRecord);
+      if (type === "Encounter") plan.creates.encounters.push(r as EncounterRecord);
+      if (type === "Condition") plan.creates.conditions.push(r as ConditionRecord);
     }
   }
   await groupCarePlans(states, records, plan, issues, options);
@@ -394,7 +414,7 @@ async function resolveExternal(raw: string, lookup: ImportLookup): Promise<Exter
       why: "Contained resources are not imported; the reference is dropped.",
     };
   if (p.kind === "relative" || p.kind === "conditional") {
-    if (!isMappedType(p.type) || p.type === "Organization") {
+    if (!isImportType(p.type)) {
       return { kind: "dropped", why: `${p.type} is not imported; the reference is dropped.` };
     }
     const id =
@@ -496,6 +516,42 @@ function extraChecks(type: MappedType, r: RecordByType[MappedType]): FhirIssue[]
     const o = r as ObservationRecord;
     if (o.valueQuantity !== null && Math.abs(o.valueQuantity) >= 1e8)
       bad("import.observation.value", "Observation value is out of range.", "valueQuantity.value");
+  }
+  if (type === "Encounter") {
+    const e = r as EncounterRecord;
+    if (e.endedAt && e.endedAt < e.startedAt)
+      bad("import.encounter.period", "Encounter ends before it starts.", "period.end");
+  }
+  if (type === "Condition") {
+    const c = r as ConditionRecord;
+    if (c.verificationStatus === "entered_in_error" && c.clinicalStatus !== null)
+      bad(
+        "import.condition.entered-in-error",
+        "A condition entered in error has no clinicalStatus (con-5).",
+        "clinicalStatus",
+      );
+    // Database rules con-3 and con-4 and the date order, reported before any write.
+    if (
+      c.category === "problem_list_item" &&
+      c.verificationStatus !== "entered_in_error" &&
+      c.clinicalStatus === null
+    )
+      bad(
+        "import.condition.clinical-status",
+        "A problem-list item needs a clinicalStatus unless entered in error (con-3).",
+        "clinicalStatus",
+      );
+    if (
+      c.abatementDate &&
+      !(c.clinicalStatus && ["inactive", "resolved", "remission"].includes(c.clinicalStatus))
+    )
+      bad(
+        "import.condition.abatement",
+        "A condition with an abatement must be inactive, resolved or in remission (con-4).",
+        "abatementDateTime",
+      );
+    if (c.onsetDate && c.abatementDate && c.abatementDate < c.onsetDate)
+      bad("import.condition.dates", "Condition abates before its onset.", "abatementDateTime");
   }
   return out;
 }
