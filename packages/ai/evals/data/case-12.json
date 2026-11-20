@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "id": "case-12",
+  "title": "Initial evaluation, right knee, soccer injury",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000012",
+    "patientId": "5a0c0000-0000-4000-8000-200000000012",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "right knee"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Jordan. Let's start with the knee. When did it start?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Two months ago during soccer. A pop, then swelling for a week. Pain is 3 out of 10 now, and 7 at the worst."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Any locking or giving way?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "Giving way twice on pivots. No locking."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Any numbness, fever, or pain at night?"
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "No, nothing like that."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Knee extension is zero degrees today, same as the left. Flexion is 130 degrees on the right and 140 on the left."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Quad strength is 4+/5 on the right with a single-leg test."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "I can walk fine and stairs are okay now. Running is still bad."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Next session we'll do a hop test. Right now you're at 60 percent of the left in the single-leg hop."
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "My goal is to play in the spring season."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Good goal. Assessment: strength is catching up, and the giving way means we keep pivots out for now."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Plan: progress to a slow jog next week only if the swelling stays down. Follow up in one week."
+    },
+    {
+      "turn": 14,
+      "speaker": "patient",
+      "text": "Okay."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain 3 out of 10 now, 7 at the worst",
+      "mustMention": [
+        "3 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Giving way twice on pivots, no locking",
+      "mustMention": [
+        "giving way"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "objective",
+      "statement": "Right knee flexion 130 degrees",
+      "mustMention": [
+        "130 degrees"
+      ],
+      "sourceTurns": [
+        7
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Quad strength 4+/5 on the right",
+      "mustMention": [
+        "4+/5"
+      ],
+      "sourceTurns": [
+        8
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Stairs okay, running still bad",
+      "mustMention": [
+        "running is still bad"
+      ],
+      "sourceTurns": [
+        9
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "objective",
+      "statement": "Single-leg hop at 60 percent of the left",
+      "mustMention": [
+        "60 percent"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "subjective",
+      "statement": "Goal: play in the spring season",
+      "mustMention": [
+        "spring season"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Slow jog next week only if swelling stays down",
+      "mustMention": [
+        "slow jog"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Follow up in one week",
+      "mustMention": [
+        "one week"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "home_exercise_adherence"
+  ],
+  "injection": null
+}

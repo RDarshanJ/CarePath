@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "id": "case-03",
+  "title": "Initial evaluation, right shoulder after painting",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000003",
+    "patientId": "5a0c0000-0000-4000-8000-200000000003",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "right shoulder"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Good afternoon, Helen. Tell me about the right shoulder."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "I painted the hallway ceiling two weeks ago and it's been sore since. Pain is 5 out of 10 at rest now."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "Reaching up for a cup in the cupboard hurts, like a sharp catch."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Can you reach your hand behind your back to your back pocket?"
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "Halfway, maybe. It's tight."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "I measured shoulder flexion at 130 degrees on the right, versus 165 on the left."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Abduction strength on the right is 3+/5, and the left is 5/5."
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "It hurts when I push against your hand, yes."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "Are you sleeping on that side?"
+    },
+    {
+      "turn": 10,
+      "speaker": "patient",
+      "text": "I can't lie on it. I've been sleeping in a recliner."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Assessment: the shoulder is stiff and weaker than the left, and reaching overhead is limited. I want to hold off on overhead exercises for now."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Plan: start gentle pendulum swings and table slides twice a day. We'll reassess in two weeks."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Can I still do light cleaning on the weekend?"
+    },
+    {
+      "turn": 14,
+      "speaker": "clinician",
+      "text": "Keep it light, and use your left arm for high shelves for now."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain 5 out of 10 at rest",
+      "mustMention": [
+        "5 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Reaching up for a cup hurts, like a sharp catch",
+      "mustMention": [
+        "reaching up"
+      ],
+      "sourceTurns": [
+        3
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "objective",
+      "statement": "Shoulder flexion 130 degrees on the right",
+      "mustMention": [
+        "130 degrees"
+      ],
+      "sourceTurns": [
+        6
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Abduction strength 3+/5 on the right",
+      "mustMention": [
+        "3+/5"
+      ],
+      "sourceTurns": [
+        7
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Sleeping in a recliner",
+      "mustMention": [
+        "recliner"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "assessment",
+      "statement": "Shoulder stiff and weaker than the left",
+      "mustMention": [
+        "weaker than the left"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Hold off on overhead exercises",
+      "mustMention": [
+        "overhead exercises"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Pendulum swings and table slides twice a day",
+      "mustMention": [
+        "pendulum swings"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Reassess in two weeks",
+      "mustMention": [
+        "two weeks"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "red_flag_screen",
+    "goals",
+    "home_exercise_adherence"
+  ],
+  "injection": null
+}

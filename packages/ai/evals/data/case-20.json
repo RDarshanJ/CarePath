@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "id": "case-20",
+  "title": "Initial evaluation, left ankle, giving way",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000020",
+    "patientId": "5a0c0000-0000-4000-8000-200000000020",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "left ankle"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Keisha. What happened with the left ankle?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "I rolled it on an uneven trail in August, and it keeps giving way since then. Pain is 2 out of 10 today."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "How often does it give way?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "Maybe once a week, usually stepping off a curb."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Let me measure. Inversion is about 25 degrees on the left, versus 35 on the right."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Single-leg balance: 8 seconds on the left, and 20 on the right."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Strength test: peroneal strength is 4/5 on the left."
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "I'm worried about running on the trail this fall."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "My goal is to run the trail race in October with no brace."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "That's a good, specific goal."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Assessment: the left ankle is weaker and less balanced than the right. I want to add balance work before any jumping."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Plan: balance drills twice a week, and no hopping or jumping for two weeks. Follow up in two weeks."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Should I wear a brace for walking?"
+    },
+    {
+      "turn": 14,
+      "speaker": "clinician",
+      "text": "For now, yes, on uneven ground."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Ankle gives way about once a week, stepping off curbs",
+      "mustMention": [
+        "once a week"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Pain 2 out of 10 today",
+      "mustMention": [
+        "2 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "objective",
+      "statement": "Inversion 25 degrees on the left",
+      "mustMention": [
+        "25 degrees"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Single-leg balance 8 seconds on the left",
+      "mustMention": [
+        "8 seconds"
+      ],
+      "sourceTurns": [
+        6
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Peroneal strength 4/5 on the left",
+      "mustMention": [
+        "4/5"
+      ],
+      "sourceTurns": [
+        7
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "subjective",
+      "statement": "Goal: trail race in October with no brace",
+      "mustMention": [
+        "trail race"
+      ],
+      "sourceTurns": [
+        9
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Balance drills twice a week",
+      "mustMention": [
+        "balance drills"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "No hopping or jumping for two weeks",
+      "mustMention": [
+        "hopping"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Brace on uneven ground for now",
+      "mustMention": [
+        "brace"
+      ],
+      "sourceTurns": [
+        13,
+        14
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "red_flag_screen",
+    "home_exercise_adherence"
+  ],
+  "injection": null
+}

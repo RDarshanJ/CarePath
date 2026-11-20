@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "id": "case-09",
+  "title": "Initial evaluation, low back, night-shift nurse",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000009",
+    "patientId": "5a0c0000-0000-4000-8000-200000000009",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "initial_evaluation",
+    "bodyRegion": "lower back"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Lena, welcome. Tell me what's going on with your low back."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "I work nights as a nurse. For about four months it's been sore low in the back, around 4 to 5 out of 10."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "Lifting patients is the worst part. Sitting in the car after a shift is bad too."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Any pain that goes into the buttock or down the leg?"
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "Sometimes the buttock, but never past the knee."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Any numbness, bowel or bladder changes, or fever?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "None of that."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "I'll do the hip and back strength test at the next visit, since we ran out of time today."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "Sure."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "How are you sleeping?"
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "Badly. I get about five hours in the day, and back pain wakes me up."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Assessment: the back pain is worse with lifting and sitting, and it's affecting your sleep. Plan: start a hinge pattern drill and a sitting-break routine."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "I'll see you again in one week, and I'll check the strength then."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Low back sore for about four months, 4 to 5 out of 10",
+      "mustMention": [
+        "4 to 5 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Lifting patients is the worst part",
+      "mustMention": [
+        "lifting patients"
+      ],
+      "sourceTurns": [
+        3
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Sleeps about five hours a day",
+      "mustMention": [
+        "five hours"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Back pain wakes the patient up",
+      "mustMention": [
+        "wakes me up"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "assessment",
+      "statement": "Pain worse with lifting and sitting, affecting sleep",
+      "mustMention": [
+        "affecting your sleep"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Hinge pattern drill and sitting-break routine",
+      "mustMention": [
+        "hinge pattern"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "See again in one week",
+      "mustMention": [
+        "one week"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "range_of_motion",
+    "strength",
+    "home_exercise_adherence",
+    "goals"
+  ],
+  "injection": null
+}

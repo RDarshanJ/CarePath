@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "id": "case-16",
+  "title": "Follow-up, lower back, missed sessions",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000016",
+    "patientId": "5a0c0000-0000-4000-8000-200000000016",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "lower back"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Owen. It's been three weeks since you were here. What happened?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "I missed two sessions because of a family situation. I'm sorry."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "No need to apologize. How's the back now?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "It's around 5 out of 10 now, which is about where I started."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Did you keep up the home exercises this month?"
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "Not really. The cat's been sick, so I stayed home and did almost nothing."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Are you still getting pain down to the foot?"
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "Only when I stand for more than an hour. Not into the foot."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "Any numbness, fever, or bowel changes?"
+    },
+    {
+      "turn": 10,
+      "speaker": "patient",
+      "text": "No."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Let's measure. Forward bend is 50 degrees today."
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Fine."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Since missed visits slow progress, I'm switching from weekly visits to every two weeks, and giving you a shorter walking program for now. Follow up in two weeks."
+    },
+    {
+      "turn": 14,
+      "speaker": "patient",
+      "text": "Okay. I don't really have a goal right now."
+    },
+    {
+      "turn": 15,
+      "speaker": "clinician",
+      "text": "Thanks. We'll set one at the next visit."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Missed two sessions due to family situation",
+      "mustMention": [
+        "two sessions"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Back pain about 5 out of 10, similar to start",
+      "mustMention": [
+        "5 out of 10"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Did not keep up home exercises this month",
+      "mustMention": [
+        "home exercises"
+      ],
+      "sourceTurns": [
+        5,
+        6
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Pain only when standing more than an hour",
+      "mustMention": [
+        "more than an hour"
+      ],
+      "sourceTurns": [
+        8
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Forward bend 50 degrees",
+      "mustMention": [
+        "50 degrees"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Switch from weekly visits to every two weeks",
+      "mustMention": [
+        "every two weeks"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Shorter walking program for now",
+      "mustMention": [
+        "walking program"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "strength",
+    "goals"
+  ],
+  "injection": null
+}

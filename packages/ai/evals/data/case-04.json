@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "id": "case-04",
+  "title": "Follow-up, left ankle, missed visit",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000004",
+    "patientId": "5a0c0000-0000-4000-8000-200000000004",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "left ankle"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Marco. You missed last Tuesday's appointment. What happened?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Double shift at the warehouse. I'm sorry, I should have called."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Thanks. How is the left ankle today?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "Pain is down to 2 out of 10 in the morning, and 3 by evening."
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "I can walk the dog around the block now without a limp."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Dorsiflexion is 15 degrees on the left, and 18 on the right."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "Single-leg balance: you held for 12 seconds on the left, which is short."
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "I wobble when I look at my phone."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "Any sharp pain on the outside of the ankle when you go down stairs?"
+    },
+    {
+      "turn": 10,
+      "speaker": "patient",
+      "text": "No, just a dull ache."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Your home program was calf stretches and balance on one foot. How many days this week?"
+    },
+    {
+      "turn": 12,
+      "speaker": "patient",
+      "text": "Three days, maybe four."
+    },
+    {
+      "turn": 13,
+      "speaker": "clinician",
+      "text": "Plan: add a balance board, and two clinic sessions a week for the next three weeks. I'm not clearing you to run yet."
+    },
+    {
+      "turn": 14,
+      "speaker": "patient",
+      "text": "Okay. When can I run?"
+    },
+    {
+      "turn": 15,
+      "speaker": "clinician",
+      "text": "We'll talk about running when balance is steady and the swelling is gone."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Missed last appointment after a double shift",
+      "mustMention": [
+        "double shift"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Pain 2 out of 10 in the morning",
+      "mustMention": [
+        "2 out of 10"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Walks the dog without a limp",
+      "mustMention": [
+        "without a limp"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Left dorsiflexion 15 degrees",
+      "mustMention": [
+        "15 degrees"
+      ],
+      "sourceTurns": [
+        6
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Single-leg balance held 12 seconds on the left",
+      "mustMention": [
+        "12 seconds"
+      ],
+      "sourceTurns": [
+        7
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "subjective",
+      "statement": "Home program done three or four days",
+      "mustMention": [
+        "three days"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Add a balance board",
+      "mustMention": [
+        "balance board"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Two clinic sessions a week for three weeks",
+      "mustMention": [
+        "three weeks"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Not cleared to run yet",
+      "mustMention": [
+        "run yet"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "strength",
+    "red_flag_screen",
+    "goals"
+  ],
+  "injection": null
+}

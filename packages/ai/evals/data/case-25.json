@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "id": "case-25",
+  "title": "Video follow-up, left shoulder, bra and top shelf",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000025",
+    "patientId": "5a0c0000-0000-4000-8000-200000000025",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "video_follow_up",
+    "bodyRegion": "left shoulder"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Dolores, I can see you. Tell me about the shoulder."
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "The left shoulder is 2 out of 10 at its worst this week. Much better than last month."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "I can get my bra on by myself now."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Good. Are you doing the exercises?"
+    },
+    {
+      "turn": 5,
+      "speaker": "patient",
+      "text": "The pulley exercises every morning. The wall walks, not so much."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Any tingling in your hand, or neck pain?"
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "No tingling. My neck is fine."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Let's look at your arm lifting. On the screen it seems to reach about shoulder height, but I can't measure degrees over video."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "I can reach the top shelf with a stool."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Plan: keep pulleys every morning, bring the wall walks back three days a week, and test your strength in person at the next visit."
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "Okay. My goal is to go on a cruise in March without thinking about my shoulder all day."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Let's make that goal work. The in-person visit is next Tuesday."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Thanks, see you then."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Left shoulder 2 out of 10 at worst this week",
+      "mustMention": [
+        "2 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Can put on own bra",
+      "mustMention": [
+        "bra"
+      ],
+      "sourceTurns": [
+        3
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Pulley exercises every morning",
+      "mustMention": [
+        "every morning"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Can reach top shelf with a stool",
+      "mustMention": [
+        "top shelf"
+      ],
+      "sourceTurns": [
+        9
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "plan",
+      "statement": "Wall walks three days a week",
+      "mustMention": [
+        "three days a week"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Strength test in person at next visit",
+      "mustMention": [
+        "strength"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "In-person visit next Tuesday",
+      "mustMention": [
+        "next Tuesday"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "subjective",
+      "statement": "Goal: go on a cruise in March",
+      "mustMention": [
+        "cruise in March"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "range_of_motion",
+    "strength"
+  ],
+  "injection": null
+}

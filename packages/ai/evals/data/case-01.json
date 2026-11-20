@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "id": "case-01",
+  "title": "Follow-up, left knee, stairs still hard",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000001",
+    "patientId": "5a0c0000-0000-4000-8000-200000000001",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "left knee"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Good morning, Dana. How has the left knee been since your last visit?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Better on flat ground. Pain is about 4/10 most days, but stairs are still hard going down."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Did you get to do your home exercises this week?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "Five of seven days. I skipped the weekend because we traveled."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Thanks for being honest. I measured knee flexion at 112 degrees today, up from 104."
+    },
+    {
+      "turn": 6,
+      "speaker": "clinician",
+      "text": "Extension is still short by about 3 degrees."
+    },
+    {
+      "turn": 7,
+      "speaker": "patient",
+      "text": "I can feel it when I straighten all the way at night."
+    },
+    {
+      "turn": 8,
+      "speaker": "clinician",
+      "text": "Let's test strength. Quad strength is 4/5 on the left."
+    },
+    {
+      "turn": 9,
+      "speaker": "patient",
+      "text": "Okay."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Any numbness, tingling, or night pain?"
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "No numbness. The swelling is down since last month."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Good. Your goal was to walk the trail with your sister in the fall. Still on track?"
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Yes, I want to be able to walk the whole loop without stopping."
+    },
+    {
+      "turn": 14,
+      "speaker": "clinician",
+      "text": "Plan: keep the home program, add step-downs from a low step, and I'll see you in three weeks."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain about 4/10 most days",
+      "mustMention": [
+        "4/10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Stairs still hard going down",
+      "mustMention": [
+        "stairs"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Home exercises five of seven days",
+      "mustMention": [
+        "five of seven"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Knee flexion 112 degrees, up from 104",
+      "mustMention": [
+        "112 degrees"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "objective",
+      "statement": "Extension short by about 3 degrees",
+      "mustMention": [
+        "3 degrees"
+      ],
+      "sourceTurns": [
+        6
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "objective",
+      "statement": "Quad strength 4/5 on the left",
+      "mustMention": [
+        "4/5"
+      ],
+      "sourceTurns": [
+        8
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "subjective",
+      "statement": "Goal: walk the whole loop without stopping",
+      "mustMention": [
+        "without stopping"
+      ],
+      "sourceTurns": [
+        13
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Add step-downs from a low step",
+      "mustMention": [
+        "step-downs"
+      ],
+      "sourceTurns": [
+        14
+      ]
+    },
+    {
+      "id": "f9",
+      "section": "plan",
+      "statement": "Follow up in three weeks",
+      "mustMention": [
+        "three weeks"
+      ],
+      "sourceTurns": [
+        14
+      ]
+    }
+  ],
+  "expectedMissing": [],
+  "injection": null
+}

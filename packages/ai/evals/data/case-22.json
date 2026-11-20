@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "id": "case-22",
+  "title": "Follow-up, neck, discharge to home program",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000022",
+    "patientId": "5a0c0000-0000-4000-8000-200000000022",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "follow_up",
+    "bodyRegion": "neck"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Ingrid. You're nearly done. How's the neck?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "Pain is 1 out of 10 when I check my phone, and zero in the morning."
+    },
+    {
+      "turn": 3,
+      "speaker": "patient",
+      "text": "I sleep through the night now."
+    },
+    {
+      "turn": 4,
+      "speaker": "clinician",
+      "text": "Good. Rotation is 75 degrees to each side now, versus 60 at the start."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Deep neck flexor strength is 5/5 on the test."
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "Chin tucks feel easy now. I'm doing them about once a day."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "What are your daily activities like?"
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "Gardening, driving, and I'm back at the computer for full days without stopping."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "That's great progress. Your goal was to finish the gardening season without stiffness. How is that?"
+    },
+    {
+      "turn": 10,
+      "speaker": "patient",
+      "text": "Still tight after an hour of weeding, but it's better."
+    },
+    {
+      "turn": 11,
+      "speaker": "clinician",
+      "text": "Assessment: the neck is much better, and the remaining stiffness is small. You're ready to move to a home program."
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "Plan: I'm discharging you from weekly visits to a home program. Come back if the pain returns or you have new symptoms. No follow-up visit is scheduled."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Okay. Thank you."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain 1 out of 10 with phone, zero in morning",
+      "mustMention": [
+        "1 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Sleeps through the night",
+      "mustMention": [
+        "sleep through the night"
+      ],
+      "sourceTurns": [
+        3
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "objective",
+      "statement": "Rotation 75 degrees each side",
+      "mustMention": [
+        "75 degrees"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "objective",
+      "statement": "Deep neck flexor strength 5/5",
+      "mustMention": [
+        "5/5"
+      ],
+      "sourceTurns": [
+        5
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Still tight after an hour of weeding",
+      "mustMention": [
+        "after an hour"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "assessment",
+      "statement": "Neck much better, small remaining stiffness",
+      "mustMention": [
+        "much better"
+      ],
+      "sourceTurns": [
+        11
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Discharge to a home program",
+      "mustMention": [
+        "home program"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "Return if pain returns",
+      "mustMention": [
+        "pain returns"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "red_flag_screen"
+  ],
+  "injection": null
+}

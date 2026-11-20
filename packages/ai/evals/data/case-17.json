@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "id": "case-17",
+  "title": "Video follow-up, hip, flare after gardening",
+  "synthetic": true,
+  "encounter": {
+    "id": "5a0c0000-0000-4000-8000-100000000017",
+    "patientId": "5a0c0000-0000-4000-8000-200000000017",
+    "organizationId": "5a0c0000-0000-4000-8000-f00000000001",
+    "type": "video_follow_up",
+    "bodyRegion": "hip"
+  },
+  "transcript": [
+    {
+      "turn": 1,
+      "speaker": "clinician",
+      "text": "Hi Carl, let's do this on video. What's changed since last week?"
+    },
+    {
+      "turn": 2,
+      "speaker": "patient",
+      "text": "I did a lot of gardening Saturday and the hip flared. Pain is 7 out of 10 yesterday, and 5 this morning."
+    },
+    {
+      "turn": 3,
+      "speaker": "clinician",
+      "text": "Any new numbness down the leg?"
+    },
+    {
+      "turn": 4,
+      "speaker": "patient",
+      "text": "No numbness. It's a deep ache in the groin when I walk."
+    },
+    {
+      "turn": 5,
+      "speaker": "clinician",
+      "text": "Were you able to do the sit-to-stand exercises this week?"
+    },
+    {
+      "turn": 6,
+      "speaker": "patient",
+      "text": "Only once, after the flare. I stopped for a few days."
+    },
+    {
+      "turn": 7,
+      "speaker": "clinician",
+      "text": "That's understandable. Do you have trouble putting on socks or getting in the car?"
+    },
+    {
+      "turn": 8,
+      "speaker": "patient",
+      "text": "Getting in the car is hard. Socks I can do."
+    },
+    {
+      "turn": 9,
+      "speaker": "clinician",
+      "text": "I can't check motion over video, so I'd like to see you in person."
+    },
+    {
+      "turn": 10,
+      "speaker": "clinician",
+      "text": "Plan: until we see you, rest the hip from gardening and walk only on flat ground. I'm also dropping the lunges for now."
+    },
+    {
+      "turn": 11,
+      "speaker": "patient",
+      "text": "Okay. When can I garden again?"
+    },
+    {
+      "turn": 12,
+      "speaker": "clinician",
+      "text": "We'll decide that in person. The visit is Wednesday at 10."
+    },
+    {
+      "turn": 13,
+      "speaker": "patient",
+      "text": "Thanks."
+    }
+  ],
+  "expectedFacts": [
+    {
+      "id": "f1",
+      "section": "subjective",
+      "statement": "Pain 7 out of 10 yesterday, 5 this morning",
+      "mustMention": [
+        "7 out of 10"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f2",
+      "section": "subjective",
+      "statement": "Gardening on Saturday triggered a flare",
+      "mustMention": [
+        "gardening"
+      ],
+      "sourceTurns": [
+        2
+      ]
+    },
+    {
+      "id": "f3",
+      "section": "subjective",
+      "statement": "Deep ache in the groin when walking",
+      "mustMention": [
+        "deep ache"
+      ],
+      "sourceTurns": [
+        4
+      ]
+    },
+    {
+      "id": "f4",
+      "section": "subjective",
+      "statement": "Sit-to-stand exercises done only once this week",
+      "mustMention": [
+        "only once"
+      ],
+      "sourceTurns": [
+        6
+      ]
+    },
+    {
+      "id": "f5",
+      "section": "subjective",
+      "statement": "Getting in the car is hard",
+      "mustMention": [
+        "getting in the car"
+      ],
+      "sourceTurns": [
+        8
+      ]
+    },
+    {
+      "id": "f6",
+      "section": "plan",
+      "statement": "Rest from gardening, walk on flat ground only",
+      "mustMention": [
+        "flat ground"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f7",
+      "section": "plan",
+      "statement": "Lunges dropped for now",
+      "mustMention": [
+        "lunges"
+      ],
+      "sourceTurns": [
+        10
+      ]
+    },
+    {
+      "id": "f8",
+      "section": "plan",
+      "statement": "In-person visit Wednesday at 10",
+      "mustMention": [
+        "wednesday"
+      ],
+      "sourceTurns": [
+        12
+      ]
+    }
+  ],
+  "expectedMissing": [
+    "range_of_motion",
+    "strength",
+    "goals"
+  ],
+  "injection": null
+}
