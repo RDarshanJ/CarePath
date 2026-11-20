@@ -62,3 +62,13 @@ Copy this block to the end of the file and fill every line.
 - Status: done
 - Answer: accepted at checkpoint C2 (ruling 3.4). Contract part delivered by WP 3.4a: `mediaAlt: string | null` beside `mediaPath` on every exercise shape (`Exercise`, plan items, session activities) and an `Exercise.mediaAlt` column with a check that path and description are set together. Both stay null in the seed until WP 3.5 assets pass review and WP 3.4b wires them; no API route serves media.
   Delivered by WP 3.4b: 19 accepted illustrations wired into the patient session, session overview, care plan and onboarding, with the mandatory caption; the seed sets both fields for every exercise (own picture or body-area picture). The clinician plan builder preview and the queue empty state are not wired yet.
+
+### CR-5: Evaluation case format for `pnpm ai:eval`
+
+- Requested by: WP 5.1 (contract owner) for WP 5.5, 2026-11-20
+- Screen or test: `pnpm ai:eval`, `docs/evaluation/ai-eval.md`
+- Endpoint and contract: `packages/ai/evals/schema.ts`, `EvalCase` (schema version 1); rules and an example in `packages/ai/evals/README.md`
+- What is missing: nothing; this entry records the agreed format. Files are `packages/ai/evals/data/case-01.json` to `case-25.json`, one synthetic encounter each. `pnpm --filter @carepath/ai exec tsx evals/check.ts <files>` validates them. A case that fails the schema is reported as invalid by the eval and excluded from every rate.
+- Why: checkpoint C2 Phase 5 (25 reviewed transcripts with expected facts); PRD section 11 (evaluation).
+- Status: done
+- Answer: defined by WP 5.1 in the commit "ai: eval case schema (EvalCase v1), README, checker, two fixture cases". Changes to the format go through a new entry here.
