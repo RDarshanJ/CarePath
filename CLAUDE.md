@@ -16,6 +16,7 @@ Authority order: `docs/decisions/advisor-plan.md` overrides `docs/BRIEF.md` wher
 ## Design principles
 
 - Follow advisor plan section 4: one token set, two themes via `data-theme`, self-hosted fonts, no gradients, no purple, no glass, never colour alone for status.
+- In `apps/web`, ESLint bans raw colour values and Tailwind arbitrary values (`bg-[#fff]`, `w-[13px]`); use token utilities from `@carepath/ui`. Only the `/design-system` gallery is exempt.
 - No dead buttons, fake charts, hardcoded interactions, or placeholder text. A route with no working action is removed, not stubbed.
 - Every app shell shows "Demonstration product. Synthetic data. Not for clinical use."
 
@@ -24,9 +25,14 @@ Authority order: `docs/decisions/advisor-plan.md` overrides `docs/BRIEF.md` wher
 - Install: `pnpm install`
 - Typecheck / lint / test / build: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`
 - Format: `pnpm format`
-- Database (native, port 54329, data in `.data/pg`): `scripts/db.sh start|stop|reset|status`
-- Seed: `pnpm db:seed [--profile small|full] [--check]` replaces all tenant data with deterministic synthetic data (demo logins in `docs/demo-accounts.md`).
-- Full gate: `pnpm verify` (db start, typecheck, lint, tests, build, teardown). Stages not yet implemented print as SKIPPED with the WP that adds them.
+- Database (native PostgreSQL 16, port 54329, data in `.data/pg`): `scripts/db.sh start|stop|reset|status|acquire|release|drop`. Many workers share one cluster. Gates never call `stop` or `reset`; they take a lease (`acquire`) and release it on exit. `stop` and `reset` refuse while a live lease exists (exit 3) unless `--force`. The database named `carepath` is for hand use by the orchestrator; every gate works in its own database.
+- Gate environment: `source scripts/gate-env.sh <name> <api_port> [web_port]` sets `DB_LEASE_PID`, `CAREPATH_DB=carepath_<name>_<pid>`, `DATABASE_URL`, `API_PORT`, `WEB_PORT` and `CORS_ORIGINS`, acquires the lease, and on exit drops that database and releases the lease. Every `scripts/gate-wp-*.sh` and `scripts/verify.sh` starts this way.
+- Ports (never 3000 or 4000 in a gate): `pnpm verify` API 4090 and web 3090; WP 3.1 API 4031; WP 3.2 API 4032 and web 3032; WP 3.3 API 4033 and web 3033.
+- Seed: `pnpm db:seed [--profile small|full] [--anchor now] [--check]` replaces all tenant data in the current `DATABASE_URL` with deterministic synthetic data (demo logins in `docs/demo-accounts.md`). Run `pnpm db:migrate` first on a fresh database.
+- Web: no `next dev`. The web build, `next start` and Playwright share `apps/web/.next`, so they run under `scripts/with-web-lock.sh`. Next rewrites `/api/*` to the API at build time from `API_PORT` (or `API_ORIGIN`), so build with the same `API_PORT` the servers will use.
+- End-to-end stage: `scripts/e2e.sh` (inside a gate environment, under the web lock) starts the API with `CAREPATH_FIXED_NOW` set to the seed anchor and `next start`, then runs Playwright with axe on system Chrome (`PLAYWRIGHT_CHROME_PATH`, default `/usr/bin/google-chrome`). The tests fix the browser clock to the same instant.
+- Full gate: `pnpm verify` (lease and own database, migrate, seed, typecheck, lint, tests, build, end-to-end). Run it from a stopped or shared cluster; it never stops a cluster someone else leased. Work package gates (`scripts/gate-wp-*.sh`) lint, type-check and test only the paths the package owns.
+- Commits name paths explicitly (never `git add -A`). A dependency change is its own commit, made right after `pnpm install`.
 - No Docker daemon in the build environment: `docker-compose.yml` is unverified.
 - Servers do not survive between turns. Every gate is one command that starts what it needs, tests, and tears down.
 

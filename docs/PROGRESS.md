@@ -12,15 +12,15 @@ Date: 2026-11-19. Synthetic data only; not for clinical use.
 - WP 2.2 Tooling probe (`docs/decisions/tooling-probe.md`). Accepted at checkpoint C1. Failures are recorded there as failures: the Playwright browser download and the HL7 packages are blocked; system Chrome 153 with Playwright 1.65.1 is an unverified version pairing.
 - Checkpoint C1 (`docs/decisions/checkpoint-c1.md`): go for Phase 3, conditional on WP 3.0.
 - WP 3.0 C1 must-fixes M1 to M7 plus the fixed-clock hook (gate output below).
+- WP 3.2a Web foundation: `/api` rewrite, typed API helpers, TanStack Query provider, sign-in with demo mode, sign-out, role-guarded patient/clinician/admin shells, apps/web ESLint style ban, end-to-end stage in `pnpm verify` (gate output below).
 
 ## Outstanding
 
 - WP 3.1 (API for Scenarios A to D, with the M8 enumeration test as a hard gate), WP 3.2a, 3.2b and 3.3, per C1 section 5. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
-- `pnpm verify` skips the Playwright/axe stage until WP 3.2a. The migrate and seed stages run.
 - PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
-- `CLAUDE.md` "Commands" still describes `scripts/db.sh start|stop|reset|status` and a verify run that tears the database down. Since WP 3.0, gates take a lease through `scripts/gate-env.sh` and never stop a shared cluster. The orchestrator owns that file; it was not edited here.
+- Interim pages from WP 3.2a (Today, Progress, Overview, Patients, Review queue, Administration) are honest empty states; WP 3.2b, 3.3 and a later admin phase replace them.
 
 ## Blockers
 
@@ -272,3 +272,33 @@ Notes and deviations:
 - Prisma interactive transactions over `@prisma/adapter-pg` 7.10.1 print a `pg` deprecation warning ("client.query() when the client is already executing a query") from inside Prisma's query interpreter. Queries are still queued in order under `pg` 8; `pg` 9 removes that queueing, so a `pg` upgrade needs a Prisma adapter that awaits each query.
 - Not done: no Next.js rewrite or web code (owned by WP 3.2a); no Phase 3 endpoints or their contracts beyond the names in the route table (WP 3.1); CI still never run.
 
+### WP 3.2a
+
+Command: `scripts/gate-wp-3.2a.sh` (ports 4032 and 3032, database `carepath_wp32_<pid>`), and `pnpm verify` (ports 4090 and 3090). Output tail of the end-to-end stage:
+
+```
+==> end-to-end (API + next start + Playwright + axe)
+Running 26 tests using 1 worker
+  ✓  4 [mobile-390] › patient: signs in, stays in its own shell, is refused the others, signs out
+  ✓  6 [mobile-390] › physical_therapist: signs in, stays in its own shell, is refused the others, signs out
+  ✓  8 [mobile-390] › care_coordinator: signs in, stays in its own shell, is refused the others, signs out
+  ✓ 10 [mobile-390] › clinic_admin: signs in, stays in its own shell, is refused the others, signs out
+  (same 13 tests again at desktop-1440)
+  26 passed (41.2s)
+verify: PASSED
+```
+
+`pnpm verify` ran in a clean worktree of the commit: migrate, seed (72 integrity checks), typecheck, lint, tests (ui 106, db 58, api 97, web 16), build, end-to-end, exit 0, no skipped stages. Note: in the working tree at that moment, lint failed on files owned by WP 3.1 (`packages/shared/src/contracts/*.ts` committed unformatted in f73b0a7, and in-flight API files); the worktree run formatted the contracts without committing it. WP 3.1 must run `pnpm format` on its files.
+
+What the tests cover: each of the four roles signs in by form and by the demo button, lands in its shell, sees only the working nav items, is redirected away from the other two shells, is refused by the API for a permission it lacks, signs out, and is then refused again. axe (wcag2a, 2aa, 21a, 21aa, 22aa) runs on every page visited at 390 and 1440 wide and fails on serious or critical findings. Screenshots: `docs/screenshots/3.2a/`.
+
+Notes and deviations:
+
+- Care coordinators and clinic administrators both use the admin shell (`/admin`), because they have no `clinical.read` (C1 ruling 3.7) and the clinician overview needs it. Only physical therapists use the clinician shell.
+- The web build uses webpack (`next build --webpack`) with an `extensionAlias` for `.js` to `.ts`: Turbopack failed to resolve `./auth.js` inside `@carepath/shared`. Switching contracts to extensionless imports would let Turbopack back in.
+- The `/api` rewrite destination is fixed at build time from `API_PORT` (or `API_ORIGIN`). A gate must build with the API port it will run with.
+- The ESLint style rule exempts `app/(public)/design-system/**`, which predates it and uses a few arbitrary layout values. `apps/web/test/style-rule.test.mjs` proves 11 violations fail and token classes pass.
+- Observed: the Next rewrite forwards `X-Forwarded-For`, so with `TRUST_PROXY=loopback` the login rate limit is per client address (two clients behind one proxy were limited separately). The e2e API raises the login limit to 500 per minute because the suite signs in about 50 times from one address.
+- Not exercised end to end: the client-side `session_expired` redirect (no page issues a client query yet; the fixed API clock cannot idle out a session). The server-side guard, the expired notice and the sign-out-with-dead-session path are tested.
+- Interim pages are empty states, not stubs with fake data; they exist because the shells must show their nav items.
+- No contract requests were needed.
