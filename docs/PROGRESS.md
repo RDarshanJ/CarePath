@@ -627,7 +627,24 @@ verify: PASSED
 WP 4.1 gate: PASSED
 ```
 
-Per-repetition counts and timings: `docs/evaluation/booking-concurrency.md`.
+Final gate run after the rebase and the care-team thread work, at commit `73719c7`, exit 0:
+
+```
+      Tests  8 passed (8)          (phase4_scheduling trigger tests)
+repetitions=20 parallel=50 all exactly one 201: true wall ms min=157 median=252 max=614
+      Tests  25 passed (25)        (scheduling, assignment-thread, M8)
+openapi: valid OpenAPI 3.1.0, 62 operations, house rules pass
+integrity checks: 77 passed
+content-hash: 7edce4a5344f971ecaf7aa71abfa583b619048c373ea2325e0f73d974b76e742
+pnpm verify: packages/ui 106, packages/db 71, apps/api 203 tests passed
+  e2e: 43 passed (4.1m)
+==> docs/ unchanged by the run
+verify: PASSED
+(clean)
+WP 4.1 gate: PASSED
+```
+
+Per-repetition counts and timings of both runs: `docs/evaluation/booking-concurrency.md`.
 
 - Migration `20261123000000_phase4_scheduling` (SQL only, `schema.prisma` unchanged, `migrate:check` passes): trigger `Appointment_matches_slot` (`enforce_appointment_slot`, CP003) on INSERT and UPDATE of `slotId`, `practitionerId`, `startsAt`, `endsAt`: same practitioner, start not before the slot, end not after it; trigger `AvailabilitySlot_keeps_appointments` (CP003) refuses moving a slot out from under its appointments; partial index `Appointment_reminder_due_idx`. The one-live-appointment-per-slot index (`Appointment_slot_live_key`, status not cancelled) and the exclusion constraints already existed in the constraints migration and are kept. Tests: `packages/db/test/phase4-scheduling.test.ts` (one rejection per condition, UPDATE paths, slot side, live-slot index).
 - Routes (`apps/api/src/modules/scheduling`, contracts `packages/shared/src/contracts/scheduling.ts`, table in `docs/architecture/api-phase3.md` section 10): `GET /practitioners/:practitionerId/slots`, `GET /patients/:patientId/appointments`, `POST /patients/:patientId/appointments`, `POST .../appointments/:appointmentId/cancel`, `POST .../appointments/:appointmentId/reschedule`, `GET /appointments?date&practitionerId` (CR-1). Patients book only with a therapist on their active care team (400 `not_care_team_practitioner`) and see slots only of those therapists (404); coordinators (`appointment.manage`) book, cancel and reschedule for anyone in the organization; therapists and admins read only. New error code `slot_unavailable` (409, past or blocked slot). Audit `appointment.book` and `appointment.cancel` in the same transaction.

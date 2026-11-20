@@ -47,6 +47,33 @@ How the booking works (checkpoint C2 section 2): one transaction locks the slot 
 
 20 of 20 repetitions had exactly one 201 and 49 `booking_conflict`. Wall time: min 154 ms, median 224 ms, max 579 ms (the first repetition includes connection warm-up).
 
+## Run 2: `scripts/gate-wp-4.1.sh` at commit `73719c7`, after the rebase onto master `18a3e1b` (gate PASSED, `pnpm verify` exit 0, clean tree)
+
+| Rep | 201 | 409 booking_conflict | Other | Live appointments | Slot | Wall ms | Slowest ms |
+|---|---|---|---|---|---|---|---|
+| 1 | 1 | 49 | 0 | 1 | booked | 614 | 585 |
+| 2 | 1 | 49 | 0 | 1 | booked | 288 | 284 |
+| 3 | 1 | 49 | 0 | 1 | booked | 303 | 300 |
+| 4 | 1 | 49 | 0 | 1 | booked | 320 | 316 |
+| 5 | 1 | 49 | 0 | 1 | booked | 271 | 267 |
+| 6 | 1 | 49 | 0 | 1 | booked | 252 | 246 |
+| 7 | 1 | 49 | 0 | 1 | booked | 257 | 254 |
+| 8 | 1 | 49 | 0 | 1 | booked | 254 | 251 |
+| 9 | 1 | 49 | 0 | 1 | booked | 204 | 202 |
+| 10 | 1 | 49 | 0 | 1 | booked | 240 | 237 |
+| 11 | 1 | 49 | 0 | 1 | booked | 203 | 200 |
+| 12 | 1 | 49 | 0 | 1 | booked | 218 | 217 |
+| 13 | 1 | 49 | 0 | 1 | booked | 214 | 210 |
+| 14 | 1 | 49 | 0 | 1 | booked | 259 | 256 |
+| 15 | 1 | 49 | 0 | 1 | booked | 222 | 220 |
+| 16 | 1 | 49 | 0 | 1 | booked | 206 | 202 |
+| 17 | 1 | 49 | 0 | 1 | booked | 157 | 155 |
+| 18 | 1 | 49 | 0 | 1 | booked | 169 | 167 |
+| 19 | 1 | 49 | 0 | 1 | booked | 258 | 256 |
+| 20 | 1 | 49 | 0 | 1 | booked | 227 | 219 |
+
+20 of 20 repetitions had exactly one 201 and 49 `booking_conflict`. Wall time: min 157 ms, median 252 ms, max 614 ms.
+
 An earlier development run of the same test (not a gate run) also gave 20 of 20, wall time 190 to 649 ms.
 
 ## Limits
