@@ -11,6 +11,12 @@
   "devDependencies": {
     "@carepath/config": "workspace:*",
     "@types/node": "22.20.5",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  },
+  "dependencies": {
+    "@medplum/core": "5.2.18",
+    "@medplum/definitions": "5.2.18",
+    "@medplum/fhirtypes": "5.2.18"
   }
 }

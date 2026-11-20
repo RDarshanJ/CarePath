@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@carepath/db": "workspace:*",
+    "@carepath/fhir": "workspace:*",
     "@carepath/shared": "workspace:*",
     "@fastify/cookie": "11.1.5",
     "@fastify/cors": "11.4.3",
