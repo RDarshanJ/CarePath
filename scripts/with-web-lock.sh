@@ -8,4 +8,4 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 # shellcheck source=scripts/data-root.sh
 source scripts/data-root.sh
-exec flock "$CAREPATH_DATA_ROOT/web.lock" "$@"
+exec flock -o "$CAREPATH_DATA_ROOT/web.lock" "$@"
