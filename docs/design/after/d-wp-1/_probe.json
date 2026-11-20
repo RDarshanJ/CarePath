@@ -2625,8 +2625,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 8,
-   "rgb(235, 239, 245)": 3,
+   "rgb(245, 247, 250)": 4,
+   "rgb(235, 239, 245)": 7,
    "rgb(255, 255, 255)": 7,
    "rgb(239, 244, 255)": 2,
    "rgb(23, 92, 211)": 2,
@@ -2654,8 +2654,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 8,
-   "rgb(235, 239, 245)": 3,
+   "rgb(245, 247, 250)": 4,
+   "rgb(235, 239, 245)": 7,
    "rgb(255, 255, 255)": 7,
    "rgb(239, 244, 255)": 2,
    "rgb(23, 92, 211)": 2,
@@ -2682,8 +2682,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 8,
-   "rgb(235, 239, 245)": 3,
+   "rgb(245, 247, 250)": 4,
+   "rgb(235, 239, 245)": 7,
    "rgb(255, 255, 255)": 7,
    "rgb(239, 244, 255)": 2,
    "rgb(23, 92, 211)": 2,
@@ -2711,8 +2711,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 8,
-   "rgb(235, 239, 245)": 3,
+   "rgb(245, 247, 250)": 4,
+   "rgb(235, 239, 245)": 7,
    "rgb(255, 255, 255)": 7,
    "rgb(239, 244, 255)": 2,
    "rgb(23, 92, 211)": 2,
@@ -2739,8 +2739,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 8,
-   "rgb(235, 239, 245)": 3,
+   "rgb(245, 247, 250)": 4,
+   "rgb(235, 239, 245)": 7,
    "rgb(255, 255, 255)": 7,
    "rgb(239, 244, 255)": 2,
    "rgb(23, 92, 211)": 2,
@@ -2768,8 +2768,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 8,
-   "rgb(235, 239, 245)": 3,
+   "rgb(245, 247, 250)": 4,
+   "rgb(235, 239, 245)": 7,
    "rgb(255, 255, 255)": 7,
    "rgb(239, 244, 255)": 2,
    "rgb(23, 92, 211)": 2,
@@ -3959,13 +3959,13 @@
  },
  {
   "file": "patient-discomfort-confirm-375.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 24,
    "rgb(23, 92, 211)": 1,
    "rgb(23, 43, 77) a0.50": 1,
@@ -3986,13 +3986,13 @@
  },
  {
   "file": "patient-discomfort-confirm-390.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 3,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 1,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4012,13 +4012,13 @@
  },
  {
   "file": "patient-discomfort-confirm-768.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 24,
    "rgb(23, 92, 211)": 1,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4039,13 +4039,13 @@
  },
  {
   "file": "patient-discomfort-confirm-1024.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 3,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 1,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4065,13 +4065,13 @@
  },
  {
   "file": "patient-discomfort-confirm-1440.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 24,
    "rgb(23, 92, 211)": 1,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4092,13 +4092,13 @@
  },
  {
   "file": "patient-discomfort-confirm-1920.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 24,
    "rgb(23, 92, 211)": 1,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4118,13 +4118,13 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-375.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 3,
    "rgb(255, 255, 255)": 22,
    "rgb(23, 92, 211)": 2,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4145,13 +4145,13 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-390.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 2,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4171,13 +4171,13 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-768.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 2,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4198,13 +4198,13 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-1024.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 2,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4224,13 +4224,13 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-1440.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 2,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4251,13 +4251,13 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-1920.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 23,
    "rgb(23, 92, 211)": 2,
    "rgb(23, 43, 77) a0.50": 1,
@@ -4277,7 +4277,7 @@
  },
  {
   "file": "patient-discomfort-stopped-375.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -4315,7 +4315,7 @@
  },
  {
   "file": "patient-discomfort-stopped-390.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -4352,7 +4352,7 @@
  },
  {
   "file": "patient-discomfort-stopped-768.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -4390,7 +4390,7 @@
  },
  {
   "file": "patient-discomfort-stopped-1024.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -4427,7 +4427,7 @@
  },
  {
   "file": "patient-discomfort-stopped-1440.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -4465,7 +4465,7 @@
  },
  {
   "file": "patient-discomfort-stopped-1920.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5495,8 +5495,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 5,
    "rgb(255, 255, 255)": 6,
    "rgb(23, 92, 211)": 1
   },
@@ -5521,8 +5521,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 5,
    "rgb(255, 255, 255)": 6,
    "rgb(23, 92, 211)": 1
   },
@@ -5546,8 +5546,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 5,
    "rgb(255, 255, 255)": 5,
    "rgb(23, 92, 211)": 1
   },
@@ -5573,8 +5573,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 5,
    "rgb(255, 255, 255)": 5,
    "rgb(23, 92, 211)": 1
   },
@@ -5599,8 +5599,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 5,
    "rgb(255, 255, 255)": 5,
    "rgb(23, 92, 211)": 1
   },
@@ -5626,8 +5626,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 5,
    "rgb(255, 255, 255)": 5,
    "rgb(23, 92, 211)": 1
   },
@@ -5974,8 +5974,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 6,
    "rgb(255, 255, 255)": 4,
    "rgb(239, 244, 255)": 4,
    "rgb(23, 92, 211)": 1
@@ -6000,8 +6000,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 6,
    "rgb(255, 255, 255)": 4,
    "rgb(239, 244, 255)": 4,
    "rgb(23, 92, 211)": 1
@@ -6025,8 +6025,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 6,
    "rgb(255, 255, 255)": 4,
    "rgb(239, 244, 255)": 4,
    "rgb(23, 92, 211)": 1
@@ -6051,8 +6051,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 6,
    "rgb(255, 255, 255)": 4,
    "rgb(239, 244, 255)": 4,
    "rgb(23, 92, 211)": 1
@@ -6076,8 +6076,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 6,
    "rgb(255, 255, 255)": 4,
    "rgb(239, 244, 255)": 4,
    "rgb(23, 92, 211)": 1
@@ -6102,8 +6102,8 @@
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 7,
-   "rgb(235, 239, 245)": 2,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 6,
    "rgb(255, 255, 255)": 4,
    "rgb(239, 244, 255)": 4,
    "rgb(23, 92, 211)": 1
@@ -6122,7 +6122,7 @@
  },
  {
   "file": "patient-session-paused-375.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -6147,7 +6147,7 @@
  },
  {
   "file": "patient-session-paused-390.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -6171,7 +6171,7 @@
  },
  {
   "file": "patient-session-paused-768.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -6196,7 +6196,7 @@
  },
  {
   "file": "patient-session-paused-1024.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -6220,7 +6220,7 @@
  },
  {
   "file": "patient-session-paused-1440.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -6245,7 +6245,7 @@
  },
  {
   "file": "patient-session-paused-1920.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -6269,13 +6269,13 @@
  },
  {
   "file": "patient-session-player-375.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 10,
    "rgb(23, 92, 211)": 1
   },
@@ -6294,13 +6294,13 @@
  },
  {
   "file": "patient-session-player-390.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 10,
    "rgb(23, 92, 211)": 1
   },
@@ -6318,13 +6318,13 @@
  },
  {
   "file": "patient-session-player-768.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 10,
    "rgb(23, 92, 211)": 1
   },
@@ -6343,13 +6343,13 @@
  },
  {
   "file": "patient-session-player-1024.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 10,
    "rgb(23, 92, 211)": 1
   },
@@ -6367,13 +6367,13 @@
  },
  {
   "file": "patient-session-player-1440.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 10,
    "rgb(23, 92, 211)": 1
   },
@@ -6392,13 +6392,13 @@
  },
  {
   "file": "patient-session-player-1920.png",
-  "url": "/session/c144c5bf-f271-4127-9d1c-da25f855b054",
+  "url": "/session/45a99452-7880-404b-97c9-e2aaf45e0792",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
   "bgs": {
-   "rgb(245, 247, 250)": 4,
-   "rgb(235, 239, 245)": 1,
+   "rgb(245, 247, 250)": 3,
+   "rgb(235, 239, 245)": 2,
    "rgb(255, 255, 255)": 10,
    "rgb(23, 92, 211)": 1
   },

@@ -24,6 +24,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 5.1 (branch `wp/5.1`): AI pipeline in `packages/ai` (ADR-5, ADR-6): provider interface, deterministic provider, optional Anthropic provider over `fetch`, versioned prompts, strict output schemas with source references, consent gate, rate-limit hook, redaction with an outbound canary, timeout and bounded retry, token and cost record, evidence verifier interface, injection set, `pnpm ai:eval` (gate output below). Includes WP 5.5's 25 cases after opus review.
 - WP 5.4 batch 1 (branch `wp/5.4`): `@carepath/fhir` mappers for Organization, Practitioner, Patient, CarePlan (one per published version), Goal, Observation; collection Bundle export; three validation layers (Medplum `validateResource`, CarePath checks, duplicates); import planning with itemised OperationOutcome; `GET /patients/:patientId/fhir/export` and `POST /fhir/import`; `pnpm synthea:demo` and three committed Synthea patient bundles plus the practitioner bundle; `docs/evaluation/fhir-validation.md`. Official HL7 validation not performed (package hosts blocked). Batch 2 followed in WP 5.4b (gate output below).
 - WP 5.4b FHIR batch 2 (branch `wp/5.4b`): mappers for Condition, Appointment, Encounter (visits that took place, AMB or VR) and DocumentReference (one per signed ClinicalNoteVersion: the signed version docStatus final, each amendment docStatus amended with relatesTo replaces, LOINC 11506-3 or 34117-2, custodian = clinic; drafts are never read); Goal.addresses and Observation.encounter now written; batch 2 checks (con-3/4/5, app-1 to app-4, per-1, us-core-6, custodian, export rules for visits and signed notes); import allow-list adds Encounter and Condition (Appointment and DocumentReference export only, skipped and listed); 24 new broken fixtures (55 of 55 fail with the expected rule); `scripts/fhir-export-check.ts` exports every seeded patient (40 of 40 pass); `pnpm synthea:demo` re-run (bundles identical; 47 encounters, 54 conditions now imported, re-import 409 with 42 duplicates); `docs/evaluation/fhir-validation.md` updated for all ten resources. Official HL7 validation still not performed (gate output below).
+- D-WP-1 tokens, type and capture tooling (branch `wp/d1`): DR-001 colour set as one map for both themes (all roles including link, selected, critical, accent, AI, `chart-1..8`, `seq-1..7`, `div-1..5`), patient and clinician type scales and `textExtra` roles, IBM Plex Sans 400/400 italic/500/600 and Plex Mono 400 with Source Serif 4 removed, scrim and overlay shadow on `ink`, token tests rewritten per DR-001 section 8, `apps/web/scripts/design-capture.mjs` with its probe, and the tokens-only capture in `docs/design/after/d-wp-1/` (gate output below).
 
 ## Outstanding
 
@@ -856,3 +857,47 @@ Worktree `/home/claude/wt/d7`, branch `wp/d7`. Image work is in `docs/design/aft
 - Part 2: six exercise pictures generated in the new palette wording on plain white (quad-set, heel-slide, straight-leg-raise, upper-trap-stretch, towel-reach-behind, walking-program), then mapped to the same recolour as Part 1. 6 accepted, 1 rejected (towel-reach-behind try 1: arm covered the face), 7 generations, 350 of 600 credits. Flagged for the reviewer: upper-trap-stretch shows a backless stool with the legs turned to one side; towel-reach-behind now shows a side view with the towel held low, not a reach over the shoulder.
 - Wiring: `exercise-media.ts` has the six new entries with plain alt text; `illustration.tsx` picture container is now a `bg-surface-sunken` tile, `rounded-container`, no border; the caption "Illustration only. Follow the written steps from your care team." is unchanged. `asset-manifest.json` has 25 assets with prompts, seeds, bytes, dimensions and licensing "not verified". The seed text changed, so the seed hash changes.
 - Not done: no vector trace (closed in WP 3.5); no medical review of the pictures (still "generated, not medically reviewed").
+
+### D-WP-1 (tokens, type and capture tooling)
+
+Worktree `/home/claude/wt/d1`, branch `wp/d1`, rebased on main after D-WP-0, D-WP-3, WP 5.4b, D-WP-7 and the web-lock and ephemeral-port fixes. Dependency commit (own commit): `@fontsource/source-serif-4` removed from `@carepath/ui`.
+
+- `packages/ui/src/tokens/tokens.ts`: the DR-001 values from `docs/design/tokens-final.json`, one palette for `patient` and `clinician` (`ColourTokens` gains the `meta.extraKeys`), density per `design-tokens.md` section 5 plus `textExtra` (data value, notes, page, section and component titles, overline), `fonts.serif` kept as the sans stack so old references resolve, `scrim` and `elevation.overlay` on `rgb(23 43 77)`. `tokens.css` regenerated; `preset.css` exposes every new colour and text role as a Tailwind utility (`bg-ai-bg`, `text-link`, `bg-selected-bg`, `text-data-value`, and so on).
+- `contrastPairs` follows DR-001 section 8: `link` replaces `primary` as text, `selected-ink` on `selected-bg` replaces the old tint pair, and the pairs of `design-tokens.md` sections 6.1 and 6.2 are added (93 pairs per theme, all pass).
+- `contrast.test.ts`: DR-001 values; the two colour maps are equal; `tokens.ts` equals `tokens-final.json` (colours, density, `textExtra`, fonts, overlay); scales `[15,17,20,24,32,40]` and `[12,13,14,15,18,24]` with every role on its scale; Plex Sans headings in both themes and no "Serif" in any token or the generated CSS; `fonts.ts` loads exactly the five DR-001 faces; "status tokens are not brand blue"; `ai-*` saturation 0.35 or less; "contains no warm neutral"; scrim and shadow derived from `ink`. "limits blue to focus and info" and "uses serif headings for patients only" are deleted.
+- Components: only `AIDraftBlock` changed (`bg-ai-bg`, DR-001 section 8); no component depended on a removed token. The gallery's colour and type copy no longer mentions forest or Source Serif and shows the new roles; `design-system-screenshots.mjs` checks Plex Sans 600 instead of the serif. `docs/design-system/README.md` has the new palette and font text; `components.md` colour words updated. The favicon uses `accent` (the brand-mark token).
+- Capture tooling: `apps/web/scripts/design-capture.mjs` (with `scripts/design-capture.sh` for database, build and servers) captures the 40 baseline screens at 375, 390, 768, 1024, 1440 and 1920 with the baseline file names and writes `_probe.json` (overflow, computed backgrounds, warm backgrounds with status and chart tokens listed apart, targets under 24 px and under the theme floor with the first offenders named, axe serious or critical at 375, 768 and 1440). `SCREENS`, `WIDTHS` and `PROBE_FAIL_ON` serve later packages. All six widths of a screen show the same state (the viewport is resized), so the session and discomfort chain runs once on `patient.flare` instead of rotating personas.
+- `docs/design/after/d-wp-1/`: 240 images and `_probe.json` from the gate's own capture run on this branch (same seed anchor and fixed clock as the baseline). Probe: no warm background on any screen; 18 images carry `warning-bg` (chips and banners, a status token, hue 53); horizontal overflow on the same 15 images as the baseline (admin patients, clinician schedule and record appointments at 375, 390, 768: layout work for D-WP-6, D-WP-14, D-WP-15); one axe serious finding, `target-size` on `patient-reschedule-375` (4 nodes), seen now because axe runs at 375 (the baseline ran it at 1440 only), left for D-WP-11 and D-WP-2.
+
+Gate: `scripts/gate-wp-d1.sh` exit 0 (token tests, `contrast.mjs --strict`, typecheck, lint and format of owned paths, capture with `PROBE_FAIL_ON=warm`, `pnpm verify`, clean tree). Tail:
+
+```
+==> contrast.mjs --strict on tokens-final.json
+### theme: patient  (84 pairs, 0 below threshold, 0 missing)
+### theme: clinician  (84 pairs, 0 below threshold, 0 missing)
+contrast.mjs --strict: exit 0
+design-capture: 240 images in /home/claude/wt/d1/.data/capture-d-wp-1
+  warm backgrounds (not a status or chart token): 0 images
+  warm status or chart token backgrounds (allowed): 18 images
+  horizontal overflow: 15 images
+  axe serious or critical (at 375, 768, 1440): 1 images
+  interactive targets under 24 px: 219 images
+  interactive targets under the theme floor: 225 images
+packages/ui test:       Tests  227 passed (227)
+apps/api test:       Tests  222 passed (222)
+  25 skipped
+  53 passed (5.3m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-1 gate: PASSED
+```
+
+Deviations and open points:
+- Output folder is `docs/design/after/d-wp-1/` (lower case, as the orchestrator asked); the rebuild plan row says `D-WP-1`.
+- The probe's warm rule (hue 25 to 65, saturation above 0.10) also matches `warning-bg` `#FEF7C3`, which DR-001 kept on purpose. The probe therefore reports status, chart and accent token colours separately and fails only on other warm colours. The probe reads computed CSS backgrounds only, not pixels inside images.
+- `apps/web/components/illustration.tsx` was not touched (D-WP-7 owns it and has already changed it). `apps/web/app/icon.svg` and `docs/design-system/components.md` were outside the listed paths and were edited for the colour change only.
+- Interaction-state rules in `design-tokens.md` section 3 (hover `primary-subtle`, selected edge bar, outline secondary button) are not applied to components; that is D-WP-2. Heading `h4` weight 500 for patients is not applied either (the `Heading` component uses one weight).
+- The baseline capture script was not in the repository, so this one was written from the audit's description; its file names match the baseline, its states are close but not identical (one persona for the session chain, `/review-queue` without a task selected at 1440).
+
