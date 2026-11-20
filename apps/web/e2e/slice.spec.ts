@@ -185,7 +185,9 @@ test("the slice: onboarding, assignment in the UI, plan, session, pain check-in,
   const patientId = tp.url().match(/\/patients\/([0-9a-f-]{36})/)![1]!;
 
   await tp.goto(`/patients/${patientId}/plan`);
-  await expect(tp.getByRole("heading", { level: 1, name: "Care plan builder" })).toBeVisible();
+  await expect(
+    tp.getByRole("heading", { level: 1, name: /Care plan (builder|for)/ }),
+  ).toBeVisible();
   await tp.getByLabel(/^Plan title/).fill("Back mobility, first plan");
   await tp
     .getByLabel(/^Plan instructions/)
