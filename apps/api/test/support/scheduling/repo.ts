@@ -93,3 +93,42 @@ export async function setReminderSent(db: Db, appointmentId: string, at: Date | 
 export async function setOrgTimezone(db: Db, orgId: string, timezone: string) {
   await db.organization.update({ where: { id: orgId }, data: { timezone } });
 }
+
+/** Moves a patient to awaiting assignment with an active care team holding only a coordinator. */
+export async function awaitingWithCoordinatorTeam(
+  db: Db,
+  org: OrgFixture,
+  patientId: string,
+): Promise<void> {
+  await db.patient.update({ where: { id: patientId }, data: { status: "awaiting_assignment" } });
+  const team = await db.careTeam.create({
+    data: { organizationId: org.orgId, patientId, name: "Care team" },
+    select: { id: true },
+  });
+  await db.careTeamMember.create({
+    data: {
+      organizationId: org.orgId,
+      careTeamId: team.id,
+      userId: org.coordinator.userId,
+      role: "care_coordinator",
+    },
+  });
+}
+
+/** active -> inactive -> awaiting_assignment, so the patient can be assigned again. */
+export async function backToAwaiting(db: Db, patientId: string): Promise<void> {
+  await db.patient.update({ where: { id: patientId }, data: { status: "inactive" } });
+  await db.patient.update({ where: { id: patientId }, data: { status: "awaiting_assignment" } });
+}
+
+export async function threadsOf(db: Db, patientId: string) {
+  return db.conversation.findMany({
+    where: { patientId },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      subject: true,
+      participants: { select: { userId: true }, orderBy: { userId: "asc" } },
+    },
+  });
+}

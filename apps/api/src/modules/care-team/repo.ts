@@ -119,3 +119,63 @@ export async function addPrimaryTherapist(
   });
   return member.id;
 }
+
+/**
+ * The patient-to-care-team thread (WP 4.1 ruling, with WP 4.2 messaging). Run inside the
+ * assignment transaction, after the patient row was updated (which holds its lock, so two
+ * assignments of one patient cannot both create a thread). Idempotent: the patient's earliest
+ * conversation is the care-team thread; it is created when missing, and the patient, the
+ * assigned therapist and the active care-team coordinators are added when not yet participants.
+ * Earlier therapists stay participants so the history keeps its senders. Returns the thread id.
+ */
+export async function ensureCareTeamConversation(
+  db: DbClient,
+  ctx: Scope,
+  input: { patientId: string; therapistUserId: string; subject: string; now: Date },
+): Promise<string> {
+  const patient = await db.patient.findFirst({
+    where: { id: input.patientId, organizationId: ctx.orgId },
+    select: { userId: true },
+  });
+  let thread = await db.conversation.findFirst({
+    where: { organizationId: ctx.orgId, patientId: input.patientId },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    select: { id: true },
+  });
+  thread ??= await db.conversation.create({
+    data: {
+      organizationId: ctx.orgId,
+      patientId: input.patientId,
+      subject: input.subject,
+      createdAt: input.now,
+      updatedAt: input.now,
+    },
+    select: { id: true },
+  });
+  const coordinators = await db.careTeamMember.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      role: "care_coordinator",
+      endedAt: null,
+      careTeam: { patientId: input.patientId, organizationId: ctx.orgId, status: "active" },
+    },
+    select: { userId: true },
+  });
+  const userIds = [
+    ...new Set([
+      ...(patient?.userId ? [patient.userId] : []),
+      input.therapistUserId,
+      ...coordinators.map((c) => c.userId),
+    ]),
+  ];
+  await db.conversationParticipant.createMany({
+    data: userIds.map((userId) => ({
+      organizationId: ctx.orgId,
+      conversationId: thread.id,
+      userId,
+      joinedAt: input.now,
+    })),
+    skipDuplicates: true,
+  });
+  return thread.id;
+}

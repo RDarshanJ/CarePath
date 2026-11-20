@@ -1,4 +1,5 @@
 /** Conversations and messages between patients and their care team, with unread state and failures. */
+import { CARE_TEAM_THREAD_SUBJECT } from "@carepath/shared";
 import { D, H, MIN, iso, type Ctx } from "./ctx.js";
 import {
   clinicianMessages,
@@ -21,6 +22,7 @@ export function buildConversations(ctx: Ctx): UnreadMessage[] {
   const unread: UnreadMessage[] = [];
   let genericIndex = 0;
 
+  const withThread = new Set<string>();
   for (const p of ctx.patients) {
     if (!p.userId || p.status === "intake_incomplete") continue;
     const rng = ctx.rng.fork(`conversation/${p.id}`);
@@ -81,6 +83,19 @@ export function buildConversations(ctx: Ctx): UnreadMessage[] {
         ? iso(prevAt + 5 * MIN)
         : null
       : iso(readAfter);
+    withThread.add(p.id);
+    // The care team's coordinator is a participant too (WP 4.1 ruling for assignment), with
+    // the thread read so the seeded unread counts stay those of patient and therapist.
+    if (p.therapist) {
+      t.ConversationParticipant.push({
+        id: ctx.id("participant", `${convId}/coordinator`),
+        organizationId: p.org.id,
+        conversationId: convId,
+        userId: p.org.coordinatorUserId,
+        lastReadAt: iso(readAfter),
+        joinedAt: iso(startMs),
+      });
+    }
     t.ConversationParticipant.push(
       {
         id: ctx.id("participant", `${convId}/patient`),
@@ -131,6 +146,38 @@ export function buildConversations(ctx: Ctx): UnreadMessage[] {
         atMs: last.atMs,
         fromName: `${p.givenName} ${p.familyName}`,
       });
+  }
+
+  // Every assigned patient with a login has the care-team thread, as assignment creates it in
+  // the API (WP 4.1): patient, therapist and the team's coordinator, no messages yet. Added
+  // after the loop so the random streams above are unchanged.
+  for (const p of ctx.patients) {
+    if (!p.userId || !p.therapist || withThread.has(p.id)) continue;
+    const convId = ctx.id("conversation", p.id);
+    const createdMs = Math.min(p.createdAtMs + 1 * D + 2 * H, ctx.anchorMs - H);
+    t.Conversation.push({
+      id: convId,
+      organizationId: p.org.id,
+      patientId: p.id,
+      subject: CARE_TEAM_THREAD_SUBJECT,
+      lastMessageAt: null,
+      createdAt: iso(createdMs),
+      updatedAt: iso(createdMs),
+    });
+    for (const [key, userId] of [
+      ["patient", p.userId],
+      ["staff", p.therapist.userId],
+      ["coordinator", p.org.coordinatorUserId],
+    ] as const) {
+      t.ConversationParticipant.push({
+        id: ctx.id("participant", `${convId}/${key}`),
+        organizationId: p.org.id,
+        conversationId: convId,
+        userId,
+        lastReadAt: null,
+        joinedAt: iso(createdMs),
+      });
+    }
   }
   return unread;
 }

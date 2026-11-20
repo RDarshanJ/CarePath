@@ -42,3 +42,9 @@ export function painNoticeMessage(painScore: number, clinicPhone: string | null)
   const contact = clinicPhone ? `contact your clinic at ${clinicPhone}` : CONTACT_CLINIC_FALLBACK;
   return `You reported pain of ${painScore} out of 10. If you are worried, ${contact}.`;
 }
+
+/**
+ * Subject of the patient-to-care-team thread that assigning a therapist creates (WP 4.1). The
+ * seed uses the same text for the threads it guarantees.
+ */
+export const CARE_TEAM_THREAD_SUBJECT = "Messages with your care team";

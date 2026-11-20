@@ -1,4 +1,5 @@
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
+import { CARE_TEAM_THREAD_SUBJECT } from "@carepath/shared";
 import {
   assignClinicianRequestSchema,
   careTeamCardSchema,
@@ -15,6 +16,7 @@ import { requirePatientRead } from "../../core/scope/patient-scope.js";
 import { setPatientStatus } from "../intake/repo.js";
 import {
   addPrimaryTherapist,
+  ensureCareTeamConversation,
   assignablePractitioner,
   careTeamMembers,
   practitionersWithCaseload,
@@ -129,6 +131,13 @@ export const careTeamRoutes: FastifyPluginAsyncZod = async (app) => {
           throw new AppError("invalid_transition");
         }
         const memberId = await addPrimaryTherapist(tx, ctx, { patientId, userId, now: at });
+        // The patient-to-care-team thread, in the same transaction (WP 4.1 ruling).
+        await ensureCareTeamConversation(tx, ctx, {
+          patientId,
+          therapistUserId: userId,
+          subject: CARE_TEAM_THREAD_SUBJECT,
+          now: at,
+        });
         await audit({
           eventName: "assignment.create",
           action: "C",

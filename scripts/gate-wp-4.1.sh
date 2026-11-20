@@ -2,7 +2,7 @@
 # WP 4.1 gate (scheduling) on this package's own port: API 4041, database carepath_wp41_<pid>.
 # Migrates, runs the phase4_scheduling trigger tests (one rejection per condition), the booking
 # concurrency test (50 parallel requests for one slot, 20 repetitions, over real HTTP on
-# API_PORT), the scheduling API tests and M8, lints and type-checks the paths this package owns,
+# API_PORT), the scheduling API tests, the assignment-thread test and M8, lints and type-checks the paths this package owns,
 # checks openapi.json, then `pnpm verify`, and ends with a clean `git status`.
 # Never stops the shared cluster.
 #   GATE_SKIP_VERIFY=1 scripts/gate-wp-4.1.sh   skip the final `pnpm verify` (development loops only)
@@ -21,6 +21,9 @@ OWNED=(
   packages/shared/src/contracts/errors.ts
   apps/api/src/modules/scheduling
   apps/api/src/modules/today
+  apps/api/src/modules/care-team
+  packages/db/seed/comms.ts
+  packages/shared/src/copy.ts
   apps/api/src/core/scope
   apps/api/src/core/db
   apps/api/src/jobs
@@ -46,7 +49,7 @@ const walls = d.results.map((r) => r.wallMs).sort((a, b) => a - b);
 console.log(`repetitions=${d.results.length} parallel=${d.parallel} all exactly one 201: ${ok} wall ms min=${walls[0]} median=${walls[Math.floor(walls.length / 2)]} max=${walls[walls.length - 1]}`);
 process.exit(ok && d.results.length === d.repetitions ? 0 : 1);
 ' "$BOOKING_CONCURRENCY_OUT" || { echo "FAILED: booking concurrency" >&2; exit 1; }
-run pnpm --filter @carepath/api exec vitest run test/phase4/scheduling.test.ts test/phase3/m8-enumeration.test.ts
+run pnpm --filter @carepath/api exec vitest run test/phase4/scheduling.test.ts test/phase4/assignment-thread.test.ts test/phase3/m8-enumeration.test.ts
 run pnpm --filter @carepath/shared typecheck
 run pnpm --filter @carepath/db typecheck
 run pnpm --filter @carepath/api typecheck

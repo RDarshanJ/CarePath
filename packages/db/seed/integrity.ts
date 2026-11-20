@@ -316,6 +316,15 @@ export async function checkIntegrity(
     "appointments fit inside their slot",
     `SELECT count(*) n FROM "Appointment" a JOIN "AvailabilitySlot" s ON s.id = a."slotId" WHERE a."startsAt" < s."startsAt" OR a."endsAt" > s."endsAt" OR a."practitionerId" <> s."practitionerId"`,
   );
+  await zero(
+    "every assigned patient with a login has a care-team thread with their therapist",
+    `SELECT count(*) n FROM "Patient" pa JOIN "CareTeam" ct ON ct."patientId" = pa.id JOIN "CareTeamMember" m ON m."careTeamId" = ct.id AND m.role = 'primary_therapist'
+      WHERE pa."userId" IS NOT NULL AND NOT EXISTS (
+        SELECT 1 FROM "Conversation" c
+        WHERE c."patientId" = pa.id
+          AND EXISTS (SELECT 1 FROM "ConversationParticipant" x WHERE x."conversationId" = c.id AND x."userId" = pa."userId")
+          AND EXISTS (SELECT 1 FROM "ConversationParticipant" x WHERE x."conversationId" = c.id AND x."userId" = m."userId"))`,
+  );
   // Checkpoint C2 section 2 (WP 4.1).
   await zero(
     "every non-cancelled appointment with a slot matches it",
