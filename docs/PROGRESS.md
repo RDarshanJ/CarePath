@@ -657,3 +657,24 @@ Per-repetition counts and timings of both runs: `docs/evaluation/booking-concurr
 - Merge notes for the orchestrator: shared files touched with minimal edits: `contracts/index.ts` (one export line), `contracts/today.ts` (`nextAppointment` after WP 4.2's `messages`), `contracts/errors.ts` (`slot_unavailable`), `app.ts` (one registration line), `jobs/handlers.ts` (one handler, one recurring queue), `modules/today/routes.ts` (one field), `core/db/repo.ts` and `core/db/tx.ts` (optional `TxOptions`), `core/scope/repo.ts` and `patient-scope.ts` (`Appointment` child kind, `requirePractitioner`), `m8-enumeration.test.ts` (scheduling fixtures beside the messaging ones), `shared/src/copy.ts` (thread subject), `modules/care-team`. `openapi.json` regenerated after the rebase (62 operations). `ClinicianOverview` not touched (CR-1 is a second call).
 - Fix in WP 4.2 files: `messaging.test.ts` failed 3 of 4 runs after the rebase on participant role order. Participants were ordered by `joinedAt` only and the test fixture gave them equal times. `test/support/fixtures/messaging.ts` now spaces `joinedAt` by 1 ms in the given order. `modules/messaging/repo.ts` is unchanged (an `id` tie-break inside its `as const` select does not type-check); participants with equal `joinedAt` still have no defined order there, worth a look by the messaging owner.
 
+
+### WP 4.3a (patient appointments and messages)
+
+Worktree `/home/claude/wt/4.3a`, branch `wp/4.3a`. `scripts/gate-wp-4.3a.sh` (API 4043, web 3043, own database, includes `pnpm verify`) exit 0 and the tree clean afterwards (the screenshot folder is excluded from that check because its pictures change with each run; they are committed after the gate).
+
+```
+seed check: 77/77 integrity checks passed
+stage 1  patient-scheduling (Scenario E at 390 and 1440, two-browser, keyboard):  4 passed (1.2m)
+stage 1b patient.spec + auth.spec (navigation now four destinations):             36 passed (2.9m)
+stage 2  patient-messaging-failure (API with MESSAGE_FORCE_FAILURE=true):         2 passed (34.2s)
+pnpm verify: packages/ui 106, packages/db 71, apps/api 203 tests passed
+  e2e: 47 passed, 17 skipped (4.9m)
+verify: PASSED
+(clean)
+WP 4.3a gate: PASSED
+```
+
+- Screens (all under `apps/web/app/(patient)/(app)`): `/appointments` (upcoming and past, reminder banner, booked/moved/cancelled confirmation), `/appointments/book` (therapist profile, visit type, day and time-of-day filters preselected from intake, open times grouped by clinic-zone day with the zone named, check and confirm), `/appointments/[id]/reschedule`, cancel dialog with a required reason, `/messages` (list with unread and failed-count text), `/messages/[conversationId]` (sender name and role on every message, composer with reply-time text and `EMERGENCY_NOTICE`, Sending/Sent/Not sent with Retry, 5 second poll while open, read marker moved on open). Today gained Next appointment and Messages sections in REQ-TOD-01 order and an appointment reminder line. Nav: four destinations, bottom tabs under md, header row from md up (one visible "Patient" landmark at a time), unread badge from the 30 second conversation poll.
+- Booking conflict: `booking_conflict` shows "That time was just taken", refreshes the list, keeps visit type and filters, and offers the three nearest open times (AC-E8). The two-browser test uses `patient.demo` and `patient.resume` against one slot.
+- Tests: `e2e/patient-scheduling.spec.ts`, `e2e/patient-messaging-failure.spec.ts` (runs only with the flag); `patient.spec.ts` and `auth.spec.ts` nav assertions updated. Everything a test books is cancelled again. Screenshots: `docs/screenshots/4.3a` (e01 to e11, each at 390 and 1440).
+- Deviations and notes: (1) Times are shown in the clinic zone, named, not the viewer zone (as the work package says; REQ-APT-03 wording says viewer zone). (2) The reminder is derived on Today and Appointments from `nextAppointment` being today or tomorrow in the clinic zone; no API route lists the stored `appointment_reminder` notifications. (3) The API answers `booking_conflict` also when the patient has an overlapping visit, so that case reads "That time was just taken" too. (4) Forced failure: the flag is set at API start, so the retried message fails again; recovery from failed to sent after a retry is covered by the WP 4.2 API tests, and the normal Sending to Sent path by Scenario E. (5) The e2e axe check removes the sticky phone tab bar's stickiness during the scan, because axe counts controls under it as too small; the bar itself is scanned on screens where nothing sits beneath it. (6) The tab bar wraps to two rows at 200 percent zoom (195 px). (7) Shared files touched: none outside `(patient)`, the two patient e2e specs and the new gate script. The patient column is `max-w-3xl` (was `2xl`) so the header nav fits.
