@@ -10,3 +10,4 @@ docs
 packages/ui/src/styles/tokens.css
 packages/db/src/generated
 packages/db/prisma/migrations
+apps/api/openapi.json

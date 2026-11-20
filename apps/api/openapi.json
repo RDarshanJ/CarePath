@@ -1,0 +1,1337 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CarePath API",
+    "version": "0.1.0",
+    "description": "Demonstration product. Synthetic data. Not for clinical use. Session cookie auth; mutating requests need an allowed Origin and the x-csrf-token header."
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "cp_session"
+      }
+    },
+    "schemas": {
+      "ErrorEnvelopeInput": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "validation_error",
+                  "organization_required",
+                  "invalid_credentials",
+                  "unauthenticated",
+                  "session_expired",
+                  "origin_rejected",
+                  "csrf_failed",
+                  "forbidden",
+                  "not_on_care_team",
+                  "not_found",
+                  "conflict",
+                  "payload_too_large",
+                  "unsupported_media_type",
+                  "rate_limited",
+                  "internal_error",
+                  "service_unavailable"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "Dot path of the offending field, empty for the whole input."
+                    },
+                    "issue": {
+                      "type": "string",
+                      "description": "Machine-readable issue code."
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "issue",
+                    "message"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "LoginRequestInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "organizationSlug": {
+            "description": "Needed only when the account belongs to more than one organization.",
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "SessionInfoInput": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "displayName",
+              "email"
+            ]
+          },
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "slug"
+            ]
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "patient",
+              "physical_therapist",
+              "care_coordinator",
+              "clinic_admin"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "patient.read_own",
+                "patient.update_own",
+                "careplan.read_own",
+                "session.write_own",
+                "checkin.write_own",
+                "appointment.manage_own",
+                "message.own",
+                "consent.manage_own",
+                "fhir.export_own",
+                "patient.read",
+                "patient.update_admin",
+                "clinical.read",
+                "careplan.status_read",
+                "activity.summary_read",
+                "clinical.write",
+                "careplan.publish",
+                "note.write",
+                "note.sign",
+                "ai.generate",
+                "ai.review",
+                "review_task.read",
+                "review_task.resolve",
+                "review_task.resolve_admin",
+                "review_rule.manage",
+                "appointment.read",
+                "appointment.manage",
+                "availability.manage_own",
+                "availability.manage",
+                "message.care_team",
+                "message.org",
+                "consent.read",
+                "enrollment.manage",
+                "assignment.manage",
+                "metrics.read",
+                "audit.read",
+                "fhir.export",
+                "fhir.import",
+                "roles.read",
+                "settings.manage"
+              ]
+            }
+          },
+          "patientId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "practitionerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "csrfToken": {
+            "type": "string",
+            "description": "Send as the x-csrf-token header on every POST, PUT, PATCH and DELETE."
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "Absolute end of the session (12 hours after login)."
+          },
+          "idleExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "End of the session if no request arrives first (30 minutes idle)."
+          }
+        },
+        "required": [
+          "user",
+          "organization",
+          "role",
+          "permissions",
+          "patientId",
+          "practitionerId",
+          "csrfToken",
+          "expiresAt",
+          "idleExpiresAt"
+        ]
+      },
+      "RoleMatrixInput": {
+        "type": "object",
+        "properties": {
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "patient",
+                    "physical_therapist",
+                    "care_coordinator",
+                    "clinic_admin"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "patient.read_own",
+                      "patient.update_own",
+                      "careplan.read_own",
+                      "session.write_own",
+                      "checkin.write_own",
+                      "appointment.manage_own",
+                      "message.own",
+                      "consent.manage_own",
+                      "fhir.export_own",
+                      "patient.read",
+                      "patient.update_admin",
+                      "clinical.read",
+                      "careplan.status_read",
+                      "activity.summary_read",
+                      "clinical.write",
+                      "careplan.publish",
+                      "note.write",
+                      "note.sign",
+                      "ai.generate",
+                      "ai.review",
+                      "review_task.read",
+                      "review_task.resolve",
+                      "review_task.resolve_admin",
+                      "review_rule.manage",
+                      "appointment.read",
+                      "appointment.manage",
+                      "availability.manage_own",
+                      "availability.manage",
+                      "message.care_team",
+                      "message.org",
+                      "consent.read",
+                      "enrollment.manage",
+                      "assignment.manage",
+                      "metrics.read",
+                      "audit.read",
+                      "fhir.export",
+                      "fhir.import",
+                      "roles.read",
+                      "settings.manage"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "key",
+                "name",
+                "description",
+                "permissions"
+              ]
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "patient.read_own",
+                    "patient.update_own",
+                    "careplan.read_own",
+                    "session.write_own",
+                    "checkin.write_own",
+                    "appointment.manage_own",
+                    "message.own",
+                    "consent.manage_own",
+                    "fhir.export_own",
+                    "patient.read",
+                    "patient.update_admin",
+                    "clinical.read",
+                    "careplan.status_read",
+                    "activity.summary_read",
+                    "clinical.write",
+                    "careplan.publish",
+                    "note.write",
+                    "note.sign",
+                    "ai.generate",
+                    "ai.review",
+                    "review_task.read",
+                    "review_task.resolve",
+                    "review_task.resolve_admin",
+                    "review_rule.manage",
+                    "appointment.read",
+                    "appointment.manage",
+                    "availability.manage_own",
+                    "availability.manage",
+                    "message.care_team",
+                    "message.org",
+                    "consent.read",
+                    "enrollment.manage",
+                    "assignment.manage",
+                    "metrics.read",
+                    "audit.read",
+                    "fhir.export",
+                    "fhir.import",
+                    "roles.read",
+                    "settings.manage"
+                  ]
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "description"
+              ]
+            }
+          }
+        },
+        "required": [
+          "roles",
+          "permissions"
+        ]
+      },
+      "HealthInput": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "database"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ]
+      },
+      "PatientHeaderInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "mrn": {
+            "type": "string"
+          },
+          "givenName": {
+            "type": "string"
+          },
+          "familyName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male",
+              "other",
+              "unknown"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "intake_incomplete",
+              "awaiting_assignment",
+              "active",
+              "inactive",
+              "discharged"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "preferredLanguage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "mrn",
+          "givenName",
+          "familyName",
+          "birthDate",
+          "gender",
+          "status",
+          "timezone",
+          "preferredLanguage"
+        ]
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "validation_error",
+                  "organization_required",
+                  "invalid_credentials",
+                  "unauthenticated",
+                  "session_expired",
+                  "origin_rejected",
+                  "csrf_failed",
+                  "forbidden",
+                  "not_on_care_team",
+                  "not_found",
+                  "conflict",
+                  "payload_too_large",
+                  "unsupported_media_type",
+                  "rate_limited",
+                  "internal_error",
+                  "service_unavailable"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "description": "Dot path of the offending field, empty for the whole input."
+                    },
+                    "issue": {
+                      "type": "string",
+                      "description": "Machine-readable issue code."
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "issue",
+                    "message"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "organizationSlug": {
+            "description": "Needed only when the account belongs to more than one organization.",
+            "type": "string",
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "additionalProperties": false
+      },
+      "SessionInfo": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "displayName",
+              "email"
+            ],
+            "additionalProperties": false
+          },
+          "organization": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "slug"
+            ],
+            "additionalProperties": false
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "patient",
+              "physical_therapist",
+              "care_coordinator",
+              "clinic_admin"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "patient.read_own",
+                "patient.update_own",
+                "careplan.read_own",
+                "session.write_own",
+                "checkin.write_own",
+                "appointment.manage_own",
+                "message.own",
+                "consent.manage_own",
+                "fhir.export_own",
+                "patient.read",
+                "patient.update_admin",
+                "clinical.read",
+                "careplan.status_read",
+                "activity.summary_read",
+                "clinical.write",
+                "careplan.publish",
+                "note.write",
+                "note.sign",
+                "ai.generate",
+                "ai.review",
+                "review_task.read",
+                "review_task.resolve",
+                "review_task.resolve_admin",
+                "review_rule.manage",
+                "appointment.read",
+                "appointment.manage",
+                "availability.manage_own",
+                "availability.manage",
+                "message.care_team",
+                "message.org",
+                "consent.read",
+                "enrollment.manage",
+                "assignment.manage",
+                "metrics.read",
+                "audit.read",
+                "fhir.export",
+                "fhir.import",
+                "roles.read",
+                "settings.manage"
+              ]
+            }
+          },
+          "patientId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "practitionerId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "csrfToken": {
+            "type": "string",
+            "description": "Send as the x-csrf-token header on every POST, PUT, PATCH and DELETE."
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "Absolute end of the session (12 hours after login)."
+          },
+          "idleExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "description": "End of the session if no request arrives first (30 minutes idle)."
+          }
+        },
+        "required": [
+          "user",
+          "organization",
+          "role",
+          "permissions",
+          "patientId",
+          "practitionerId",
+          "csrfToken",
+          "expiresAt",
+          "idleExpiresAt"
+        ],
+        "additionalProperties": false
+      },
+      "RoleMatrix": {
+        "type": "object",
+        "properties": {
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "patient",
+                    "physical_therapist",
+                    "care_coordinator",
+                    "clinic_admin"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "patient.read_own",
+                      "patient.update_own",
+                      "careplan.read_own",
+                      "session.write_own",
+                      "checkin.write_own",
+                      "appointment.manage_own",
+                      "message.own",
+                      "consent.manage_own",
+                      "fhir.export_own",
+                      "patient.read",
+                      "patient.update_admin",
+                      "clinical.read",
+                      "careplan.status_read",
+                      "activity.summary_read",
+                      "clinical.write",
+                      "careplan.publish",
+                      "note.write",
+                      "note.sign",
+                      "ai.generate",
+                      "ai.review",
+                      "review_task.read",
+                      "review_task.resolve",
+                      "review_task.resolve_admin",
+                      "review_rule.manage",
+                      "appointment.read",
+                      "appointment.manage",
+                      "availability.manage_own",
+                      "availability.manage",
+                      "message.care_team",
+                      "message.org",
+                      "consent.read",
+                      "enrollment.manage",
+                      "assignment.manage",
+                      "metrics.read",
+                      "audit.read",
+                      "fhir.export",
+                      "fhir.import",
+                      "roles.read",
+                      "settings.manage"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "key",
+                "name",
+                "description",
+                "permissions"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "patient.read_own",
+                    "patient.update_own",
+                    "careplan.read_own",
+                    "session.write_own",
+                    "checkin.write_own",
+                    "appointment.manage_own",
+                    "message.own",
+                    "consent.manage_own",
+                    "fhir.export_own",
+                    "patient.read",
+                    "patient.update_admin",
+                    "clinical.read",
+                    "careplan.status_read",
+                    "activity.summary_read",
+                    "clinical.write",
+                    "careplan.publish",
+                    "note.write",
+                    "note.sign",
+                    "ai.generate",
+                    "ai.review",
+                    "review_task.read",
+                    "review_task.resolve",
+                    "review_task.resolve_admin",
+                    "review_rule.manage",
+                    "appointment.read",
+                    "appointment.manage",
+                    "availability.manage_own",
+                    "availability.manage",
+                    "message.care_team",
+                    "message.org",
+                    "consent.read",
+                    "enrollment.manage",
+                    "assignment.manage",
+                    "metrics.read",
+                    "audit.read",
+                    "fhir.export",
+                    "fhir.import",
+                    "roles.read",
+                    "settings.manage"
+                  ]
+                },
+                "description": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "description"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "roles",
+          "permissions"
+        ],
+        "additionalProperties": false
+      },
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "unavailable"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "unavailable"
+                ]
+              }
+            },
+            "required": [
+              "database"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "status",
+          "checks"
+        ],
+        "additionalProperties": false
+      },
+      "PatientHeader": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "mrn": {
+            "type": "string"
+          },
+          "givenName": {
+            "type": "string"
+          },
+          "familyName": {
+            "type": "string"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "female",
+              "male",
+              "other",
+              "unknown"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "intake_incomplete",
+              "awaiting_assignment",
+              "active",
+              "inactive",
+              "discharged"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "preferredLanguage": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "mrn",
+          "givenName",
+          "familyName",
+          "birthDate",
+          "gender",
+          "status",
+          "timezone",
+          "preferredLanguage"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "summary": "Liveness and database reachability. 503 when the database does not answer.",
+        "tags": [
+          "system"
+        ],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Sign in with email and password; sets the session cookie.",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequestInput"
+              }
+            }
+          }
+        },
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "End the current session and clear the cookie.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "204": {
+            "description": "Default Response"
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/session": {
+      "get": {
+        "operationId": "getSession",
+        "summary": "The signed-in user, organization, role, permissions and CSRF token.",
+        "tags": [
+          "auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "operationId": "listRoles",
+        "summary": "Roles and their permission keys, as stored in the database.",
+        "tags": [
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleMatrix"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/patients/{patientId}": {
+      "get": {
+        "operationId": "getPatientHeader",
+        "summary": "Patient header. Opening it writes a phi.read audit event.",
+        "tags": [
+          "patients"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "path",
+            "name": "patientId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientHeader"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "sessionCookie": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Sessions."
+    },
+    {
+      "name": "patients",
+      "description": "Patient-scoped reads."
+    },
+    {
+      "name": "admin",
+      "description": "Administration."
+    },
+    {
+      "name": "system",
+      "description": "Health and documentation."
+    }
+  ]
+}

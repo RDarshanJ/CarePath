@@ -1,4 +1,4 @@
 {
   "extends": "@carepath/config/tsconfig.node.json",
-  "include": ["src"]
+  "include": ["src", "test", "scripts", "vitest.config.ts"]
 }
