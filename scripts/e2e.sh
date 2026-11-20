@@ -42,7 +42,7 @@ wait_for() { # url, name, log
 # The API behind the rewrite: trusts X-Forwarded-For from loopback only. The login limit is raised
 # because the suite signs in dozens of times from one address in a minute (default 10).
 # Each server starts in its own session (setsid), so one kill of the group stops tsx or next and its children.
-setsid env API_HOST=127.0.0.1 TRUST_PROXY=loopback RATE_LIMIT_LOGIN_PER_MINUTE=500 \
+setsid env API_HOST=127.0.0.1 TRUST_PROXY=loopback RATE_LIMIT_LOGIN_PER_MINUTE=500 RATE_LIMIT_GLOBAL_PER_MINUTE=6000 \
   bash -c 'cd apps/api && exec ./node_modules/.bin/tsx src/server.ts' >"$LOGS/api.log" 2>&1 &
 PIDS+=("$!")
 wait_for "http://127.0.0.1:${API_PORT}/health" "API" "$LOGS/api.log" || exit 1

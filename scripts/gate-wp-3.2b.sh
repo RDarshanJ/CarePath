@@ -42,7 +42,7 @@ stage() { # build and end-to-end under ONE hold of the web lock, so no other wor
     for _ in $(seq 1 90); do curl -fsS -o /dev/null "$1" 2>/dev/null && return 0; sleep 1; done
     echo "gate: $2 did not become ready at $1" >&2; tail -n 30 "$3" >&2; return 1
   }
-  setsid env API_HOST=127.0.0.1 TRUST_PROXY=loopback RATE_LIMIT_LOGIN_PER_MINUTE=500 \
+  setsid env API_HOST=127.0.0.1 TRUST_PROXY=loopback RATE_LIMIT_LOGIN_PER_MINUTE=500 RATE_LIMIT_GLOBAL_PER_MINUTE=6000 \
     bash -c 'cd apps/api && exec ./node_modules/.bin/tsx src/server.ts' >"$LOGS/api.log" 2>&1 &
   PIDS+=("$!")
   wait_for "http://127.0.0.1:${API_PORT}/health" API "$LOGS/api.log" || return 1
