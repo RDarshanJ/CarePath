@@ -12,6 +12,7 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "test": "pnpm -r --if-present test",
+    "ai:eval": "pnpm --filter @carepath/ai eval",
     "build": "pnpm -r --if-present build",
     "db:start": "scripts/db.sh start",
     "db:stop": "scripts/db.sh stop",
