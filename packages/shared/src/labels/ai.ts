@@ -6,7 +6,8 @@ export const AI_CONSENT_NAME = "AI-assisted drafting";
 
 /** Database `AIGenerationStatus` and `AIReviewDecision`. */
 export type AIGenerationStatusValue = "pending" | "succeeded" | "failed";
-export type AIReviewDecisionValue = "approved" | "approved_with_edits" | "rejected";
+/** `revised` (WP 5.2) is a clinician edit, not a decision: the draft is still not reviewed. */
+export type AIReviewDecisionValue = "approved" | "approved_with_edits" | "rejected" | "revised";
 
 /** The six states an AI draft shows (CD-236), derived from the two enums. */
 export type AIDraftState =
@@ -67,6 +68,7 @@ export const aiReviewDecisionStates: Record<AIReviewDecisionValue, AIDraftState>
   approved: "approved",
   approved_with_edits: "approved_with_edits",
   rejected: "rejected",
+  revised: "unreviewed",
 };
 
 export function aiDraftState(
