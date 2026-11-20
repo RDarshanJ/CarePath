@@ -55,3 +55,110 @@ export async function insertRuleTask(db: DbClient, ctx: Scope, t: NewTask): Prom
 }
 
 export type TaskJson = Prisma.JsonValue;
+
+export const taskSelect = {
+  id: true,
+  status: true,
+  patientId: true,
+  explanation: true,
+  evidence: true,
+  priority: true,
+  createdAt: true,
+  dueAt: true,
+  resolvedAt: true,
+  resolutionNote: true,
+  patient: { select: { id: true, givenName: true, familyName: true, mrn: true } },
+  rule: { select: { id: true, key: true, name: true } },
+  assignedTo: {
+    select: { id: true, userId: true, givenName: true, familyName: true, credentials: true },
+  },
+  resolvedBy: {
+    select: {
+      user: { select: { id: true, displayName: true, practitioner: { select: { id: true } } } },
+    },
+  },
+} as const;
+
+export type TaskRow = Prisma.ReviewTaskGetPayload<{ select: typeof taskSelect }>;
+
+export const activeTaskStatuses = ["open", "in_review"] as const;
+
+const statusFilter: Record<string, readonly ("open" | "in_review" | "resolved" | "dismissed")[]> = {
+  active: activeTaskStatuses,
+  open: ["open"],
+  in_review: ["in_review"],
+  resolved: ["resolved"],
+  dismissed: ["dismissed"],
+  closed: ["resolved", "dismissed"],
+};
+
+export interface TaskListFilter {
+  status: keyof typeof statusFilter;
+  /** null: unassigned only; undefined: any. */
+  assignedPractitionerId?: string | null;
+  ruleKey?: string;
+  patientIds?: string[];
+}
+
+/** Highest priority first, then oldest. */
+export async function listTasks(
+  db: DbClient,
+  ctx: Scope,
+  filter: TaskListFilter,
+  offset: number,
+  take: number,
+): Promise<TaskRow[]> {
+  return db.reviewTask.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      status: { in: [...(statusFilter[filter.status] ?? activeTaskStatuses)] },
+      ...(filter.assignedPractitionerId !== undefined
+        ? { assignedPractitionerId: filter.assignedPractitionerId }
+        : {}),
+      ...(filter.ruleKey ? { rule: { key: filter.ruleKey } } : {}),
+      ...(filter.patientIds ? { patientId: { in: filter.patientIds } } : {}),
+    },
+    orderBy: [{ priority: "desc" }, { createdAt: "asc" }, { id: "asc" }],
+    skip: offset,
+    take,
+    select: taskSelect,
+  });
+}
+
+/** Every task of one patient, newest first. */
+export async function listPatientTasks(
+  db: DbClient,
+  ctx: Scope,
+  patientId: string,
+  offset: number,
+  take: number,
+): Promise<TaskRow[]> {
+  return db.reviewTask.findMany({
+    where: { organizationId: ctx.orgId, patientId },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    skip: offset,
+    take,
+    select: taskSelect,
+  });
+}
+
+export async function findTask(db: DbClient, ctx: Scope, patientId: string, taskId: string) {
+  return db.reviewTask.findFirst({
+    where: { id: taskId, organizationId: ctx.orgId, patientId },
+    select: taskSelect,
+  });
+}
+
+/** Completion time of the last successful time-rule run for the organization. */
+export async function rulesLastRunAt(
+  db: DbClient,
+  ctx: Scope,
+  queue: string,
+): Promise<Date | null> {
+  const row = await db.job.findFirst({
+    where: { organizationId: ctx.orgId, queue, status: "succeeded" },
+    orderBy: { completedAt: "desc" },
+    select: { completedAt: true },
+  });
+  return row?.completedAt ?? null;
+}

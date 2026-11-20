@@ -21,6 +21,10 @@ import { carePlanRoutes } from "./modules/care-plans/routes.js";
 import { checkInRoutes } from "./modules/check-ins/routes.js";
 import { checkInWriteRoutes } from "./modules/check-ins/write-routes.js";
 import { clinicRoutes } from "./modules/clinic/routes.js";
+import { exerciseRoutes } from "./modules/exercises/routes.js";
+import { overviewRoutes } from "./modules/overview/routes.js";
+import { recordRoutes } from "./modules/records/routes.js";
+import { reviewRoutes } from "./modules/review/routes.js";
 import { patientRoutes } from "./modules/patients/routes.js";
 import { progressRoutes } from "./modules/progress/routes.js";
 import { sessionRoutes } from "./modules/sessions/routes.js";
@@ -93,6 +97,11 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   // Step 2: session and check-in writes.
   await app.register(sessionWriteRoutes);
   await app.register(checkInWriteRoutes);
+  // Step 3: clinician reads (the directory is GET /patients in patientRoutes).
+  await app.register(overviewRoutes);
+  await app.register(recordRoutes);
+  await app.register(exerciseRoutes);
+  await app.register(reviewRoutes);
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();
