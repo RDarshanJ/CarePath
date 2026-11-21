@@ -4,7 +4,7 @@
  * counts and the number of failing bundles. Exit 1 if any export fails. Used by the WP 5.4b gate.
  *   tsx scripts/fhir-export-check.ts
  */
-import { buildPatientBundle, isError, validateBundle } from "@carepath/fhir";
+import { buildPatientBundle, isError, isValidNpi, validateBundle } from "@carepath/fhir";
 import { buildApp } from "../src/app.js";
 import { loadPatientExport } from "../src/modules/fhir/repo.js";
 
@@ -45,6 +45,12 @@ try {
   console.log(`patients exported: ${patients.length}, bundles failing the three layers: ${failed}`);
   for (const [t, n] of Object.entries(totals).sort()) console.log(`  ${t.padEnd(18)} ${n}`);
   for (const [r, n] of Object.entries(rules).sort()) console.log(`  failing rule ${r}: ${n}`);
+  // Integrity: every seeded clinician NPI passes isValidNpi (the rule the mapper uses to decide
+  // whether an NPI is exported). WP 6.3 added this check beside the export check.
+  const npis = await db.practitioner.findMany({ where: { npi: { not: null } }, select: { npi: true } });
+  const badNpis = npis.filter((p) => !isValidNpi(p.npi ?? "")).length;
+  console.log(`seeded NPIs: ${npis.length}, failing isValidNpi: ${badNpis}`);
+  if (badNpis > 0) failed += 1;
   const unsigned = await db.clinicalNote.count({ where: { signedAt: null } });
   console.log(
     `unsigned notes in the database: ${unsigned}; draft version ids found in exports: ${drafts}`,

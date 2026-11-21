@@ -100,6 +100,27 @@ const personas: Persona[] = [
   },
 ];
 
+/**
+ * A fictitious NPI: a leading 9 (never a real registry number), eight more digits taken from
+ * `seedNumber`, and a check digit computed by the rule `isValidNpi` uses in packages/fhir (Luhn
+ * over the prefix 80840 and the ten digits). The seed cannot import packages/fhir, so the rule is
+ * repeated here; the gate checks every seeded NPI with `isValidNpi` itself.
+ */
+export function fictitiousNpi(seedNumber: number): string {
+  const body = `9${String(seedNumber).padStart(9, "0").slice(0, 8)}`;
+  const withPlaceholder = `80840${body}0`.split("").map(Number);
+  let sum = 0;
+  for (let i = 0; i < withPlaceholder.length; i++) {
+    let d = withPlaceholder[withPlaceholder.length - 1 - i]!;
+    if (i % 2 === 1) {
+      d *= 2;
+      if (d > 9) d -= 9;
+    }
+    sum += d;
+  }
+  return `${body}${(10 - (sum % 10)) % 10}`;
+}
+
 export function buildPeople(ctx: Ctx): { demoAccounts: DemoAccount[] } {
   const { t, profile } = ctx;
   const demoAccounts: DemoAccount[] = [];
@@ -240,7 +261,7 @@ export function buildPeople(ctx: Ctx): { demoAccounts: DemoAccount[] } {
         organizationId: id,
         userId,
         staffId: `PT-${n}-${String(k).padStart(2, "0")}`,
-        npi: `9${String(100_000_000 + (((oi + 1) * 7919 + k * 104_729) % 899_999_999)).padStart(9, "0")}`,
+        npi: fictitiousNpi(100_000_000 + (((oi + 1) * 7919 + k * 104_729) % 899_999_999)),
         givenName: given,
         familyName: family,
         credentials: "PT, DPT (fictional)",
