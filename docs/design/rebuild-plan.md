@@ -57,7 +57,7 @@ Owner model: **opus** for the shared foundation and tricky interaction infrastru
 
 | Id | Package | Owner | Owns (paths) | Changes (decisions) | Blocks on | Gate additions |
 |---|---|---|---|---|---|---|
-| D-WP-8 | Onboarding and consent | sonnet | `apps/web/app/(patient)/onboarding/**`, `(patient)/(app)/consent/**` | DR-002 A; CD-102, 105 to 109, 140 to 145, 441 | D2 | All 11 steps and the resume summary captured; error summary state; reload on the account step warns and stores nothing (test reads `sessionStorage` and `localStorage`) |
+| D-WP-8 | Onboarding and consent | sonnet | `apps/web/app/(patient)/onboarding/**`, `(patient)/(app)/consent/**` | DR-002 A; CD-102, 105 to 109, 140 to 145, 441 | D2 | All 11 steps and the resume summary captured; error summary state; reload on the account step warns and stores nothing (test reads `sessionStorage` and `localStorage`). Added by C3 5: remove the "Camera movement tracking, not available yet" block from onboarding and from Sharing and consent (`(patient)/_lib/consent-copy.ts:34`, the `motion_tracking` entry), because a promise about a cut feature is a dead item under R7; the `motion_tracking` enum value stays and stays ungrantable |
 | D-WP-9 | Today, plan, progress | sonnet | `(patient)/(app)/today/**`, `plan/**`, `progress/**`, `(patient)/_components/charts.tsx` (removed in favour of the kit) | DR-002 B and E; CD-210 to 219, 300, 304, 416 | D2 | Exactly one primary button on Today in each of the five session states (test); no string matching "min" beside the session, "improv" anywhere (AC-C7); charts fill their container at 1440; chart and table values equal |
 | D-WP-10 | Session player and pain reporting | opus | `(patient)/(session)/**`, `(patient)/(app)/check-in/**` | DR-002 C and D; CD-100, 101, 124 to 126, 421, 424, 525 | D2. CR-6 does not block | Primary action visible without scrolling at 375 by 667 and 390 by 844 in every phase; Stop reachable in every phase; pause, resume and stop paths in e2e; after a stop the check-in shows the earlier number with its sentence; reduced-motion run; the pain scale wraps as 0 to 5 and 6 to 10. When CR-6 lands, a follow-up commit makes Stop immediate |
 | D-WP-11 | Patient scheduling | sonnet | `(patient)/(app)/appointments/**` | DR-002 F; CD-103, 310, 311, 314 to 318, 448 | D2 | Conflict recovery e2e; video visit seen from another zone shows both times; no success state before the server answers; the calendar file contains no type or reason (test parses it) |
@@ -85,7 +85,7 @@ Owner model: **opus** for the shared foundation and tricky interaction infrastru
 | WP 6.1 | Admin API | sonnet | `apps/api/src/modules/admin`, admin contracts | Metrics (CR-13), availability writes (CR-14), audit query (CR-15), eligibility codes, review-rule settings | after B-CR (schema lock) |
 | WP 5.3 | AI review and notes UI | sonnet | `(clinician)/patients/[patientId]/notes/**`, `summaries/**`, the Overview "AI drafts" group | Built once, on the new system, per DR-002 M and CD-400 to 416. First gate includes the DR-003 render check | 5.2, C3, D-WP-15 |
 | WP 6.2 | Admin UI | sonnet | `apps/web/app/(admin)/**` except the layout | Per DR-002 N; also restyles the existing `/admin/patients` (CD-204, 231, 339) so one owner holds the folder | 6.1, D-WP-6, D-WP-13 |
-| WP 6.3 | Full seed profile | haiku | `packages/db/seed/**` | Separate profile; the demo seed and its anchor do not change, so before-and-after pairs stay comparable | none (not beside a schema change) |
+| WP 6.3 | Full seed profile | haiku | `packages/db/seed/**` | Separate profile; the demo seed and its anchor do not change, so before-and-after pairs stay comparable. Added by C3 4.4: the seed NPIs in `packages/db/seed/people.ts` get a computed check digit by the same rule as `isValidNpi` (prefix 80840), keeping the leading 9 that marks them as fictitious; new integrity check "every seeded NPI passes `isValidNpi`"; record the new content hash | none (not beside a schema change) |
 
 ### Phases 7 to 9
 
@@ -168,3 +168,13 @@ Rejected, with the reason in DR-002: eligibility pre-check, email confirmation, 
 | Token change breaks pinned colours in e2e or screenshots | D-WP-1 owns finding and fixing them and runs alone |
 | A slice quietly forks a shared component | Rule 3, and the D-WP-19 gate requires one implementation per INDEX row |
 | Plex Sans reads too technical for patients (DR-001 untested assumption) | Looked at in D2 on Today and the player at 390; a change is a token edit |
+
+## 9. Checkpoint C3 addendum
+
+Dated 2026-11-20. Source: `docs/decisions/checkpoint-c3.md`, which wins where it differs from this plan.
+
+- **Stretch tier.** Cut: Medplum sandbox push, patient navigation assistant, motion tracking (Phase 9), saved filters, editable roles, row-level security, audit hash chain, PWA polish beyond manifest and app-shell worker, landing page art. Held: live Anthropic run, as an evaluation-only run once the user supplies a key (never in the app). Storybook stays released (section 6).
+- **D-WP-8.** Remove the camera movement tracking block from onboarding and from Sharing and consent (`(patient)/_lib/consent-copy.ts:34`). The `motion_tracking` enum value stays and stays ungrantable.
+- **WP 6.3.** Fix the seed NPIs (`packages/db/seed/people.ts:243`): compute the check digit with the rule `isValidNpi` uses (prefix 80840), keep the leading 9, add the integrity check "every seeded NPI passes `isValidNpi`", and record the new content hash. The mapper keeps omitting an NPI that fails the check; `fhir-validation.md` then reports the seeded export with NPIs present.
+- **Fix packages.** WP 5.6a (`packages/ai`, evaluation report) starts now. WP 5.6b (notes, AI and FHIR modules, one migration, labels) starts after WP B-CR merges and finishes before WP 6.1 and WP 5.3. Order of schema changes: 5.2, B-CR, 5.6b, 6.1. CR-18 and CR-19 are delivered by 5.6b.
+- **WP 5.3 added conditions.** The label strings from DR-002 M (as amended); no supported mark on an edited statement; "opened", never "checked"; no pending state; autosave posts a version on leaving the editor, on explicit save, or after 30 seconds without typing.

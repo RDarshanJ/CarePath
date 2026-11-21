@@ -418,7 +418,7 @@ CarePath implements selected security controls (HD §10) and has not been assess
 
 - **Sessions:** database sessions, HttpOnly SameSite=Lax cookie, scrypt, rotation on login, 30-minute idle and 12-hour absolute timeouts [Assumption], Origin check on mutations (plan ADR-7).
 - **Isolation:** `ctx` on every route; repositories filter by organisation and patient; Prisma outside `repo.ts` fails lint (ADR-8).
-- **Audit events:** `auth.login`, `auth.login_failed`, `auth.logout`, `account.create`, `consent.grant`, `consent.revoke`, `phi.read`, `careplan.publish`, `note.sign`, `ai.generate`, `ai.refused`, `ai.review`, `review_task.resolve`, `review_rule.update`, `appointment.book`, `appointment.cancel`, `assignment.create`, `availability.update`, `settings.update`, `export.fhir`, `import.fhir`, `security.access_denied`.
+- **Audit events:** `auth.login`, `auth.login_failed`, `auth.logout`, `account.create`, `consent.grant`, `consent.revoke`, `phi.read`, `careplan.publish`, `note.sign`, `note.version`, `note.entered_in_error`, `ai.generate`, `ai.refused`, `ai.review`, `review_task.resolve`, `review_rule.update`, `appointment.book`, `appointment.cancel`, `assignment.create`, `availability.update`, `settings.update`, `export.fhir`, `import.fhir`, `security.access_denied`.
 - **Logs:** request id, route template, status, actor and resource ids only; a canary test asserts seeded names and check-in text never appear (HD §2.1).
 - **Rate limit targets:** login 10 per minute per account and IP; AI 10 per minute per user; export and import 5 per minute; booking 20 per minute per patient; 429 with Retry-After.
 - **Not claimed:** regulatory compliance, certification, MFA, an authorisation server, encryption at rest in the demo, multi-instance rate limiting (ADR-4).
@@ -469,13 +469,15 @@ Banned diagnostic terms for the copy tests in AC-A9 and AC-D7: "diagnosis", "dia
 
 | Brief feature | Tier |
 |---|---|
-| Patient onboarding, Today, session, check-in, progress, appointments, messaging, assistant | Core |
+| Patient onboarding, Today, session, check-in, progress, appointments, messaging | Core |
 | Clinician overview, directory, record, plan builder, review queue, SOAP notes | Core |
 | AI summaries, note assistance, deterministic provider, evaluation | Core |
 | Enrollment, assignment, availability, appointment operations, settings, metrics, audit viewer, read-only role matrix | Core |
 | Ten FHIR mappings, export, validation, import, Synthea import demo | Core |
 | Session auth, RBAC, isolation, audit, rate limits, Postgres jobs, OpenAPI, `/design-system` gallery | Core |
-| Saved filters, live model run, sandbox push, PWA polish beyond manifest and app-shell worker, landing page art, Storybook, editable roles, row-level security, audit hash chain, motion tracking | Stretch |
+| Storybook | Stretch (released by `rebuild-plan.md` section 6) |
+| Live Anthropic provider run | Held: evaluation run only, never in the app, and only once a key is supplied (checkpoint C3 section 5) |
+| Patient navigation assistant, motion tracking (Phase 9), Medplum sandbox push, saved filters, editable roles, row-level security, audit hash chain, PWA polish beyond manifest and app-shell worker, landing page art | Cut (checkpoint C3 section 5) |
 | Coach role, push notifications, WebSockets, Python AI service, Redis, BullMQ, Turborepo, three frontends, OAuth and app launch, MFA, break-glass, extra consent types, photo attachments, AI draft replies, queue snooze, offline-first sessions, billing | Cut |
 | Usability testing | Method and scenarios only |
 | Docker Compose, deployment | Written; unverified unless a run is logged |
@@ -500,7 +502,7 @@ Rows 1 to 11 are rev1 §3; the rest follow from the plan.
 | §5 record audit history | Record history from domain rows; AuditEvent admin-only | HD §2.3 |
 | §7 role management | Read-only matrix; editing Stretch | Plan §1 |
 | §8, §10 Storybook and stack | Gallery route; one Next.js app, Fastify, TypeScript AI, Postgres jobs, polling | Plan §1, ADR-1 to ADR-5, ADR-12 |
-| §4 motion tracking | Stretch | Plan §1 |
+| §4 motion tracking | Cut | Plan §1; checkpoint C3 section 5 |
 
 ### Revisions (design checkpoint D1)
 
@@ -566,6 +568,19 @@ Test types: API (`app.inject` integration), DB (constraints and triggers), Unit 
 | FHR-01 to 05 | AC-G1 to G8 | G | Unit, API | 5.4 |
 | ADM-02, 03, 05 to 08, DIR-01 | AC-H1 to H6 | H | API, PW | 6.1, 6.2 |
 | AUD-01 to 04, REC-01, 02 | AC-I1 to I7 | I | API, DB, PW | 2.4, 6.1, 6.2 |
-| SES-05, DIR-02, AIS-08, ADM-09, FHR-06, AUD-05 | Own criteria in section 7 | Stretch | As listed | 9.1, after C3 |
+| SES-05, DIR-02, ADM-09, FHR-06, AUD-05, and 7.5 (AST-01, AST-02) | Own criteria in section 7 | Cut at C3 | Not built | none |
+| AIS-08 | Own criterion in section 7 | Held at C3 | Evaluation run only, key required | none until a key is supplied |
 
 All IDs carry the `REQ-` prefix.
+
+### Revisions (checkpoint C3)
+
+Dated 2026-11-20. Source: `docs/decisions/checkpoint-c3.md` (C3).
+
+| Item | Revision | Source |
+|---|---|---|
+| Section 13 audit events | Adds `note.version` (a write of clinical note text) and `note.entered_in_error` (an irreversible act on a signed note) | C3 4.2 |
+| Navigation assistant (section 7.5, AC-F9), motion tracking (REQ-SES-05), Medplum sandbox push (REQ-FHR-06) | Cut. No route, screen or consent text mentions them. Docs keep "no sandbox or EHR integration" | C3 5 |
+| Saved filters (REQ-DIR-02), editable roles (REQ-ADM-09), row-level security, audit hash chain (REQ-AUD-05), PWA polish, landing page art | Cut | C3 5 |
+| Live model run (REQ-AIS-08) | Held as an evaluation-only run, with a key supplied by the user. The API stays on the demo provider | C3 5 |
+| Entered-in-error notes | Excluded from the FHIR export (DR-002 M.3 stands) | C3 4.1 |

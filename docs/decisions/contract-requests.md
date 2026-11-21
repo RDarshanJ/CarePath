@@ -216,3 +216,27 @@ Copy this block to the end of the file and fill every line.
 - Blocking: No. Until it lands the unknown-outcome banner tells the patient to check Appointments.
 - Status: open
 - Answer: pending
+
+### CR-18: Entered-in-error permission and header-only answer
+
+- Requested by: advisor, checkpoint C3 (sections 1.2 and 4.3), 2026-11-20
+- Screen or test: signed note, mark entered in error; `apps/api/test/phase5/ai.test.ts` (administrator path)
+- Endpoint and contract: `POST …/notes/:noteId/entered-in-error`; `packages/shared/src/contracts/permissions.ts`
+- What is missing: A permission key `note.mark_entered_in_error` ("Mark a signed clinical note entered in error, with a reason"), granted to `clinic_admin` only by migration. The route admits `note.sign` or `note.mark_entered_in_error`; the handler requires that the caller is the author or holds `note.mark_entered_in_error`, and compares no role name. A caller without `clinical.read` gets the note header (id, type, status, author, signed time, the entered-in-error block) with `versions: []` and `currentVersion: null`, so no note text. The audit `purposeOfUse` and `detailCode` follow the permission used.
+- Why: A clinic administrator was sent the full note text without `clinical.read` and without a `phi.read` event; `settings.manage` is not an accepted gate.
+- Owner (WP): WP 5.6b (items B1, B3)
+- Blocking: Yes, WP 5.3 and any administrator action from the audit viewer (WP 6.2).
+- Status: open
+- Answer: pending
+
+### CR-19: Error code `encounter_already_documented`
+
+- Requested by: advisor, checkpoint C3 (sections 1.2 and 6), 2026-11-20
+- Screen or test: `POST …/notes/:noteId/sign`; WP 5.3 note editor
+- Endpoint and contract: note sign endpoint; `packages/shared/src/contracts/errors.ts`
+- What is missing: Error code `encounter_already_documented`, answered 409 when a signed note already exists for the encounter. The database rule is a partial unique index on `ClinicalNote(encounterId)` where `status = 'signed'`. Marking a note entered in error frees the visit for a corrected note.
+- Why: Two signed notes for one visit were possible, because each approved draft becomes its own note.
+- Owner (WP): WP 5.6b (item B4)
+- Blocking: Yes, WP 5.3 (the sign action must handle the 409).
+- Status: open
+- Answer: pending

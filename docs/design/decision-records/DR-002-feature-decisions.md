@@ -132,6 +132,7 @@ Verdicts: **Accept** (the researcher's recommendation as written), **Amend** (ac
 - These need CR-8 in WP 5.2.
 - No sparkle, no confidence figure, no chat assistant. The navigation assistant stays stretch and is not built.
 - DR-001's follow-up stands: the first real review screen is captured with the final tokens and reviewed before the AI treatment is called done.
+- **Amended by checkpoint C3 section 3.1 (2026-11-20): status labels drop "AI".** The output on screen is rule-based extraction, not a model. The labels are "Draft, generated, not reviewed", "Generated, reviewed and approved" and "Generated, edited and approved"; the note line reads "Started from a generated draft"; `AI_GENERATED_NAME` becomes "Generated draft". Every generated block shows `provider.label` as received, and when `provider.isDemo` is true it also shows the constant "Rule-based demo output. No AI model was used." (R3). This amends CD-236. The patient consent wording ("Automated drafting tools") and `AI_CONSENT_NAME` stay. S5 is unchanged and remains an open sign-off. The navigation assistant is cut, not stretch (C3 section 5).
 
 ### N. Administrative analytics: Accept
 
