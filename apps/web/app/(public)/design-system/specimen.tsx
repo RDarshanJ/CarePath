@@ -52,18 +52,40 @@ function render(c: ReactNode | ((t: ThemeName) => ReactNode), t: ThemeName): Rea
 
 /** Shows the same content in both themes. Pass `patient` and `clinician` for pieces that exist in one theme only. */
 export function Specimen({
+  id,
   children,
   patient,
   clinician,
   title,
+  only,
 }: {
+  /** Specimen id: the gallery spec runs axe on each `[data-specimen]` on its own. */
+  id: string;
   children?: ReactNode | ((theme: ThemeName) => ReactNode);
   patient?: ReactNode;
   clinician?: ReactNode;
   title?: string;
+  /** Show one theme only, for components that exist in one app. */
+  only?: ThemeName;
 }) {
+  if (only) {
+    return (
+      <div data-specimen={id}>
+        {title ? (
+          <Heading level={3} className="mb-3">
+            {title}
+          </Heading>
+        ) : null}
+        <Pane theme={only}>
+          {only === "patient"
+            ? (patient ?? render(children, "patient"))
+            : (clinician ?? render(children, "clinician"))}
+        </Pane>
+      </div>
+    );
+  }
   return (
-    <div>
+    <div data-specimen={id}>
       {title ? (
         <Heading level={3} className="mb-3">
           {title}
