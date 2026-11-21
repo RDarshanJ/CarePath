@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { sessionInfoSchema, type SessionInfo } from "@carepath/shared/contracts";
-import { Banner, Button, Field, Icon, Mono, TextInput } from "@carepath/ui";
+import { Banner, Button, Field, Icon, TextInput } from "@carepath/ui";
 import { apiRequest, rememberCsrfToken } from "../../../lib/api/client";
 import { ApiError } from "../../../lib/api/errors";
 import { homeForRole } from "../../../lib/auth/roles";
@@ -52,23 +52,22 @@ export function LoginForm({ next, section }: { next: string | null; section: "fo
   if (section === "demo") {
     return (
       <div className="flex flex-col gap-3">
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface p-1">
           {demoAccounts.map((account) => (
             <li key={account.role}>
               <button
                 type="button"
                 disabled={pending !== null}
                 onClick={() => void signIn(account.email, DEMO_PASSWORD, account.role)}
-                className="group flex min-h-target w-full items-start gap-3 rounded-container border border-border-control bg-surface p-3 text-left motion-fast transition-colors hover:bg-surface-sunken focus-visible:focus-ring disabled:cursor-not-allowed disabled:text-disabled-ink"
+                className="group flex min-h-target w-full items-center gap-3 rounded-control px-3 py-2.5 text-left motion-fast transition-colors hover:bg-primary-subtle focus-visible:focus-ring active:bg-selected-bg disabled:cursor-not-allowed"
               >
-                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="text-label font-semibold text-ink">
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="text-label font-medium text-link underline-offset-2 group-hover:underline group-disabled:text-disabled-ink">
                     {pending === account.role ? "Signing in" : `Sign in as ${account.label}`}
                   </span>
                   <span className="text-small text-ink-muted">{account.summary}</span>
-                  <Mono className="text-caption text-ink-muted">{account.email}</Mono>
                 </span>
-                <Icon name="chevron-right" size={20} className="mt-0.5 shrink-0 text-primary" />
+                <Icon name="chevron-right" size={20} className="shrink-0 text-link" />
               </button>
             </li>
           ))}
@@ -108,6 +107,7 @@ export function LoginForm({ next, section }: { next: string | null; section: "fo
       <div>
         <Button
           type="submit"
+          fullWidthOnPhone
           loading={pending === "form"}
           loadingLabel="Signing in"
           disabled={pending !== null && pending !== "form"}
