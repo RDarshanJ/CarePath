@@ -47,7 +47,10 @@ try {
   for (const [r, n] of Object.entries(rules).sort()) console.log(`  failing rule ${r}: ${n}`);
   // Integrity: every seeded clinician NPI passes isValidNpi (the rule the mapper uses to decide
   // whether an NPI is exported). WP 6.3 added this check beside the export check.
-  const npis = await db.practitioner.findMany({ where: { npi: { not: null } }, select: { npi: true } });
+  const npis = await db.practitioner.findMany({
+    where: { npi: { not: null } },
+    select: { npi: true },
+  });
   const badNpis = npis.filter((p) => !isValidNpi(p.npi ?? "")).length;
   console.log(`seeded NPIs: ${npis.length}, failing isValidNpi: ${badNpis}`);
   if (badNpis > 0) failed += 1;
