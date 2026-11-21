@@ -35,7 +35,9 @@ export default async function CheckInPage({
       : null;
   }
   const intro = stopped
-    ? "You stopped today's session. Choose the number that fits how you feel now."
+    ? stoppedAt !== null
+      ? "You stopped today's session. Change the number if it is different now."
+      : "You stopped today's session. Choose the number that fits how you feel now."
     : sessionId
       ? "How did today's session go? Choose the number that fits."
       : today.checkIn.due
@@ -49,6 +51,7 @@ export default async function CheckInPage({
         heading="Daily check-in"
         intro={intro}
         stoppedAt={stoppedAt}
+        aboveTabBar
       />
     </div>
   );

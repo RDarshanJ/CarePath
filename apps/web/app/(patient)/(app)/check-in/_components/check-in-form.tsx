@@ -6,6 +6,7 @@ import { EMERGENCY_NOTICE } from "@carepath/shared";
 import {
   Banner,
   Button,
+  cx,
   Field,
   FieldGroup,
   Heading,
@@ -46,6 +47,8 @@ export interface CheckInFormProps {
   contactShown?: boolean;
   /** Ask whether the exercises felt easier or harder; only after a session. */
   askDifficulty?: boolean;
+  /** The page has the patient tab bar below 768 px: the send bar sticks just above it. */
+  aboveTabBar?: boolean;
 }
 
 /**
@@ -64,6 +67,7 @@ export function CheckInForm({
   stoppedAt = null,
   contactShown = false,
   askDifficulty = true,
+  aboveTabBar = false,
 }: CheckInFormProps) {
   const [pain, setPain] = useState<number | null>(stoppedAt);
   const [difficulty, setDifficulty] = useState<string>("");
@@ -136,7 +140,12 @@ export function CheckInForm({
   }
 
   return (
-    <form onSubmit={submit} noValidate className="flex flex-col gap-6">
+    <form
+      onSubmit={submit}
+      noValidate
+      data-sticky-layout="patient-flow"
+      className="flex flex-col gap-6"
+    >
       <div className="flex flex-col gap-1.5">
         <Heading level={headingLevel}>{heading}</Heading>
         <p className="max-w-measure text-body text-ink-muted">{intro}</p>
@@ -150,7 +159,6 @@ export function CheckInForm({
             setError(null);
           }}
           stoppedAt={stoppedAt}
-          {...(stoppedAt !== null ? { hint: "Change it if it is different now." } : {})}
           {...(error && pain === null ? { error } : {})}
         />
       </div>
@@ -191,7 +199,10 @@ export function CheckInForm({
       <div
         ref={barRef}
         data-sticky-bar
-        className="sticky bottom-0 z-10 flex flex-col gap-3 rounded-container border border-border bg-surface p-3"
+        className={cx(
+          "sticky z-10 flex flex-col gap-3 rounded-container border border-border bg-surface p-3",
+          aboveTabBar ? "bottom-16 md:bottom-0" : "bottom-0",
+        )}
       >
         {contactShown ? null : (
           <p className="flex items-start gap-2 text-small text-ink-muted">

@@ -487,6 +487,54 @@ test.describe("D-WP-10 session player", () => {
   });
 });
 
+test("check-in page: the send bar sits above the tab bar and focus stays clear of both", async ({
+  page,
+}, info) => {
+  test.skip(!isPhone(info), "the tab bar is below 768 px");
+  // Read only: nothing is sent, so the persona's data is unchanged for later specs.
+  await signInWithForm(page, personas.noai);
+  await expect(page).toHaveURL(/\/today$/);
+  await page.setViewportSize(phones[0]!);
+  await page.goto("/check-in");
+  await expect(page.getByRole("heading", { level: 1, name: "Daily check-in" })).toBeVisible();
+  const send = page.getByRole("button", { name: "Send check-in" });
+  await expectInViewport(page, send, "send at 375 by 667");
+  await expect(page.getByText(EMERGENCY_NOTICE)).toBeVisible();
+  const boxes = await page.evaluate(() =>
+    Array.from(document.querySelectorAll<HTMLElement>("[data-sticky-bar]")).map((b) => {
+      const r = b.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom };
+    }),
+  );
+  expect(boxes.length).toBe(2);
+  const [form, tabs] =
+    boxes[0]!.top < boxes[1]!.top ? [boxes[0]!, boxes[1]!] : [boxes[1]!, boxes[0]!];
+  // The tab bar is 64.5 px tall (64 px plus a half-pixel rule); half a pixel of overlap is the rule itself.
+  expect(form.bottom).toBeLessThanOrEqual(tabs.top + 1);
+  const covered: string[] = [];
+  await page.locator("body").focus();
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press("Tab");
+    const hit = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el || el === document.body) return null;
+      for (const bar of Array.from(document.querySelectorAll<HTMLElement>("[data-sticky-bar]"))) {
+        if (bar.contains(el)) continue;
+        const a = el.getBoundingClientRect();
+        const b = bar.getBoundingClientRect();
+        if (a.bottom > b.top + 1 && a.top < b.bottom - 1)
+          return (el.getAttribute("aria-label") ?? el.textContent ?? el.tagName)
+            .trim()
+            .slice(0, 40);
+      }
+      return null;
+    });
+    if (hit) covered.push(hit);
+  }
+  expect(covered, "focused controls covered by a sticky bar").toEqual([]);
+  await expectNoSeriousViolations(page, "check-in at 375 by 667");
+});
+
 test("1440: the player is two columns with the controls beside the steps", async ({
   page,
 }, info) => {

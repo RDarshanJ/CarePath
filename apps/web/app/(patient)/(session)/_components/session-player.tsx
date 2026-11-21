@@ -506,7 +506,7 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
               heading="Report your pain"
               intro={
                 level !== null
-                  ? "This adds to what you told us when you stopped."
+                  ? "Change the number if it is different now."
                   : "You stopped without choosing a number. Choose the one that fits how you feel now."
               }
               stoppedAt={level}
@@ -643,7 +643,7 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
 
   return (
     <FocusContext.Provider value={first}>
-      <div className="flex flex-col gap-5">
+      <div data-sticky-layout="patient-flow" className="flex flex-col gap-5">
         {error ? (
           <Banner tone="error" title="Not saved">
             {error}
