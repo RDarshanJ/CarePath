@@ -205,6 +205,11 @@ export async function checkIntegrity(
   await equals("a failed (dead) job", `SELECT count(*) n FROM "Job" WHERE status = 'dead'`, 1);
   await atLeast("signed notes", `SELECT count(*) n FROM "ClinicalNote" WHERE status = 'signed'`);
   await atLeast("draft notes", `SELECT count(*) n FROM "ClinicalNote" WHERE status = 'draft'`);
+  // Checkpoint C3, B4 (index ClinicalNote_one_signed_per_encounter_key).
+  await zero(
+    "at most one signed note per encounter",
+    `SELECT count(*) n FROM (SELECT "encounterId" FROM "ClinicalNote" WHERE status = 'signed' AND "encounterId" IS NOT NULL GROUP BY "encounterId" HAVING count(*) > 1) d`,
+  );
   await atLeast(
     "note versions drafted by AI",
     `SELECT count(*) n FROM "ClinicalNoteVersion" WHERE source = 'ai_draft'`,
