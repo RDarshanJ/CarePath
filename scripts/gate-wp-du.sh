@@ -59,6 +59,7 @@ MIGRATED=(
   "apps/web/app/(patient)/_components/table-toggle.tsx"
   "apps/web/app/(patient)/_components/thread-view.tsx"
   "apps/web/app/(public)/design-system"
+  apps/web/e2e/design-system.spec.ts
 )
 
 run pnpm --filter @carepath/ui typecheck
@@ -73,10 +74,10 @@ echo; echo "==> structure"
 bad=0
 fail() { echo "not ok: $1"; bad=1; }
 grep -rn "<wbr" packages/ui/src/components "apps/web/app/(patient)/_components/patient-frame.tsx" \
-  "apps/web/app/(clinician)/_components/staff-shell.tsx" && fail "a <wbr> is left in a navigation label (U4)"
+  "apps/web/app/(clinician)/_components/staff-shell.tsx" | grep -v "\.test\.tsx:" && fail "a <wbr> is left in a navigation label (U4)"
 grep -rnE "no supporting record found|have no source|has no source" -i packages/ui/src packages/shared/src \
   apps/web/app apps/web/components --include=*.ts --include=*.tsx && fail "a second unsupported-statement wording (U7)"
-hits="$(grep -rn 'variant="secondary"' packages/ui/src/components --include=*.tsx | grep -v "\.test\.tsx:" | grep -v "\.stories\.tsx:" || true)"
+hits="$(grep -rnE '(variant=|variant: )"secondary"' packages/ui/src/components --include=*.tsx | grep -v "\.test\.tsx:" | grep -v "\.stories\.tsx:" | grep -v "^[^:]*:[0-9]*: *\(/\*\|\*\)" || true)"
 # Left by design: the dialog safe choice beside a destructive confirm (CD-421) and the leave guard's
 # "Keep editing", each the single supporting action beside a primary inside an overlay.
 extra="$(echo "$hits" | grep -v "composed/overlays.tsx" | grep -v '^$' || true)"

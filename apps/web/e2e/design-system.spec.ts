@@ -303,8 +303,11 @@ test("load more: focus moves to the first new item and the count is announced", 
   const s = specimen(page, "load-more");
   await s.getByRole("button", { name: "Show more tasks" }).click();
   await expect(s.getByRole("link", { name: "Check-in from Frankie Demopatient6" })).toBeFocused();
-  await expect(s.getByRole("status").filter({ hasText: "5 more tasks loaded" })).toBeAttached();
-  await expect(s.getByText("Showing 10 of 23")).toBeVisible();
+  // DR-004 ruling 6.2: the polite status gives the number loaded and "Showing N of M".
+  await expect(
+    s.getByRole("status").filter({ hasText: "5 more tasks loaded. Showing 10 of 23." }),
+  ).toBeAttached();
+  await expect(s.getByText("Showing 10 of 23", { exact: true })).toBeVisible();
 });
 
 test("icon button: the name shows as a tooltip on keyboard focus, Esc hides it", async ({

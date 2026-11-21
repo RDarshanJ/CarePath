@@ -78,7 +78,7 @@ export const ErrorSummary = forwardRef<
         <Icon name="alert-circle" size={20} className="shrink-0" />
         {title}
       </p>
-      <ul className="mt-2 flex flex-col gap-1">
+      <ul className="mt-2 flex flex-col gap-2">
         {errors.map((e) => (
           <li key={(e.targetId ?? "") + e.message}>
             <a

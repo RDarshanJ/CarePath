@@ -67,11 +67,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={push}>
       {children}
+      {/*
+        The region never takes pointer events itself (only a toast does), and it sits above any sticky
+        bottom bar (the sticky-offset token), so an empty region never covers the tab bar.
+      */}
       <section
         aria-label="Notifications"
-        className="fixed right-0 bottom-0 z-30 flex w-full max-w-sm flex-col gap-2 p-4"
+        className="pointer-events-none fixed right-0 bottom-[var(--cp-sticky-bottom)] z-30 flex w-full max-w-sm flex-col gap-2 p-4"
       >
-        <div role="status" aria-live="polite" aria-atomic="true">
+        <div role="status" aria-live="polite" aria-atomic="true" className="pointer-events-auto">
           {current ? (
             <ToastItem
               key={current.id}
