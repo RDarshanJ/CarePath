@@ -3,7 +3,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { PAIN_ANCHOR_HIGH, PAIN_ANCHOR_LOW } from "@carepath/shared";
 import {
-  AIDraftBlock,
   ActiveFilterChips,
   Banner,
   BottomTabBar,
@@ -360,10 +359,5 @@ describe("Timer, loading, tabs, toast, dialog panel, nav, AI block", () => {
       <BottomTabBar label="Patient" items={[{ href: "/today", label: "Today", icon: "home" }]} />,
     );
     expect(bottom).toContain('aria-label="Patient"');
-  });
-  it("AIDraftBlock keeps its label and dashed rule", () => {
-    const out = html(<AIDraftBlock provider="Demo provider, rule-based">Text</AIDraftBlock>);
-    expect(out).toContain("Draft, generated, not reviewed");
-    expect(out).toContain("border-dashed");
   });
 });

@@ -44,5 +44,7 @@ export * from "./components/composed/pain-scale";
 export * from "./components/composed/date-of-birth-field";
 export * from "./components/composed/timer";
 export * from "./components/composed/nav";
-export * from "./components/ai-draft";
+// Healthcare layer.
+export * from "./components/healthcare";
+
 export { overlayClasses } from "./components/composed/overlay-classes";
