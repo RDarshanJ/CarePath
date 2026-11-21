@@ -2,7 +2,6 @@
 
 import { useId, useMemo, useRef, useState } from "react";
 import {
-  AIDraftBlock,
   ActiveFilterChips,
   Banner,
   BottomSheetContent,
@@ -24,7 +23,6 @@ import {
   DropdownMenuTrigger,
   EmptyState,
   ErrorSummary,
-  EvidenceRef,
   Field,
   FieldGroup,
   FilterBar,
@@ -916,47 +914,6 @@ export function LoadMoreDemo() {
           }, 300);
         }}
       />
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------ AI */
-
-export function AIDraftDemo() {
-  const [open, setOpen] = useState<number | null>(null);
-  return (
-    <div className="flex flex-col gap-4">
-      <AIDraftBlock
-        provider="Demo provider, rule-based"
-        actions={
-          <>
-            <Button size="sm">Approve</Button>
-            <Button size="sm" variant="secondary">
-              Edit
-            </Button>
-            <Button size="sm" variant="quiet">
-              Discard
-            </Button>
-          </>
-        }
-      >
-        Patient reports left knee pain of 6 out of 10 on 12 Nov
-        <EvidenceRef n={1} onClick={() => setOpen(1)} />, down from 7 the week before
-        <EvidenceRef n={2} onClick={() => setOpen(2)} />. Completed 5 of 7 planned sessions.
-        <EvidenceRef n={3} onClick={() => setOpen(3)} />
-      </AIDraftBlock>
-      <p aria-live="polite" className="text-small text-ink-muted">
-        {open
-          ? `Evidence ${open} would open in the side panel.`
-          : "Select a reference number to open its source record."}
-      </p>
-      <AIDraftBlock provider="Demo provider, rule-based" state="approved" reviewer="J. Alvarez, PT">
-        Plan version 3: continue hamstring stretch and sit-to-stand, hold step-ups until pain is 4
-        or lower.
-      </AIDraftBlock>
-      <AIDraftBlock provider="Demo provider, rule-based" state="rejected">
-        Suggested adding single-leg squats this week.
-      </AIDraftBlock>
     </div>
   );
 }

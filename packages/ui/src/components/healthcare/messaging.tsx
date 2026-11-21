@@ -163,7 +163,8 @@ export function MessageItem({
     <li
       data-message={message.id}
       className={cx(
-        "flex max-w-measure flex-col gap-1 rounded-container border p-3",
+        "flex flex-col gap-1 rounded-container border p-3",
+        variant === "staff" ? "max-w-xl" : "max-w-measure",
         message.mine
           ? "bg-primary-subtle"
           : variant === "staff"

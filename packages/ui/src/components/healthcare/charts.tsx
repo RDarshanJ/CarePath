@@ -503,7 +503,10 @@ export function ChartFigure({
   const headingId = useId();
   const visibleTable = tableMode === "visible";
   return (
-    <section aria-labelledby={headingId} className={cx("flex min-w-0 flex-col gap-3", className)}>
+    <section
+      aria-labelledby={headingId}
+      className={cx("@container flex min-w-0 flex-col gap-3", className)}
+    >
       <div className="flex flex-col gap-0.5">
         <Heading level={headingLevel} id={headingId}>
           {title}
@@ -540,7 +543,7 @@ export function ChartFigure({
       ) : (
         <>
           {stale}
-          <div className={cx("grid gap-4", visibleTable && "xl:grid-cols-2 xl:items-start")}>
+          <div className={cx("grid gap-4", visibleTable && "@4xl:grid-cols-2 @4xl:items-start")}>
             <figure className="flex min-w-0 flex-col gap-2">
               {legend}
               {chart}
@@ -548,7 +551,7 @@ export function ChartFigure({
               {caption ? <figcaption className="text-small text-ink">{caption}</figcaption> : null}
             </figure>
             {visibleTable ? (
-              <div className="order-first min-w-0 xl:order-none">{table}</div>
+              <div className="order-first min-w-0 @4xl:order-none">{table}</div>
             ) : (
               <div className="flex flex-col gap-3">
                 <div>

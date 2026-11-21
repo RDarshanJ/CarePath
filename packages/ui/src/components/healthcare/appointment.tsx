@@ -93,7 +93,9 @@ export function AppointmentRecord({
     isVideo: video,
     audience: audience === "patient" ? "patient" : "staff",
   }).viewer;
-  const therapist = a.practitioner.name.trim() || NOT_RECORDED;
+  const therapist = a.practitioner.name.trim()
+    ? `With ${a.practitioner.name.trim()}`
+    : `Therapist ${NOT_RECORDED.toLowerCase()}`;
   const statusNode = status.tone ? (
     <Tag tone={status.tone}>{statusText}</Tag>
   ) : (
@@ -111,10 +113,10 @@ export function AppointmentRecord({
       {patientBornText ? (
         <span className="text-small text-ink-muted">{patientBornText}</span>
       ) : null}
-      <span className="text-small text-ink-muted">With {therapist}</span>
+      <span className="text-small text-ink-muted">{therapist}</span>
     </span>
   ) : (
-    <span className="text-small text-ink">With {therapist}</span>
+    <span className="text-small text-ink">{therapist}</span>
   );
   const moved =
     replacement && a.rescheduledToId ? (

@@ -801,7 +801,7 @@ describe("generated content (CD-236, CD-404 to CD-407, C3 3.1)", () => {
       { code: "missing_unacknowledged" as const, statementIds: [], items: ["pain_score"] },
     ];
     expect(approvalUnavailableText(blockers)).toBe(
-      "Approve is unavailable: 2 statements have no source, and missing information is not acknowledged.",
+      "Approve is unavailable: 2 statements have no supporting record, and missing information is not acknowledged.",
     );
     const out = html(
       <ReviewDecisionBar

@@ -6,7 +6,6 @@ import {
   localDayOf,
   plural,
   tzAbbreviation,
-  unsupportedStatementsText,
 } from "@carepath/shared";
 import type { AiGeneration, AiSourceType, AiStatement } from "@carepath/shared/contracts";
 
@@ -109,11 +108,18 @@ export function reviewSummaryText(
   return `${plural(v.statementCount, "statement")}: ${v.supportedCount} supported, ${v.unsupportedCount} with no supporting record.${missingPart}`;
 }
 
+/** "1 statement has no supporting record", the words the statement chip uses. */
+export function supportCountText(n: number): string {
+  return n === 1
+    ? "1 statement has no supporting record"
+    : `${n} statements have no supporting record`;
+}
+
 /** One phrase per approval blocker (CD-407). Rejecting is always available. */
 export function blockerPhrase(b: AiBlocker): string {
   switch (b.code) {
     case "unsupported_unresolved":
-      return unsupportedStatementsText(b.statementIds.length || 1);
+      return supportCountText(b.statementIds.length || 1);
     case "missing_unacknowledged":
       return b.items.length > 1
         ? `${b.items.length} items of missing information are not acknowledged`
@@ -125,7 +131,7 @@ export function blockerPhrase(b: AiBlocker): string {
     case "empty_output":
       return "nothing would be left to approve";
     case "consent_withdrawn":
-      return `the patient no longer allows ${AI_CONSENT_NAME.toLowerCase()}`;
+      return `the patient no longer allows ${AI_CONSENT_NAME}`;
   }
 }
 

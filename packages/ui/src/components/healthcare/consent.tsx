@@ -1,3 +1,6 @@
+"use client";
+
+import { useId } from "react";
 import {
   AI_CONSENT_NAME,
   formatDate,
@@ -147,9 +150,12 @@ export function ConsentSummary({
   headingAs?: "h2" | "h3" | "h4";
 }) {
   const entries = list.types.filter((t) => t.grantable);
+  const id = useId();
   return (
-    <section aria-label="Consent" className="flex flex-col gap-2">
-      <H className="text-h4 font-h4 text-ink">Consent</H>
+    <section aria-labelledby={id} className="flex flex-col gap-2">
+      <H id={id} className="text-h4 font-h4 text-ink">
+        Consent
+      </H>
       <dl className="flex flex-col gap-3">
         {entries.map((e) => {
           const s = consentState(e, list.history, timezone);

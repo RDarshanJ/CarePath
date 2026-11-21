@@ -11,7 +11,6 @@ import { Field } from "../primitives/field";
 import { Icon } from "../primitives/icons";
 import { Textarea } from "../primitives/inputs";
 import { StatusChip } from "../primitives/status";
-import { Mono } from "../primitives/text";
 import {
   APPROVED_NOT_SIGNED,
   DECISION_LABELS,
@@ -118,9 +117,9 @@ export function AIDraftBlock({
         </p>
         <p className="text-small text-ink-muted">
           Provider:{" "}
-          <Mono className="text-small text-ink">
+          <span className="font-medium text-ink">
             {provider?.label.trim() ? provider.label : PROVIDER_NOT_RECORDED}
-          </Mono>
+          </span>
         </p>
         {provider?.isDemo ? (
           <p data-demo-provider="" className="text-small font-medium text-ink">
@@ -249,11 +248,15 @@ export function StatementSupport({
 }) {
   const kind = statementSupportKind(statement);
   if (kind === "unsupported") {
-    return <StatusChip tone="warning">{statementSupportWords.unsupported}</StatusChip>;
+    return (
+      <StatusChip tone="warning" className="self-start">
+        {statementSupportWords.unsupported}
+      </StatusChip>
+    );
   }
   if (kind === "supported") {
     return (
-      <span className="inline-flex items-center gap-1 text-small text-success-ink">
+      <span className="inline-flex items-center gap-1 self-start text-small text-success-ink">
         <Icon name="check" size={14} />
         {statementSupportWords.supported}
       </span>
@@ -384,7 +387,7 @@ export function ReviewDecisionBar({
                 <li key={l.code}>
                   <a
                     href={l.href}
-                    className="rounded-control text-link underline underline-offset-2 focus-visible:focus-ring"
+                    className="inline-flex min-h-6 items-center rounded-control text-link underline underline-offset-2 focus-visible:focus-ring"
                   >
                     Go to: {l.text}
                   </a>
