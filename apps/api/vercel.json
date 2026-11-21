@@ -1,14 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "fastify",
+  "framework": null,
   "installCommand": "pnpm install --frozen-lockfile --filter @carepath/api...",
   "buildCommand": "pnpm run vercel-build",
+  "outputDirectory": "public",
   "functions": {
-    "server.mjs": {
+    "api/index.mjs": {
       "maxDuration": 60,
       "includeFiles": "../../{packages/fhir/node_modules/@medplum/definitions,node_modules/.pnpm/@medplum+definitions@*/node_modules/@medplum/definitions/{package.json,dist/cjs/index.cjs,dist/esm/index.mjs,dist/fhir/r4/profiles-types.json,dist/fhir/r4/profiles-resources.json}}"
     }
   },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ],
   "crons": [
     {
       "path": "/internal/cron/jobs",

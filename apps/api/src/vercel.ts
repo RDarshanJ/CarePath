@@ -1,5 +1,5 @@
 /**
- * Vercel Function entry for the API (docs/deployment.md). `apps/api/server.mjs` loads the
+ * Vercel Function entry for the API (docs/deployment.md). `apps/api/api/index.mjs` loads the
  * compiled copy of this file that `scripts/vercel-build.mjs` writes during the Vercel build.
  *
  * Vercel's Node runtime stubs `http.Server.prototype.listen` while it imports the entry, keeps

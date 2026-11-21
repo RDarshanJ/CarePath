@@ -6,7 +6,7 @@
  * Used by scripts/vercel-check.sh.
  *
  * Usage: node vercel-trace.mjs <repo root> <entry relative to root> <output dir> [include globs...]
- * Include globs are relative to the entry's folder, as `functions[...].includeFiles` is.
+ * Include globs are relative to TRACE_WORK_DIR (the Vercel project root) or the entry's folder.
  */
 import { cpSync, globSync, lstatSync, mkdirSync, readlinkSync, symlinkSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -22,7 +22,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(path.join(here, "../apps/web/package.json"));
 const { nodeFileTrace } = require("next/dist/compiled/@vercel/nft");
 
-const workPath = path.join(root, path.dirname(entry));
+// Vercel resolves includeFiles against the project root, which TRACE_WORK_DIR names when the
+// entry sits in a subfolder (api/index.mjs).
+const workPath = path.join(root, process.env.TRACE_WORK_DIR ?? path.dirname(entry));
 const { fileList, warnings } = await nodeFileTrace([path.join(root, entry)], {
   base: root,
   processCwd: workPath,

@@ -10,7 +10,7 @@
 #      the first build migrates and seeds; a preview build skips the database step; after the
 #      function has written data, a second build migrates but does not reseed; a third with
 #      CAREPATH_DEPLOY_RESEED=1 reseeds; a build whose migration cannot connect fails,
-#   4. traces server.mjs with @vercel/nft plus the includeFiles of apps/api/vercel.json and copies
+#   4. traces api/index.mjs with @vercel/nft plus the includeFiles of apps/api/vercel.json and copies
 #      only the traced files into an empty folder, as a Vercel Function would hold them,
 #   5. loads that copy the way Vercel's Node runtime does (scripts/vercel-harness.mjs) with
 #      NODE_ENV=production against its own migrated and seeded database, and drives it over HTTP.
@@ -85,8 +85,8 @@ check_api() {
   echo "==> trace the function files"
   local includes=()
   mapfile -t includes < <(node -e \
-    'for (const g of [].concat(require("./apps/api/vercel.json").functions["server.mjs"].includeFiles)) console.log(g)')
-  node scripts/vercel-trace.mjs "$SCRATCH/repo" apps/api/server.mjs "$SCRATCH/fn" "${includes[@]}" \
+    'for (const g of [].concat(require("./apps/api/vercel.json").functions["api/index.mjs"].includeFiles)) console.log(g)')
+  TRACE_WORK_DIR=apps/api node scripts/vercel-trace.mjs "$SCRATCH/repo" apps/api/api/index.mjs "$SCRATCH/fn" "${includes[@]}" \
     || fail "trace"
   if find "$SCRATCH/fn" -name '*.ts' ! -name '*.d.ts' | grep -q .; then
     find "$SCRATCH/fn" -name '*.ts' ! -name '*.d.ts' | head -5
@@ -100,7 +100,7 @@ check_api() {
         SESSION_SECRET="vercel-check-session-secret-$RANDOM$RANDOM" \
         CRON_SECRET="vercel-check-cron-secret-$RANDOM$RANDOM" \
         CORS_ORIGINS="$WEB_ORIGIN_EXAMPLE" TRUST_PROXY=loopback JOBS_INLINE=1 LOG_LEVEL=warn \
-        node "$ROOT/scripts/vercel-harness.mjs" server.mjs
+        node "$ROOT/scripts/vercel-harness.mjs" api/index.mjs
   ) || fail "harness"
 
   # The harness sent one message. A reseed would delete it.

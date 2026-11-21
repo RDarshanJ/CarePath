@@ -24,7 +24,7 @@
  *                              deploy and remove it, or every production build resets the demo.
  */
 import { spawnSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ts from "typescript";
@@ -183,3 +183,10 @@ for (const dir of manifests) {
 console.log(
   `vercel-build: compiled ${compiled} files; retargeted ${manifests.length} package manifests`,
 );
+
+// The project's static output folder (vercel.json "outputDirectory"). Without it Vercel would
+// serve the project root, source files included. Every other path is rewritten to the function.
+const publicDir = path.join(root, "apps/api/public");
+mkdirSync(publicDir, { recursive: true });
+writeFileSync(path.join(publicDir, "robots.txt"), "User-agent: *\nDisallow: /\n");
+console.log("vercel-build: wrote apps/api/public/robots.txt");
