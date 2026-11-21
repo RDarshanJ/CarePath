@@ -22,10 +22,21 @@ import { SignOutButton } from "../../../components/sign-out-button";
 import { useUnreadTotal } from "../_lib/use-conversations";
 
 /** The four patient destinations (CD-500, checkpoint C2 section 5). Plan is reached from Today. */
-const destinations: { href: string; label: string; icon: IconName }[] = [
+const destinations: { href: string; label: ReactNode; icon: IconName }[] = [
   { href: "/today", label: "Today", icon: "home" },
   { href: "/progress", label: "Progress", icon: "activity" },
-  { href: "/appointments", label: "Appointments", icon: "calendar" },
+  // "Appointments" is wider than a quarter of a 375 px screen: it may break after "Appoint" (CD-500).
+  {
+    href: "/appointments",
+    label: (
+      <>
+        Appoint
+        <wbr />
+        ments
+      </>
+    ),
+    icon: "calendar",
+  },
   { href: "/messages", label: "Messages", icon: "message" },
 ];
 

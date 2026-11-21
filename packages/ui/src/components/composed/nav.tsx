@@ -5,7 +5,8 @@ import { CountBadge } from "../primitives/status";
 
 export interface NavItem {
   href: string;
-  label: string;
+  /** Visible label; may carry a `<wbr />` so a long word breaks onto two lines in the bottom bar. */
+  label: ReactNode;
   icon: IconName;
   current?: boolean;
   /** Work-list count shown beside the label; only a true API total (CD-508). */
@@ -59,8 +60,8 @@ export function BottomTabBar({ items, label, linkAs: Link = "a", className }: Na
                   />
                 ) : null}
               </span>
-              {/* A long one-word label hyphenates at 320 px and 200 percent text instead of clipping. */}
-              <span className="max-w-full text-center hyphens-auto">{it.label}</span>
+              {/* A long label wraps (at its `<wbr />` or a space) instead of clipping under its neighbour. */}
+              <span className="max-w-full text-center">{it.label}</span>
               {typeof it.count === "number" && it.count > 0 ? (
                 <span className="sr-only">
                   , {it.count} {it.countUnit ?? "new"}
