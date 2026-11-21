@@ -16,7 +16,6 @@ run() { echo; echo "==> $*"; "$@" || { echo "FAILED: $*" >&2; exit 1; }; }
 OWNED=(
   packages/db/seed
   apps/api/scripts/fhir-export-check.ts
-  scripts/gate-wp-6.3.sh
 )
 SMALL_HASH=40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee
 FULL_HASH=eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54
