@@ -21,12 +21,13 @@ function watch(page: Page) {
 }
 
 async function expectTermOnlyInBody(page: Page, seen: ReturnType<typeof watch>) {
+  // The search runs after a short pause, so wait for the request itself.
+  await expect.poll(() => seen.posts.length).toBeGreaterThan(0);
   expect(page.url().toLowerCase()).not.toContain(TERM.toLowerCase());
   expect(page.url()).not.toMatch(/[?&]q=/);
   for (const u of seen.urls) {
     expect(decodeURIComponent(u).toLowerCase(), u).not.toContain(TERM.toLowerCase());
   }
-  expect(seen.posts.length).toBeGreaterThan(0);
   expect(seen.posts.some((p) => p.body?.includes(TERM))).toBe(true);
 }
 
