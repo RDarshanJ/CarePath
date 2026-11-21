@@ -51,7 +51,7 @@ export async function withStickyBarsInFlow<T>(page: Page, fn: () => Promise<T>):
   try {
     return await fn();
   } finally {
-    await handle.evaluate((el) => el.remove());
+    await handle.evaluate((el) => (el as Element).remove());
   }
 }
 
