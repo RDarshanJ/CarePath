@@ -105,6 +105,16 @@ export const errorCodes = {
     status: 409,
     message: "This visit already has a signed note. Mark that note entered in error first.",
   },
+  // Phase 6 administration (WP 6.1, CR-14).
+  slot_booked: {
+    status: 409,
+    message: "This time has a booked visit. Cancel the visit first.",
+  },
+  availability_overlap: {
+    status: 409,
+    message: "These times overlap an existing time.",
+  },
+  availability_past: { status: 409, message: "Past times cannot be changed." },
   payload_too_large: { status: 413, message: "The request body is too large." },
   unsupported_media_type: { status: 415, message: "Unsupported content type." },
   rate_limited: { status: 429, message: "Too many requests. Try again later." },

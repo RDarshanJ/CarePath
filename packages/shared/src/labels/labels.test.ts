@@ -1,12 +1,30 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import {
+  auditActions,
+  auditEventNames,
+  auditOutcomes,
+  enrollmentCodeStatuses,
+  metricKeys,
+  metricListKeys,
+  reviewBands,
+  slotStatuses,
+} from "../contracts/admin.js";
 import { appointmentStatuses, appointmentTypes } from "../contracts/scheduling.js";
 import { exerciseSessionStatuses, sessionActivityStatusSchema } from "../contracts/sessions.js";
 import { messageStatusSchema } from "../contracts/messaging.js";
 import { patientStatusSchema, planStageSchema } from "../contracts/patients.js";
 import { reviewTaskEventKindSchema, reviewTaskStatusSchema } from "../contracts/review.js";
 import {
+  auditActionLabels,
+  auditEventLabels,
+  auditOutcomeLabels,
+  enrollmentCodeStatusLabels,
+  metricListLabels,
+  metricText,
+  reviewBandLabels,
+  slotStatusLabels,
   aiDraftState,
   aiDraftStateLabels,
   aiGenerationStatusStates,
@@ -66,6 +84,9 @@ describe("status maps cover the database enums", () => {
     ["NoteVersionSource", noteVersionSourceLabels],
     ["AIGenerationStatus", aiGenerationStatusStates],
     ["AIReviewDecision", aiReviewDecisionStates],
+    ["SlotStatus", slotStatusLabels],
+    ["AuditOutcome", auditOutcomeLabels],
+    ["AuditAction", auditActionLabels],
   ])("%s", (name, map) => {
     expectCovers(map, prismaEnum(name), name);
   });
@@ -92,6 +113,33 @@ describe("status maps cover the contract enums", () => {
     ],
   ])("%s", (name, map, values) => {
     expectCovers(map, values, name);
+  });
+});
+
+describe("admin vocabularies (WP 6.1)", () => {
+  it.each([
+    ["slotStatuses", slotStatusLabels, slotStatuses],
+    ["enrollmentCodeStatuses", enrollmentCodeStatusLabels, enrollmentCodeStatuses],
+    ["auditOutcomes", auditOutcomeLabels, auditOutcomes],
+    ["auditActions", auditActionLabels, auditActions],
+    ["auditEventNames", auditEventLabels, auditEventNames],
+    ["reviewBands", reviewBandLabels, reviewBands],
+    ["metricKeys (text)", metricText, metricKeys],
+    ["metricKeys (list labels)", metricListLabels, metricKeys],
+  ])("%s", (name, map, values) => {
+    expectCovers(map, values, name);
+  });
+
+  it("every metric has a label for each of its lists, and nothing else", () => {
+    for (const key of metricKeys) {
+      expect(keys(metricListLabels[key]), key).toEqual(sorted(metricListKeys[key]));
+    }
+  });
+
+  it("each metric states a comparison caveat or the reason there is none, never both or neither", () => {
+    for (const t of Object.values(metricText)) {
+      expect(Boolean(t.previousCaveat) !== Boolean(t.noPreviousReason)).toBe(true);
+    }
   });
 });
 

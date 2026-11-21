@@ -7,10 +7,10 @@ import type { DbClient } from "../../core/db/repo.js";
  * from the eligibility code, and every write below names it explicitly.
  */
 
-/** An unredeemed, unexpired code by hash. Expired and used codes look exactly like unknown ones. */
+/** An unredeemed, unrevoked, unexpired code by hash. Expired, used and revoked codes look exactly like unknown ones. */
 export async function findUsableCode(db: DbClient, codeHash: string, now: Date) {
   return db.enrollmentCode.findFirst({
-    where: { codeHash, redeemedAt: null, expiresAt: { gt: now } },
+    where: { codeHash, redeemedAt: null, revokedAt: null, expiresAt: { gt: now } },
     select: {
       id: true,
       organizationId: true,
@@ -29,6 +29,7 @@ export async function redeemCode(
       id: input.codeId,
       organizationId: input.orgId,
       redeemedAt: null,
+      revokedAt: null,
       expiresAt: { gt: input.now },
     },
     data: { redeemedAt: input.now, redeemedByPatientId: input.patientId },

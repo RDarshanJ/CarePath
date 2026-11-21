@@ -1401,6 +1401,9 @@ model EnrollmentCode {
   expiresAt           DateTime  @db.Timestamptz(3)
   redeemedAt          DateTime? @db.Timestamptz(3)
   redeemedByPatientId String?   @db.Uuid
+  /// Set when staff revoke an unredeemed code (WP 6.1). A revoked code looks unknown to onboarding.
+  /// CHECK: never set together with redeemedAt.
+  revokedAt           DateTime? @db.Timestamptz(3)
   createdAt           DateTime  @default(now()) @db.Timestamptz(3)
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)

@@ -31,3 +31,5 @@ export * from "./sessions.js";
 export * from "./today.js";
 // WP 5.2. Last, so the OpenAPI component order of earlier contracts does not move.
 export * from "./ai.js";
+// WP 6.1. After ai.js for the same reason.
+export * from "./admin.js";
