@@ -2,9 +2,9 @@
 
 import { forwardRef } from "react";
 import * as S from "@radix-ui/react-select";
-import { cx } from "../lib/cx";
+import { cx } from "../../lib/cx";
 import { Icon } from "./icons";
-import { overlayClasses } from "./overlay-classes";
+import { overlayClasses } from "../composed/overlay-classes";
 import { ThemeWrap } from "./theme";
 
 export interface SelectOption {

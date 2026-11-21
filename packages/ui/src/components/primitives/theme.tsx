@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, type HTMLAttributes, type ReactNode } from "react";
-import type { ThemeName } from "../tokens/tokens";
-import { cx } from "../lib/cx";
+import type { ThemeName } from "../../tokens/tokens";
+import { cx } from "../../lib/cx";
 
 const ThemeContext = createContext<ThemeName>("patient");
 export const useTheme = (): ThemeName => useContext(ThemeContext);

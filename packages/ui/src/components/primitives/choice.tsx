@@ -1,10 +1,10 @@
 "use client";
 
-import { forwardRef, useState, type ComponentPropsWithoutRef, type ReactNode } from "react";
+import { forwardRef, useId, useState, type ComponentPropsWithoutRef, type ReactNode } from "react";
 import * as C from "@radix-ui/react-checkbox";
 import * as R from "@radix-ui/react-radio-group";
 import * as W from "@radix-ui/react-switch";
-import { cx } from "../lib/cx";
+import { cx } from "../../lib/cx";
 import { Icon } from "./icons";
 
 const row = "group flex min-h-target items-start gap-3 py-1.5";
@@ -27,8 +27,8 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Ch
   { label, hint, className, id, disabled, ...rest },
   ref,
 ) {
-  const fallback = `cb-${String(label).replace(/\W+/g, "-").toLowerCase()}`;
-  const cid = id ?? fallback;
+  const auto = useId();
+  const cid = id ?? auto;
   return (
     <div className={cx(row, className)}>
       <C.Root
@@ -72,7 +72,8 @@ export const Radio = forwardRef<HTMLButtonElement, RadioProps>(function Radio(
   { label, hint, className, id, disabled, ...rest },
   ref,
 ) {
-  const rid = id ?? `rd-${rest.value}`;
+  const auto = useId();
+  const rid = id ?? auto;
   return (
     <div className={cx(row, className)}>
       <R.Item
@@ -120,7 +121,8 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
   },
   ref,
 ) {
-  const sid = id ?? `sw-${String(label).replace(/\W+/g, "-").toLowerCase()}`;
+  const auto = useId();
+  const sid = id ?? auto;
   const [inner, setInner] = useState(defaultChecked ?? false);
   const on = checked ?? inner;
   return (

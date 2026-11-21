@@ -47,14 +47,62 @@
 .cp-drawer-bottom[data-state="open"] {
   animation: cp-slide-in-bottom var(--cp-duration-base) var(--cp-ease);
 }
-.cp-toast[data-state="open"] {
-  animation: cp-fade-in var(--cp-duration-base) var(--cp-ease);
-}
-.cp-toast[data-state="closed"] {
-  animation: cp-fade-out var(--cp-duration-fast) var(--cp-ease);
-}
 .cp-spinner {
   animation: cp-spin 800ms linear infinite;
+}
+
+/* IconButton tooltip and toast enter from slightly below; no movement under reduced motion. */
+[data-tooltip] {
+  animation: cp-fade-in var(--cp-duration-fast) var(--cp-ease);
+}
+
+/* Theme-dependent values that are not colours or sizes. */
+[data-theme="patient"] {
+  --cp-h4-weight: 500;
+}
+[data-theme="clinician"] {
+  --cp-h4-weight: 600;
+}
+
+/*
+ * Sticky offsets (CD-125, WCAG 2.4.11). A layout that has a sticky bar marks its root with
+ * data-sticky-layout; scroll padding then equals the bar height, so a focused control scrolled into
+ * view never ends up under the bar. One token set, read by every layout:
+ *   staff        sticky page or record header at the top
+ *   patient-app  bottom tab bar below 768 px
+ *   patient-flow sticky action bar at the bottom of a form or the session player
+ */
+:root {
+  --cp-sticky-top: 0px;
+  --cp-sticky-bottom: 0px;
+  --cp-sticky-staff-top: 7rem;
+  --cp-sticky-patient-bottom: 6rem;
+}
+html:has([data-sticky-layout~="staff"]) {
+  --cp-sticky-top: var(--cp-sticky-staff-top);
+}
+html:has([data-sticky-layout~="patient-app"]),
+html:has([data-sticky-layout~="patient-flow"]) {
+  --cp-sticky-bottom: var(--cp-sticky-patient-bottom);
+}
+html {
+  scroll-padding-top: var(--cp-sticky-top);
+  scroll-padding-bottom: var(--cp-sticky-bottom);
+}
+/* At large zoom or very short windows sticky bars become static (CD-125), so no padding is needed. */
+@media (max-height: 480px) {
+  html {
+    scroll-padding-top: 0;
+    scroll-padding-bottom: 0;
+  }
+  [data-sticky-bar] {
+    position: static !important;
+  }
+}
+
+.cp-toast[data-state="open"],
+.cp-toast-enter {
+  animation: cp-pop-in var(--cp-duration-base) var(--cp-ease);
 }
 
 @media (prefers-reduced-motion: reduce) {

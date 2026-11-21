@@ -1,7 +1,7 @@
 "use client";
 
 import * as PR from "@radix-ui/react-progress";
-import { cx } from "../lib/cx";
+import { cx } from "../../lib/cx";
 
 export interface ProgressProps {
   label: string;
@@ -12,8 +12,13 @@ export interface ProgressProps {
   className?: string;
 }
 
+/**
+ * Position in a process (step 4 of 11, exercise 3 of 6). Always a visible label and value text, never a
+ * bare percentage, and never for recovery, pain or goals (CD-214, CD-536). Timers are separate.
+ */
 export function Progress({ label, value, max, valueText, className }: ProgressProps) {
   const text = valueText ?? `${value} of ${max}`;
+  const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
   return (
     <div className={cx("flex flex-col gap-1.5", className)}>
       <div className="flex items-baseline justify-between gap-3 text-label">
@@ -29,7 +34,7 @@ export function Progress({ label, value, max, valueText, className }: ProgressPr
       >
         <PR.Indicator
           className="h-full bg-primary motion-base transition-[width]"
-          style={{ width: `${(value / max) * 100}%` }}
+          style={{ width: `${pct}%` }}
         />
       </PR.Root>
     </div>
