@@ -13,3 +13,5 @@ test-results
 .turbo
 packages/db/src/generated
 .playwright-results
+.playwright-results-storybook
+.storybook-static

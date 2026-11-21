@@ -34,6 +34,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - D-WP-2 primitives, feedback, overlays and accessibility infrastructure (branch `wp/d2`): primitive and composed layers in `packages/ui` with `lib/` helpers, the duplicates of `component-usage-matrix.md` removed from `apps/web` (except two files owned by WP B-CR at the time), the `/design-system` gallery with a per-specimen axe and keyboard spec, gallery captures at six widths, reduced motion and 200 percent zoom, and `docs/design/after/d-wp-2/` (gate output below).
 - D-WP-5 healthcare components kit (branch `wp/d5`): `packages/ui/src/components/healthcare` with patient identity (banner, list rows), clinical data (pain and weekly sessions charts with equal tables, figure, day strip, missing, partial, failed and stale states), planning (exercise row, dose editor, move buttons, plan diff, version list, plan state line), appointment record, messaging (thread, composer, delivery state, emergency and urgent lines), generated drafts (six-state draft block with the demo notice, provenance line, evidence refs, statement support, decision bar shell) and consent status; `/design-system/healthcare` gallery pages, unit and browser tests, `docs/design/after/d-wp-5/` (gate output below).
 - D-WP-6 shells, navigation and sign-in (branch `wp/d6`): patient header with "Signed in as" and tab row, ui bottom bar below 768; clinician sidebar from 768 and labelled bottom bar below, DR-002 H order, Review queue and Messages badges from API totals; admin shell without navigation; one skip link per page; `BackLink`; demo notice inside each route group; sign-in with the form primary and the demo chooser secondary; staff search store in memory; `docs/design/after/d-wp-6/` (gate output below).
+- D-WP-4 Storybook (branch `wp/d4`): Storybook 10.6.8 for `packages/ui` (`.storybook/`: patient and clinician theme switch through `data-theme`, self-hosted fonts and `tokens.css`, a11y addon, 375 and 1440 viewports), 96 stories with states on synthetic content (primitives, composed, healthcare kit; reuses the gallery's fixtures), `pnpm --filter @carepath/ui storybook:build` to the gitignored `packages/ui/.storybook-static`, a Playwright spec that runs axe on every story in both themes at 375 and 1440 (`apps/web/storybook-e2e/`, `pnpm --filter @carepath/web e2e:storybook`), and a unit test that the story count equals the exported component count less a reasoned exclusion list. The `/design-system` gallery stays until D-WP-19.
 
 ## Outstanding
 
@@ -1274,3 +1275,52 @@ D-WP-6 gate: PASSED
 ```
 
 Earlier runs of the same gate on this branch failed and were fixed, not retried blindly: the reschedule axe target-size finding under the tab bar (see the axe note above), a sign-out overtaken by a polling 401, the "Back to Today" name shared by the header link and the page button, "Appointments" clipped at 375, and the Contact care team button pushing the page sideways at 200 percent text. One run before the rebase failed once on `auth.spec` with axe `document-title` on `/admin/patients` straight after sign-in (the title is set by the page's metadata; the next two runs passed); recorded here as a possible flake, not changed.
+
+### D-WP-4 (Storybook)
+
+Worktree `/home/claude/wt/d4`, branch `wp/d4`, from `main` at `83e818e`.
+
+Dependencies (dev only, exact pins, own commit `dbd78de`, lockfile in the same commit): `storybook` 10.6.8, `@storybook/react-vite` 10.6.8, `@storybook/addon-a11y` 10.6.8, `vite` 8.3.8 (already in the lockfile through vitest 4.1.12, now a direct dev dependency so Storybook resolves it), `@vitejs/plugin-react` 6.3.0. Not installed: the Storybook test runner, Chromatic, any hosted service, `@tailwindcss/vite`. Storybook's telemetry is off in `main.ts`.
+
+- Setup: `packages/ui/.storybook/main.ts`, `preview.tsx`, `preview.css`. Tailwind is compiled by `@tailwindcss/postcss`, resolved from `apps/web` (which already depends on it) so `packages/ui` takes on no dependency the advisor did not approve; `preview.css` imports Tailwind from the same place and is otherwise the web app's `globals.css`. The toolbar switches `patient` and `clinician`; the spec sets the same global from the URL. The addon's automatic run is set to manual in the iframe so it does not collide with the spec's own axe run; the panel runs it on request.
+- Stories: one story per exported component, named after it, with the component's states stacked inside the story (not one story per state). Files sit beside the components: `primitives/{foundations,actions,fields,choices,status}.stories.tsx`, `composed/{feedback,overlays,navigation,data,forms}.stories.tsx`, `healthcare/{records,data,plan,messaging,ai}.stories.tsx`. Overlay stories open on load so the open state is what is scanned. Shared synthetic content is `src/stories/fixtures.ts` (a copy of the gallery's healthcare fixtures; the gallery imports from the app, which `packages/ui` must not).
+- Coverage test (`src/stories/coverage.test.ts`, in `pnpm test`): exported components are the mixed-case function and `forwardRef` exports of the package index (constants such as `TOAST_MS` are not). 123 are exported; 96 have a story; 27 compound parts are excluded, each with its parent story and a reason, and the test checks that the parent story exists and renders the part: `LinkProvider`, `ThemeWrap`, `Radio`, `ToggleChip`, `TabsList`, `TabsTrigger`, `TabsContent`, `THead`, `TBody`, `Tr`, `Th`, `Td`, `DialogTrigger`, `DialogClose`, `PopoverTrigger`, `PopoverClose`, `PopoverContent`, `TooltipProvider`, `TooltipTrigger`, `TooltipContent`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `ToastProvider` (under `ToastSurface`). Story count equals exported components less exclusions, by assertion.
+- Spec (`apps/web/storybook-e2e/stories.spec.ts`, own Playwright config, port 6104, a 40-line static server `serve-static.mjs`, system Chrome, web lock): reads the build's `index.json`, opens each story's iframe in the patient and clinician themes at 375 and 1440, fails on any axe violation of WCAG 2.0, 2.1 and 2.2 A and AA at every impact level (not only serious and critical), and on any page error. Three document-level rules are off because a story is a fragment: `region`, `landmark-one-main`, `page-has-heading-one`. 96 stories x 2 themes x 2 widths = 384 axe runs, plus 2 for the list check.
+
+Fixes made to components (tiny, found by axe in the stories):
+- `SlotButton` (selected): accessible name was "Friday, November 20, 9:30 AM, selected" while the visible text reads "9:30 AM Selected" (WCAG 2.5.3, `label-content-name-mismatch`). The name is now "... 9:30 AM selected" and the markup has a space before "Selected". `e2e/design-system.spec.ts` line 130 follows the new name.
+- Nothing else in `packages/ui` changed.
+
+Changes outside the row's paths (small):
+- `packages/config/eslint/index.mjs`: ignore `**/.storybook-static/**` (build output; the gitignore is not read by ESLint).
+- `apps/web/package.json`: script `e2e:storybook`. `.gitignore`: `.storybook-static`, `.playwright-results-storybook`.
+- `packages/ui/tsconfig.json`: includes `.storybook` so the config is type-checked.
+
+Deviations and open points:
+- The Storybook spec is run by `scripts/gate-wp-d4.sh`, not by `pnpm verify`: it needs the static build, which `pnpm build` does not make. Later `packages/ui` writers (D-WP-U) re-run this gate; D-WP-19 may fold it into verify.
+- `DropdownMenu` is shown non-modal in its story only: a modal menu marks the page behind it hidden while its trigger stays focusable, which axe reports as `aria-hidden-focus`. The component is unchanged.
+- Hover, focus and pressed states of buttons, links and inputs are forced with the `data-demo` attribute, as in the gallery.
+- The static build's JS chunk is over 500 kB (the a11y addon's axe-core and Storybook itself); not a product bundle, left as is.
+
+Gate: `scripts/gate-wp-d4.sh` exit 0 on `wp/d4` (includes `pnpm verify`). Tail:
+
+```
+==> pnpm --filter @carepath/ui exec vitest run --reporter=dot
+      Tests  320 passed (320)
+==> static Storybook build
+stories in the build: 96
+==> Storybook spec: axe on every story, both themes, 375 and 1440
+  386 passed (6.2m)
+==> pnpm verify
+integrity checks: 79 passed
+packages/fhir 101, packages/ai 114, packages/shared 87, packages/ui 320, packages/db 101, apps/api 339 tests passed
+  25 skipped
+  121 passed (8.1m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-4 gate: PASSED
+```
+
+The first full Storybook run found three things, all fixed before the gate run above: the `SlotButton` mismatch, the `DropdownMenu` modal finding (see deviations), and a wrong assumption in the spec (overlay stories render only in a portal, so the story container is empty and is checked as attached, not visible). An earlier flake came from the preview decorator overwriting `body.className` and removing Storybook's own classes; it now adds classes.

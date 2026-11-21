@@ -9,7 +9,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "screenshots": "node scripts/design-system-screenshots.mjs",
     "test": "node --test test/style-rule.test.mjs",
-    "e2e": "playwright test --config e2e/playwright.config.ts"
+    "e2e": "playwright test --config e2e/playwright.config.ts",
+    "e2e:storybook": "playwright test --config storybook-e2e/playwright.config.ts"
   },
   "dependencies": {
     "@carepath/shared": "workspace:*",

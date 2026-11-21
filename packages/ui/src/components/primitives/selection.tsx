@@ -206,7 +206,8 @@ export const SlotButton = forwardRef<HTMLButtonElement, SlotButtonProps>(functio
     <button
       ref={ref}
       type={type ?? "button"}
-      aria-label={selected ? `${fullLabel}, selected` : fullLabel}
+      // The name contains the visible text "9:00 AM Selected" (WCAG 2.5.3): no comma before "selected" here, and a space before "Selected" in the markup. Found by axe in Storybook.
+      aria-label={selected ? `${fullLabel} selected` : fullLabel}
       className={cx(
         chipBase,
         "tabular-nums whitespace-nowrap focus-visible:focus-ring active:scale-98",
@@ -220,7 +221,7 @@ export const SlotButton = forwardRef<HTMLButtonElement, SlotButtonProps>(functio
     >
       {selected ? <Icon name="check" size={16} className="shrink-0" /> : null}
       <span>{time}</span>
-      {selected ? <span className="text-small font-semibold">Selected</span> : null}
+      {selected ? <span className="text-small font-semibold"> Selected</span> : null}
     </button>
   );
 });
