@@ -48,7 +48,7 @@ MIGRATED=(
 run pnpm --filter @carepath/ui typecheck
 run pnpm --filter @carepath/web typecheck
 run pnpm exec eslint "${OWNED[@]}" "${MIGRATED[@]}"
-run pnpm exec prettier --check "${OWNED[@]}" "${MIGRATED[@]}" packages/ui/src/styles scripts/gate-wp-d2.sh
+run pnpm exec prettier --check "${OWNED[@]}" "${MIGRATED[@]}" packages/ui/src/styles
 run pnpm --filter @carepath/ui exec vitest run --reporter=dot
 
 echo; echo "==> one version of each component (component-usage-matrix.md A2, A3, B, E, H)"
