@@ -16,7 +16,8 @@ Status: Proposed, provisional until advisor sign-off. Date: 2026-11-20. Research
 | Clinical and privacy constraints | Birth date is PHI; show only where identity is needed |
 | Interaction complexity | Low |
 | Technical feasibility | High: age computed client-side from `birthDate` and org-zone today |
-| Selected | C: "Born 3 Mar 1989 (37 years)" |
+| Selected | C: "Born Mar 3, 1989 (37 years)" (month first, the product's one date formatter; corrected by DR-004 ruling 6.3) |
 | Rejected | A (needs mental arithmetic); B; D |
 | Rationale | Two cross-checking identifiers, unambiguous month word |
 | Validation method | Unit tests for birthday edge, under two years, org zone near midnight; reading test |
+| Amended | 2026-11-21, DR-004 ruling 6.3: the example read day-first ("3 Mar 1989"); the product uses one month-first formatter (`microcopy-guidelines.md` section 5), so the banner reads "Born Mar 3, 1989 (37 years)". The age stays in the banner. |

@@ -16,7 +16,8 @@ Status: provisional until advisor sign-off. Date: 2026-11-20. Full research and 
 | Clinical and privacy constraints | Consent revoke confirmation decided in family 15 |
 | Interaction complexity | Low |
 | Technical feasibility | High |
-| Selected | Rule plus ToggleChip |
-| Rejected | button aria-pressed chips |
+| Selected | Rule plus ToggleChip. ToggleChip is a button with `aria-pressed` (CD-311 wins, DR-004 ruling 6.1), only for filters that take effect at once, in a group with a visible label, selected shown by fill plus check. A choice that is a form value saved on submit (onboarding limitations and availability, plan schedule days) is a `Checkbox` group in a `fieldset`. No chip-styled checkbox is built. |
+| Rejected | button aria-pressed chips for form values (narrowed by DR-004 ruling 6.1; for instant filters they stand) |
 | Decision rationale | Conventional element |
 | Validation method | Group legend and checked-state tests |
+| Amended | 2026-11-21 by DR-004 ruling 6.1. |

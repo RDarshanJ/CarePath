@@ -10,11 +10,12 @@
 - **Alternatives considered:** Conventional element: one shared button pattern; no invented alternatives
 - **Production references and sources:** Calendly list with View more meetings https://mobbin.com/screens/3a2fdf98-1d65-4469-8031-d43b2a64c08a; code read of five variants
 - **Research evidence and its limits:** Observed Mobbin screen; no design-system page documents the pattern. No participant data exists; scores are heuristic.
-- **Accessibility considerations:** Focus to first new item, polite count, inline error with retry, text end state
+- **Accessibility considerations:** Focus to the first new item (DR-004 ruling 6.2, which this record wins over CD-530), on these conditions: the item receives focus without landing under a sticky bar (it is scrolled to the middle of the window); a polite status gives the number loaded and "Showing N of M"; on failure focus stays on the button, with the inline error and the button reading "Try again"; at the end the button is replaced by the end text
 - **Clinical and privacy constraints:** None
 - **Interaction complexity:** Low
 - **Technical feasibility:** High
-- **Selected:** One LoadMore: secondary medium button, direction in the label, count line
+- **Selected:** One LoadMore: neutral medium button (a utility, DR-004 section 5.1 rule 1), direction in the label, count line
 - **Rejected:** Five variants
 - **Rationale:** One behaviour and one look
 - **Validation method:** Focus, status, error retry and end state tests
+- **Amended:** 2026-11-21 by DR-004 (ruling 6.2 and U3): conditions for the focus move stated; the button is neutral.

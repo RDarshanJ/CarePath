@@ -16,7 +16,9 @@ Status: provisional until advisor sign-off. Date: 2026-11-20. Full research and 
 | Clinical and privacy constraints | None |
 | Interaction complexity | Low |
 | Technical feasibility | High |
-| Selected | One of each |
+| Selected | One of each. Button hierarchy (DR-004 section 5.1 rule 1): one `primary` per view; `secondary` at most once per view, only for the single supporting action beside or standing in for the primary; `neutral` for everything repeated per row or card and every utility; `quiet` for Remove and Clear. Links in table cells and list rows have a 24 px minimum hit height in the kit (DR-004 U5). |
 | Rejected | AppLink, TextLink, ButtonLink, class-override danger |
 | Decision rationale | Conventional element |
-| Validation method | Lint for Button className overrides; link text audit |
+| Validation method | Lint for Button className overrides; link text audit; per-route count of `variant="secondary"` |
+| Exception | LoadMore moves focus to the first new item after a load (CD-335, DR-004 ruling 6.2); every other button keeps focus where it is. |
+| Amended | 2026-11-21 by DR-004 (U3, U5, ruling 6.2). |
