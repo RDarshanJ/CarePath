@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { EXERCISE_CONTENT_NOTICE, doseText } from "@carepath/shared";
 import { bodyAreas, exerciseCategories, type Exercise } from "@carepath/shared/contracts";
-import { Button, Select, Tag, TextInput } from "@carepath/ui";
-import { Empty, ListSkeleton, QueryError } from "../../../_components/common";
+import { Button, Select, Tag, TextInput, EmptyState, LoadMore, FilterField } from "@carepath/ui";
+import { ListSkeleton, QueryError } from "../../../_components/common";
 import { keys, qs, reads } from "../../../_lib/queries";
 
 const areaOptions = [
@@ -59,10 +59,7 @@ export function ExerciseLibrary({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="lib-search" className="text-small font-medium text-ink">
-            Search the library
-          </label>
+        <FilterField label="Search the library" id="lib-search" className="md:w-auto">
           <TextInput
             id="lib-search"
             type="search"
@@ -70,25 +67,19 @@ export function ExerciseLibrary({
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Exercise name"
           />
-        </div>
+        </FilterField>
         <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="lib-area" className="text-small font-medium text-ink">
-              Body area
-            </label>
+          <FilterField label="Body area" id="lib-area" className="md:w-auto">
             <Select id="lib-area" options={areaOptions} value={area} onValueChange={setArea} />
-          </div>
-          <div className="flex flex-col gap-1">
-            <label htmlFor="lib-type" className="text-small font-medium text-ink">
-              Type
-            </label>
+          </FilterField>
+          <FilterField label="Type" id="lib-type" className="md:w-auto">
             <Select
               id="lib-type"
               options={categoryOptions}
               value={category}
               onValueChange={setCategory}
             />
-          </div>
+          </FilterField>
         </div>
       </div>
 
@@ -103,9 +94,9 @@ export function ExerciseLibrary({
       ) : !list.data ? (
         <ListSkeleton rows={6} label="Loading exercises" />
       ) : items.length === 0 ? (
-        <Empty icon="search" title="No exercises match">
+        <EmptyState padded icon="search" title="No exercises match">
           Clear the search or choose a different body area or type.
-        </Empty>
+        </EmptyState>
       ) : (
         <ul
           aria-label="Exercise library"
@@ -141,15 +132,14 @@ export function ExerciseLibrary({
         </ul>
       )}
       {list.hasNextPage ? (
-        <Button
-          variant="secondary"
-          size="sm"
+        <LoadMore
+          label="Show more exercises"
+          noun="exercises"
+          hasMore={true}
           loading={list.isFetchingNextPage}
-          loadingLabel="Loading"
-          onClick={() => void list.fetchNextPage()}
-        >
-          Load more exercises
-        </Button>
+          shown={items.length}
+          onLoadMore={() => void list.fetchNextPage()}
+        />
       ) : null}
       <p className="text-small text-ink-muted">{EXERCISE_CONTENT_NOTICE}</p>
     </div>

@@ -15,7 +15,6 @@ import {
   Banner,
   Button,
   Field,
-  FieldGroup,
   Heading,
   Panel,
   Radio,
@@ -23,7 +22,10 @@ import {
   SkeletonGroup,
   Skeleton,
   Textarea,
-  cx,
+  SlotButton,
+  ToggleChip,
+  ToggleChipGroup,
+  LoadMore,
 } from "@carepath/ui";
 import { api } from "../../../lib/api/client";
 import { ApiError } from "../../../lib/api/errors";
@@ -82,11 +84,6 @@ function toggle<T>(set: Set<T>, value: T): Set<T> {
   else next.add(value);
   return next;
 }
-
-const chip =
-  "inline-flex min-h-target min-w-14 items-center justify-center rounded-control border px-3 text-label font-medium motion-fast transition-colors focus-visible:focus-ring";
-const chipOn = "border-primary bg-primary-subtle text-primary";
-const chipOff = "border-border-control bg-surface text-ink hover:bg-surface-sunken";
 
 /**
  * Appointment booking and rescheduling (REQ-APT-01 to 05). Open times come from the API as a list
@@ -361,9 +358,11 @@ export function BookingFlow({
               <ul className="mt-3 flex flex-wrap gap-2">
                 {alternatives.map((s) => (
                   <li key={s.id}>
-                    <button type="button" className={cx(chip, chipOff)} onClick={() => pick(s)}>
-                      {formatInstantDate(s.startsAt, timezone)}, {formatClock(s.startsAt, timezone)}
-                    </button>
+                    <SlotButton
+                      time={`${formatInstantDate(s.startsAt, timezone)}, ${formatClock(s.startsAt, timezone)}`}
+                      fullLabel={`${formatInstantDate(s.startsAt, timezone)}, ${formatClock(s.startsAt, timezone)}`}
+                      onClick={() => pick(s)}
+                    />
                   </li>
                 ))}
               </ul>
@@ -467,46 +466,38 @@ export function BookingFlow({
               it here whenever you like.
             </p>
           ) : null}
-          <FieldGroup legend="Days" requirement="optional" hint="Leave all off to see every day.">
-            <ul className="flex flex-wrap gap-2">
-              {filterDays.map((d) => (
-                <li key={d.value}>
-                  <button
-                    type="button"
-                    aria-pressed={days.has(d.value)}
-                    className={cx(chip, days.has(d.value) ? chipOn : chipOff)}
-                    onClick={() => {
-                      setDays(toggle(days, d.value));
-                      setVisibleDays(DAYS_PER_PAGE);
-                    }}
-                  >
-                    <span aria-hidden="true">{d.label.slice(0, 3)}</span>
-                    <span className="sr-only">{d.label}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </FieldGroup>
-          <FieldGroup legend="Time of day" requirement="optional">
-            <ul className="flex flex-wrap gap-2">
-              {(Object.keys(timeOfDayLabels) as TimeOfDay[]).map((t) => (
-                <li key={t}>
-                  <button
-                    type="button"
-                    aria-pressed={times.has(t)}
-                    className={cx(chip, times.has(t) ? chipOn : chipOff)}
-                    onClick={() => {
-                      setTimes(toggle(times, t));
-                      setVisibleDays(DAYS_PER_PAGE);
-                    }}
-                  >
-                    {timeOfDayLabels[t]}
-                    <span className="sr-only"> ({timeOfDayHints[t]})</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </FieldGroup>
+          <ToggleChipGroup
+            legend="Days"
+            requirement="optional"
+            hint="Leave all off to see every day."
+          >
+            {filterDays.map((d) => (
+              <ToggleChip
+                key={d.value}
+                label={d.label}
+                shortLabel={d.label.slice(0, 3)}
+                pressed={days.has(d.value)}
+                onPressedChange={() => {
+                  setDays(toggle(days, d.value));
+                  setVisibleDays(DAYS_PER_PAGE);
+                }}
+              />
+            ))}
+          </ToggleChipGroup>
+          <ToggleChipGroup legend="Time of day" requirement="optional">
+            {(Object.keys(timeOfDayLabels) as TimeOfDay[]).map((t) => (
+              <ToggleChip
+                key={t}
+                label={timeOfDayLabels[t]}
+                description={timeOfDayHints[t]}
+                pressed={times.has(t)}
+                onPressedChange={() => {
+                  setTimes(toggle(times, t));
+                  setVisibleDays(DAYS_PER_PAGE);
+                }}
+              />
+            ))}
+          </ToggleChipGroup>
         </div>
 
         <div aria-live="polite" className="flex flex-col gap-5">
@@ -564,29 +555,24 @@ export function BookingFlow({
                   <ul className="flex flex-wrap gap-2">
                     {day.slots.map((s) => (
                       <li key={s.id}>
-                        <button
-                          type="button"
-                          className={cx(chip, chipOff, "min-w-28")}
+                        <SlotButton
+                          className="min-w-28"
+                          time={formatClock(s.startsAt, timezone)}
+                          fullLabel={`${formatLocalDate(day.date, "short")}, ${formatClock(s.startsAt, timezone)}`}
                           onClick={() => pick(s)}
-                        >
-                          <span className="sr-only">{formatLocalDate(day.date, "short")}, </span>
-                          {formatClock(s.startsAt, timezone)}
-                        </button>
+                        />
                       </li>
                     ))}
                   </ul>
                 </section>
               ))}
-              {filtered.length > visibleDays ? (
-                <div>
-                  <Button
-                    variant="secondary"
-                    onClick={() => setVisibleDays(visibleDays + DAYS_PER_PAGE)}
-                  >
-                    Show later days
-                  </Button>
-                </div>
-              ) : null}
+              <LoadMore
+                label="Show later days"
+                noun="days"
+                hasMore={filtered.length > visibleDays}
+                shown={Math.min(visibleDays, filtered.length)}
+                onLoadMore={() => setVisibleDays(visibleDays + DAYS_PER_PAGE)}
+              />
             </>
           )}
         </div>

@@ -3,16 +3,9 @@
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Table, TBody, Td, Th, THead, TextInput, Tr } from "@carepath/ui";
+import { Button, Table, TBody, Td, Th, THead, TextInput, Tr, Link, EmptyState } from "@carepath/ui";
 import { AppointmentStatusTag, VisitType, isCancelled } from "../_components/appointments";
-import {
-  AppLink,
-  Empty,
-  ListSkeleton,
-  PageHeader,
-  QueryError,
-  Section,
-} from "../_components/common";
+import { ListSkeleton, PageHeader, QueryError, Section } from "../_components/common";
 import { useClinician } from "../_lib/context";
 import {
   addDays,
@@ -58,9 +51,9 @@ export function Schedule() {
     return (
       <div className="flex flex-col gap-4">
         <PageHeader title="Schedule" />
-        <Empty icon="calendar" title="No schedule for this account">
+        <EmptyState padded icon="calendar" title="No schedule for this account">
           Your account is not linked to a practitioner profile, so there is no calendar to show.
-        </Empty>
+        </EmptyState>
       </div>
     );
   }
@@ -102,21 +95,21 @@ export function Schedule() {
             <ListSkeleton rows={4} label="Loading visits" />
           </div>
         ) : items.length === 0 ? (
-          <Empty icon="calendar" title="No visits on this day">
+          <EmptyState padded icon="calendar" title="No visits on this day">
             Nothing is booked with you on {formatLongDay(date)}. Visits appear here as soon as a
             patient or the care coordinator books one.
-          </Empty>
+          </EmptyState>
         ) : (
           <div className="p-3">
             <Table caption={`Visits on ${formatLongDay(date)}`}>
               <THead>
-                <tr>
+                <Tr header>
                   <Th>Time</Th>
                   <Th>Patient</Th>
                   <Th>Visit</Th>
                   <Th>Reason</Th>
                   <Th>Status</Th>
-                </tr>
+                </Tr>
               </THead>
               <TBody>
                 {items.map((a) => (
@@ -127,12 +120,12 @@ export function Schedule() {
                       </span>
                     </Td>
                     <Td>
-                      <AppLink
+                      <Link
                         href={`/patients/${a.patient.id}?tab=appointments`}
                         className="font-medium"
                       >
                         {a.patient.name}
-                      </AppLink>
+                      </Link>
                     </Td>
                     <Td>
                       <VisitType type={a.type} />

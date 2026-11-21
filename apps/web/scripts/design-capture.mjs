@@ -424,6 +424,83 @@ await group(["admin-"], async (page) => {
   }
 });
 
+// D-WP-2: the /design-system gallery at every width, then explicitly under reduced motion, and at
+// 200 percent zoom of a 1280 px window (a 640 CSS px viewport drawn at device scale 2).
+await group(["design-system"], async (page) => {
+  await page.goto("/design-system");
+  await h1(page, "Tokens and components");
+  await capture(page, "design-system");
+});
+if (want("design-system-reduced-motion")) {
+  const ctx = await browser.newContext({
+    baseURL: BASE,
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: "reduce",
+  });
+  const page = await ctx.newPage();
+  await page.clock.setFixedTime(ANCHOR);
+  try {
+    await page.goto("/design-system");
+    await h1(page, "Tokens and components");
+    await settle(page);
+    const anim = await page.evaluate(
+      () =>
+        [...document.querySelectorAll("*")].filter((el) => {
+          const cs = getComputedStyle(el);
+          return cs.animationName !== "none" || parseFloat(cs.transitionDuration) > 0;
+        }).length,
+    );
+    const full = await page.evaluate(() => document.documentElement.scrollHeight);
+    await page.setViewportSize({ width: 1440, height: full });
+    await page.screenshot({ path: `${out}/design-system-reduced-motion-1440.png` });
+    probes.push({
+      file: "design-system-reduced-motion-1440.png",
+      url: "/design-system",
+      animatedElements: anim,
+      warm: [],
+      warmToken: [],
+      overflowX: 0,
+      underThemeFloor: 0,
+      smallTargets: 0,
+    });
+    console.log(
+      `saved design-system-reduced-motion-1440.png  [animated or transitioning elements: ${anim}]`,
+    );
+    if (anim > 0) failures.push(`design-system-reduced-motion: ${anim} elements still animate`);
+  } catch (e) {
+    failures.push(`design-system-reduced-motion: ${e.message.split("\n")[0]}`);
+  } finally {
+    await ctx.close();
+  }
+}
+if (want("design-system-zoom-200")) {
+  const ctx = await browser.newContext({
+    baseURL: BASE,
+    viewport: { width: 640, height: 400 },
+    deviceScaleFactor: 2,
+    reducedMotion: "reduce",
+  });
+  const page = await ctx.newPage();
+  await page.clock.setFixedTime(ANCHOR);
+  try {
+    await page.goto("/design-system");
+    await h1(page, "Tokens and components");
+    await settle(page);
+    const probe = await page.evaluate(probeInPage, warmTokenValues);
+    const full = await page.evaluate(() => document.documentElement.scrollHeight);
+    await page.setViewportSize({ width: 640, height: full });
+    await page.screenshot({ path: `${out}/design-system-zoom-200-1280.png` });
+    probes.push({ file: "design-system-zoom-200-1280.png", url: "/design-system", ...probe });
+    console.log(
+      `saved design-system-zoom-200-1280.png${probe.overflowX > 1 ? `  [overflow ${probe.overflowX}px]` : ""}`,
+    );
+  } catch (e) {
+    failures.push(`design-system-zoom-200: ${e.message.split("\n")[0]}`);
+  } finally {
+    await ctx.close();
+  }
+}
+
 await browser.close();
 
 probes.sort((a, b) => a.file.localeCompare(b.file, "en", { numeric: true }));

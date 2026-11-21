@@ -13,6 +13,8 @@ import {
   Link,
   cx,
   type IconName,
+  CountBadge,
+  SkipLink,
 } from "@carepath/ui";
 import { SignOutButton } from "../../../components/sign-out-button";
 import { useUnreadTotal } from "../_lib/use-conversations";
@@ -24,16 +26,6 @@ const tabs: { href: string; label: string; icon: IconName }[] = [
   { href: "/appointments", label: "Appointments", icon: "calendar" },
   { href: "/messages", label: "Messages", icon: "message" },
 ];
-
-function UnreadCount({ count }: { count: number }) {
-  if (count <= 0) return null;
-  return (
-    <span className="inline-flex min-w-6 items-center justify-center rounded-control border border-primary bg-primary px-1.5 text-caption font-semibold tabular-nums text-ink-inverse">
-      {count}
-      <span className="sr-only"> unread</span>
-    </span>
-  );
-}
 
 /**
  * One nav element for each width, never both at once: the other is `display: none`, so assistive
@@ -76,7 +68,7 @@ function BottomNav({ unread }: { unread: number }) {
                 <Icon name={it.icon} size={22} />
                 {it.count > 0 ? (
                   <span className="absolute -right-3 -top-2">
-                    <UnreadCount count={it.count} />
+                    <CountBadge count={it.count} unit="unread" />
                   </span>
                 ) : null}
               </span>
@@ -108,7 +100,7 @@ function HeaderNav({ unread }: { unread: number }) {
             >
               <Icon name={it.icon} size={20} />
               <span>{it.label}</span>
-              <UnreadCount count={it.count} />
+              <CountBadge count={it.count} unit="unread" />
               {it.current ? (
                 <span aria-hidden="true" className="absolute inset-x-3 bottom-0 h-0.5 bg-primary" />
               ) : null}
@@ -117,17 +109,6 @@ function HeaderNav({ unread }: { unread: number }) {
         ))}
       </ul>
     </nav>
-  );
-}
-
-function SkipLink() {
-  return (
-    <a
-      href="#main"
-      className="sr-only rounded-control bg-surface px-3 py-2 text-label font-medium text-primary focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-10 focus-visible:focus-ring"
-    >
-      Skip to main content
-    </a>
   );
 }
 
@@ -176,13 +157,9 @@ export function ContactCareTeam({ clinic }: { clinic: ClinicCard }) {
             <p className="text-body text-ink-muted">{clinic.replyTimeText}</p>
           ) : null}
           <p>
-            <NextLink
-              href="/messages"
-              onClick={() => setOpen(false)}
-              className="rounded-control text-label font-medium text-primary underline underline-offset-2 focus-visible:focus-ring"
-            >
+            <Link variant="standalone" href="/messages" onClick={() => setOpen(false)}>
               Send your care team a message
-            </NextLink>
+            </Link>
           </p>
           <p className="flex items-start gap-2 rounded-control bg-warning-bg p-3 text-label font-medium text-warning-ink">
             <Icon name="alert-triangle" size={18} className="mt-0.5 shrink-0" />
@@ -246,13 +223,7 @@ export function PatientFrame({
         <>
           <footer className="mx-auto w-full max-w-3xl px-4 pb-6 sm:px-gutter text-small text-ink-muted">
             <p>
-              {organizationName}.{" "}
-              <NextLink
-                href="/consent"
-                className="rounded-control text-primary underline underline-offset-2 focus-visible:focus-ring"
-              >
-                Sharing and consent
-              </NextLink>
+              {organizationName}. <Link href="/consent">Sharing and consent</Link>
             </p>
           </footer>
           <BottomNav unread={unread} />

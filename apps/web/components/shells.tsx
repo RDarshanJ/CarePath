@@ -4,21 +4,10 @@ import type { ReactNode } from "react";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import type { SessionInfo } from "@carepath/shared/contracts";
-import { Avatar, Muted, SideNav, type NavItem } from "@carepath/ui";
+import { Avatar, Muted, SideNav, type NavItem, SkipLink } from "@carepath/ui";
 import { roleLabel } from "../lib/auth/roles";
 import { useUnreadTotal } from "../app/(clinician)/_lib/unread";
 import { SignOutButton } from "./sign-out-button";
-
-function SkipLink() {
-  return (
-    <a
-      href="#main"
-      className="sr-only rounded-control bg-surface px-3 py-2 text-label font-medium text-primary focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-10 focus-visible:focus-ring"
-    >
-      Skip to main content
-    </a>
-  );
-}
 
 function withCurrent(items: Omit<NavItem, "current">[], pathname: string): NavItem[] {
   return items.map((it) => ({
@@ -98,7 +87,7 @@ function StaffShell({
 export function ClinicianShell(props: { session: SessionInfo; children: ReactNode }) {
   const unread = useUnreadTotal();
   const items = clinicianNav.map((it) =>
-    it.href === "/inbox" && unread ? { ...it, count: unread } : it,
+    it.href === "/inbox" && unread ? { ...it, count: unread, countUnit: "unread" } : it,
   );
   return <StaffShell {...props} items={items} navLabel="Clinician" />;
 }

@@ -18,16 +18,18 @@ import {
 } from "@carepath/shared";
 import type { ConversationPage, ConversationSummary, Message } from "@carepath/shared/contracts";
 import { MESSAGE_BODY_MAX } from "@carepath/shared/contracts";
-import { Banner, Button, Icon, StatusChip, Textarea, cx, useToast } from "@carepath/ui";
 import {
-  AppLink,
-  Empty,
-  ListSkeleton,
-  PageHeader,
-  QueryError,
-  Section,
-  errorText,
-} from "../_components/common";
+  Banner,
+  Button,
+  Icon,
+  StatusChip,
+  Textarea,
+  cx,
+  Link,
+  EmptyState,
+  LoadMore,
+} from "@carepath/ui";
+import { ListSkeleton, PageHeader, QueryError, Section, errorText } from "../_components/common";
 import { useClinician } from "../_lib/context";
 import { formatDateTime, fullName, plural } from "../_lib/format";
 import { keys, reads, writes } from "../_lib/queries";
@@ -68,9 +70,9 @@ export function Messages() {
             <Thread key={selected} conversationId={selected} />
           ) : (
             <Section id="thread-empty" title="Thread">
-              <Empty icon="message" title="Choose a conversation">
+              <EmptyState padded icon="message" title="Choose a conversation">
                 Pick a conversation from the list to read it and reply.
-              </Empty>
+              </EmptyState>
             </Section>
           )}
         </div>
@@ -104,10 +106,10 @@ function ConversationList({
           <ListSkeleton rows={5} label="Loading conversations" />
         </div>
       ) : items.length === 0 ? (
-        <Empty icon="message" title="No conversations yet">
+        <EmptyState padded icon="message" title="No conversations yet">
           A conversation appears here once a patient is assigned to you. You are not part of any
           yet.
-        </Empty>
+        </EmptyState>
       ) : (
         <ul className="divide-y divide-border">
           {items.map((c) => (
@@ -179,7 +181,8 @@ function ConversationRow({
 function Thread({ conversationId }: { conversationId: string }) {
   const { timezone } = useClinician();
   const qc = useQueryClient();
-  const toast = useToast();
+  // CD-442: no toast for a retry; the row says "Retrying". A failed retry is shown above the log.
+  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
   const thread = useInfiniteQuery({
@@ -229,13 +232,8 @@ function Thread({ conversationId }: { conversationId: string }) {
 
   const retry = useMutation({
     mutationFn: (messageId: string) => writes.retryMessage(conversationId, messageId),
-    onSuccess: () => {
-      toast({ tone: "info", title: "Trying to send again" });
-    },
-    onError: (e) => {
-      const t = errorText(e);
-      toast({ tone: "error", title: t.title, description: t.body });
-    },
+    onMutate: () => setFailure(null),
+    onError: (e) => setFailure(errorText(e)),
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: keys.thread(conversationId) });
       void qc.invalidateQueries({ queryKey: keys.conversations });
@@ -246,9 +244,9 @@ function Thread({ conversationId }: { conversationId: string }) {
     return (
       <Section id="thread" title="Thread">
         <div className="flex flex-col gap-3 p-4">
-          <AppLink href="/inbox" className="text-small xl:hidden">
+          <Link href="/inbox" className="text-small xl:hidden">
             Back to conversations
-          </AppLink>
+          </Link>
           <QueryError error={thread.error} onRetry={() => void thread.refetch()} />
         </div>
       </Section>
@@ -276,16 +274,16 @@ function Thread({ conversationId }: { conversationId: string }) {
       className="flex flex-col rounded-container border border-border bg-surface"
     >
       <div className="flex flex-col gap-1 border-b border-border px-4 py-3">
-        <AppLink href="/inbox" className="w-fit text-small xl:hidden">
+        <Link href="/inbox" className="w-fit text-small xl:hidden">
           Back to conversations
-        </AppLink>
+        </Link>
         <h2 id="thread-heading" className="font-heading text-h4 font-semibold text-ink">
           {patientName}
           <span className="ml-2 font-normal text-ink-muted">{conversation.subject}</span>
         </h2>
         <p className="text-small text-ink-muted">
           In this conversation: {people}.{" "}
-          <AppLink href={`/patients/${conversation.patient.id}`}>Open the patient record</AppLink>
+          <Link href={`/patients/${conversation.patient.id}`}>Open the patient record</Link>
         </p>
       </div>
 
@@ -296,18 +294,20 @@ function Thread({ conversationId }: { conversationId: string }) {
         tabIndex={0}
         className="flex max-h-96 min-h-48 flex-col gap-3 overflow-y-auto px-4 py-4 focus-visible:focus-ring"
       >
+        {failure ? (
+          <Banner tone="error" title={failure.title} focusOnMount>
+            {failure.body}
+          </Banner>
+        ) : null}
         {thread.hasNextPage ? (
-          <div>
-            <Button
-              variant="secondary"
-              size="sm"
-              loading={thread.isFetchingNextPage}
-              loadingLabel="Loading"
-              onClick={() => void thread.fetchNextPage()}
-            >
-              Show earlier messages
-            </Button>
-          </div>
+          <LoadMore
+            label="Show earlier messages"
+            noun="messages"
+            hasMore
+            loading={thread.isFetchingNextPage}
+            shown={messages.length}
+            onLoadMore={() => void thread.fetchNextPage()}
+          />
         ) : null}
         {messages.length === 0 ? (
           <p className="text-body text-ink-muted">

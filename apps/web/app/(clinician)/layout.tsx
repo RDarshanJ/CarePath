@@ -7,8 +7,8 @@ import { ClinicianProviders } from "./_lib/context";
 export default async function ClinicianLayout({ children }: { children: ReactNode }) {
   const session = await requireShell("clinician");
   return (
-    <ThemeScope theme="clinician" className="flex flex-1 flex-col">
-      <style>{"html{scroll-padding-top:7rem}"}</style>
+    // data-sticky-layout sets the scroll padding from the sticky-offset tokens (CD-125).
+    <ThemeScope theme="clinician" className="flex flex-1 flex-col" data-sticky-layout="staff">
       <ClinicianShell session={session}>
         <ClinicianProviders session={session}>{children}</ClinicianProviders>
       </ClinicianShell>

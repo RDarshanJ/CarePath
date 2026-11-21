@@ -34,14 +34,18 @@ export function Section({
 
 export function Pane({ theme, children }: { theme: ThemeName; children: ReactNode }) {
   return (
-    <ThemeScope theme={theme} className="min-w-0 rounded-container border border-border-control">
+    <ThemeScope
+      theme={theme}
+      data-pane={theme}
+      className="min-w-0 rounded-container border border-border-control"
+    >
       <div
         data-theme="clinician"
         className="rounded-t-container border-b border-border bg-surface px-4 py-2 text-caption text-ink-muted"
       >
         <Mono>data-theme="{theme}"</Mono> <span className="px-1">/</span> {meta[theme]}
       </div>
-      <div className="flex flex-col gap-6 p-4 sm:p-5">{children}</div>
+      <div className="flex flex-col gap-6 p-3 sm:p-5">{children}</div>
     </ThemeScope>
   );
 }
@@ -52,18 +56,40 @@ function render(c: ReactNode | ((t: ThemeName) => ReactNode), t: ThemeName): Rea
 
 /** Shows the same content in both themes. Pass `patient` and `clinician` for pieces that exist in one theme only. */
 export function Specimen({
+  id,
   children,
   patient,
   clinician,
   title,
+  only,
 }: {
+  /** Specimen id: the gallery spec runs axe on each `[data-specimen]` on its own. */
+  id: string;
   children?: ReactNode | ((theme: ThemeName) => ReactNode);
   patient?: ReactNode;
   clinician?: ReactNode;
   title?: string;
+  /** Show one theme only, for components that exist in one app. */
+  only?: ThemeName;
 }) {
+  if (only) {
+    return (
+      <div data-specimen={id}>
+        {title ? (
+          <Heading level={3} className="mb-3">
+            {title}
+          </Heading>
+        ) : null}
+        <Pane theme={only}>
+          {only === "patient"
+            ? (patient ?? render(children, "patient"))
+            : (clinician ?? render(children, "clinician"))}
+        </Pane>
+      </div>
+    );
+  }
   return (
-    <div>
+    <div data-specimen={id}>
       {title ? (
         <Heading level={3} className="mb-3">
           {title}

@@ -12,7 +12,6 @@ import { painNoticeMessage } from "@carepath/shared";
 import {
   Banner,
   Button,
-  cx,
   DrawerContent,
   Dialog,
   Field,
@@ -23,6 +22,7 @@ import {
   Radio,
   RadioGroup,
   Textarea,
+  FieldError,
 } from "@carepath/ui";
 import { SESSION_ACTIVITY_CURRENT_LABEL, sessionActivityStatusLabels } from "@carepath/shared";
 import { api } from "../../../lib/api/client";
@@ -30,7 +30,6 @@ import { ApiError } from "../../../lib/api/errors";
 import { IllustrationFigure } from "../../../components/illustration";
 import { exerciseIllustration } from "../../../lib/illustrations";
 import { clock, doseText, restText, secondsText } from "../_lib/format";
-import { ButtonLink } from "./button-link";
 import { CheckInForm } from "./check-in-form";
 import { useCountdown, useElapsed } from "./use-timers";
 
@@ -38,23 +37,13 @@ import { useCountdown, useElapsed } from "./use-timers";
 const FocusContext = createContext<{ current: boolean }>({ current: true });
 
 function ViewHeading({ children, level = 1 }: { children: ReactNode; level?: 1 | 2 }) {
-  const ref = useRef<HTMLHeadingElement>(null);
   const first = useContext(FocusContext);
-  const Tag = level === 1 ? "h1" : "h2";
-  useEffect(() => {
-    if (!first.current) ref.current?.focus();
-  }, [first]);
+  // The ui Heading's focusOnMount (CD-120); the first render of the page does not move focus.
+  const [focus] = useState(() => !first.current);
   return (
-    <Tag
-      ref={ref}
-      tabIndex={-1}
-      className={cx(
-        "font-heading font-semibold text-ink focus:outline-none",
-        level === 1 ? "text-h1" : "text-h2",
-      )}
-    >
+    <Heading level={level} focusOnMount={focus}>
       {children}
-    </Tag>
+    </Heading>
   );
 }
 
@@ -185,9 +174,9 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
           >
             Resume session
           </Button>
-          <ButtonLink href="/today" variant="secondary" className="w-full sm:w-auto">
+          <Button href="/today" variant="secondary" className="w-full sm:w-auto">
             Back to Today
-          </ButtonLink>
+          </Button>
         </div>
         <ExerciseList activities={activities} currentId={current?.id ?? null} />
       </div>
@@ -220,7 +209,7 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
           </section>
         ) : (
           <div>
-            <ButtonLink href="/today">Back to Today</ButtonLink>
+            <Button href="/today">Back to Today</Button>
           </div>
         )}
       </div>
@@ -250,7 +239,7 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
           </section>
         ) : (
           <div>
-            <ButtonLink href="/today">Back to Today</ButtonLink>
+            <Button href="/today">Back to Today</Button>
           </div>
         )}
       </div>
@@ -263,7 +252,7 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
           It was left open for more than a day, so CarePath closed it. What you recorded is kept.
         </p>
         <div>
-          <ButtonLink href="/today">Back to Today</ButtonLink>
+          <Button href="/today">Back to Today</Button>
         </div>
       </div>
     );
@@ -535,10 +524,10 @@ function ExerciseView({
         </div>
         <Button
           variant="secondary"
-          iconLeft="alert-circle"
+          tone="critical"
           onClick={() => setStopOpen(true)}
           disabled={busy}
-          className="w-full border-error-ink text-error-ink"
+          className="w-full"
         >
           Stop, this hurts
         </Button>
@@ -648,16 +637,7 @@ function SkipSheet({
               )}
             </Field>
           ) : error ? (
-            <p
-              role="alert"
-              className="flex items-start gap-1.5 text-small font-medium text-error-ink"
-            >
-              <Icon name="alert-circle" size={16} className="mt-0.5 shrink-0" />
-              <span>
-                <span className="sr-only">Error: </span>
-                {error}
-              </span>
-            </p>
+            <FieldError live>{error}</FieldError>
           ) : null}
         </div>
       </DrawerContent>
@@ -715,18 +695,7 @@ function StopSheet({
               setError(null);
             }}
           />
-          {error ? (
-            <p
-              role="alert"
-              className="flex items-start gap-1.5 text-small font-medium text-error-ink"
-            >
-              <Icon name="alert-circle" size={16} className="mt-0.5 shrink-0" />
-              <span>
-                <span className="sr-only">Error: </span>
-                {error}
-              </span>
-            </p>
-          ) : null}
+          {error ? <FieldError live>{error}</FieldError> : null}
           <Field
             label="What happened?"
             requirement="optional"

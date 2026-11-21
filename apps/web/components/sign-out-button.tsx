@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "@carepath/ui";
+import { Button, FieldError } from "@carepath/ui";
 import { apiRequest, rememberCsrfToken } from "../lib/api/client";
 import { ApiError } from "../lib/api/errors";
 
@@ -43,10 +43,9 @@ export function SignOutButton({ className }: { className?: string }) {
         Sign out
       </Button>
       {error ? (
-        <p role="alert" className="mt-1.5 text-small font-medium text-error-ink">
-          <span className="sr-only">Error: </span>
+        <FieldError live className="mt-1.5">
           {error}
-        </p>
+        </FieldError>
       ) : null}
     </div>
   );

@@ -3,6 +3,7 @@ import { DemoNotice } from "@carepath/ui";
 import "@carepath/ui/fonts";
 import "./globals.css";
 import { QueryProvider } from "../lib/query/providers";
+import { AppLinkProvider } from "../components/link-provider";
 
 export const metadata = {
   title: "CarePath",
@@ -14,7 +15,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body className="flex min-h-dvh flex-col">
         <DemoNotice />
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <AppLinkProvider>{children}</AppLinkProvider>
+        </QueryProvider>
       </body>
     </html>
   );

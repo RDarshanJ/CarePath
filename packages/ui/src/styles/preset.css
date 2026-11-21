@@ -192,3 +192,8 @@
     @slot;
   }
 }
+
+/* Heading h4 weight per theme (design-tokens section 5: patient 500, clinician 600). */
+@utility font-h4 {
+  font-weight: var(--cp-h4-weight, 600);
+}

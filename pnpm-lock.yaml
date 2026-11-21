@@ -259,6 +259,9 @@ importers:
 
   packages/ui:
     dependencies:
+      '@carepath/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@fontsource/ibm-plex-mono':
         specifier: 5.3.0
         version: 5.3.0

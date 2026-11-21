@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import {
-  Avatar,
   Banner,
-  BottomTabBar,
   Button,
-  Checkbox,
   CountBadge,
   DialogPanel,
   EmptyState,
   Field,
-  FieldGroup,
   Heading,
   Icon,
   IconButton,
@@ -18,17 +14,12 @@ import {
   PainScale,
   Panel,
   Progress,
-  Radio,
-  RadioGroup,
-  Select,
-  SideNav,
   Skeleton,
+  SkipLink,
   SkeletonGroup,
   StatusChip,
-  Switch,
   Tag,
   TextInput,
-  Textarea,
   ThemeScope,
   ToastSurface,
   colours,
@@ -39,10 +30,34 @@ import {
   motion,
   overlayClasses,
   radius,
-  type NavItem,
   type ThemeName,
 } from "@carepath/ui";
-import { AIDraftDemo, ChoiceDemo, OverlayDemos, TableDemo, TabsDemo } from "./demos";
+import {
+  AIDraftDemo,
+  BannerFocusDemo,
+  ChoiceDemo,
+  ConfirmDemo,
+  CountedNoteDemo,
+  DateOfBirthDemo,
+  DrawerDemo,
+  ErrorSummaryDemo,
+  LeaveGuardDemo,
+  LoadMoreDemo,
+  LoadingDemo,
+  NavDemo,
+  NoteDialogDemo,
+  PainDemo,
+  PopoverMenuDemo,
+  SegmentedDemo,
+  SheetDemo,
+  SidePanelDemo,
+  SlotDemo,
+  TableDemo,
+  TimerDemo,
+  ToastDemo,
+  ToggleChipDemo,
+  UrlTabsDemo,
+} from "./demos";
 import { Label, Row, Section, Specimen } from "./specimen";
 
 export const metadata: Metadata = {
@@ -55,32 +70,17 @@ const sections = [
   ["type", "Type"],
   ["shape", "Shape and depth"],
   ["icons", "Icons"],
-  ["buttons", "Buttons"],
+  ["buttons", "Buttons and links"],
   ["fields", "Fields"],
   ["choices", "Choices"],
   ["pain", "Pain scale"],
-  ["nav", "Navigation"],
-  ["status", "Status and messages"],
-  ["surfaces", "Surfaces and states"],
-  ["table", "Table"],
-  ["ai", "AI draft"],
+  ["status", "Status"],
+  ["feedback", "Feedback"],
   ["overlays", "Overlays"],
+  ["nav", "Navigation"],
+  ["table", "Tables"],
+  ["ai", "AI draft"],
 ] as const;
-
-const patientNav: NavItem[] = [
-  { href: "#nav", label: "Today", icon: "home", current: true },
-  { href: "#nav", label: "Plan", icon: "clipboard" },
-  { href: "#nav", label: "Messages", icon: "message" },
-  { href: "#nav", label: "Appointments", icon: "calendar" },
-];
-
-const clinicianNav: NavItem[] = [
-  { href: "#nav", label: "Review queue", icon: "list", current: true, count: 12 },
-  { href: "#nav", label: "Patients", icon: "users" },
-  { href: "#nav", label: "Messages", icon: "message", count: 3 },
-  { href: "#nav", label: "Appointments", icon: "calendar" },
-  { href: "#nav", label: "Settings", icon: "settings" },
-];
 
 const swatchOrder = [
   "bg",
@@ -182,12 +182,23 @@ function ContrastTable({ theme }: { theme: ThemeName }) {
             return (
               <tr key={`${p.fg}-${p.bg}`} className="border-t border-border">
                 <td className="px-2 py-1">
-                  <span
-                    className="inline-flex h-6 min-w-12 items-center justify-center rounded-control border border-border px-2 text-caption font-semibold"
-                    style={{ background: c[p.bg], color: c[p.fg] }}
-                  >
-                    Aa 12
-                  </span>
+                  {p.rule === "ui" ? (
+                    // UI pairs (borders, fills, marks) are judged at 3:1 as non-text: a swatch, not text.
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex h-6 min-w-12 items-center justify-center rounded-control border border-border px-2"
+                      style={{ background: c[p.bg] }}
+                    >
+                      <span className="block h-0.5 w-6" style={{ background: c[p.fg] }} />
+                    </span>
+                  ) : (
+                    <span
+                      className="inline-flex h-6 min-w-12 items-center justify-center rounded-control border border-border px-2 text-caption font-semibold"
+                      style={{ background: c[p.bg], color: c[p.fg] }}
+                    >
+                      Aa 12
+                    </span>
+                  )}
                 </td>
                 <td className="px-2 py-1 text-caption">
                   <Mono>{p.fg}</Mono> on <Mono>{p.bg}</Mono>
@@ -209,6 +220,7 @@ function ContrastTable({ theme }: { theme: ThemeName }) {
 export default function DesignSystemPage() {
   return (
     <ThemeScope theme="clinician" className="min-h-screen">
+      <SkipLink />
       <header className="border-b border-border bg-surface px-gutter py-6">
         <div className="mx-auto max-w-[1400px]">
           <p className="text-caption font-semibold text-ink-muted">CarePath / design system</p>
@@ -225,7 +237,9 @@ export default function DesignSystemPage() {
             <ul className="flex flex-wrap gap-x-4 gap-y-1 text-label">
               {sections.map(([id, label]) => (
                 <li key={id}>
-                  <Link href={`#${id}`}>{label}</Link>
+                  <Link href={`#${id}`} variant="standalone">
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -233,14 +247,23 @@ export default function DesignSystemPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-[1400px] flex-col gap-10 px-gutter py-8">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto flex max-w-[1400px] flex-col gap-10 px-gutter py-8 focus:outline-none"
+      >
         <Section
           id="colour"
           title="Colour"
           intro="Semantic roles, not raw values. Cobalt is for actions, links and selection. Status colours are never cobalt. Generated content is graphite. No purple or magenta, no warm neutrals, no gradients."
         >
-          <Specimen title="Roles">{(t) => <Swatches theme={t} />}</Specimen>
-          <Specimen title="Contrast, computed from the tokens by the unit test">
+          <Specimen id="colour-roles" title="Roles">
+            {(t) => <Swatches theme={t} />}
+          </Specimen>
+          <Specimen
+            id="colour-contrast"
+            title="Contrast, computed from the tokens by the unit test"
+          >
             {(t) => <ContrastTable theme={t} />}
           </Specimen>
         </Section>
@@ -250,7 +273,7 @@ export default function DesignSystemPage() {
           title="Type"
           intro="IBM Plex Sans 400, 500 and 600, with 400 italic, for all text and headings in both themes. IBM Plex Mono 400 for identifiers. The themes differ in size and density, not typeface. Numerals are tabular in tables and charts."
         >
-          <Specimen>
+          <Specimen id="type-scale">
             <div className="flex flex-col gap-3">
               <Heading level={1}>Today</Heading>
               <Heading level={2}>Your plan this week</Heading>
@@ -280,7 +303,7 @@ export default function DesignSystemPage() {
           title="Shape and depth"
           intro="4 px grid. Radius 6 for controls and 10 for containers, nothing larger. Borders separate surfaces. A shadow appears only on dialogs, drawers, popovers, menus and tooltips."
         >
-          <Specimen>
+          <Specimen id="shape-depth">
             <Row label="Spacing, multiples of 4 px">
               {[1, 2, 3, 4, 6, 8, 12].map((n) => (
                 <span
@@ -321,7 +344,7 @@ export default function DesignSystemPage() {
           title="Icons"
           intro="Drawn for CarePath on a 24 px grid with a 1.75 px square stroke. They support a label and never replace one, except in IconButton, which requires an accessible name."
         >
-          <Specimen>
+          <Specimen id="icon-set">
             <ul className="grid grid-cols-4 gap-3 sm:grid-cols-6">
               {iconNames.map((n) => (
                 <li
@@ -338,13 +361,13 @@ export default function DesignSystemPage() {
 
         <Section
           id="buttons"
-          title="Buttons"
-          intro="One primary action per screen. Loading keeps the button width and says what is happening in words. Disabled controls stay legible."
+          title="Buttons and links"
+          intro="One primary per context. Secondary is the cobalt outline for the supporting action; neutral is for utility actions such as Pause or Refresh; quiet is the third tier. Danger appears only as the confirming button of a destructive dialog. The control that starts a safety action uses the critical tone with its icon and words. Navigation is a link, also when it looks like a button."
         >
-          <Specimen>
-            {(["primary", "secondary", "quiet", "danger"] as const).map((v) => (
+          <Specimen id="button-variants">
+            {(["primary", "secondary", "neutral", "quiet", "danger"] as const).map((v) => (
               <Row key={v} label={v}>
-                <Button variant={v}>Start session</Button>
+                <Button variant={v}>Save draft</Button>
                 <Button variant={v} data-demo="hover">
                   Hover
                 </Button>
@@ -362,48 +385,85 @@ export default function DesignSystemPage() {
                 </Button>
               </Row>
             ))}
-            <Row label="With icon, small, and icon only">
-              <Button iconLeft="play">Start today&apos;s session</Button>
-              <Button variant="secondary" iconRight="chevron-right">
-                Next
-              </Button>
-              <Button variant="secondary" size="sm">
-                Small
-              </Button>
-              <IconButton label="Close" icon="x" />
-              <IconButton label="More actions" icon="more" variant="secondary" />
-              <IconButton label="Search" icon="search" variant="secondary" size="sm" />
-              <IconButton label="Search, disabled" icon="search" variant="secondary" disabled />
+          </Specimen>
+          <Specimen id="button-critical-unavailable">
+            {(t) => (
+              <>
+                <Row label="Critical tone: starts a safety action">
+                  <Button variant="secondary" tone="critical">
+                    Stop, this hurts
+                  </Button>
+                  <Button variant="secondary" tone="critical" data-demo="hover">
+                    Hover
+                  </Button>
+                </Row>
+                <Row label="Unavailable: stays focusable, reason in text">
+                  <Button unavailable aria-describedby={`${t}-publish-reason`}>
+                    Review and publish version 2
+                  </Button>
+                  <p id={`${t}-publish-reason`} className="text-small text-ink-muted">
+                    Add at least one exercise to publish.
+                  </p>
+                </Row>
+                <Row label="Link that looks like a button, full width on a phone">
+                  <Button href="#buttons" fullWidthOnPhone>
+                    Start today&apos;s session
+                  </Button>
+                  <Button href="#buttons" variant="secondary">
+                    Open care plan builder
+                  </Button>
+                </Row>
+                <Row label="Icon only: close, dismiss, move; the name shows on hover and focus">
+                  <IconButton label="Close evidence panel" icon="x" />
+                  <IconButton label="Move Sit to stand up" icon="arrow-up" variant="neutral" />
+                  <IconButton label="Move Sit to stand down" icon="arrow-down" variant="neutral" />
+                </Row>
+              </>
+            )}
+          </Specimen>
+          <Specimen id="links">
+            <p className="max-w-measure text-body">
+              Inline links sit in a sentence:{" "}
+              <Link href="#links">read how your data is shared</Link>. Phone numbers show the
+              number: <Link href="tel:5550100199">(555) 010-0199</Link>.
+            </p>
+            <Row label="Standalone links get the theme's target height">
+              <Link href="#links" variant="standalone">
+                See all progress
+              </Link>
+              <Link href="#links" variant="standalone" data-demo="hover">
+                Hover
+              </Link>
+              <Link href="#links" variant="standalone" data-demo="focus">
+                Focus
+              </Link>
             </Row>
           </Specimen>
         </Section>
 
         <Section
           id="fields"
-          title="Fields"
-          intro="Every field says required or optional in words and, where it asks for something clinical, why and who sees it. Errors say what is wrong and what to do, with an icon."
+          title="Fields and validation"
+          intro="Field is the only label, hint and error wrapper. Required or optional is said in words. The error sits above the control and repeats the field's wording. On submit, an error summary takes focus and each line moves focus to its field; the page title starts with Error."
         >
-          <Specimen>
+          <Specimen id="field-states">
             <Field
               label="Preferred name"
               requirement="required"
               why="Your care team uses this name when they message you."
             >
-              {(c) => <TextInput {...c} defaultValue="Adaeze" autoComplete="off" />}
+              {(c) => <TextInput {...c} defaultValue="Avery" autoComplete="given-name" />}
+            </Field>
+            <Field label="Phone" requirement="optional" hint="For example, (555) 010-0199.">
+              {(c) => <TextInput {...c} inputMode="tel" autoComplete="tel" />}
             </Field>
             <Field
-              label="Phone"
-              requirement="optional"
-              hint="Only used for appointment reminders you turn on."
-            >
-              {(c) => <TextInput {...c} placeholder="(555) 010-0199" inputMode="tel" />}
-            </Field>
-            <Field
-              label="Date of birth"
+              label="Hold time"
               requirement="required"
-              error="Enter a date that has already passed, for example 14 03 1962."
+              hint="From 5 to 120."
+              error="Enter a hold time from 5 to 120 seconds"
             >
-              {(c) => <TextInput {...c} defaultValue="14 03 2062" />}
+              {(c) => <TextInput {...c} defaultValue="300" inputMode="numeric" unit="seconds" />}
             </Field>
             <Field label="Clinic" requirement="required">
               {(c) => (
@@ -427,302 +487,243 @@ export default function DesignSystemPage() {
                 className="max-w-40"
               />
             </Row>
-            <Field label="Which side?" requirement="required">
-              {(c) => (
-                <Select
-                  {...c}
-                  options={[
-                    { value: "left", label: "Left" },
-                    { value: "right", label: "Right" },
-                    { value: "both", label: "Both" },
-                    { value: "na", label: "Not applicable", disabled: true },
-                  ]}
-                />
-              )}
-            </Field>
-            <Field label="Side, with a choice made" requirement="optional">
-              {(c) => (
-                <Select
-                  {...c}
-                  defaultValue="left"
-                  options={[
-                    { value: "left", label: "Left" },
-                    { value: "right", label: "Right" },
-                  ]}
-                />
-              )}
-            </Field>
-            <Field
-              label="Anything else your therapist should know?"
-              requirement="optional"
-              hint="This goes in your record. Do not use it for emergencies."
-            >
-              {(c) => <Textarea {...c} />}
-            </Field>
+            <CountedNoteDemo />
+          </Specimen>
+          <Specimen id="error-summary" title="Error summary, live">
+            <ErrorSummaryDemo />
+          </Specimen>
+          <Specimen id="date-of-birth" title="Date of birth" only="patient">
+            <DateOfBirthDemo />
+            <DateOfBirthDemo error />
           </Specimen>
         </Section>
 
         <Section
           id="choices"
-          title="Choices"
-          intro="The whole row is the hit area. Switches also say On or Off in words. Optional sharing defaults to off."
+          title="Choices and selection"
+          intro="Radios for one choice among a few, checkboxes for many, a switch for a setting that applies at once. Two or three exclusive options that change a list use a segmented control. Filters are toggle chips; a time slot is a button that moves the booking on. Selected states show a fill and a check mark, never fill alone."
         >
-          <Specimen>
+          <Specimen id="choice-controls">
             <ChoiceDemo />
-            <FieldGroup
-              legend="Reminders"
-              requirement="optional"
-              hint="Reminders never include details about your care."
-            >
-              <div className="flex flex-col">
-                <Checkbox checked={false} label="Unchecked" />
-                <Checkbox checked label="Checked" />
-                <Checkbox checked="indeterminate" label="Some selected" />
-                <Checkbox checked disabled label="Checked, disabled" />
-                <Checkbox checked={false} disabled label="Unchecked, disabled" />
-              </div>
-            </FieldGroup>
-            <FieldGroup
-              legend="Contact method"
-              requirement="required"
-              error="Choose how we should contact you."
-            >
-              <RadioGroup defaultValue="">
-                <Radio value="app" label="In the app" hint="Replies appear in Messages." />
-                <Radio value="email" label="By email" />
-                <Radio
-                  value="phone"
-                  label="Phone call"
-                  disabled
-                  hint="Not available at your clinic."
-                />
-              </RadioGroup>
-            </FieldGroup>
-            <RadioGroup defaultValue="app" aria-label="Contact method, one selected">
-              <Radio value="app" label="In the app" />
-              <Radio value="email" label="By email" />
-            </RadioGroup>
-            <div className="flex flex-col">
-              <Switch label="Appointment reminders" hint="Sent the day before." />
-              <Switch label="Share my pain log" defaultChecked />
-              <Switch label="Quiet hours" disabled hint="Set by your clinic." />
-            </div>
+          </Specimen>
+          <Specimen id="segmented-control" only="clinician">
+            <SegmentedDemo />
+          </Specimen>
+          <Specimen id="toggle-chips-slots" only="patient">
+            <ToggleChipDemo />
+            <SlotDemo />
           </Specimen>
         </Section>
 
         <Section
           id="pain"
           title="Pain scale"
-          intro="Pain logging takes seconds. The result is spelled out in words and the chart title elsewhere reads &ldquo;Patient-reported pain&rdquo;. This is a self-report scale and is not a diagnosis."
+          intro="Patient-reported pain from 0 to 10. The ends read 0 No pain and 10 Worst pain imaginable, and both are read by screen readers. The line under the scale states only the number. Items stay at least 48 px: 0 to 5 and 6 to 10 on a phone, one row when there is room."
         >
-          <Specimen>
-            <PainScale />
-            <PainScale label="Pain right now, after the session" defaultValue={4} />
-            <PainScale label="Pain right now (locked after submit)" defaultValue={7} disabled />
+          <Specimen id="pain-scale" only="patient">
+            <PainDemo />
+            <PainScale label="Pain right now, after the session" defaultValue={8} stoppedAt={8} />
+            <PainScale
+              label="How much does it hurt right now?"
+              error="Choose a pain number from 0 to 10 before you send this"
+            />
+            <PainScale label="Pain right now (sending)" defaultValue={7} disabled />
           </Specimen>
-        </Section>
-
-        <Section
-          id="nav"
-          title="Navigation and tabs"
-          intro="Patients get a bottom tab bar with four text-labelled destinations. Clinicians and admins get a left rail with work-list counts. The current page is marked by a bar and weight, not colour alone."
-        >
-          <Specimen
-            patient={
-              <>
-                <div className="overflow-hidden rounded-container border border-border">
-                  <div className="h-24 bg-bg p-4 text-small text-ink-muted">Screen content</div>
-                  <BottomTabBar label="Patient" items={patientNav} />
-                </div>
-                <TabsDemo />
-              </>
-            }
-            clinician={
-              <>
-                <div className="grid grid-cols-[220px_1fr] overflow-hidden rounded-container border border-border">
-                  <SideNav
-                    label="Clinician"
-                    items={clinicianNav}
-                    className="min-h-72"
-                    footer={<p className="px-2 py-1 text-caption text-ink-muted">J. Alvarez, PT</p>}
-                  />
-                  <div className="bg-bg p-4 text-small text-ink-muted">Work list</div>
-                </div>
-                <TabsDemo />
-              </>
-            }
-          />
         </Section>
 
         <Section
           id="status"
-          title="Status and messages"
-          intro="Clinical statuses are filled chips with an icon. Administrative statuses are outlined tags with no icon or fill. Never colour alone."
+          title="Status and counts"
+          intro="An expected state is plain text. An administrative state is an outlined tag with no icon. A state that needs attention or is live is a filled chip with an icon and words. Counts use one filled badge whose accessible text carries the unit; it is hidden at zero and shows 99+ above 99."
         >
-          <Specimen>
-            <Row label="Clinical: filled chip with icon">
+          <Specimen id="status-chips-tags">
+            <Row label="Needs attention or live: chip">
               <StatusChip tone="warning">Discomfort reported</StatusChip>
-              <StatusChip tone="error">Needs review</StatusChip>
-              <StatusChip tone="success">On track</StatusChip>
-              <StatusChip tone="info">New message</StatusChip>
-              <StatusChip tone="neutral">No flags</StatusChip>
+              <StatusChip tone="critical">Stopped for discomfort</StatusChip>
+              <StatusChip tone="error">Not sent</StatusChip>
+              <StatusChip tone="info">In progress today</StatusChip>
+              <StatusChip tone="success">Reviewed</StatusChip>
+              <StatusChip tone="neutral">Not yet reviewed</StatusChip>
             </Row>
-            <Row label="Administrative: outlined tag">
+            <Row label="Administrative: tag">
               <Tag tone="warning">Intake incomplete</Tag>
-              <Tag>Unscheduled</Tag>
-              <Tag tone="info">Invited</Tag>
-              <Tag tone="success">Enrolled</Tag>
-              <Tag tone="error">Access ended</Tag>
+              <Tag tone="success">Current</Tag>
+              <Tag>Earlier version</Tag>
+              <Tag tone="info">Preview, not published</Tag>
+              <Tag tone="warning">Cancelled by the patient</Tag>
             </Row>
             <Row label="Counts">
               <span className="inline-flex items-center gap-2 text-label">
-                To review <CountBadge count={12} unit="to review" />
+                Messages <CountBadge count={3} unit="unread" />
               </span>
               <span className="inline-flex items-center gap-2 text-label">
-                Unread <CountBadge count={3} unit="unread" />
+                Review queue <CountBadge count={120} unit="open" />
+              </span>
+              <span className="inline-flex items-center gap-2 text-label">
+                Nothing new <CountBadge count={0} unit="unread" />
               </span>
             </Row>
-            <Banner tone="info" title="Messages are not monitored for emergencies">
-              If you need urgent help, call your clinic or local emergency number.
-            </Banner>
-            <Banner tone="success" title="Plan published">
-              Your patient sees version 4 from tomorrow.
-            </Banner>
-            <Banner
-              tone="warning"
-              title="Two sessions were missed this week"
-              action={
-                <Button size="sm" variant="secondary">
-                  Message patient
-                </Button>
-              }
-            >
-              The rule that flagged this is set by your clinic and can be changed in Settings.
-            </Banner>
-            <Banner
-              tone="error"
-              title="We could not save your check-in"
-              action={
-                <Button size="sm" variant="secondary">
-                  Try again
-                </Button>
-              }
-            >
-              Your answers are kept on this device and nothing was lost.
-            </Banner>
           </Specimen>
         </Section>
 
         <Section
-          id="surfaces"
-          title="Surfaces and states"
-          intro="Panels use a border and radius 10, with no shadow. Empty states explain why and what fills them. Skeletons mirror the final layout and do not animate."
+          id="feedback"
+          title="Feedback, empty and loading"
+          intro="Messages tied to a place are banners in that place: an error says what happened, whether data is safe and one next step, and takes focus after an action. Toasts are for low-priority success with no other visible state; there is no error toast, one shows at a time, and they wait while a dialog is open. Skeletons mirror the layout and do not move; long loads say so."
         >
-          <Specimen>
-            <Panel>
-              <Heading level={4} as="h3">
-                Today&apos;s session
-              </Heading>
-              <p className="mt-1 max-w-measure text-body text-ink-muted">
-                Knee strengthening, 12 minutes, 6 exercises. Set by your care team.
-              </p>
-              <div className="mt-3 flex items-center gap-3">
-                <Avatar name="Jordan Alvarez" />
-                <p className="text-body">
-                  <span className="font-medium">Jordan Alvarez</span>
-                  <span className="block text-small text-ink-muted">
-                    Physical therapist. Usually replies within one working day.
-                  </span>
-                </p>
-              </div>
-            </Panel>
-            <Progress label="Session progress" value={3} max={6} valueText="3 of 6 exercises" />
-            <Progress label="Weekly sessions" value={0} max={5} valueText="0 of 5 sessions" />
-            <Progress label="Plan complete" value={5} max={5} valueText="5 of 5 sessions" />
+          <Specimen id="banners">
+            <Banner tone="info" title="Your plan changed">
+              Version 3, published November 18 by Terry Demotherapist.
+            </Banner>
+            <Banner tone="success" title="Saved">
+              Version 4 is published. Your patient sees it from now on.
+            </Banner>
+            <Banner tone="warning" title="This page may be out of date">
+              Last updated 9:02 AM.
+            </Banner>
+            <Banner
+              tone="error"
+              title="Your check-in was not sent"
+              action={
+                <Button size="sm" variant="secondary">
+                  Retry sending check-in
+                </Button>
+              }
+            >
+              Your answers are kept on this page.
+            </Banner>
+            <BannerFocusDemo />
+          </Specimen>
+          <Specimen id="empty-loading">
             <EmptyState
               icon="calendar"
-              title="No appointments yet"
-              action={<Button variant="secondary">Find a time</Button>}
+              title="No visits booked"
+              action={<Button variant="secondary">Book a visit</Button>}
             >
-              Appointments you book with your therapist appear here, with a reminder the day before.
+              Visits you book with your therapist appear here.
+            </EmptyState>
+            <EmptyState icon="search" title="No patients match" padded>
+              Try fewer filters, or check the spelling.
             </EmptyState>
             <SkeletonGroup label="Loading your plan">
               <Panel className="flex flex-col gap-2">
                 <Skeleton className="h-5 w-2/5" />
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-4/5" />
-                <Skeleton className="mt-1 h-control w-40" />
               </Panel>
             </SkeletonGroup>
+            <LoadingDemo />
+            <Progress label="Session" value={3} max={6} valueText="Exercise 3 of 6" />
+            <Progress label="Onboarding" value={4} max={11} valueText="Step 4 of 11" />
           </Specimen>
-        </Section>
-
-        <Section
-          id="table"
-          title="Table"
-          intro="Dense by design in the clinician theme: 36 px rows, 13/18 type, tabular numerals, sortable headers that announce direction, a selected row marked by a bar as well as tint. Charts get a table alternative like this one."
-        >
-          <Specimen>
-            <TableDemo />
+          <Specimen id="timer" only="patient">
+            <TimerDemo />
           </Specimen>
-        </Section>
-
-        <Section
-          id="ai"
-          title="AI draft"
-          intro="Generated content is a labelled draft: dashed left rule, the fixed label and the provider name. Approval, edit and rejection are logged elsewhere; nothing here leaves the clinic. No sparkle icons."
-        >
-          <Specimen>
-            <AIDraftDemo />
+          <Specimen id="toasts" only="clinician">
+            <ToastDemo />
+            <div className="flex max-w-sm flex-col gap-2">
+              <ToastSurface
+                tone="success"
+                title="Version 3 published"
+                description="Patients see it now."
+              />
+              <ToastSurface tone="info" title="Link copied" />
+            </div>
           </Specimen>
         </Section>
 
         <Section
           id="overlays"
           title="Overlays"
-          intro="Dialogs, side panels, bottom sheets, popovers, menus, tooltips and toasts. These are the only places a shadow appears. Live triggers first, then static specimens of the open surfaces."
+          intro="One overlay at a time. Each has a visible title, a close control and Esc, unless there is typed text: then outside clicks do nothing and Esc or close asks to discard, in place. A confirmation is an alert dialog with outcome-named buttons and focus on the safe one. Errors from an action stay inside the overlay. Side-by-side work starts at 1280 px; below it the panel is a drawer, below 768 px a full screen. The patient sheet is a centred dialog from 768 px."
         >
-          <Specimen>
-            <OverlayDemos />
-            <Label>Static specimens (open state)</Label>
+          <Specimen id="dialogs">
+            <Row>
+              <NoteDialogDemo />
+              <ConfirmDemo />
+              <DrawerDemo />
+              <PopoverMenuDemo />
+            </Row>
+            <Label>Static specimen of an open dialog</Label>
             <div className={`rounded-container p-6 ${overlayClasses.surface}`}>
               <DialogPanel
-                title="Discard this draft?"
-                description="The draft is removed from your queue. The discard is recorded in the audit log."
+                title="Publish version 3?"
+                description="The patient sees version 3 from now on. Published versions cannot be changed."
+                feedback={
+                  <Banner tone="error" title="Version 3 was not published">
+                    Your draft is unchanged. Check your connection and try again.
+                  </Banner>
+                }
                 footer={
                   <>
-                    <Button variant="secondary">Keep draft</Button>
-                    <Button variant="danger">Discard draft</Button>
+                    <Button variant="secondary">Cancel</Button>
+                    <Button>Publish version 3</Button>
                   </>
                 }
               />
             </div>
-            <div className={`${overlayClasses.popover} max-w-72`}>
-              <p className="text-label font-semibold">Popover</p>
-              <p className="mt-1 text-body text-ink-muted">
-                Short, optional explanation that does not block the page.
-              </p>
+          </Specimen>
+          <Specimen id="sheet" only="patient">
+            <SheetDemo />
+          </Specimen>
+          <Specimen
+            id="side-panel"
+            only="clinician"
+            title="Side panel (resize the window: 1280, 768)"
+          >
+            <SidePanelDemo />
+          </Specimen>
+          <Specimen id="leave-guard" only="clinician" title="Leave guard">
+            <LeaveGuardDemo />
+          </Specimen>
+        </Section>
+
+        <Section
+          id="nav"
+          title="Navigation and tabs"
+          intro="The current page is marked by the selected fill, an edge bar, weight and aria-current. Record sections keep the tab in the address with a history entry per change, so Back returns to the previous section. A skip link is the first stop on every shell."
+        >
+          <Specimen id="navigation">{(t) => <NavDemo theme={t} />}</Specimen>
+          <Specimen id="url-tabs" only="clinician">
+            <UrlTabsDemo />
+          </Specimen>
+          <Specimen id="skip-link">
+            <p className="text-small text-ink-muted">
+              Press Tab from the top of any app page; the first stop is the link below, shown here
+              in its focused state.
+            </p>
+            <div>
+              <a
+                href="#main"
+                data-demo="focus"
+                className="inline-block rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus-visible:focus-ring"
+              >
+                Skip to main content
+              </a>
             </div>
-            <div className={`max-w-56 ${overlayClasses.menu}`}>
-              <div className={`${overlayClasses.menuItem} bg-primary-subtle`}>Open record</div>
-              <div className={overlayClasses.menuItem}>Message patient</div>
-              <div className={`${overlayClasses.menuItem} text-disabled-ink`}>
-                Archive (needs admin)
-              </div>
-            </div>
-            <span className="inline-block max-w-64 rounded-control bg-ink px-2.5 py-1.5 text-small text-ink-inverse shadow-overlay">
-              Tooltip, supplementary only
-            </span>
-            <ToastSurface
-              tone="success"
-              title="Check-in sent"
-              description="Your therapist will see this."
-            />
-            <ToastSurface
-              tone="error"
-              title="Message not sent"
-              description="Your text is saved. Try again when you are online."
-            />
+          </Specimen>
+        </Section>
+
+        <Section
+          id="table"
+          title="Tables, paging and filters"
+          intro="A native table with a caption and one header row. Only columns the API can sort have sort buttons, and they say their direction. The selected row has a fill and an edge bar. Tables page with Previous and Next, hidden at the ends; feeds use one Show more control. The filter bar is a named search landmark; the search text never goes in the address."
+        >
+          <Specimen id="data-table" only="clinician">
+            <TableDemo />
+          </Specimen>
+          <Specimen id="load-more" only="clinician">
+            <LoadMoreDemo />
+          </Specimen>
+        </Section>
+
+        <Section
+          id="ai"
+          title="AI draft"
+          intro="Generated content is a labelled draft: dashed left rule, the fixed label and the provider name. No sparkle icons."
+        >
+          <Specimen id="ai-draft" only="clinician">
+            <AIDraftDemo />
           </Specimen>
         </Section>
       </main>

@@ -4,11 +4,9 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { painStaffText } from "@carepath/shared";
 import type { ClinicianOverview } from "@carepath/shared/contracts";
-import { Button, StatusChip, Tag, useToast } from "@carepath/ui";
+import { Button, StatusChip, Tag, useToast, Link, EmptyState, Banner } from "@carepath/ui";
 import {
   errorText,
-  AppLink,
-  Empty,
   ListSkeleton,
   PageHeader,
   QueryError,
@@ -129,13 +127,13 @@ function OpenTasks({ data }: { data: ClinicianOverview }) {
       title="Your review tasks"
       count={list.count}
       description="Open and in-review tasks for patients on your caseload, highest priority first. Each one is created by a clinic rule, and you decide what it needs."
-      actions={<AppLink href="/review-queue">Open the clinic review queue</AppLink>}
+      actions={<Link href="/review-queue">Open the clinic review queue</Link>}
     >
       {list.items.length === 0 ? (
-        <Empty icon="clipboard" title="Nothing needs attention">
+        <EmptyState padded icon="clipboard" title="Nothing needs attention">
           No open review tasks for patients on your caseload. Checked at{" "}
           {formatTime(data.generatedAt, timezone)}.
-        </Empty>
+        </EmptyState>
       ) : (
         <WorkList
           items={list.items}
@@ -144,7 +142,7 @@ function OpenTasks({ data }: { data: ClinicianOverview }) {
             <li key={t.id} className="flex flex-wrap items-start gap-x-4 gap-y-1 px-4 py-2.5">
               <div className="min-w-0 flex-1">
                 <p className="text-label font-medium text-ink">
-                  <AppLink href={`/review-queue?task=${t.id}`}>{fullName(t.patient)}</AppLink>{" "}
+                  <Link href={`/review-queue?task=${t.id}`}>{fullName(t.patient)}</Link>{" "}
                   <span className="font-normal text-ink-muted">{t.rule.name}</span>
                 </p>
                 <p className="text-small text-ink-muted">{t.explanation}</p>
@@ -171,17 +169,17 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
   const qc = useQueryClient();
   const toast = useToast();
   const [pendingId, setPendingId] = useState<string | null>(null);
+  // CD-442: an error is shown in place, not as a toast; it stays until the next attempt.
+  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null);
   const review = useMutation({
     mutationFn: ({ patientId, checkInId }: { patientId: string; checkInId: string }) =>
       writes.reviewCheckIn(patientId, checkInId),
+    onMutate: () => setFailure(null),
     onSuccess: () => {
       toast({ tone: "success", title: "Check-in marked reviewed" });
       void qc.invalidateQueries({ queryKey: keys.overview });
     },
-    onError: (e) => {
-      const t = errorText(e);
-      toast({ tone: "error", title: t.title, description: t.body });
-    },
+    onError: (e) => setFailure(errorText(e)),
     onSettled: () => setPendingId(null),
   });
   const list = data.unreviewedCheckIns;
@@ -192,10 +190,17 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
       count={list.count}
       description="Patient-reported check-ins, oldest first. Marking one reviewed records that you read it."
     >
+      {failure ? (
+        <div className="p-4 pb-0">
+          <Banner tone="error" title={failure.title} focusOnMount>
+            {failure.body}
+          </Banner>
+        </div>
+      ) : null}
       {list.items.length === 0 ? (
-        <Empty icon="check-circle" title="Every check-in has been reviewed">
+        <EmptyState padded icon="check-circle" title="Every check-in has been reviewed">
           New check-ins from your patients appear here until someone on the care team reviews them.
-        </Empty>
+        </EmptyState>
       ) : (
         <WorkList
           items={list.items}
@@ -204,9 +209,9 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
             <li key={c.id} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2">
               <div className="min-w-0 flex-1">
                 <p className="text-label font-medium">
-                  <AppLink href={patientHref(c.patient.id, `?tab=check-ins&checkIn=${c.id}`)}>
+                  <Link href={patientHref(c.patient.id, `?tab=check-ins&checkIn=${c.id}`)}>
                     {fullName(c.patient)}
-                  </AppLink>
+                  </Link>
                 </p>
                 <p className="text-small text-ink-muted tabular-nums">
                   {painStaffText(c.painScore)}, submitted {formatDateTime(c.submittedAt, timezone)}
@@ -252,13 +257,13 @@ function VisitsToday({ today }: { today: string }) {
       id="visits"
       title="Visits today"
       description={`Your booked visits on ${formatLocalDate(today)}, in clinic time${cancelled > 0 ? `. ${plural(cancelled, "cancelled visit")} not listed` : ""}.`}
-      actions={<AppLink href="/schedule">Open the schedule</AppLink>}
+      actions={<Link href="/schedule">Open the schedule</Link>}
       {...(agenda.data ? { count: rows.length } : {})}
     >
       {!practitionerId ? (
-        <Empty icon="calendar" title="No schedule for this account">
+        <EmptyState padded icon="calendar" title="No schedule for this account">
           Your account is not linked to a practitioner profile.
-        </Empty>
+        </EmptyState>
       ) : agenda.isError ? (
         <div className="p-4">
           <QueryError error={agenda.error} onRetry={() => void agenda.refetch()} />
@@ -268,9 +273,9 @@ function VisitsToday({ today }: { today: string }) {
           <ListSkeleton rows={2} label="Loading visits" />
         </div>
       ) : rows.length === 0 ? (
-        <Empty icon="calendar" title="No visits today">
+        <EmptyState padded icon="calendar" title="No visits today">
           Nothing is booked with you on {formatLocalDate(today)}.
-        </Empty>
+        </EmptyState>
       ) : (
         <ul className="divide-y divide-border">
           {rows.map((a) => (
@@ -279,12 +284,12 @@ function VisitsToday({ today }: { today: string }) {
                 {formatTime(a.startsAt, timezone)}
               </span>
               <div className="min-w-0 flex-1">
-                <AppLink
+                <Link
                   href={patientHref(a.patient.id, "?tab=appointments")}
                   className="text-label font-medium"
                 >
                   {a.patient.name}
-                </AppLink>
+                </Link>
                 <p className="text-small text-ink-muted">{appointmentTypeText[a.type]}</p>
               </div>
               <AppointmentStatusTag appointment={a} />
@@ -304,12 +309,12 @@ function UnreadMessages({ data }: { data: ClinicianOverview }) {
       title="Unread messages"
       count={m.unreadCount}
       description="Messages from patients and the care team in your own conversations."
-      actions={<AppLink href="/inbox">Open messages</AppLink>}
+      actions={<Link href="/inbox">Open messages</Link>}
     >
       {m.unreadCount === 0 ? (
-        <Empty icon="message" title="No unread messages">
+        <EmptyState padded icon="message" title="No unread messages">
           You have read every message in your conversations.
-        </Empty>
+        </EmptyState>
       ) : (
         <p className="px-4 py-3 text-body">
           {plural(m.unreadCount, "unread message")} in{" "}
@@ -330,9 +335,9 @@ function MissedActivity({ data }: { data: ClinicianOverview }) {
       description="Active patients with fewer completed sessions than the plan assigned over the last 7 days."
     >
       {list.items.length === 0 ? (
-        <Empty icon="activity" title="No missed sessions">
+        <EmptyState padded icon="activity" title="No missed sessions">
           Every active patient on your caseload completed the sessions their plan assigned.
-        </Empty>
+        </EmptyState>
       ) : (
         <WorkList
           items={list.items}
@@ -340,9 +345,7 @@ function MissedActivity({ data }: { data: ClinicianOverview }) {
           render={(m) => (
             <li key={m.patient.id} className="px-4 py-2.5">
               <p className="text-label font-medium">
-                <AppLink href={patientHref(m.patient.id, "?tab=activity")}>
-                  {fullName(m.patient)}
-                </AppLink>
+                <Link href={patientHref(m.patient.id, "?tab=activity")}>{fullName(m.patient)}</Link>
               </p>
               <p className="text-small text-ink-muted tabular-nums">
                 Completed {m.completedSessions} of {m.assignedSessions} assigned sessions,{" "}
@@ -367,9 +370,9 @@ function PlanUpdates({ data }: { data: ClinicianOverview }) {
       description="Versions published in the last 7 days."
     >
       {list.items.length === 0 ? (
-        <Empty icon="file" title="No plan versions published this week">
+        <EmptyState padded icon="file" title="No plan versions published this week">
           Publishing a new version from a patient's care plan lists it here for 7 days.
-        </Empty>
+        </EmptyState>
       ) : (
         <WorkList
           items={list.items}
@@ -377,9 +380,7 @@ function PlanUpdates({ data }: { data: ClinicianOverview }) {
           render={(p) => (
             <li key={p.versionId} className="px-4 py-2.5">
               <p className="text-label font-medium">
-                <AppLink href={patientHref(p.patient.id, "?tab=plan")}>
-                  {fullName(p.patient)}
-                </AppLink>{" "}
+                <Link href={patientHref(p.patient.id, "?tab=plan")}>{fullName(p.patient)}</Link>{" "}
                 <span className="font-normal text-ink-muted">version {p.versionNumber}</span>
               </p>
               <p className="text-small text-ink-muted">

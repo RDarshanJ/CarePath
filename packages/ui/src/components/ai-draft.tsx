@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { cx } from "../lib/cx";
-import { Mono } from "./text";
+import { Mono } from "./primitives/text";
 
 export type AIDraftState = "draft" | "approved" | "rejected";
 

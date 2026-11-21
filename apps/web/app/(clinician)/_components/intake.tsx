@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Dialog, DrawerContent } from "@carepath/ui";
+import { Button, Dialog, DrawerContent, EmptyState } from "@carepath/ui";
 import {
   intakeAnswerSchemas,
   type IntakeAnswers,
@@ -13,7 +13,7 @@ import { ApiError } from "../../../lib/api/errors";
 import { useClinician } from "../_lib/context";
 import { formatDateTime, weekdayLabels } from "../_lib/format";
 import { keys, reads } from "../_lib/queries";
-import { Empty, ListSkeleton, QueryError, Section } from "./common";
+import { ListSkeleton, QueryError, Section } from "./common";
 
 export const INTAKE_HEADING = "What the patient told us at intake";
 
@@ -171,9 +171,9 @@ export function IntakeBody({ patientId }: { patientId: string }) {
   if (intake.isError) {
     if (intake.error instanceof ApiError && intake.error.code === "not_found") {
       return (
-        <Empty icon="clipboard" title="No intake on file">
+        <EmptyState padded icon="clipboard" title="No intake on file">
           This patient has not started the intake questions.
-        </Empty>
+        </EmptyState>
       );
     }
     return <QueryError error={intake.error} onRetry={() => void intake.refetch()} />;

@@ -2,9 +2,9 @@
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { Appointment } from "@carepath/shared/contracts";
-import { Button, Table, TBody, Td, Th, THead, Tr } from "@carepath/ui";
+import { Table, TBody, Td, Th, THead, Tr, EmptyState, LoadMore } from "@carepath/ui";
 import { AppointmentStatusTag, VisitType, isCancelled } from "../../_components/appointments";
-import { Empty, ListSkeleton, QueryError, Section } from "../../_components/common";
+import { ListSkeleton, QueryError, Section } from "../../_components/common";
 import { useClinician } from "../../_lib/context";
 import { formatDayShort, formatTime, tzAbbreviation } from "../../_lib/format";
 import { keys, reads } from "../../_lib/queries";
@@ -23,14 +23,14 @@ function AppointmentTable({
     <div className="p-3">
       <Table caption={caption}>
         <THead>
-          <tr>
+          <Tr header>
             <Th>Day</Th>
             <Th>Time</Th>
             <Th>Visit</Th>
             <Th>With</Th>
             <Th>{showCancellation ? "Reason or note" : "Reason for visit"}</Th>
             <Th>Status</Th>
-          </tr>
+          </Tr>
         </THead>
         <TBody>
           {items.map((a) => (
@@ -94,25 +94,28 @@ function AppointmentList({ patientId, when }: { patientId: string; when: "upcomi
           <ListSkeleton rows={2} label={`Loading ${title.toLowerCase()}`} />
         </div>
       ) : items.length === 0 ? (
-        <Empty icon="calendar" title={upcoming ? "No upcoming visits" : "No past visits"}>
+        <EmptyState
+          padded
+          icon="calendar"
+          title={upcoming ? "No upcoming visits" : "No past visits"}
+        >
           {upcoming
             ? "This patient has nothing booked. The patient or the care coordinator can book a visit."
             : "No visit has ended or been cancelled for this patient yet."}
-        </Empty>
+        </EmptyState>
       ) : (
         <AppointmentTable caption={title} items={items} showCancellation={!upcoming} />
       )}
       {list.hasNextPage ? (
         <div className="border-t border-border px-4 py-2">
-          <Button
-            variant="quiet"
-            size="sm"
+          <LoadMore
+            label="Show more visits"
+            noun="visits"
+            hasMore={true}
             loading={list.isFetchingNextPage}
-            loadingLabel="Loading"
-            onClick={() => void list.fetchNextPage()}
-          >
-            Show more visits
-          </Button>
+            shown={items.length}
+            onLoadMore={() => void list.fetchNextPage()}
+          />
         </div>
       ) : null}
     </Section>

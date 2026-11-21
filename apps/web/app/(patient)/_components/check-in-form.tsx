@@ -13,10 +13,10 @@ import {
   Radio,
   RadioGroup,
   Textarea,
+  FieldError,
 } from "@carepath/ui";
 import { api } from "../../../lib/api/client";
 import { ApiError } from "../../../lib/api/errors";
-import { ButtonLink } from "./button-link";
 
 const difficulties = [
   { value: "easier", label: "Easier than I expected" },
@@ -101,7 +101,7 @@ export function CheckInForm({
           </Banner>
         ) : null}
         <div>
-          <ButtonLink href="/today">Back to Today</ButtonLink>
+          <Button href="/today">Back to Today</Button>
         </div>
       </div>
     );
@@ -115,18 +115,7 @@ export function CheckInForm({
       </div>
       <div ref={painRef} className="flex flex-col gap-2">
         <PainScale label="How much does it hurt right now?" value={pain} onValueChange={setPain} />
-        {error && pain === null ? (
-          <p
-            role="alert"
-            className="flex items-start gap-1.5 text-small font-medium text-error-ink"
-          >
-            <Icon name="alert-circle" size={16} className="mt-0.5 shrink-0" />
-            <span>
-              <span className="sr-only">Error: </span>
-              {error}
-            </span>
-          </p>
-        ) : null}
+        {error && pain === null ? <FieldError live>{error}</FieldError> : null}
       </div>
       <FieldGroup legend="How did your exercises feel?" requirement="optional">
         <RadioGroup
