@@ -3,7 +3,13 @@ import { isActivationKey, isSearchShortcut, rovingIndex } from "./keyboard";
 import { errorTitle, isDirtyText, remainingCharacters, toggleExclusive } from "./forms";
 import { checkDateOfBirth, formatDateOfBirth, partsFromIso } from "./date-of-birth";
 import { formatClock, spokenDuration, timerMilestone } from "./timer";
-import { emptyToastQueue, toastQueue, MAX_WAITING, type ToastQueueState } from "./toast-queue";
+import {
+  emptyToastQueue,
+  toastQueue,
+  MAX_WAITING,
+  type ToastInput,
+  type ToastQueueState,
+} from "./toast-queue";
 import { readParam, withParam } from "./url-state";
 import { paneModeFor } from "./media";
 
@@ -161,11 +167,8 @@ describe("toast queue (CD-442)", () => {
   });
   it("has no error tone in its type", () => {
     // @ts-expect-error errors are not toasts (CD-442 rule 1)
-    toastQueue(emptyToastQueue, {
-      type: "push",
-      toast: { tone: "error", title: "x" },
-      held: false,
-    });
+    const tone: ToastInput["tone"] = "error";
+    expect(tone).toBe("error");
   });
 });
 

@@ -125,7 +125,7 @@ export function DateOfBirthField({
             value={value.month}
             aria-invalid={invalid("month")}
             onChange={(e) => set("month", e.currentTarget.value)}
-            className={cx(inputClass, "w-40")}
+            className={cx(inputClass, "w-48 read-only:bg-surface")}
           >
             <option value="">Choose month</option>
             {MONTH_NAMES.map((m, i) => (

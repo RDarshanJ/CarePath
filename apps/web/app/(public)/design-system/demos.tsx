@@ -562,9 +562,11 @@ export function SheetDemo() {
   const [reason, setReason] = useState("");
   return (
     <Dialog onOpenChange={(o) => (!o ? setReason("") : undefined)}>
-      <DialogTrigger asChild>
-        <Button variant="neutral">Skip this exercise</Button>
-      </DialogTrigger>
+      <div>
+        <DialogTrigger asChild>
+          <Button variant="neutral">Skip this exercise</Button>
+        </DialogTrigger>
+      </div>
       <BottomSheetContent
         title="Why are you skipping it?"
         description="Your care team sees the reason."
@@ -590,7 +592,7 @@ export function SheetDemo() {
 }
 
 export function SidePanelDemo({ mode }: { mode?: "inline" }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-3">
       <div>

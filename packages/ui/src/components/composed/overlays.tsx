@@ -4,6 +4,7 @@ import {
   forwardRef,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type ComponentPropsWithoutRef,
@@ -95,9 +96,24 @@ export function DialogPanel({
 }
 
 /** Mounted inside Radix Content, which exists only while open: counts the overlay as open. */
-function OverlayMark() {
+function OverlayMark({ opener }: { opener?: { current: HTMLElement | null } }) {
   useRegisterOverlay(true);
+  // Runs before Radix moves focus in, so it sees the element that opened the overlay.
+  useLayoutEffect(() => {
+    if (opener) opener.current = document.activeElement as HTMLElement | null;
+  }, [opener]);
   return null;
+}
+
+/** Focus back to the opener on close, also for overlays opened without a Trigger (CD-520). */
+function returnFocus(opener: { current: HTMLElement | null }) {
+  return (e: Event) => {
+    const el = opener.current;
+    if (el && el.isConnected && el !== document.body) {
+      e.preventDefault();
+      el.focus();
+    }
+  };
 }
 
 /** The discard row that replaces a dirty overlay's footer (CD-522). */
@@ -197,6 +213,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(func
   ref,
 ) {
   const d = useDirtyDismiss(dirty);
+  const opener = useRef<HTMLElement | null>(null);
   return (
     <D.Portal>
       <ThemeWrap>
@@ -204,6 +221,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(func
         <D.Content
           ref={ref}
           {...(description ? {} : { "aria-describedby": undefined })}
+          onCloseAutoFocus={returnFocus(opener)}
           className={cx(
             "cp-dialog fixed top-1/2 left-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-container p-6",
             overlaySurface,
@@ -220,7 +238,7 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(func
           }}
           {...rest}
         >
-          <OverlayMark />
+          <OverlayMark opener={opener} />
           <DialogPanel
             title={title}
             description={description}
@@ -340,6 +358,18 @@ function ConfirmBody({
 }: Omit<ConfirmDialogProps, "open" | "onOpenChange">) {
   const safe = useRef<HTMLButtonElement>(null);
   const body = useRef<HTMLDivElement>(null);
+  // No Trigger element: remember the opener and give focus back to it on close (CD-520).
+  const [opener] = useState<HTMLElement | null>(() =>
+    typeof document === "undefined" ? null : (document.activeElement as HTMLElement | null),
+  );
+  useEffect(
+    () => () => {
+      requestAnimationFrame(() => {
+        if (opener?.isConnected) opener.focus();
+      });
+    },
+    [opener],
+  );
   const d = useDirtyDismiss(!!dirty);
   return (
     <D.Portal>
@@ -363,6 +393,10 @@ function ConfirmBody({
             d.contentProps.onEscapeKeyDown(e);
           }}
           onInteractOutside={(e) => e.preventDefault()}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault();
+            opener?.focus();
+          }}
           className={cx(
             "cp-dialog fixed top-1/2 left-1/2 z-50 max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-container p-6",
             overlaySurface,
@@ -490,6 +524,7 @@ export const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(func
   ref,
 ) {
   const d = useDirtyDismiss(dirty);
+  const opener = useRef<HTMLElement | null>(null);
   return (
     <D.Portal>
       <ThemeWrap>
@@ -497,6 +532,7 @@ export const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(func
         <D.Content
           ref={ref}
           {...(description ? {} : { "aria-describedby": undefined })}
+          onCloseAutoFocus={returnFocus(opener)}
           onFocusCapture={d.contentProps.onFocusCapture}
           onEscapeKeyDown={(e) => {
             onEscapeKeyDown?.(e);
@@ -522,7 +558,7 @@ export const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(func
           )}
           {...rest}
         >
-          <OverlayMark />
+          <OverlayMark opener={opener} />
           <header className="flex items-start justify-between gap-4 border-b border-border p-4">
             <div className="min-w-0">
               <D.Title className="font-heading text-h3 font-semibold text-ink">{title}</D.Title>

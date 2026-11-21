@@ -120,7 +120,9 @@ export function TablePagination({
         ) : null}
         {onPageSizeChange ? (
           <div className="flex items-center gap-2 text-small text-ink-muted">
-            <label htmlFor={sizeId}>Rows per page</label>
+            <label htmlFor={sizeId} className="whitespace-nowrap">
+              Rows per page
+            </label>
             <Select
               id={sizeId}
               className="w-24"

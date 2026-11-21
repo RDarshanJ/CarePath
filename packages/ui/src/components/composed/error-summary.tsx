@@ -45,8 +45,16 @@ export const ErrorSummary = forwardRef<
 
   useEffect(() => {
     if (!prefixTitle || !has) return;
-    document.title = errorTitle(document.title, true);
+    const apply = () => {
+      const next = errorTitle(document.title, true);
+      if (document.title !== next) document.title = next;
+    };
+    apply();
+    // The framework may set the title again after this effect (streamed metadata): keep the prefix.
+    const observer = new MutationObserver(apply);
+    observer.observe(document.head, { subtree: true, childList: true, characterData: true });
     return () => {
+      observer.disconnect();
       document.title = errorTitle(document.title, false);
     };
   }, [has, prefixTitle]);

@@ -182,12 +182,23 @@ function ContrastTable({ theme }: { theme: ThemeName }) {
             return (
               <tr key={`${p.fg}-${p.bg}`} className="border-t border-border">
                 <td className="px-2 py-1">
-                  <span
-                    className="inline-flex h-6 min-w-12 items-center justify-center rounded-control border border-border px-2 text-caption font-semibold"
-                    style={{ background: c[p.bg], color: c[p.fg] }}
-                  >
-                    Aa 12
-                  </span>
+                  {p.rule === "ui" ? (
+                    // UI pairs (borders, fills, marks) are judged at 3:1 as non-text: a swatch, not text.
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex h-6 min-w-12 items-center justify-center rounded-control border border-border px-2"
+                      style={{ background: c[p.bg] }}
+                    >
+                      <span className="block h-0.5 w-6" style={{ background: c[p.fg] }} />
+                    </span>
+                  ) : (
+                    <span
+                      className="inline-flex h-6 min-w-12 items-center justify-center rounded-control border border-border px-2 text-caption font-semibold"
+                      style={{ background: c[p.bg], color: c[p.fg] }}
+                    >
+                      Aa 12
+                    </span>
+                  )}
                 </td>
                 <td className="px-2 py-1 text-caption">
                   <Mono>{p.fg}</Mono> on <Mono>{p.bg}</Mono>
@@ -608,12 +619,14 @@ export default function DesignSystemPage() {
           </Specimen>
           <Specimen id="toasts" only="clinician">
             <ToastDemo />
-            <ToastSurface
-              tone="success"
-              title="Version 3 published"
-              description="Patients see it now."
-            />
-            <ToastSurface tone="info" title="Link copied" />
+            <div className="flex max-w-sm flex-col gap-2">
+              <ToastSurface
+                tone="success"
+                title="Version 3 published"
+                description="Patients see it now."
+              />
+              <ToastSurface tone="info" title="Link copied" />
+            </div>
           </Specimen>
         </Section>
 
@@ -677,13 +690,15 @@ export default function DesignSystemPage() {
               Press Tab from the top of any app page; the first stop is the link below, shown here
               in its focused state.
             </p>
-            <a
-              href="#main"
-              data-demo="focus"
-              className="inline-block rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus-visible:focus-ring"
-            >
-              Skip to main content
-            </a>
+            <div>
+              <a
+                href="#main"
+                data-demo="focus"
+                className="inline-block rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus-visible:focus-ring"
+              >
+                Skip to main content
+              </a>
+            </div>
           </Specimen>
         </Section>
 
