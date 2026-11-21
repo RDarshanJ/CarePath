@@ -26,7 +26,7 @@ OWNED=(
 run pnpm --filter @carepath/ui typecheck
 run pnpm --filter @carepath/web typecheck
 run pnpm exec eslint "${OWNED[@]}"
-run pnpm exec prettier --check "${OWNED[@]}" scripts/gate-wp-d4.sh
+run pnpm exec prettier --check "${OWNED[@]}"
 run pnpm --filter @carepath/ui exec vitest run --reporter=dot
 
 echo; echo "==> static Storybook build"
