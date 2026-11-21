@@ -176,7 +176,7 @@ export function PatientFrame({
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-bg">
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-4 gap-y-1 px-gutter py-2">
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-4 px-gutter pt-2 pb-1">
           {variant === "focus" ? (
             <BackLink href="/today">Back to Today</BackLink>
           ) : (

@@ -30,9 +30,21 @@ export function rememberCsrfToken(token: string | null): void {
   csrfToken = token;
 }
 
+let signingOut = false;
+
+/**
+ * Called by Sign out before it ends the session: a poll that answers 401 while sign-out is under way
+ * (the shell's badge counts) must not send the browser to "Sign in to continue" instead of "You are
+ * signed out".
+ */
+export function markSigningOut(value = true): void {
+  signingOut = value;
+}
+
 /** Send the browser to sign-in with a reason and the page to come back to. */
 export function redirectToSignIn(reason: "expired" | "required"): void {
   csrfToken = null;
+  if (signingOut) return;
   if (typeof window === "undefined" || window.location.pathname.startsWith("/login")) return;
   const next = window.location.pathname + window.location.search;
   window.location.assign(`/login?${new URLSearchParams({ reason, next }).toString()}`);

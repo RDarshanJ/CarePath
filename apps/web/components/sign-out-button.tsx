@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, FieldError, type ButtonVariant } from "@carepath/ui";
-import { apiRequest, rememberCsrfToken } from "../lib/api/client";
+import { apiRequest, markSigningOut, rememberCsrfToken } from "../lib/api/client";
 import { ApiError } from "../lib/api/errors";
 
 /**
@@ -26,11 +26,13 @@ export function SignOutButton({
   async function signOut() {
     setPending(true);
     setError(null);
+    markSigningOut();
     try {
       await apiRequest("POST", "/auth/logout", null, { quietSessionEnd: true });
     } catch (e) {
       // A session that is already gone is the outcome we wanted; anything else is shown.
       if (!(e instanceof ApiError && e.sessionEnded)) {
+        markSigningOut(false);
         setError("Could not sign you out. You are still signed in. Try again.");
         setPending(false);
         return;
