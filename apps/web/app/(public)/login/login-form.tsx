@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { sessionInfoSchema, type SessionInfo } from "@carepath/shared/contracts";
 import { Banner, Button, Field, Icon, TextInput } from "@carepath/ui";
 import { apiRequest, rememberCsrfToken } from "../../../lib/api/client";
@@ -14,7 +13,6 @@ import { DEMO_PASSWORD, demoAccounts } from "../../../lib/demo-accounts";
  * Demo mode is real authentication with a known password; nothing is bypassed.
  */
 export function LoginForm({ next, section }: { next: string | null; section: "form" | "demo" }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState<string | null>(null);
@@ -30,8 +28,11 @@ export function LoginForm({ next, section }: { next: string | null; section: "fo
       });
       rememberCsrfToken(session.csrfToken);
       // Sent back to the page they wanted only if their own shell allows it; the guard decides.
-      router.replace(next ?? homeForRole(session.role));
-      router.refresh();
+      // A full page load, not a client transition: the shell's document arrives with its title, so
+      // no moment exists where the signed-in page shows without one (DR-004 ruling 6.7: axe found
+      // `document-title` on /admin/patients straight after sign-in with the h1 already present).
+      // The CSRF token is fetched again from GET /auth/session on the first mutation.
+      window.location.assign(next ?? homeForRole(session.role));
     } catch (e) {
       setPending(null);
       setError(messageFor(e));
