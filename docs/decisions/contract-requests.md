@@ -82,8 +82,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 C, D; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): B-CR
 - Blocking: No. D-WP-10 ships the current order and switches in a follow-up commit.
-- Status: open
-- Answer: pending
+- Status: delivered (WP B-CR, branch `wp/bcr`)
+- Answer: `SessionStopRequest.discomfortLevel` is nullable and may be left out. Stop ends the session at once as `stopped_discomfort`. With no number nothing is stored as pain (`SessionActivity.discomfortReported` stays as it was, because the row check requires a level whenever it is true; a level reported earlier on the activity is kept; a note is stored if given). No `Observation` is written by a stop; the rating follows as a check-in that references the session, which still requires `painScore`, so no observation exists without a value. A number, when given, is stored as before.
 
 ### CR-7: AI review payload: resolutions, acknowledgement, evidence opens
 
@@ -118,8 +118,8 @@ Copy this block to the end of the file and fill every line.
 - Why: CD-235; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): B-CR
 - Blocking: No. Tag absent until then.
-- Status: open
-- Answer: pending
+- Status: delivered (WP B-CR, branch `wp/bcr`)
+- Answer: `ReviewTask.priorityLevel` is `high` when the task's stored `priority` is 70 or more (`HIGH_PRIORITY_MIN`, `priorityLevelOf` in `packages/shared/src/contracts/review.ts`), otherwise `standard`. The stored priority is a copy of the rule's priority when the task was created, so changing a rule's priority affects later tasks. With the seeded rule priorities only reported pain (80) is high. It is an ordering aid set by clinic rules, not a measure of medical risk.
 
 ### CR-10: Per-rule totals on review tasks
 
@@ -130,8 +130,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 L; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): B-CR
 - Blocking: No. Chips absent until then.
-- Status: open
-- Answer: pending
+- Status: delivered (WP B-CR, branch `wp/bcr`)
+- Answer: `GET /review-tasks` returns `ruleTotals`: one entry per rule of the organization (`ruleId`, `key`, `name`, `total`), highest rule priority first, zeros included. Totals follow `status` and `assignedTo` and ignore `ruleKey`, so chips keep their numbers while one rule is selected; without `ruleKey` they add up to `total`. `GET /patients/:patientId/review-tasks` returns the same field for that patient's tasks.
 
 ### CR-11: Review task event history
 
@@ -142,8 +142,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 L; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): B-CR
 - Blocking: No. History shows created and resolution.
-- Status: open
-- Answer: pending
+- Status: delivered (WP B-CR, branch `wp/bcr`)
+- Answer: Every task response (list, patient list, assign, resolve, dismiss) carries `events`, oldest first: `kind` (assigned, unassigned, reviewed, resolved, dismissed), `occurredAt`, `actor`, `practitioner` (assignee, for assigned and unassigned) and `note` (the resolution or dismissal note). Storage is a new append-only table `ReviewTaskEvent` (trigger rejects update and delete). Why not the audit log: audit is a security log with its own retention and access rules, it never stores free-text notes, assign was not audited, and it has no foreign key to the task, so the queue would depend on a join through JSON metadata. Creation is the task's `createdAt`, not an event. Assigning the same person, or unassigning an open task, records nothing. `reviewed` is written for each open or in-review task that reads a check-in when the care team marks that check-in reviewed. Seeded tasks get assigned and closed events.
 
 ### CR-12: Patient search with the term in the body
 
@@ -154,8 +154,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 I, CD-333; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): B-CR
 - Blocking: No. The browser-URL fix in D-WP-13 is UI-only and is the blocking part.
-- Status: open
-- Answer: pending
+- Status: delivered (WP B-CR, branch `wp/bcr`)
+- Answer: `POST /patients/search` takes `{ "q": "..." }` (1 to 100 characters, strict) and the same filter, sort, cursor and limit query as `GET /patients`, with the same result shape, scope and `patient.read` permission. It is a read: nothing is written and no audit event is added. `q` is removed from `GET /patients` (an unknown `q` in the URL is ignored). The clinician directory and admin patients now keep the term in component state and call the POST route, so no URL contains it. Playwright check: `apps/web/e2e/bcr-search-privacy.spec.ts`. D-WP-13 still owns the layout-level store described in DR-002 I.
 
 ### CR-13: Metrics endpoint with definitions and drill-down
 
@@ -214,8 +214,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 F; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): B-CR
 - Blocking: No. Until it lands the unknown-outcome banner tells the patient to check Appointments.
-- Status: open
-- Answer: pending
+- Status: delivered (WP B-CR, branch `wp/bcr`)
+- Answer: `POST /patients/:patientId/appointments` and `POST .../appointments/:appointmentId/reschedule` accept `Idempotency-Key` (1 to 128 of letters, digits and `_ . : -`; anything else is 400). Same key and same body returns the first 201 body again with `Idempotency-Replayed: true` and runs nothing (no second booking, no second audit event). Same key with a different body is 409 `idempotency_key_reused`. The key is scoped to the signed-in user and to the operation and target. Only successful answers are stored, in the same transaction as the booking, so a refused request (for example 409 `booking_conflict`) stores nothing and a retry is a fresh attempt. A key is honoured for 24 hours from its first success; after that it is treated as new. Two requests with one key at the same time are serialized by a transaction advisory lock on the key, so the second replays the first. New table `IdempotencyKey`; expired rows are replaced on next use of the key and are otherwise ignored.
 
 ### CR-18: Entered-in-error permission and header-only answer
 
