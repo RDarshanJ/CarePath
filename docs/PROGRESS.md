@@ -32,6 +32,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 
 - WP 6.3 (branch `wp/6.3`): seed NPIs carry a check digit that passes `isValidNpi` (Luhn, prefix 80840, leading 9 kept); the FHIR export check asserts every seeded NPI passes `isValidNpi`. The full profile already met the brief targets and was measured, not changed: 1,000 patients, 30 clinicians, 5 clinics, 2,000 appointments, 10,000 activity records, 51 encounters, 250 exercise rows (50 entries per clinic). Full wall time about 6.6 to 6.9 s per seed; all 1,000 exports pass the three layers. Record: `docs/evaluation/seed-full.md`. Small content hash `40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee`; full `eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54`. Gate `scripts/gate-wp-6.3.sh` (branch tip 13e3b57): exit 0.
 - D-WP-2 primitives, feedback, overlays and accessibility infrastructure (branch `wp/d2`): primitive and composed layers in `packages/ui` with `lib/` helpers, the duplicates of `component-usage-matrix.md` removed from `apps/web` (except two files owned by WP B-CR at the time), the `/design-system` gallery with a per-specimen axe and keyboard spec, gallery captures at six widths, reduced motion and 200 percent zoom, and `docs/design/after/d-wp-2/` (gate output below).
+- D-WP-5 healthcare components kit (branch `wp/d5`): `packages/ui/src/components/healthcare` with patient identity (banner, list rows), clinical data (pain and weekly sessions charts with equal tables, figure, day strip, missing, partial, failed and stale states), planning (exercise row, dose editor, move buttons, plan diff, version list, plan state line), appointment record, messaging (thread, composer, delivery state, emergency and urgent lines), generated drafts (six-state draft block with the demo notice, provenance line, evidence refs, statement support, decision bar shell) and consent status; `/design-system/healthcare` gallery pages, unit and browser tests, `docs/design/after/d-wp-5/` (gate output below).
 
 ## Outstanding
 
@@ -1157,3 +1158,59 @@ db: lease 1284 released
 WP 6.3 gate: PASSED
 db: lease 627 released
 ```
+### D-WP-5 (healthcare components kit)
+
+Worktree `/home/claude/wt/d5`, branch `wp/d5`, from main at `b5441b5`. Owned paths: `packages/ui/src/components/healthcare/**`, the `/design-system` gallery (`apps/web/app/(public)/design-system/**`), `apps/web/e2e/design-system-healthcare.spec.ts`, one block in `apps/web/scripts/design-capture.mjs`, `scripts/gate-wp-d5.sh`, `docs/design/after/d-wp-5/`, this section. No dependency added.
+
+- Presentation only: props typed from `@carepath/shared` contracts (`PatientHeader`, `CareTeamCard`, `WeeklyProgress`, progress pain points, `Dose`, `Schedule`, `CarePlanDiff`, `CarePlanVersionList`, `Appointment`, `Message`, `AiGeneration` provider, statements and blockers, `ConsentList`); wording from shared labels, formatters and copy constants. No fetch, query client, API path or browser storage (gate check).
+- Identity (CD-200 to 204): `PatientBanner` (identity-only `section` named Patient, name as the record heading, MRN in Mono, "Born Mar 3, 1989 (37 years)" with a spelled-out screen-reader form, status Tag, "Record as of", one "Patient details" disclosure with gender, language, zone and care team, "Not recorded" for missing values, offline line, not-on-care-team line; compact below 1024, born line moves into details below 768; sticky with `data-sticky-bar`, unsticks when taller than 30 percent of the window), `PatientBannerSkeleton`, `PatientRowIdentity` (name link plus muted Born line), age helpers (months under two years).
+- Clinical data (CD-210 to 218): `PainChart` (fixed 0 to 10, ticks 0, 5, 10, points at their dates, a line only between check-ins at most 7 days apart, plan ticks for staff only), `PainGapList`, `WeeklySessionsChart` (assigned outline, completed solid, values printed, current week dashed with "so far", stops in words), `SessionsLegend`, `PainTable` and `WeeklySessionsTable` built from the same row functions as the marks, `ChartFigure` (title with data-class label and window, `figure` plus `figcaption` count sentence, table visible for clinicians and behind a toggle that stays in the DOM for patients, loading, empty, error and stale states), `DataStaleLine`, `DayStrip` (ordered list of seven days: Done, Stopped, Planned, Rest, Not done) with `dayStripDays`, `painListSummaryText` (CD-215), `findEvaluativeWords` for caption tests. Charts draw at their container's pixel width so axis text keeps the caption size.
+- Planning (CD-300 to 305): `ExerciseSummary` (library, plan, editor, session-overview; decorative picture; instructions disclosure; "In the plan" unavailable with a reason), `MoveButtons` (position in words, names with the position, focus kept on the moved item, `aria-disabled` with "First in the plan" or "Last in the plan", `moveAnnouncement` for the caller's live region), `DoseEditorRow` (shared dose string as the summary, "Edit dose" disclosure with typed labelled fields, days, times per day, note to the patient with a counter, group and field errors, read-only form), `PlanDiff` (words per audience for every API field key, staff scope sentence, first version), `VersionList`, `PlanStateLine` (Draft; Published, version N; Draft differs from version N; Earlier version; patients never see Draft; loading, error, stale).
+- `AppointmentRecord` (CD-317): row and summary layouts, clinic-zone time range with the zone named, viewer time for a video visit, shared status words with the perspective pair, reason and cancellation details for staff only, replacement link, `appointmentActionLabel` ("Cancel visit on Fri, Nov 20"), "Therapist not recorded".
+- Messaging (CD-510 to 513): `MessageThread` (named `role="log"`, sender, role and clinic-zone time on every message, "New messages" separator, earlier messages, still-not-sent Banner, loading, empty and error), `MessageItem`, `DeliveryState` (Sending, Sent, Not sent with reason and Retry; never Delivered or Read), `MessageComposer` (patient: label, reply-time hint, starting points, notices above Send, sticky below 768; staff: "Message to {name}", reply time, Ctrl or Cmd+Enter hint, no emergency notice; empty send says "Write a message first."; never disabled; drafts held by the caller), `EmergencyNotice` (exact `EMERGENCY_NOTICE`, `URGENT_NOTICE` with a real `tel:` link, `URGENT_NOTICE_NO_PHONE` fallback).
+- Generated drafts (CD-236, 404 to 407, C3 3.1): `AIDraftBlock` in the six states of `aiDraftStateLabels` with the provider label as received, `DEMO_PROVIDER_NOTICE` on every demo block, "Provider not recorded" when missing, "Approved. Not yet part of a signed note.", no strike-through; `ProvenanceLine` with "How this draft was made"; `EvidenceRef` (name says the source and day, adds "opened", never "checked"); `StatementSupport` ("Supported: the cited record exists for this patient", "No supporting record found", "Edited, not re-checked", kept with note); `ReviewDecisionBar` shell (counts, written reason with jump links, one approve label, `aria-disabled` Approve, inline required reject reason, error, offline, not on the care team).
+- Consent (CD-140, 144, 146): `ConsentStatusLine` (Agreed on, Withdrawn on, Not agreed; Allowed since, Not allowed; wording version and changed-wording note; nothing for a type that cannot be granted, so motion tracking never shows) and `ConsentSummary` (read only, no control, the reason generated drafts are blocked).
+- Gallery: `/design-system/healthcare` index and five family pages (records, data, planning, messaging, ai), every component with long names, missing data and error content; interactive specimens report what was pressed. The main gallery's AI draft section now links to the family pages.
+- Tests: `packages/ui/src/components/healthcare/healthcare.test.tsx` (33 tests: ages, every patient and appointment status, gap rule, chart marks equal table rows, captions without evaluative words, plan words for every diff key, plan states, move-button ends, dose summary equals the shared formatter, delivery words, exact emergency constant, six AI states with the demo notice and no "AI" in output labels, blocker sentence, consent words). `apps/web/e2e/design-system-healthcare.spec.ts` (11 tests, run at 390 and 1440): axe on every healthcare specimen, titles without names, banner disclosure by keyboard, action names with the date, chart marks against table cells in the browser, move buttons (focus kept, position announced, ends unavailable with a reason), dose editor, library add, composers, retry, evidence refs and the decision gate.
+- Two visual passes on the gallery captures. Pass 1 fixes: chart and table side by side only when the figure is at least 56rem wide (axis text had shrunk to about 7 px), patient visit actions under the details, "Therapist not recorded", provider name in Plex Sans (Mono is for identifiers), staff messages `max-w-xl`, consent blocker keeps "AI-assisted drafting", one wording for unsupported statements, decision-bar link targets. Pass 2 fixes: charts draw at their container width (text was tiny at 390), list-row and replacement links standalone with the theme target, "How this draft was made" and the no-phone urgent link at least 24 px, exercise name keeps 12rem before actions wrap, breadcrumb link target.
+- `docs/design/after/d-wp-5/`: 30 images (five pages at six widths), `_probe.json` and `pairs.md`. Probe: no warm background outside status and chart tokens, no overflow, no axe serious or critical finding at 375, 768, 1440. Targets under 24 px: only the visually hidden skip link and the phone numbers inside the emergency sentence (inline links, WCAG 2.5.8 inline exception).
+
+Gate: `scripts/gate-wp-d5.sh` exit 0 (typecheck, lint and format of owned paths, `packages/ui` tests, presentation-only check, both gallery specs, capture of the five healthcare pages with `PROBE_FAIL_ON=warm,overflow,axe`, `pnpm verify`, clean tree). Tail:
+
+```
+==> pnpm --filter @carepath/ui exec vitest run --reporter=dot
+ Test Files  5 passed (5)
+      Tests  314 passed (314)
+==> presentation only: no data fetching or browser storage in the healthcare layer
+ok: no fetch, query, API path or storage
+==> gallery specs (design-system and design-system-healthcare), API 4105, web 3105
+  50 passed (1.9m)
+design-capture: 30 images in /home/claude/wt/d5/.data/capture-d-wp-5
+  warm backgrounds (not a status or chart token): 0 images
+  horizontal overflow: 0 images
+  axe serious or critical (at 375, 768, 1440): 0 images
+==> pnpm verify
+packages/ui test:       Tests  314 passed (314)
+apps/api test:       Tests  271 passed (271)
+  25 skipped
+  107 passed (7.3m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-5 gate: PASSED
+```
+
+Deviations and open points:
+- Additive changes outside `components/healthcare`: `components/ai-draft.tsx` removed (its `AIDraftBlock` and `EvidenceRef` now live in the healthcare layer with the six-state API; the only caller was the gallery, so there is one version), `src/index.ts` exports the healthcare layer, the old `AIDraftBlock` test removed from `composed.test.tsx`. No primitive was changed.
+- `apps/web/scripts/design-capture.mjs` gains one block (the five healthcare pages, inserted after the gallery group). D-WP-6 may edit the same file; the block is self-contained for the merge.
+- The born line uses the shared date style ("Born Mar 3, 1989 (37 years)") rather than CD-201's "3 Mar 1989", to keep one date format (`formatBornText`). Age uses the clinic-zone day the caller passes.
+- CD-212 "stopped beside the week": printed under the week in the chart when there are at most six weeks; with more weeks it is in the caption and the table only (no room for words under each bar).
+- CD-216 "table first on narrow": the clinician figure shows the table above the chart until the figure is 56rem wide, then side by side.
+- The `pending` state is built because the row asks for six states; per checkpoint C3 WP 5.3 does not show it (the API never returns a pending generation).
+- `AIDraftBlock` drops the strike-through on rejected text (CD-406 6.7) and shows the provider in Plex Sans, not Mono (DR-001: Mono for identifiers only).
+- The banner's unstick rule measures the banner against 30 percent of the window height; the sticky offset token for the record layout (`--cp-sticky-staff-top`) stays with D-WP-6 and D-WP-15.
+- `ConsentSummary` and `ConsentStatusLine` render nothing for a consent that cannot be granted, so the motion-tracking consent never appears (C3 item 5, R7). Consent titles: patient "Automated drafting tools", staff `AI_CONSENT_NAME`.
+- Unsupported statements read "No supporting record found" and the blocker sentence "1 statement has no supporting record"; the shared `unsupportedStatementsText` ("has no source") is not used, so the two wordings on one screen agree. A request to align the shared helper can go to D-WP-U.
+- Storybook is not set up in this branch (D-WP-4); the gallery pages are the catalogue for the kit until stories exist.
+- Not built here (no row item): review-queue task components, note editor, evidence panel drawer content, missing-information list actions (WP 5.3 and D-WP-13 compose them from these parts).

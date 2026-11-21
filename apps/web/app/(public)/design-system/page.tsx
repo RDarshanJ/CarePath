@@ -33,7 +33,6 @@ import {
   type ThemeName,
 } from "@carepath/ui";
 import {
-  AIDraftDemo,
   BannerFocusDemo,
   ChoiceDemo,
   ConfirmDemo,
@@ -58,6 +57,7 @@ import {
   ToggleChipDemo,
   UrlTabsDemo,
 } from "./demos";
+import { HealthcareIndex } from "./healthcare/families";
 import { Label, Row, Section, Specimen } from "./specimen";
 
 export const metadata: Metadata = {
@@ -79,7 +79,7 @@ const sections = [
   ["overlays", "Overlays"],
   ["nav", "Navigation"],
   ["table", "Tables"],
-  ["ai", "AI draft"],
+  ["healthcare", "Healthcare components"],
 ] as const;
 
 const swatchOrder = [
@@ -718,13 +718,13 @@ export default function DesignSystemPage() {
         </Section>
 
         <Section
-          id="ai"
-          title="AI draft"
-          intro="Generated content is a labelled draft: dashed left rule, the fixed label and the provider name. No sparkle icons."
+          id="healthcare"
+          title="Healthcare components"
+          intro="The healthcare layer (patient identity, clinical data, planning, visits, messages, generated drafts and consent) has its own pages, one per family, with every state on synthetic content."
         >
-          <Specimen id="ai-draft" only="clinician">
-            <AIDraftDemo />
-          </Specimen>
+          <div data-specimen="healthcare-index">
+            <HealthcareIndex />
+          </div>
         </Section>
       </main>
     </ThemeScope>
