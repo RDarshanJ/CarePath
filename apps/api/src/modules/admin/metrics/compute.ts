@@ -1,5 +1,4 @@
-import type {
-  metricListKeys} from "@carepath/shared/contracts";
+import type { metricListKeys } from "@carepath/shared/contracts";
 import {
   priorityLevelOf,
   type MetricKey,
