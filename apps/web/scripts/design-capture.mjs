@@ -192,10 +192,19 @@ function probeInPage(warmTokens) {
   };
 }
 
+/**
+ * Sticky bottom bars (`data-sticky-bar`) sit in the page flow while axe runs, as in the e2e helpers
+ * (`withStickyBarsInFlow`, D-WP-6): axe's target-size rule otherwise counts controls the tab bar happens
+ * to overlap at the current scroll position as obscured, so a screen passed or failed by a few pixels.
+ */
 async function axe(page) {
+  const style = await page.addStyleTag({
+    content: "[data-sticky-bar] { position: static !important; }",
+  });
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-    .analyze();
+    .analyze()
+    .finally(() => style.evaluate((el) => el.remove()));
   return results.violations
     .filter((v) => v.impact === "serious" || v.impact === "critical")
     .map((v) => `${v.impact} ${v.id}: ${v.help} (${v.nodes.length} nodes)`);

@@ -44,6 +44,7 @@ OWNED=(
   packages/ui/src/components/composed/nav.tsx
   packages/ui/src/components/composed/table.tsx
   scripts/gate-wp-d6-probe.mjs
+  apps/web/scripts/design-capture.mjs
 )
 
 run pnpm --filter @carepath/ui typecheck
