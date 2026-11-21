@@ -140,8 +140,13 @@ export async function arrow(page: Page, key: "ArrowDown" | "ArrowRight" | "Arrow
   await page.keyboard.up(key);
 }
 
-/** Complete the exercise on screen by tapping Done for each set, skipping rest. */
+/**
+ * Complete the exercise on screen by tapping Done for each set, skipping rest. When the player shows the
+ * Next phase between two exercises (D-WP-10), "Start exercise n" is tapped first.
+ */
 export async function finishExercise(page: Page) {
+  const start = page.getByRole("button", { name: /^Start exercise \d+$/ });
+  if (await start.isVisible()) await start.click();
   const skipRest = page.getByRole("button", { name: "Skip rest" });
   const done = page.getByRole("button", { name: /^Done with/ });
   for (let i = 0; i < 14; i++) {
