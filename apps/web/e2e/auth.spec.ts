@@ -105,28 +105,32 @@ for (const role of roles) {
     }
     if (account.shell === "clinician") {
       const nav = page.getByRole("navigation", { name: "Clinician" });
+      // DR-002 H (amends CD-501): the day, then people, then the two inboxes side by side.
       await expect(nav.getByRole("link")).toHaveText([
         "Overview",
-        "Patients",
         "Schedule",
-        /^Messages/,
-        "Review queue",
+        "Patients",
+        /Review queue/,
+        /Messages/,
       ]);
       for (const [name, url] of [
         ["Patients", /\/patients$/],
-        ["Review queue", /\/review-queue$/],
+        [/^Review queue/, /\/review-queue$/],
       ] as const) {
         await nav.getByRole("link", { name }).click();
         await expect(page).toHaveURL(url);
         await expect(nav.getByRole("link", { name })).toHaveAttribute("aria-current", "page");
-        await expectNoSeriousViolations(page, name);
+        await expectNoSeriousViolations(page, String(name));
       }
       await shot(page, "clinician-review-queue", width);
       await page.goto(account.home);
     }
     if (account.shell === "admin") {
-      const nav = page.getByRole("navigation", { name: "Administration" });
-      await expect(nav.getByRole("link")).toHaveText(["Patients"]);
+      // CD-502: one destination, so no navigation landmark at all; the banner carries identity and sign-out.
+      await expect(page.locator('nav:not([aria-label="Pagination"])')).toHaveCount(0);
+      await expect(
+        page.getByRole("banner").getByRole("button", { name: "Sign out" }),
+      ).toBeVisible();
       await expect(page.getByRole("heading", { level: 1, name: "Patients" })).toBeVisible();
     }
 

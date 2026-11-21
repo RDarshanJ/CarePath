@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import type { Locator, Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { expect } from "./fixtures";
+import { expect, withStickyBarsInFlow } from "./fixtures";
 
 /** Patient personas from docs/demo-accounts.md. */
 export const personas = {
@@ -100,9 +100,12 @@ export function radio(scope: Page | Locator, group: string, value: string) {
  * finding can be fixed rather than guessed at. Serious and critical findings fail; lesser ones do not.
  */
 export async function expectNoSeriousViolations(page: Page, label: string) {
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-    .analyze();
+  // Sticky bars in the page flow while axe runs: see `withStickyBarsInFlow` in fixtures.ts.
+  const results = await withStickyBarsInFlow(page, () =>
+    new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze(),
+  );
   const blocking = results.violations.filter(
     (v) => v.impact === "serious" || v.impact === "critical",
   );

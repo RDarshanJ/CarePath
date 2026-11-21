@@ -37,13 +37,34 @@ export const test = base.extend({
 export { expect };
 
 /**
+ * Runs `fn` with every sticky bottom bar (`data-sticky-bar`: the patient and staff tab bars, sticky action
+ * bars) placed in the page flow, as CD-125 already does at large zoom. axe's target-size rule counts a
+ * control as "partially obscured" when the sticky bar happens to overlap it at the current scroll
+ * position, so the same page passed or failed depending on where the previous page left the scroll. The
+ * bar's own controls are still checked (they are at the end of the page), and focus under the bar is
+ * tested separately by the keyboard passes in shells.spec.ts (WCAG 2.4.11).
+ */
+export async function withStickyBarsInFlow<T>(page: Page, fn: () => Promise<T>): Promise<T> {
+  const handle = await page.addStyleTag({
+    content: "[data-sticky-bar] { position: static !important; }",
+  });
+  try {
+    return await fn();
+  } finally {
+    await handle.evaluate((el) => el.remove());
+  }
+}
+
+/**
  * axe on the page as it is now. Serious and critical findings fail the test; lesser ones are
  * attached so they stay visible. Every page the tests visit goes through this.
  */
 export async function expectNoSeriousViolations(page: Page, label: string) {
-  const results = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
-    .analyze();
+  const results = await withStickyBarsInFlow(page, () =>
+    new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+      .analyze(),
+  );
   const blocking = results.violations.filter(
     (v) => v.impact === "serious" || v.impact === "critical",
   );
