@@ -3,6 +3,7 @@ import {
   AI_CONSENT_NAME,
   AI_GENERATED_NAME,
   DEMO_DEFAULT_LABEL,
+  DEMO_PROVIDER_NOTICE,
   EMERGENCY_NOTICE,
   PAIN_ANCHOR_HIGH,
   PAIN_ANCHOR_LOW,
@@ -62,6 +63,7 @@ function allNewStrings(): string[] {
     PAIN_ANCHOR_HIGH,
     painChosenLine(7),
     DEMO_DEFAULT_LABEL,
+    DEMO_PROVIDER_NOTICE,
     AI_GENERATED_NAME,
     AI_CONSENT_NAME,
     ACTIVE_STATUS_DEFINITION,
@@ -120,6 +122,25 @@ describe("fixed safety copy", () => {
     expect(PAIN_ANCHOR_HIGH).toBe("10 Worst pain imaginable");
     expect(painChosenLine(7)).toBe("You chose 7 of 10.");
     expect(DEMO_DEFAULT_LABEL).toBe("Demo default. Not clinically reviewed.");
+  });
+});
+
+describe("generated-output wording (checkpoint C3 section 3.1)", () => {
+  it("states that the demo provider used no model", () => {
+    expect(DEMO_PROVIDER_NOTICE).toBe("Rule-based demo output. No AI model was used.");
+  });
+  it("the labels for generated output do not say AI", () => {
+    const shown = [
+      AI_GENERATED_NAME,
+      noteVersionSourceLabels.ai_draft ?? "",
+      ...Object.values(aiDraftStateLabels).flatMap((v) => [v.label, v.explanation ?? ""]),
+    ];
+    for (const s of shown) expect(s, s).not.toMatch(/\bAI\b/);
+    expect(AI_GENERATED_NAME).toBe("Generated draft");
+    expect(noteVersionSourceLabels.ai_draft).toBe("Started from a generated draft");
+    expect(aiDraftStateLabels.unreviewed.label).toBe("Draft, generated, not reviewed");
+    expect(aiDraftStateLabels.approved.label).toBe("Generated, reviewed and approved");
+    expect(aiDraftStateLabels.approved_with_edits.label).toBe("Generated, edited and approved");
   });
 });
 

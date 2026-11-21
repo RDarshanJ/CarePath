@@ -1,7 +1,11 @@
 import type { StatusLabel } from "./types.js";
 
-/** One name for the feature on staff screens, and one in patient consent (CD-236). */
-export const AI_GENERATED_NAME = "AI-generated";
+/**
+ * One name for generated output on staff screens, and one for the feature in patient consent
+ * (CD-236, amended by checkpoint C3 section 3.1: the demonstrated output is rule-based, so the
+ * name on screen does not say AI; `AI_CONSENT_NAME` names the feature a clinic could configure).
+ */
+export const AI_GENERATED_NAME = "Generated draft";
 export const AI_CONSENT_NAME = "AI-assisted drafting";
 
 /** Database `AIGenerationStatus` and `AIReviewDecision`. */
@@ -18,7 +22,10 @@ export interface AIDraftStateLabel extends StatusLabel {
   explanation: string | null;
 }
 
-/** No confidence figure and no sparkle: provenance says AI in words. */
+/**
+ * No confidence figure and no sparkle. Provenance is said in words: the state label, the
+ * provider label as received, and `DEMO_PROVIDER_NOTICE` when `provider.isDemo` (C3 3.1).
+ */
 export const aiDraftStateLabels: Record<AIDraftState, AIDraftStateLabel> = {
   pending: {
     label: "Generating draft",
@@ -27,19 +34,19 @@ export const aiDraftStateLabels: Record<AIDraftState, AIDraftStateLabel> = {
     explanation: "This can take a minute. You can keep working.",
   },
   unreviewed: {
-    label: "Draft, AI-generated, not reviewed",
+    label: "Draft, generated, not reviewed",
     tone: "neutral",
     form: "text",
     explanation: null,
   },
   approved: {
-    label: "AI-generated, reviewed and approved",
+    label: "Generated, reviewed and approved",
     tone: "success",
     form: "text",
     explanation: null,
   },
   approved_with_edits: {
-    label: "AI-generated, edited and approved",
+    label: "Generated, edited and approved",
     tone: "success",
     form: "text",
     explanation: null,

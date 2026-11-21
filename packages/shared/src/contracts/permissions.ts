@@ -27,6 +27,7 @@ export const permissionDescriptions = {
   "careplan.publish": "Publish care plan versions for care-team patients.",
   "note.write": "Draft clinical notes for care-team patients.",
   "note.sign": "Sign own clinical notes for care-team patients.",
+  "note.mark_entered_in_error": "Mark a signed clinical note entered in error, with a reason.",
   "ai.generate": "Generate AI summaries and drafts for care-team patients.",
   "ai.review": "Approve, edit or reject AI output for care-team patients.",
   // Review queue.

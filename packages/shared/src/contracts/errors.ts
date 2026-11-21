@@ -101,6 +101,10 @@ export const errorCodes = {
   },
   not_note_author: { status: 403, message: "Only the note's author can do this." },
   note_empty: { status: 409, message: "A note with all four sections empty cannot be signed." },
+  encounter_already_documented: {
+    status: 409,
+    message: "This visit already has a signed note. Mark that note entered in error first.",
+  },
   payload_too_large: { status: 413, message: "The request body is too large." },
   unsupported_media_type: { status: 415, message: "Unsupported content type." },
   rate_limited: { status: 429, message: "Too many requests. Try again later." },

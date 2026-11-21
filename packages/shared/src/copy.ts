@@ -30,6 +30,12 @@ export function painChosenLine(score: number): string {
 /** Shown to staff beside any threshold or band no clinic chose (DR-002 R5). */
 export const DEMO_DEFAULT_LABEL = "Demo default. Not clinically reviewed.";
 
+/**
+ * Shown on every generated block whose `provider.isDemo` is true, beside `provider.label`
+ * (checkpoint C3 section 3.1, DR-002 R3). The demo provider is rules, not a model.
+ */
+export const DEMO_PROVIDER_NOTICE = "Rule-based demo output. No AI model was used.";
+
 /** Pain notice when the organization has no clinic phone (Organization.phone is null). */
 export const CONTACT_CLINIC_FALLBACK = "contact your clinic";
 

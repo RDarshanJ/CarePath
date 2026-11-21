@@ -84,5 +84,7 @@ export const rolePermissions: Record<RoleKey, readonly Permission[]> = {
     "fhir.import",
     "roles.read",
     "settings.manage",
+    // Checkpoint C3 ruling 4.3; granted by migration 20261126000000_phase5_c3_fixes.
+    "note.mark_entered_in_error",
   ],
 };

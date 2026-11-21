@@ -21,5 +21,5 @@ export const clinicalNoteStatusLabels: Record<
 /** Authorship is a plain line, not a second Tag. Clinician-written versions need no line. */
 export const noteVersionSourceLabels: Record<NoteVersionSourceValue, string | null> = {
   clinician: null,
-  ai_draft: "Started from an AI-generated draft",
+  ai_draft: "Started from a generated draft",
 };

@@ -51,6 +51,12 @@ export const aiSourceRefSchema = z
     status: aiRefStatusSchema,
     /** The cited value when resolved; null otherwise. Open the record with the sources route. */
     value: aiFieldValueSchema,
+    /**
+     * Whether the cited record was among the records the generation was given (checkpoint C3,
+     * A2 and B8). False makes the statement unsupported with reason `not_in_input`. Null when
+     * the generation did not store its input records (older rows) or for a notice reference.
+     */
+    inInput: z.boolean().nullable(),
   })
   .meta({ id: "AiSourceRef" });
 export type AiSourceRef = z.infer<typeof aiSourceRefSchema>;
@@ -148,8 +154,13 @@ export const aiStatementSchema = z
     /** The clinician's note for `acknowledged`; null otherwise. */
     note: z.string().nullable(),
     support: z.enum(["supported", "unsupported"]),
-    /** Why unsupported; null when supported. */
-    unsupportedReason: z.enum(["no_source_refs", "unresolved_source_ref"]).nullable(),
+    /**
+     * Why unsupported; null when supported. `not_in_input`: every cited record exists for this
+     * patient, but at least one was not among the records the generation was given.
+     */
+    unsupportedReason: z
+      .enum(["no_source_refs", "unresolved_source_ref", "not_in_input"])
+      .nullable(),
     /** True while unsupported and not edited, removed or acknowledged: approval waits for it. */
     needsResolution: z.boolean(),
     /**
