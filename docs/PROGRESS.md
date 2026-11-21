@@ -28,6 +28,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 
 - WP 5.2 (branch `wp/5.2`): AI progress summaries and SOAP note drafts through `@carepath/ai` with a SQL evidence resolver, stored generations and append-only reviews, gated approval, note draft from approval, sign, amendment and entered in error, consent refusal, failure path, overview AI drafts; CR-7, CR-8 and CR-16 delivered as demo rules pending clinical governance review (gate output below).
 - WP 5.6a (branch `wp/5.6a`, checkpoint C3 fixes in `packages/ai`): A1 empty progress summary as `progress_summary@1.1.0` (1.0.0 unchanged and still pinned); A2 verifier allow-list of input records with reason `not_in_input`, passed by the pipeline; A3 a redaction token left after restore is `invalid_output`; A4 Anthropic `stop_reason: max_tokens` is `invalid_output`, named as truncation, not retried, and its tokens counted; A5 the three C3 3.2 statements in the eval report, re-run with `pnpm ai:eval` (gate output below).
+- D-WP-U (branch `wp/du`, DR-004 section 4): U1 to U10, the CD record edits and rulings 6.1, 6.2, 6.6 and 6.7; captures in `docs/design/after/d-wp-u/` (gate output below).
 - WP 5.6b (branch `wp/5.6b`, checkpoint C3 fixes B1 to B8): migration `20261126000000_phase5_c3_fixes` (`note.mark_entered_in_error` for `clinic_admin`, partial unique index one signed note per encounter); entered in error decided by permission with a header-only answer for a caller without `clinical.read`; FHIR export reads signed notes only; `encounter_already_documented`; staff names to the redactor; stored `inputRefs` passed to the verifier on read and at approval, with `not_in_input` and `inInput` in the contract; generated-output labels without "AI" and `DEMO_PROVIDER_NOTICE`; CR-18 and CR-19 delivered (gate output below).
 
 - WP 6.3 (branch `wp/6.3`): seed NPIs carry a check digit that passes `isValidNpi` (Luhn, prefix 80840, leading 9 kept); the FHIR export check asserts every seeded NPI passes `isValidNpi`. The full profile already met the brief targets and was measured, not changed: 1,000 patients, 30 clinicians, 5 clinics, 2,000 appointments, 10,000 activity records, 51 encounters, 250 exercise rows (50 entries per clinic). Full wall time about 6.6 to 6.9 s per seed; all 1,000 exports pass the three layers. Record: `docs/evaluation/seed-full.md`. Small content hash `40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee`; full `eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54`. Gate `scripts/gate-wp-6.3.sh` (branch tip 13e3b57): exit 0.
@@ -1324,3 +1325,84 @@ D-WP-4 gate: PASSED
 ```
 
 The first full Storybook run found three things, all fixed before the gate run above: the `SlotButton` mismatch, the `DropdownMenu` modal finding (see deviations), and a wrong assumption in the spec (overlay stories render only in a portal, so the story container is empty and is checked as attached, not visible). An earlier flake came from the preview decorator overwriting `body.className` and removing Storybook's own classes; it now adds classes.
+
+### D-WP-U (DR-004 checkpoint D2 foundation fixes)
+
+Worktree `/home/claude/wt/du`, branch `wp/du`, from `main` at `24a5430`, rebased onto `main` at `bccc911` (after D-WP-4). API 4120, web 3120.
+
+Per item (DR-004 section 4, in priority order):
+- U1 done. The staff shell is a grid from 1024 px: the sidebar spans both rows (full window height, sticky, `h-dvh`), the demo notice and main share the second column. A page shorter than the window is exactly the window tall and Sign out is fully visible on load at 1024, 1440 and 1920. New test in `shells.spec.ts` (sizes 768x1024, 1024x768, 1440x900, 1920x1080; main emptied to make a short page).
+- U2 done. Sidebar from `lg` (1024); below it the short top bar and the labelled bottom bar (main is the full 768 px at 768). `staff-bar` sticky offset now below 1024. Clinician and admin content capped at 1440 px (`max-w-staff`), left-aligned. CD-501 and the D-WP-6 row in `rebuild-plan.md` amended.
+- U3 done. `SlotButton` neutral at rest (`border-control`, `ink`, hover `primary-subtle`), selected unchanged; library Add, Retry sending, both Reject draft buttons, LoadMore and the patient header Contact care team are `neutral`. `button.tsx` doc comment and `design-tokens.md` section 3 carry rule 5.1.1. Call sites migrated mechanically (Refresh, Retry, Mark reviewed, Add, Assign, pagination, day navigation, Pause, Skip, timers, Got it, Reschedule, Cancel visit, table toggle, Load older to `neutral`; Clear filters and "Show every day and time" to `quiet`), plus five gallery demos. Left `secondary`: the dialog safe choice and "Keep editing" in `overlays.tsx`, dialog Cancel and Close buttons, booking Back, and page-level supporting actions the slices own.
+- U4 done. Text role `nav-label` 13/16 in both themes (`tokens.ts` `textExtra`, `tokens-final.json`, `preset.css`, generated `tokens.css`); the token test allows it as the one patient role below 15 and asserts that. Bottom bar labels use it at weight 500; `<wbr>` removed, "Appointments" on one line at 375; the badge is anchored at the icon's right edge above its top (`-top-2 left-full`), so the icon stays whole; bar 64 px.
+- U5 done. `Link` inline variant has 4 px vertical padding (hit height 25 px at 13 px, no line change); standalone is the theme target in both directions; `Td` gives links `inline-flex min-h-6 items-center` and buttons `min-h-6` (36 px rows unchanged); checkbox, radio and switch labels are the theme target tall with the box centred on the first line; the focused skip link is the theme target. `identity.tsx` needed no change (its row link was already standalone).
+- U6 done. The probe excludes a visually hidden element unless focused, the 1 px native select, and Radix's bare form input (aria-hidden, not focusable, pointer-events none); measures a checkbox, radio or switch by the box of control plus label; ignores the pressed-state scale; excepts a text link inside a sentence (WCAG 2.5.8) and counts it. `targets` and `pictures` are new `PROBE_FAIL_ON` kinds. Count on the recorded set: 0 real targets under the theme floor in 278 images (D-WP-6 set: 277 of 278 images listed some; the first development capture of this batch, before U5 and with part of U6, still had 921 entries in 114 images); not counted: 279 hidden, 66 native select, 378 bare inputs, 42 links inside a sentence; reported and not failed: 18 entries, the onboarding header "Sign in" link (D-WP-8, DR-004 5.2) through `PROBE_TARGETS_ELSEWHERE`.
+- U7 done. `UNSUPPORTED_STATEMENT_LABEL` "No supporting record" and `unsupportedStatementsText` ("1 statement has no supporting record", "N statements have no supporting record") in `packages/shared/src/labels/ai.ts`; the kit's `statementSupportWords.unsupported`, `NoSupportingRecord` and `supportCountText` use them; a test asserts there is no second string.
+- U8 done. Provider line and `DEMO_PROVIDER_NOTICE` are `text-small` weight 400 `ink-muted` on every block; the state label stays 600 (test).
+- U9 done. `exerciseIllustration(exercise, size)` with `hero | overview | tile`; only `tile` falls back to the body-area picture, and a stored `area-*` `mediaPath` counts as the fallback (the seed stores area files there). `IllustrationFigure` draws any `area-*` file as a 64 px tile (this covers the onboarding body-area picture without editing D-WP-8's files). Manifest note in `lib/illustrations.ts`. Probe: no `area-*` file wider than 64 px in any capture.
+- U10 done. Chooser row titles in `ink` weight 500, chevron `ink-muted`; form panel capped at 26rem (`max-w-104`).
+- CD-201, CD-311, CD-335, CD-501, CD-530 and CD-534 edited to match section 6 (each with an Amended line).
+- Rulings: ToggleChip stays `aria-pressed` for instant filters only (doc comment, CD-311, CD-534); LoadMore moves focus to the first new item, scrolls it to the middle of the window (clear of sticky bars), announces "N more ... loaded. Showing N of M.", leaves focus on the button with the inline error and "Try again" on failure, and is replaced by the end text; `auth.spec` waits for each home page's own h1 (`accounts.*.heading`) and the clicked page's h1 before axe; `fixtures.ts` documents ruling 6.6 and exports `expectNoAxeViolations` as the name DR-004 uses.
+- Orchestrator request from D-WP-8: `ErrorSummary` items 8 px apart (`gap-2`).
+
+Ruling 6.7 failure, pasted as required. With the h1 wait in place, one run of the gate failed on `auth.spec` (desktop-1440, care_coordinator) with the heading present:
+
+```
+  ✘   58 [desktop-1440] › e2e/auth.spec.ts:75:3 › care_coordinator: signs in, stays in its own shell, is refused the others, signs out (1.3s)
+    Error: axe serious or critical findings on care_coordinator home /admin/patients
+    + Array [
+    +   "serious document-title: Documents must have <title> element to aid in navigation (1 nodes)",
+    + ]
+```
+
+Treated as a product defect, fixed in the shell: sign-in ended in `router.replace` plus `router.refresh`, and the client transition left the document without a title for a moment. Sign-in now ends in a full page load (`window.location.assign`), so the shell document arrives with its title; the CSRF token is fetched again on the first mutation, as before. `auth.spec` "signing out after the session already ended" now waits for Today to settle before clearing the cookie (otherwise a first request meets the 401 and the page goes to "Sign in to continue" before the click). No retry was added.
+
+Also fixed on the way: the empty notifications region (`ToastSurface`, fixed, z-30) lay over the staff bottom bar below 1024 px and took its clicks; it now passes pointer events through and sits above the sticky bar (`bottom: var(--cp-sticky-bottom)`).
+
+Prop and export changes for the stories (D-WP-4): `exerciseIllustration` takes a required `size` (apps/web only); `NavItem.label` doc changed (no `<wbr>`); new shared export `UNSUPPORTED_STATEMENT_LABEL`; new preset utilities `grid-staff-shell`, `max-w-staff`, text role `nav-label`. No component prop in `packages/ui` changed; `scripts/gate-wp-d4.sh` (without verify) passed on the rebased branch: 325 ui tests including story coverage, 96 stories built, 386 Storybook axe checks passed.
+
+Captures: `docs/design/after/d-wp-u/` (278 images, `_probe.json`, `pairs.md` with the before and after against `../d-wp-6/` and the two visual passes). Probe: warm 0, overflow 0, axe serious or critical 0 (375, 768, 1440), real targets 0, body-area pictures wider than 64 px 0.
+
+Deviations and open points:
+- The probe excepts text links inside a sentence (WCAG 2.5.8 inline exception), a fourth exclusion beyond the three in ruling 6.5; without it every patient phone number and "read how your data is shared" in running text fails the 48 px floor. Counted in the summary (42).
+- The onboarding header "Sign in" link (52x32) is under the 48 px floor and is D-WP-8's to fix (DR-004 5.2); its folder was not edited. The gate reports it and does not fail on it.
+- U10: "Create your account" stays a cobalt text link above the fold at 1440; it is a link, not a control styled as a button.
+- U5 is done with padding on inline links rather than `inline-flex` everywhere: same hit height, no change to wrapping inside sentences. `inline-flex min-h-6` is used in table cells as specified.
+- The `packages/ai` verifier label `UNSUPPORTED_LABEL` ("No supporting record found") is a stored verifier output, not shown by the kit; not changed (not this batch's package).
+- DR-004 section 4 names `gate-wp-d2.sh`, `gate-wp-d5.sh` and `gate-wp-d6.sh`; this batch ran its own gate, which covers their galleries, shells and capture (the D-WP-6 probe script's overflow and target rules are now in the capture itself), and `gate-wp-d4.sh`. The three older gates were not re-run.
+- At 1440 the sign-in page leaves a wide gap between the 26rem panel and the chooser; at 1024 the queue's "Why it appeared" still truncates (D-WP-13).
+
+Gate: `scripts/gate-wp-du.sh` exit 0 on `wp/du` rebased onto `main` at `bccc911` (includes `pnpm verify`). Tail:
+
+```
+==> pnpm --filter @carepath/ui exec vitest run --reporter=dot
+      Tests  325 passed (325)
+==> pnpm --filter @carepath/shared exec vitest run --reporter=dot
+      Tests  87 passed (87)
+==> structure
+ok: no <wbr>, one unsupported wording, no kit cobalt outline outside overlays, staff shell at lg, picture sizes named
+==> end-to-end (shells, auth, patient-scheduling, clinician-scenario-d, galleries), API 4120, web 3120
+  3 skipped
+  97 passed (4.8m)
+design-capture: 278 images in /home/claude/wt/du/.data/capture-d-wp-u
+  warm backgrounds (not a status or chart token): 0 images
+  horizontal overflow: 0 images
+  axe serious or critical (at 375, 768, 1440): 0 images
+  interactive targets under 24 px: 0 images
+  body-area pictures wider than 64 px: 0 images
+  real targets under the theme floor: 0 in 0 images (owned elsewhere, reported: 18)
+  not counted as targets: hidden 279, 1 px native select 66, bare form input 378, link inside a sentence 42
+==> pnpm verify
+integrity checks: 79 passed
+content-hash: 40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee
+packages/ai 114, packages/fhir 101, packages/shared 87, packages/ui 325, packages/db 101, apps/api 339 tests passed
+  25 skipped
+  123 passed (8.4m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-U gate: PASSED
+```
+
+Earlier runs of this gate failed and were fixed, not retried blindly: the structure check matching a comment and a test, the gallery LoadMore test meeting the new status text twice, the notifications region over the staff bottom bar at 390, the ruling 6.7 failure above, and the sign-out race it exposed.
