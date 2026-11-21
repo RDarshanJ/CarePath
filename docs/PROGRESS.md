@@ -30,14 +30,13 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 5.6a (branch `wp/5.6a`, checkpoint C3 fixes in `packages/ai`): A1 empty progress summary as `progress_summary@1.1.0` (1.0.0 unchanged and still pinned); A2 verifier allow-list of input records with reason `not_in_input`, passed by the pipeline; A3 a redaction token left after restore is `invalid_output`; A4 Anthropic `stop_reason: max_tokens` is `invalid_output`, named as truncation, not retried, and its tokens counted; A5 the three C3 3.2 statements in the eval report, re-run with `pnpm ai:eval` (gate output below).
 - WP 5.6b (branch `wp/5.6b`, checkpoint C3 fixes B1 to B8): migration `20261126000000_phase5_c3_fixes` (`note.mark_entered_in_error` for `clinic_admin`, partial unique index one signed note per encounter); entered in error decided by permission with a header-only answer for a caller without `clinical.read`; FHIR export reads signed notes only; `encounter_already_documented`; staff names to the redactor; stored `inputRefs` passed to the verifier on read and at approval, with `not_in_input` and `inInput` in the contract; generated-output labels without "AI" and `DEMO_PROVIDER_NOTICE`; CR-18 and CR-19 delivered (gate output below).
 
+- WP 6.3 (branch `wp/6.3`): seed NPIs carry a check digit that passes `isValidNpi` (Luhn, prefix 80840, leading 9 kept); the FHIR export check asserts every seeded NPI passes `isValidNpi`. The full profile already met the brief targets and was measured, not changed: 1,000 patients, 30 clinicians, 5 clinics, 2,000 appointments, 10,000 activity records, 51 encounters, 250 exercise rows (50 entries per clinic). Full wall time about 6.6 to 6.9 s per seed; all 1,000 exports pass the three layers. Record: `docs/evaluation/seed-full.md`. Small content hash `40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee`; full `eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54`. Gate `scripts/gate-wp-6.3.sh` (branch tip 13e3b57): exit 0.
 - D-WP-2 primitives, feedback, overlays and accessibility infrastructure (branch `wp/d2`): primitive and composed layers in `packages/ui` with `lib/` helpers, the duplicates of `component-usage-matrix.md` removed from `apps/web` (except two files owned by WP B-CR at the time), the `/design-system` gallery with a per-specimen axe and keyboard spec, gallery captures at six widths, reduced motion and 200 percent zoom, and `docs/design/after/d-wp-2/` (gate output below).
 
 ## Outstanding
 
 - CR-4 follow-ups: `moment-nothing-to-review` is in `public/assets/illustrations` but not yet shown (the queue empty state is `Empty` in `(clinician)/_components/common.tsx`, more than a one-line change; use `MomentImage` from `apps/web/components/illustration.tsx`). The plan builder preview in `(clinician)/_components/plan-view.tsx` does not yet show exercise pictures; use `IllustrationFigure` and `exerciseIllustration`. The patient `/plan`, session overview and session player do.
 - WP 3.3 is committed by its own worker; WP 3.2b is listed above. Route table: `docs/architecture/api-phase3.md`.
-- WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
-- Seed NPIs (WP 6.3, `packages/db/seed/people.ts`): the fictitious `9…` NPIs fail the us-core-17 check digit. Since WP 5.4b the FHIR export leaves such an NPI out (staff identifier kept); on main before 5.4b merges, exporting a seeded patient whose plans or observations name such a practitioner answers 500. Generating check-digit-valid `9…` values would let the export carry them.
 - WP 5.4b depends on WP 5.2 only by reading. `scripts/gate-wp-5.4b.sh` was re-run on branch `wp/5.6b` after WP 5.2 merged (exit 0, `GATE_SKIP_VERIFY=1`; WP 5.6b's own gate ran `pnpm verify`); since WP 5.6b an entered-in-error note is not exported at all.
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
 - PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
@@ -1130,4 +1129,31 @@ db: lease 10502 released
 
 WP 6.1 gate: PASSED
 db: lease 9377 released
+```
+
+### WP 6.3 (full seed profile, NPI check digits)
+
+Seeded determinism, recorded in `docs/evaluation/seed-full.md`: small run 1 and run 2 both `40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee`; full run A and run B both `eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54`. Integrity: 79 of 79 (small), 80 of 80 (full). Export: 40 of 40 small patients and 1,000 of 1,000 full patients with zero failing bundles; 6 and 30 seeded NPIs all pass `isValidNpi`.
+
+Deviations:
+- The NPI integrity check is in `apps/api/scripts/fhir-export-check.ts`, not in `packages/db/seed/integrity.ts`. `@carepath/db` does not depend on `@carepath/fhir`, and adding that dependency needs advisor approval. The seed generates its own check digit with the same rule.
+- Exercise library: 50 entries per clinic (250 rows across 5 clinics), read as the brief's 50 entries.
+- Encounters: 51 rows against the profile's 50 (the small profile shows the same one-row offset).
+- The brief's 3 administrative roles were not re-counted.
+
+`scripts/gate-wp-6.3.sh` (tail, exit 0):
+
+```
+  85 passed (6.5m)
+
+==> docs/ unchanged by the run
+
+verify: PASSED
+db: lease 1284 released
+
+==> git status --porcelain
+(clean)
+
+WP 6.3 gate: PASSED
+db: lease 627 released
 ```
