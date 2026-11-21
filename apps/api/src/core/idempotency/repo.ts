@@ -47,7 +47,7 @@ export async function storeKey(
   data: {
     requestHash: string;
     statusCode: number;
-    responseBody: Prisma.InputJsonValue;
+    responseBody: unknown;
     at: Date;
     expiresAt: Date;
   },
@@ -60,7 +60,7 @@ export async function storeKey(
       key: ref.key,
       requestHash: data.requestHash,
       statusCode: data.statusCode,
-      responseBody: data.responseBody,
+      responseBody: data.responseBody as Prisma.InputJsonValue,
       createdAt: data.at,
       expiresAt: data.expiresAt,
     },

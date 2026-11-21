@@ -13,7 +13,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 source scripts/gate-env.sh wpbcr 4034 3034 || exit 1
 run() { echo; echo "==> $*"; "$@" || { echo "FAILED: $*" >&2; exit 1; }; }
 OWNED=(
-  packages/db/prisma/schema.prisma
   packages/db/seed
   packages/db/test/bcr-contract-batch.test.ts
   packages/shared/src/contracts

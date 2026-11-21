@@ -1,5 +1,4 @@
 import { createHash } from "node:crypto";
-import type { Prisma } from "@carepath/db/client";
 import type { RequestCtx } from "../context.js";
 import type { DbTx } from "../db/repo.js";
 import { AppError } from "../errors.js";
@@ -76,7 +75,7 @@ export async function withIdempotencyKey<T>(
   await storeKey(tx, ref, {
     requestHash,
     statusCode: input.status,
-    responseBody: JSON.parse(JSON.stringify(body)) as Prisma.InputJsonValue,
+    responseBody: JSON.parse(JSON.stringify(body)) as unknown,
     at: input.at,
     expiresAt: new Date(input.at.getTime() + IDEMPOTENCY_TTL_MS),
   });

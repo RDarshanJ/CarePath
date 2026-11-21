@@ -419,6 +419,22 @@ describe("M8: OpenAPI enumeration of tenant-scoped routes", () => {
         }
       }
     }
+    // WP B-CR (CR-12): POST /patients/search has no path id, so its body fixture is here. The
+    // term matches every patient name in organization A's fixture; none may reach organization B.
+    for (const r of roles) {
+      const res = await as(
+        app,
+        sessions[r]!,
+      )({
+        method: "POST",
+        url: "/patients/search",
+        payload: { q: "Synthetic" },
+      });
+      for (const id of secrets) {
+        if (res.body.includes(id)) problems.push(`POST /patients/search as B ${r} leaks ${id}`);
+      }
+      if (!["patient"].includes(r)) expect(res.statusCode, `search as B ${r}`).toBe(200);
+    }
     expect(problems).toEqual([]);
   });
 });
