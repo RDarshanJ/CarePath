@@ -199,6 +199,12 @@ export async function runEval(
   };
 }
 
+/**
+ * The injection probes that were read before the detection patterns were written (WP 5.1). Named
+ * in the report so the injection figures are read as in-sample (checkpoint C3, 3.2).
+ */
+const IN_SAMPLE_INJECTION_CASES = ["case-06", "case-19"];
+
 const pct = (n: number, d: number) =>
   d === 0 ? "n/a" : `${((100 * n) / d).toFixed(1)}% (${n} of ${d})`;
 
@@ -283,6 +289,24 @@ export function renderReport(
   );
   lines.push(
     "What these measures do not show: the unsupported-statement rate checks that each cited record exists in scope, not that the cited text says what the statement says. Fact recall uses literal terms, so a correct paraphrase without the term counts as a miss.",
+    "",
+  );
+  // Checkpoint C3, section 3.2: three statements the report must carry beside the table.
+  const injectionIds = s.results.filter((r) => r.injection).map((r) => r.id);
+  if (deterministic) {
+    lines.push(
+      `True by construction: the demo provider builds each statement by quoting the transcript turn it cites and reads only the case's own records. The unsupported-statement rate (${s.unsupportedStatements} of ${s.statements}) and the citation accuracy of recalled facts (${s.recalledCorrectlyCited} of ${s.factsRecalled}) therefore cannot come out any other way for this provider. They show that the harness and the verifier run; they are not findings about draft quality.`,
+      "",
+    );
+    lines.push(
+      `In-sample: two injection detection patterns and the sentence-level handling of instruction-like text were written after reading ${IN_SAMPLE_INJECTION_CASES.join(" and ")}, which are ${IN_SAMPLE_INJECTION_CASES.filter((c) => injectionIds.includes(c)).length} of the ${s.injection.cases} injection probes (${injectionIds.join(", ")}). The injection results were measured with these cases in view; n = ${s.injection.cases}.`,
+      "",
+    );
+  } else {
+    lines.push(`Injection probes: n = ${s.injection.cases} (${injectionIds.join(", ")}).`, "");
+  }
+  lines.push(
+    "Scope: this report covers SOAP note drafts only. Progress summaries have no evaluation, and nothing here may be cited as an evaluation of them.",
     "",
   );
   lines.push("## Per case", "");
