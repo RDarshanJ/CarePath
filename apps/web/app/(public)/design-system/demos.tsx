@@ -338,7 +338,7 @@ export function BannerFocusDemo() {
           focusOnMount
           focusKey={n}
           action={
-            <Button variant="secondary" size="sm" onClick={() => setN((x) => x + 1)}>
+            <Button variant="neutral" size="sm" onClick={() => setN((x) => x + 1)}>
               Retry saving note
             </Button>
           }
@@ -453,7 +453,7 @@ export function NoteDialogDemo() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="secondary">Resolve with a note</Button>
+        <Button variant="neutral">Resolve with a note</Button>
       </DialogTrigger>
       <DialogContent
         title="Resolve this task"
@@ -495,7 +495,7 @@ export function ConfirmDemo() {
   const [failed, setFailed] = useState(false);
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>
+      <Button variant="neutral" onClick={() => setOpen(true)}>
         Cancel visit
       </Button>
       <ConfirmDialog

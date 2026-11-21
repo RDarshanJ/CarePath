@@ -196,7 +196,7 @@ export function AdminPatients() {
               : "The patient list could not load"
           }
           action={
-            <Button variant="secondary" size="sm" onClick={() => void result.refetch()}>
+            <Button variant="neutral" size="sm" onClick={() => void result.refetch()}>
               Try again
             </Button>
           }
@@ -271,7 +271,7 @@ export function AdminPatients() {
                       <Td>
                         {r.status === "awaiting_assignment" ? (
                           <Button
-                            variant="secondary"
+                            variant="neutral"
                             size="sm"
                             aria-label={`Assign therapist to ${fullName(r)}`}
                             onClick={() => {
@@ -303,7 +303,7 @@ export function AdminPatients() {
               />
             </div>
             <Button
-              variant="secondary"
+              variant="neutral"
               size="sm"
               disabled={page === 0}
               onClick={() => setPage(page - 1)}
@@ -311,7 +311,7 @@ export function AdminPatients() {
               Previous page
             </Button>
             <Button
-              variant="secondary"
+              variant="neutral"
               size="sm"
               disabled={!nextCursor}
               onClick={() => {

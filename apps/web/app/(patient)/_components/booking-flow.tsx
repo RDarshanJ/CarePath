@@ -511,7 +511,7 @@ export function BookingFlow({
               tone="error"
               title="Open times did not load"
               action={
-                <Button variant="secondary" size="sm" onClick={() => void slots.refetch()}>
+                <Button variant="neutral" size="sm" onClick={() => void slots.refetch()}>
                   Try again
                 </Button>
               }
@@ -531,7 +531,7 @@ export function BookingFlow({
               </p>
               {filtersOn ? (
                 <Button
-                  variant="secondary"
+                  variant="quiet"
                   onClick={() => {
                     setDays(new Set());
                     setTimes(new Set());

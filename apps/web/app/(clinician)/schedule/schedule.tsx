@@ -160,17 +160,17 @@ function DayStepper({
   const [typed, setTyped] = useState<string | null>(null);
   return (
     <div role="group" aria-label="Choose a day" className="flex flex-wrap items-end gap-2">
-      <Button variant="secondary" onClick={() => onGo(addDays(date, -1))}>
+      <Button variant="neutral" onClick={() => onGo(addDays(date, -1))}>
         Previous day
       </Button>
       <Button
-        variant="secondary"
+        variant="neutral"
         disabled={!today || date === today}
         onClick={() => today && onGo(today)}
       >
         Today
       </Button>
-      <Button variant="secondary" onClick={() => onGo(addDays(date, 1))}>
+      <Button variant="neutral" onClick={() => onGo(addDays(date, 1))}>
         Next day
       </Button>
       <div className="ml-2 flex flex-col gap-1.5">

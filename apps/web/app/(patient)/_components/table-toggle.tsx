@@ -11,7 +11,7 @@ export function TableToggle({ children, label }: { children: ReactNode; label: s
     <div className="flex flex-col gap-3">
       <div>
         <Button
-          variant="secondary"
+          variant="neutral"
           size="sm"
           aria-expanded={open}
           aria-controls={id}

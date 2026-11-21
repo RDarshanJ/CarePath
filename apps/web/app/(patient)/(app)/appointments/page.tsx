@@ -66,7 +66,7 @@ function Visit({
       ) : null}
       {actions && appt.status === "booked" ? (
         <div className="flex flex-wrap gap-2">
-          <Button href={`/appointments/${appt.id}/reschedule`} variant="secondary" size="sm">
+          <Button href={`/appointments/${appt.id}/reschedule`} variant="neutral" size="sm">
             Reschedule
             <span className="sr-only"> visit on {summary}</span>
           </Button>

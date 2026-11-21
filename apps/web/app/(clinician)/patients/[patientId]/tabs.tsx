@@ -773,7 +773,7 @@ export function CheckInsTab({
                     ) : can("clinical.write") ? (
                       <Button
                         size="sm"
-                        variant="secondary"
+                        variant="neutral"
                         aria-label={`Mark reviewed: check-in from ${formatDateTime(c.submittedAt, timezone)}`}
                         loading={review.isPending && review.variables === c.id}
                         loadingLabel="Marking"

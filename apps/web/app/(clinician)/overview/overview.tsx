@@ -97,7 +97,7 @@ export function Overview() {
           </>
         }
         actions={
-          <Button variant="secondary" size="sm" onClick={() => void overview.refetch()}>
+          <Button variant="neutral" size="sm" onClick={() => void overview.refetch()}>
             Refresh lists
           </Button>
         }
@@ -220,7 +220,7 @@ function UnreviewedCheckIns({ data, canReview }: { data: ClinicianOverview; canR
               {canReview ? (
                 <Button
                   size="sm"
-                  variant="secondary"
+                  variant="neutral"
                   aria-label={`Mark reviewed: ${fullName(c.patient)}, check-in from ${formatDateTime(c.submittedAt, timezone)}`}
                   loading={pendingId === c.id}
                   loadingLabel="Marking"

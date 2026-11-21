@@ -585,7 +585,7 @@ export default function DesignSystemPage() {
               tone="error"
               title="Your check-in was not sent"
               action={
-                <Button size="sm" variant="secondary">
+                <Button size="sm" variant="neutral">
                   Retry sending check-in
                 </Button>
               }
@@ -598,7 +598,7 @@ export default function DesignSystemPage() {
             <EmptyState
               icon="calendar"
               title="No visits booked"
-              action={<Button variant="secondary">Book a visit</Button>}
+              action={<Button variant="neutral">Book a visit</Button>}
             >
               Visits you book with your therapist appear here.
             </EmptyState>

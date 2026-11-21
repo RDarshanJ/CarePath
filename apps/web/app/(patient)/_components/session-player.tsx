@@ -381,7 +381,7 @@ function ExerciseView({
     if (ok) window.sessionStorage.removeItem(storageKey);
   }
 
-  const picture = exerciseIllustration(exercise);
+  const picture = exerciseIllustration(exercise, "hero");
   const total = session.activities.length;
   const upNext = session.activities.find((a) => a.status === "pending" && a.id !== activity.id);
 
@@ -453,12 +453,12 @@ function ExerciseView({
           </p>
           <div className="flex flex-wrap gap-2">
             {hold.remaining === null || hold.remaining === 0 ? (
-              <Button variant="secondary" size="sm" onClick={() => hold.start(timedSeconds)}>
+              <Button variant="neutral" size="sm" onClick={() => hold.start(timedSeconds)}>
                 Start timer
               </Button>
             ) : (
               <>
-                <Button variant="secondary" size="sm" onClick={hold.toggle}>
+                <Button variant="neutral" size="sm" onClick={hold.toggle}>
                   {hold.running ? "Pause timer" : "Continue timer"}
                 </Button>
                 <Button variant="quiet" size="sm" onClick={hold.reset}>
@@ -498,7 +498,7 @@ function ExerciseView({
             >
               Skip rest
             </Button>
-            <Button variant="secondary" onClick={rest.toggle}>
+            <Button variant="neutral" onClick={rest.toggle}>
               {rest.running ? "Pause rest" : "Continue rest"}
             </Button>
           </div>
@@ -515,10 +515,10 @@ function ExerciseView({
 
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="secondary" onClick={() => void onPause()} disabled={busy}>
+          <Button variant="neutral" onClick={() => void onPause()} disabled={busy}>
             Pause
           </Button>
-          <Button variant="secondary" onClick={() => setSkipOpen(true)} disabled={busy}>
+          <Button variant="neutral" onClick={() => setSkipOpen(true)} disabled={busy}>
             Skip exercise
           </Button>
         </div>

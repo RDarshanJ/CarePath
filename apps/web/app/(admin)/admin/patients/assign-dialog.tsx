@@ -125,7 +125,7 @@ export function AssignDialog({
               tone="error"
               title="Therapists could not load"
               action={
-                <Button variant="secondary" size="sm" onClick={() => void practitioners.refetch()}>
+                <Button variant="neutral" size="sm" onClick={() => void practitioners.refetch()}>
                   Try again
                 </Button>
               }

@@ -36,7 +36,7 @@ export default async function SessionOverviewPage() {
 
       <ol className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface">
         {items.map((item, index) => {
-          const picture = exerciseIllustration(item.exercise);
+          const picture = exerciseIllustration(item.exercise, "overview");
           return (
             <li key={item.position} className="flex gap-3 p-4">
               <span

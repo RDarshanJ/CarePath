@@ -116,7 +116,7 @@ export function ExerciseLibrary({
                 </div>
                 <Button
                   size="sm"
-                  variant="secondary"
+                  variant="neutral"
                   iconLeft={added ? "check" : "plus"}
                   aria-label={added ? `${e.name} is in the plan` : `Add ${e.name} to the plan`}
                   aria-disabled={added || undefined}

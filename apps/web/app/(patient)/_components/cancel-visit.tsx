@@ -77,7 +77,7 @@ export function CancelVisit({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
+        <Button variant="neutral" size="sm">
           Cancel visit
           <span className="sr-only"> on {summary}</span>
         </Button>

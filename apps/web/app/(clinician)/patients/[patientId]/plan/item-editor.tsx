@@ -101,7 +101,7 @@ export function ItemEditor({
             label={`Move ${name} up`}
             icon="arrow-up"
             size="sm"
-            variant="secondary"
+            variant="neutral"
             disabled={index === 0}
             onClick={() => onMove(-1)}
           />
@@ -110,7 +110,7 @@ export function ItemEditor({
             label={`Move ${name} down`}
             icon="arrow-down"
             size="sm"
-            variant="secondary"
+            variant="neutral"
             disabled={index === count - 1}
             onClick={() => onMove(1)}
           />

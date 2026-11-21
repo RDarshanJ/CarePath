@@ -58,12 +58,7 @@ export function PlanChangeNote(props: PlanChangeNoteProps) {
         title={first ? "Your plan is ready" : "Your plan changed"}
         action={
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Button
-              variant="secondary"
-              onClick={acknowledge}
-              loading={pending}
-              loadingLabel="Saving"
-            >
+            <Button variant="neutral" onClick={acknowledge} loading={pending} loadingLabel="Saving">
               Got it
             </Button>
             <p className="text-small text-ink-muted">

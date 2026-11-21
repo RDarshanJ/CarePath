@@ -93,7 +93,7 @@ export function QueryError({ error, onRetry }: { error: unknown; onRetry?: () =>
       title={title}
       action={
         onRetry ? (
-          <Button variant="secondary" size="sm" onClick={onRetry}>
+          <Button variant="neutral" size="sm" onClick={onRetry}>
             Try again
           </Button>
         ) : undefined
@@ -192,7 +192,7 @@ export function EmptyDirectory({ filtered, onClear }: { filtered: boolean; onCle
       {...(filtered && onClear
         ? {
             action: (
-              <Button variant="secondary" onClick={onClear}>
+              <Button variant="quiet" onClick={onClear}>
                 Clear filters
               </Button>
             ),

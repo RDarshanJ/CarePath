@@ -47,7 +47,7 @@ export function ClinicianProviders({
           tone="error"
           title="The workspace could not load"
           action={
-            <Button variant="secondary" size="sm" onClick={() => void overview.refetch()}>
+            <Button variant="neutral" size="sm" onClick={() => void overview.refetch()}>
               Try again
             </Button>
           }

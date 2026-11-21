@@ -92,7 +92,7 @@ export function PlanView({ plan }: { plan: CarePlanView }) {
         </h4>
         <ol className="mt-2 flex flex-col divide-y divide-border rounded-container border border-border">
           {plan.items.map((item, i) => {
-            const picture = exerciseIllustration(item.exercise);
+            const picture = exerciseIllustration(item.exercise, "overview");
             return (
               <li
                 key={`${item.exercise.id}`}

@@ -252,7 +252,7 @@ export function ReviewQueue() {
               ? {
                   action: (
                     <Button
-                      variant="secondary"
+                      variant="quiet"
                       onClick={() => update({ assigned: null, rule: null, task: null })}
                     >
                       Clear filters
@@ -540,7 +540,7 @@ function TaskDetail({
                 <div className="flex flex-wrap gap-2">
                   {mine ? (
                     <Button
-                      variant="secondary"
+                      variant="neutral"
                       loading={assign.isPending}
                       loadingLabel="Updating"
                       disabled={teamBlocked}
@@ -551,7 +551,7 @@ function TaskDetail({
                     </Button>
                   ) : (
                     <Button
-                      variant="secondary"
+                      variant="neutral"
                       loading={assign.isPending}
                       loadingLabel="Assigning"
                       disabled={!session.practitionerId || teamBlocked}
@@ -563,7 +563,7 @@ function TaskDetail({
                   )}
                   {checkInSource && can("clinical.write") ? (
                     <Button
-                      variant="secondary"
+                      variant="neutral"
                       loading={acknowledge.isPending}
                       loadingLabel="Marking"
                       disabled={teamBlocked}
@@ -581,7 +581,7 @@ function TaskDetail({
                     Resolve with a note
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="neutral"
                     disabled={closeBlocked}
                     {...(closeBlocked ? { "aria-describedby": "team-reason" } : {})}
                     onClick={() => setNoteAction("dismiss")}

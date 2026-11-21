@@ -61,7 +61,7 @@ export default async function PlanPage() {
         <p className="text-small text-ink-muted">{plan.contentNotice}</p>
         <ol className="flex flex-col divide-y divide-border rounded-container border border-border bg-surface">
           {plan.items.map((item, index) => {
-            const picture = exerciseIllustration(item.exercise);
+            const picture = exerciseIllustration(item.exercise, "overview");
             return (
               <li key={item.position} className="flex flex-col gap-1.5 p-4">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">

@@ -386,7 +386,7 @@ export function Directory() {
                 />
               </div>
               <Button
-                variant="secondary"
+                variant="neutral"
                 size="sm"
                 disabled={page === 0}
                 onClick={() => setPage(page - 1)}
@@ -394,7 +394,7 @@ export function Directory() {
                 Previous page
               </Button>
               <Button
-                variant="secondary"
+                variant="neutral"
                 size="sm"
                 disabled={!nextCursor}
                 onClick={() => {

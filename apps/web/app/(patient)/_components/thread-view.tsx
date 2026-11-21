@@ -204,7 +204,7 @@ export function ThreadView({
         {cursor ? (
           <div>
             <Button
-              variant="secondary"
+              variant="neutral"
               onClick={loadOlder}
               loading={loadingOlder}
               loadingLabel="Loading"
@@ -338,7 +338,7 @@ function MessageItem({
             </p>
             {m.canRetry ? (
               <Button
-                variant="secondary"
+                variant="neutral"
                 size="sm"
                 onClick={onRetry}
                 loading={retrying}

@@ -438,7 +438,7 @@ function Builder({
           tone="error"
           title="This draft was saved somewhere else"
           action={
-            <Button variant="secondary" size="sm" onClick={() => void reloadDraft()}>
+            <Button variant="neutral" size="sm" onClick={() => void reloadDraft()}>
               Load the saved draft
             </Button>
           }
@@ -605,7 +605,7 @@ function Builder({
                   ))}
                   <div>
                     <Button
-                      variant="secondary"
+                      variant="neutral"
                       iconLeft="plus"
                       onClick={() =>
                         edit((s) => ({
@@ -713,7 +713,7 @@ function SaveStatus({
         {text}
       </p>
       {state.kind === "error" ? (
-        <Button variant="secondary" size="sm" onClick={onRetry}>
+        <Button variant="neutral" size="sm" onClick={onRetry}>
           Try saving again
         </Button>
       ) : null}

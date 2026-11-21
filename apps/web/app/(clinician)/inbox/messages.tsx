@@ -392,7 +392,7 @@ function MessageItem({
             {m.canRetry ? (
               <Button
                 size="sm"
-                variant="secondary"
+                variant="neutral"
                 loading={retrying}
                 loadingLabel={MESSAGE_RETRYING_LABEL}
                 onClick={onRetry}
