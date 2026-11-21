@@ -1,7 +1,8 @@
 /**
  * Row checksums for determinism checks. Each table is hashed over its rows as canonical JSON in
  * primary-key order. Database-assigned ids never appear: the seed supplies every id, and the
- * Role foreign key on memberships is replaced by the role key.
+ * Role foreign key on memberships is replaced by the role key, and the insertion-order counter of
+ * ReviewTaskEvent (`seq`, a database sequence that keeps counting across seeds) is left out.
  */
 import { createHash } from "node:crypto";
 import type pg from "pg";
@@ -24,7 +25,9 @@ export async function contentChecksums(
     const source =
       table === "OrganizationMembership"
         ? `SELECT (to_jsonb(m) - 'roleId') || jsonb_build_object('role', r.key) AS j, m.id FROM "OrganizationMembership" m JOIN "Role" r ON r.id = m."roleId"`
-        : `SELECT to_jsonb(t) AS j, t.id FROM "${table}" t`;
+        : table === "ReviewTaskEvent"
+          ? `SELECT to_jsonb(t) - 'seq' AS j, t.id FROM "ReviewTaskEvent" t`
+          : `SELECT to_jsonb(t) AS j, t.id FROM "${table}" t`;
     const res = await db.query<{ rows: string; md5: string }>(
       `SELECT count(*) AS rows, coalesce(md5(string_agg(j::text, E'\\n' ORDER BY id)), md5('')) AS md5 FROM (${source}) x`,
     );
