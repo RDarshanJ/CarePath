@@ -182,7 +182,7 @@ test("patient shell: signed in as, one nav, badge from the API, back link in the
   await expect(page.getByRole("navigation")).toHaveCount(0);
   await expect(page.getByRole("banner")).not.toContainText("Signed in as");
   await expect(page.getByRole("button", { name: "Contact care team" })).toBeVisible();
-  await page.getByRole("link", { name: "Back to Today" }).click();
+  await page.getByRole("banner").getByRole("link", { name: "Back to Today" }).click();
   await expect(page).toHaveURL(/\/today$/);
   await expectNoSeriousViolations(page, "/today after the back link");
 });

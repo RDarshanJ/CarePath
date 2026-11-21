@@ -109,8 +109,9 @@ export function ContactCareTeam({ clinic }: { clinic: ClinicCard }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
-          Contact care team
+        {/* The label may wrap at 200 percent text on a phone instead of pushing the page sideways. */}
+        <Button variant="secondary" size="sm" className="h-auto! min-h-target py-1.5">
+          <span className="text-center whitespace-normal">Contact care team</span>
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -228,7 +229,7 @@ export function PatientFrame({
             </Link>
           </footer>
           {/* Sticky in the page flow, not fixed, so it never rides above the on-screen keyboard (CD-500). */}
-          <div data-sticky-bar className="sticky bottom-0 z-10 md:hidden">
+          <div data-sticky-bar className="sticky bottom-0 z-10 overflow-x-clip md:hidden">
             <BottomTabBar label="Patient" items={items} linkAs={NextLink} />
           </div>
         </>

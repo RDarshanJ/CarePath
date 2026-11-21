@@ -123,7 +123,7 @@ function ShellBody({ session, children }: { session: SessionInfo; children: Reac
         </main>
       </div>
       {/* Sticky in the page flow (not fixed), so it never sits over the on-screen keyboard. */}
-      <div data-sticky-bar className="sticky bottom-0 z-10 md:hidden">
+      <div data-sticky-bar className="sticky bottom-0 z-10 overflow-x-clip md:hidden">
         <BottomTabBar label="Clinician" items={items} linkAs={NextLink} />
       </div>
     </div>

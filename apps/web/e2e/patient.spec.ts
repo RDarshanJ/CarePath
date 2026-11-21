@@ -425,7 +425,8 @@ test.describe("Scenario C: guided session", () => {
     await shots(page, "c09-checkin-sent");
     await expectNoSeriousViolations(page, "check-in sent");
 
-    await page.getByRole("link", { name: "Back to Today" }).click();
+    // The page's own "Back to Today" (the header back link of CD-505 has the same name and destination).
+    await page.getByRole("main").getByRole("link", { name: "Back to Today" }).click();
     await expect(page.getByRole("heading", { level: 2, name: "Done for today" })).toBeVisible();
     await shots(page, "c10-today-done");
     await expectNoSeriousViolations(page, "today done");

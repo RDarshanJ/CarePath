@@ -49,7 +49,7 @@ const next = (page: Page) => page.getByRole("button", { name: "Continue", exact:
 
 async function onboard(page: Page) {
   await page.goto("/login");
-  await page.getByRole("link", { name: "Start here" }).click();
+  await page.getByRole("link", { name: "Create your account" }).click();
   await expect(page).toHaveURL(/\/onboarding$/);
   await expect(page.getByRole("heading", { level: 1, name: "Create your account" })).toBeVisible();
   await page.getByLabel(/^First name/).fill(PATIENT.first);
@@ -257,7 +257,7 @@ test("the slice: onboarding, assignment in the UI, plan, session, pain check-in,
   await expect(pp.getByText("You reported pain of 8 out of 10").first()).toBeVisible();
   await expect(pp.getByTestId("check-in-done").getByText(EMERGENCY_NOTICE)).toBeVisible();
   await shots(pp, "slice-08-checkin-sent");
-  await pp.getByRole("link", { name: "Back to Today" }).click();
+  await pp.getByRole("main").getByRole("link", { name: "Back to Today" }).click();
   await expect(pp.getByRole("heading", { level: 2, name: "Done for today" })).toBeVisible();
   await shots(pp, "slice-09-today-done");
   await expectNoSeriousViolations(pp, "today done");

@@ -26,15 +26,17 @@ const isUnder = (path: string, prefix: string) => path === prefix || path.starts
 
 /**
  * Back link (CD-505): one link named for its parent, before the `h1` and after the skip link, never beside
- * breadcrumbs. When the page before this one was the parent, the link goes back in history so the parent
- * returns in the state it was left in (filters, sort, page and scroll live in its URL or its layout store).
- * Otherwise it navigates to `href`. It is a real link either way: it works without script and opens in a
- * new tab like any other.
+ * breadcrumbs. With `restoreState`, when the page before this one was the parent, the link goes back in
+ * history so a list returns in the state it was left in (filters, sort, page and scroll). Without it, or
+ * when the parent was not the previous page, it navigates to `href`, which fetches the parent fresh: use
+ * that where the parent's content changes because of what happened here (Today after a session). It is a
+ * real link either way: it works without script and opens in a new tab like any other.
  */
 export function BackLink({
   href,
   children,
   parentPrefix,
+  restoreState = false,
   className,
 }: {
   /** Where the link goes when the parent is not the previous page. */
@@ -43,6 +45,8 @@ export function BackLink({
   children: ReactNode;
   /** Paths that count as the parent; defaults to the path of `href`. */
   parentPrefix?: string;
+  /** Go back in history when the previous page was the parent (lists with filters). Default false. */
+  restoreState?: boolean;
   className?: string;
 }) {
   const router = useRouter();
@@ -51,7 +55,7 @@ export function BackLink({
   function onClick(event: MouseEvent<HTMLAnchorElement>) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)
       return;
-    if (previousPath && isUnder(previousPath, prefix)) {
+    if (restoreState && previousPath && isUnder(previousPath, prefix)) {
       event.preventDefault();
       router.back();
     }
