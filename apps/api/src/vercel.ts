@@ -12,12 +12,26 @@
  * between requests on a function. GET /internal/cron/jobs does that work (Vercel Cron), and
  * JOBS_INLINE=1 delivers messages inside the request that sent them.
  */
+import { createHmac } from "node:crypto";
 import { buildApp } from "./app.js";
 import { clockFromEnv } from "./core/clock.js";
 
 // Every Vercel deployment, preview or production, runs with production rules: Secure __Host-
 // cookie, required SESSION_SECRET, test hooks and CAREPATH_FIXED_NOW ignored.
 if (process.env["VERCEL"] === "1") process.env["NODE_ENV"] = "production";
+
+// Without its own SESSION_SECRET, a Vercel deployment derives one from the database connection
+// string the Neon integration provides: HMAC-SHA256 keyed by that secret, so the key is as
+// private as the database password and changes when the password is rotated (which signs
+// everyone out). Setting SESSION_SECRET in the project still takes precedence.
+if (process.env["VERCEL"] === "1" && !process.env["SESSION_SECRET"]) {
+  const source = process.env["DATABASE_URL_UNPOOLED"] ?? process.env["DATABASE_URL"];
+  if (source) {
+    process.env["SESSION_SECRET"] = createHmac("sha256", source)
+      .update("carepath-session-secret-v1")
+      .digest("base64");
+  }
+}
 
 const clock = clockFromEnv(process.env);
 const app = await buildApp({ now: clock.now });

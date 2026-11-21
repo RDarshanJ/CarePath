@@ -97,7 +97,6 @@ check_api() {
   (
     cd "$SCRATCH/fn/apps/api" &&
       env -i PATH="$PATH" HOME="$HOME" VERCEL=1 DATABASE_URL="$DATABASE_URL" \
-        SESSION_SECRET="vercel-check-session-secret-$RANDOM$RANDOM" \
         CRON_SECRET="vercel-check-cron-secret-$RANDOM$RANDOM" \
         CORS_ORIGINS="$WEB_ORIGIN_EXAMPLE" TRUST_PROXY=loopback JOBS_INLINE=1 LOG_LEVEL=warn \
         node "$ROOT/scripts/vercel-harness.mjs" api/index.mjs

@@ -146,8 +146,8 @@ Set for Production and Preview. Secret values are marked; mark them **Sensitive*
 |---|---|---|---|
 | `DATABASE_URL` | `postgresql://neondb_owner:...@ep-xxx-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require` | yes | Added by the Neon integration (pooled). |
 | `DATABASE_URL_UNPOOLED` | `postgresql://neondb_owner:...@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require` | yes | Added by the Neon integration. Not read by the running API; the build migrates and seeds through it. |
-| `SESSION_SECRET` | output of `openssl rand -base64 32` | yes | HMAC key for CSRF tokens and address hashes. The API refuses to start in production with the development default. Changing it signs everyone out. |
-| `CRON_SECRET` | output of `openssl rand -hex 32` | yes | At least 16 characters in production. Without it the cron route refuses every call. |
+| `SESSION_SECRET` | output of `openssl rand -base64 32` | yes | Optional on Vercel. HMAC key for CSRF tokens and address hashes. When unset, `src/vercel.ts` derives it from the database connection string (HMAC-SHA256), so rotating the Neon password signs everyone out. Elsewhere the API refuses to start in production with the development default. Changing it signs everyone out. |
+| `CRON_SECRET` | output of `openssl rand -hex 32` | yes | At least 16 characters in production. Without it the cron route refuses every call, so the daily job pass (reminders, recurring jobs) does not run; messages still deliver through `JOBS_INLINE`. |
 | `CORS_ORIGINS` | `https://carepath-web.vercel.app` | no | Exact web origin(s), comma-separated. Used for CORS and for the Origin check on every mutating request. |
 | `TRUST_PROXY` | `loopback` | no | Vercel's runtime forwards each request from 127.0.0.1 with the visitor address in `X-Forwarded-For`. |
 | `JOBS_INLINE` | `1` | no | Deliver messages inside the send and retry requests. |
