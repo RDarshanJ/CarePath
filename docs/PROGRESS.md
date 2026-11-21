@@ -27,6 +27,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - D-WP-1 tokens, type and capture tooling (branch `wp/d1`): DR-001 colour set as one map for both themes (all roles including link, selected, critical, accent, AI, `chart-1..8`, `seq-1..7`, `div-1..5`), patient and clinician type scales and `textExtra` roles, IBM Plex Sans 400/400 italic/500/600 and Plex Mono 400 with Source Serif 4 removed, scrim and overlay shadow on `ink`, token tests rewritten per DR-001 section 8, `apps/web/scripts/design-capture.mjs` with its probe, and the tokens-only capture in `docs/design/after/d-wp-1/` (gate output below).
 
 - WP 5.2 (branch `wp/5.2`): AI progress summaries and SOAP note drafts through `@carepath/ai` with a SQL evidence resolver, stored generations and append-only reviews, gated approval, note draft from approval, sign, amendment and entered in error, consent refusal, failure path, overview AI drafts; CR-7, CR-8 and CR-16 delivered as demo rules pending clinical governance review (gate output below).
+- D-WP-2 primitives, feedback, overlays and accessibility infrastructure (branch `wp/d2`): primitive and composed layers in `packages/ui` with `lib/` helpers, the duplicates of `component-usage-matrix.md` removed from `apps/web` (except two files owned by WP B-CR at the time), the `/design-system` gallery with a per-specimen axe and keyboard spec, gallery captures at six widths, reduced motion and 200 percent zoom, and `docs/design/after/d-wp-2/` (gate output below).
 
 ## Outstanding
 
@@ -939,4 +940,53 @@ Deviations and open points:
 - `apps/web/components/illustration.tsx` was not touched (D-WP-7 owns it and has already changed it). `apps/web/app/icon.svg` and `docs/design-system/components.md` were outside the listed paths and were edited for the colour change only.
 - Interaction-state rules in `design-tokens.md` section 3 (hover `primary-subtle`, selected edge bar, outline secondary button) are not applied to components; that is D-WP-2. Heading `h4` weight 500 for patients is not applied either (the `Heading` component uses one weight).
 - The baseline capture script was not in the repository, so this one was written from the audit's description; its file names match the baseline, its states are close but not identical (one persona for the session chain, `/review-queue` without a task selected at 1440).
+### D-WP-2 (primitives, feedback, overlays, accessibility infrastructure)
 
+Worktree `/home/claude/wt/d2`, branch `wp/d2`. Dependency commit first (own commit): `@carepath/shared` (workspace) added to `@carepath/ui` so `PainScale` reads `PAIN_ANCHOR_LOW` and `PAIN_ANCHOR_HIGH` (CD-101, DR-002 R3). No third-party dependency added.
+
+- `packages/ui/src/components` is split into `primitives/` and `composed/`; `packages/ui/src/lib` holds pure rules and hooks. Built or rebuilt:
+  - Buttons (CD-420, 421, 426, 429, 530; design-tokens section 3): `secondary` is the cobalt outline, `neutral` the utility button, `quiet` the third tier, `danger` only for confirming; `tone="critical"`; `unavailable` (aria-disabled with a linked reason); `href` renders the app's link; `IconButton` shows its name as a tooltip on mouse hover and keyboard focus, Esc hides it. One `Link` (inline, standalone with the theme target) with `LinkProvider` (next/link set once in the root layout). `SkipLink`.
+  - Fields (CD-531, 108, 110, 441): `Field` with the error above the control, describedby in order why, hint, error, character count near the limit; `FieldError`; `FieldGroup`; `TextInput unit`; `ErrorSummary` (focus, links to fields, "Error:" title prefix).
+  - Choice controls (CD-105, 107, 311, 532, 534): `Checkbox`, `Radio`, `Switch` with stable ids; `SegmentedControl`; `ToggleChip` and `ToggleChipGroup`; `SlotButton`; `toggleExclusive` for "None of these".
+  - `DateOfBirthField` and `checkDateOfBirth` (CD-102). `PainScale` (CD-100, 101): shared anchors visible and in the names of 0 and 10, no band words, check mark on the selected item, error and stop-note states, 0 to 5 and 6 to 10 at phone width, three rows at 320.
+  - Status (CD-230, 508): `StatusChip` (adds `critical`), `Tag` (no icon), one filled `CountBadge` with unit, hidden at zero, 99+.
+  - Feedback (CD-440, 442, 443, 446, 447, 449, 528, 535): `Banner` (focus on mount, heading option), one `EmptyState` (padding, image), `Skeleton`, `LoadingStatus` with the 10-second text, `Spinner`; toast policy as a pure queue (success and info only, one visible, duplicates merged, up to three waiting, held while an overlay is open, paused on hover, focus and window blur).
+  - Overlays (CD-520 to 525, CD-306, 522, DR-002 R6): `DialogContent` with the in-place discard row and in-overlay feedback, `ConfirmDialog` (alertdialog, safe-button focus, no outside dismiss, pending and error states), `DrawerContent` (right, screen), `BottomSheetContent` (sheet below 768, centred dialog above), `SidePanel` (inline from 1280, drawer from 768, full screen below), focus back to the opener for overlays opened without a Trigger, `useLeaveGuard` and `LeaveGuardDialog` (beforeunload, in-app links, Back; limitations in the file header).
+  - Accessibility infrastructure (CD-120 to 127, 507): `Heading focusOnMount`, focus helpers, `LiveRegion` and `useAnnouncer`, `Timer` and `useCountdown` with milestone announcements, sticky-offset tokens (`data-sticky-layout` drives `scroll-padding`, replacing the two inline style tags), theme h4 weight (patient 500).
+  - Tables (CD-331, 334, 335, 338 to 340, 342, 343): `Table` (caption help, busy), `Tr header`, selected edge, hover only on clickable rows, sort button names, `Td wrap`; `TablePagination`; `LoadMore`; `FilterBar`, `SearchField`, `FilterField`, `FilterPanel`, `ActiveFilterChips`. Tabs with the selected edge, a scroll cue and `useUrlTab` (CD-504, 533). `Progress` (CD-214, 536).
+- Duplicates removed from `apps/web` (mechanical call-site changes, behaviour kept): `AppLink`, `TextLink`, `ButtonLink` and hand-styled next/link anchors; the clinician `Empty` wrapper; two `SkipLink` copies; patient `UnreadCount`; eight hand-built inline errors and the onboarding summary; booking chips; five show-more variants (now "Show more ..."); raw table header rows; error toasts (now Banners in place, inside the queue note dialog, which also protects typed text); the retry info toast; the unused `TooltipProvider`; the class-override Stop button; the hand-built plan change card; local queue and library filter fields.
+- `/design-system` gallery: every component with its states, live where it has behaviour, each specimen marked `data-specimen`. `apps/web/e2e/design-system.spec.ts` (28 tests, 390 and 1440): axe on every specimen, plus keyboard and state checks. `design-capture.mjs` captures the gallery at six widths, under reduced motion (fails if anything animates) and at 200 percent zoom of 1280.
+- `docs/design/after/d-wp-2/`: 248 images, `_probe.json` and `pairs.md`. Probe: no warm background; overflow on the same 15 images as D-WP-1 (layout packages); axe serious `target-size` only on `patient-reschedule-375` (3 nodes, was 4); none on the gallery.
+- Two visual passes on the gallery and the booking, review queue and Today captures; fixes: date of birth month width, side sheet trigger and toast specimen widths, rows-per-page label, skip-link specimen, standalone section links, UI contrast pairs shown as swatches.
+
+Gate: `scripts/gate-wp-d2.sh` exit 0 (typecheck, lint and format of owned and migrated paths, `packages/ui` tests, duplicate check, gallery spec, design capture with `PROBE_FAIL_ON=warm`, `pnpm verify`, clean tree). Tail:
+
+```
+==> one version of each component (component-usage-matrix.md A2, A3, B, E, H)
+ok: text link (AppLink, TextLink, ButtonLink components)
+... (14 checks, all ok)
+==> gallery spec (axe per specimen, keyboard and states), API 4102, web 3102
+  28 passed (1.2m)
+design-capture: 248 images in /home/claude/wt/d2/.data/capture-d-wp-2
+  warm backgrounds (not a status or chart token): 0 images
+  horizontal overflow: 15 images
+  axe serious or critical (at 375, 768, 1440): 1 images
+packages/ui test:       Tests  282 passed (282)
+apps/api test:       Tests  243 passed (243)
+  25 skipped
+  81 passed (6.7m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-2 gate: PASSED
+```
+
+Deviations and open points:
+- `ToggleChip` is a toggle button with `aria-pressed` (CD-311 and the booking specs) rather than the styled checkbox of CD-534; the two records disagree. For the advisor.
+- `neutral` button variant added beside CD-420's set because design-tokens section 3 defines the neutral utility column separately from the outline secondary; existing `secondary` call sites now render as the cobalt outline. Slices choose `neutral` for utility actions (Pause, Edit, Refresh).
+- `SlotButton` and the pain scale use the 48 px patient floor (CD-121), not the 44 px in CD-311.
+- `LoadMore` keeps focus on the first new item (CD-335) rather than on the button (CD-530); they disagree; CD-335 is the later, more specific record.
+- Not migrated, because WP B-CR owned the files during D-WP-2: `(clinician)/patients/directory.tsx` (local `FilterField`, pagination block; uses `AppLink`, kept as an alias of the ui `Link` in `common.tsx` until D-WP-13) and `(admin)/admin/patients/**` (pagination block, `assign-dialog.tsx` inline error). `TablePagination` and `FilterBar` are built and tested in the gallery; D-WP-13 and WP 6.2 adopt them.
+- Left for their slices (not duplicates in the row's list): `BottomNav` and `HeaderNav` in `patient-frame.tsx` (D-WP-6), the session player's local `use-timers` (D-WP-10 can use `useCountdown` and `Timer`), queue "Show" select to `SegmentedControl` (D-WP-13), wiring `useLeaveGuard` into the builder (D-WP-16), `ErrorSummary` titles per CD-441 in onboarding (kept "n things to fix"; D-WP-8), row-level error placement for overview and record check-ins (region banner now).
+- Storage: nothing added to `localStorage` or `sessionStorage`; the leave guard and drafts stay in memory (R1).
