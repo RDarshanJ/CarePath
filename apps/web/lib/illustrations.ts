@@ -39,6 +39,9 @@ const areaAlt: Record<string, string> = {
   general: "A person standing, seen from the front, from the head to the knees",
 };
 
+/** True for a body-area picture (`area-*.webp`): a tile of 64 px or less only (DR-004 U9). */
+export const isAreaPath = (path: string): boolean => /\/area-[^/]+\.webp$/.test(path);
+
 const slugOf = (bodyArea: string) => bodyArea.trim().toLowerCase().replace(/\W+/g, "-");
 
 /** The picture for a body area, or null for a value the set does not cover. */
@@ -67,7 +70,8 @@ export function exerciseIllustration(
   },
   size: IllustrationSize,
 ): Illustration | null {
-  if (exercise.mediaPath && exercise.mediaAlt) {
+  // A stored `area-*` path is the body-area fallback, not a picture of the exercise.
+  if (exercise.mediaPath && exercise.mediaAlt && !isAreaPath(exercise.mediaPath)) {
     return { path: exercise.mediaPath, alt: exercise.mediaAlt };
   }
   return size === "tile" ? areaIllustration(exercise.bodyArea) : null;

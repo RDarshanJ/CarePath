@@ -3,12 +3,10 @@ import {
   ILLUSTRATION_CAPTION,
   ILLUSTRATION_HEIGHT,
   ILLUSTRATION_WIDTH,
+  isAreaPath,
   smallVariant,
   type Illustration as IllustrationData,
 } from "../lib/illustrations";
-
-/** Body-area pictures are tight crops: only ever drawn as a tile of 64 px or less (DR-004 U9). */
-export const isAreaPicture = (path: string): boolean => /\/area-[^/]+\.webp$/.test(path);
 
 /**
  * An exercise or body-area picture with its mandatory caption. Explicit width and height reserve the
@@ -26,7 +24,7 @@ export function IllustrationFigure({
   priority?: boolean;
   className?: string;
 }) {
-  if (isAreaPicture(illustration.path)) {
+  if (isAreaPath(illustration.path)) {
     return (
       <figure className={cx("flex items-center gap-3", className)}>
         <img
