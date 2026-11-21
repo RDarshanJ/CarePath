@@ -1434,3 +1434,33 @@ Deviations and open points:
 - Wake lock and screen behaviour are untested on real phones (feature C, U).
 - Seen and not changed (shell, not this package): from 768 the focus shell puts "Contact care team" beside "Back to Today" rather than at the right edge.
 - No participant saw any of this; every judgement above is heuristic.
+
+Gate: `scripts/gate-wp-d10.sh` exit 0 on `wp/d10` at `f9d3735` (rebased onto `main` at `04f6002`; includes `pnpm verify`). Tail:
+
+```
+==> structure
+ok: owned folders only, set count only in sessionStorage, no band words, Stop is the only outline, sizes named
+==> end-to-end (session-player, patient, slice, shells), API 4110, web 3110
+  34 passed (4.3m)
+design-capture: 78 images in /home/claude/wt/d10/.data/capture-d-wp-10
+  warm backgrounds (not a status or chart token): 0 images
+  horizontal overflow: 0 images
+  axe serious or critical (at 375, 768, 1440): 0 images
+  interactive targets under 24 px: 0 images
+  interactive targets under the theme floor: 0 images
+  body-area pictures wider than 64 px: 0 images
+  real targets under the theme floor: 0 in 0 images (owned elsewhere, reported: 0)
+==> pnpm verify
+integrity checks: 79 passed
+content-hash: 40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee
+packages/ai 114, packages/fhir 101, packages/shared 87, packages/ui 325, packages/db 101, apps/api 339 tests passed
+  130 passed (10.8m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-10 gate: PASSED
+```
+
+Earlier runs failed and were fixed, not retried blindly: `patient.spec` strict-mode match of "Exercise 3 of 4" against the paused sentence (the sentence now names the exercise); the `patient.spec` keyboard test waiting on "Your therapist will see this." (now also beside Send) and racing the result (now waits for "Check-in sent"); the `/check-in` send bar under the tab bar (visual pass 2); and, in the first full `pnpm verify`, `clinician-screens.spec` at 1440 missing the plan event in Dana Demopatient's timeline because this spec's sessions ran on her (they now run on `patient.flare`). One run was cut by the server restart and was run again from the start; the dead lease it left was pruned by the next acquire.
+
