@@ -237,7 +237,9 @@ export default function DesignSystemPage() {
             <ul className="flex flex-wrap gap-x-4 gap-y-1 text-label">
               {sections.map(([id, label]) => (
                 <li key={id}>
-                  <Link href={`#${id}`}>{label}</Link>
+                  <Link href={`#${id}`} variant="standalone">
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
