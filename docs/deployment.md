@@ -16,6 +16,7 @@ Status: the configuration in this repository was checked locally with `scripts/v
 
 - The API entry for Vercel is `apps/api/server.mjs`. Vercel's Fastify preset searches `app`, `index` and `server` files in the project root before `src/`, and takes the first one that imports `fastify`; `server.mjs` is that file. It loads `src/vercel.ts` (compiled), which builds the app and calls `listen()`. Vercel's Node runtime intercepts that call and serves requests through the server it captured.
 - The workspace packages export TypeScript source, and the API normally runs through tsx. The build command `pnpm run vercel-build` (`apps/api/scripts/vercel-build.mjs`) compiles every runtime TypeScript file to JavaScript beside itself and points the workspace package manifests at the `.js` files. The layout does not change, so Prisma's query compiler and the Medplum R4 definitions load from the same relative places as in development. The script refuses to run outside a Vercel build or the scratch copy made by `scripts/vercel-check.sh`, because it rewrites files in place.
+- The same build command can migrate and seed the database (step 3). That runs only for production builds on Vercel and only when `CAREPATH_DEPLOY_MIGRATE=1` (and `CAREPATH_DEPLOY_SEED=1`) are set, so preview builds never touch the database.
 - The Medplum R4 definition files are read from disk at run time, which the file tracer cannot see, so `apps/api/vercel.json` lists them under `functions["server.mjs"].includeFiles`.
 - There is no worker loop on a function. `GET /internal/cron/jobs` does what the loop does: it enqueues the recurring jobs for the current 15-minute slot (deduplicated), then runs due jobs until none are left or `CRON_BUDGET_MS` is spent. It needs `Authorization: Bearer <CRON_SECRET>`; Vercel Cron sends that header itself when the project has a `CRON_SECRET` variable. With `JOBS_INLINE=1`, sending or retrying a message runs that message's delivery job inside the same request, so messages do not wait for the next cron call.
 - Session cookies: the API sets `__Host-cp_session` with `Secure`, `HttpOnly`, `SameSite=Lax`, `Path=/` and no `Domain`. Because the browser reaches the API through the web origin's `/api` rewrite, the cookie belongs to the web host. Mutating requests must carry an `Origin` listed in `CORS_ORIGINS` and the CSRF token, so `CORS_ORIGINS` must name the web project's public origin exactly.
@@ -43,10 +44,11 @@ openssl rand -hex 32      # CRON_SECRET (at least 16 characters; hex keeps it he
 4. **Framework Preset**: Fastify. `apps/api/vercel.json` also sets `"framework": "fastify"`.
 5. **Build and Output Settings**: leave the overrides off. `apps/api/vercel.json` sets them:
    - Install Command: `pnpm install --frozen-lockfile --filter @carepath/api...`
+     (the API and every workspace package it depends on, with their dev dependencies; that includes `@carepath/db` with tsx, the WebAssembly schema engine and the seed code the database step uses)
    - Build Command: `pnpm run vercel-build`
    - Output Directory: not used by the Fastify preset.
 6. **Environment Variables**: add the variables from "API project variables" below, except `CORS_ORIGINS`, which needs the web domain (step 4). Use a temporary value such as `https://carepath-web.vercel.app` if you expect that name, and correct it later.
-7. Click **Deploy**. The first deployment will report database errors on `/health` until step 2 and step 3 are done; that is expected.
+7. Click **Deploy**. Without a database the build still succeeds (the database step is off until step 3), and `/health` reports the database as unavailable until step 2 and step 3 are done; that is expected.
 8. After it builds, open **Settings**, then **General**, and set **Node.js Version** to `22.x` to match local development.
 
 ## Step 2: add Neon from the Marketplace
@@ -61,26 +63,42 @@ openssl rand -hex 32      # CRON_SECRET (at least 16 characters; hex keeps it he
 | `DATABASE_URL_UNPOOLED` | direct | Migrations and the seed, from your machine. |
 | `PGHOST`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGHOST_UNPOOLED`, `POSTGRES_*`, `NEON_PROJECT_ID` | various | Not used. |
 
-4. Redeploy `carepath-api` (**Deployments**, the latest one, **Redeploy**) so the function sees `DATABASE_URL`.
+4. Continue with step 3 before redeploying; the redeploy at the end of step 3 picks up the database variables.
 
 ## Step 3: migrate and seed the Neon database
 
-Run these on your own machine from the repository root. Copy the `DATABASE_URL_UNPOOLED` value from the Neon dashboard or from **Settings**, **Environment Variables** in `carepath-api` (or run `vercel env pull` after `vercel link`). Use the direct (unpooled) string for both commands.
+The API build does this for you. In `carepath-api`, **Settings**, **Environment Variables**, add for the **Production** environment only:
+
+| Variable | Value | Effect on each production build |
+|---|---|---|
+| `CAREPATH_DEPLOY_MIGRATE` | `1` | Applies pending migrations from `packages/db/prisma/migrations` (WebAssembly schema engine) to `DATABASE_URL_UNPOOLED`, or to `DATABASE_URL` when the unpooled one is missing. A failed migration fails the build, so a broken schema is never deployed. |
+| `CAREPATH_DEPLOY_SEED` | `1` | After migrating, loads the small synthetic seed with `--anchor now`, but only when the database has no `Organization` rows. A database that already holds tenant data is never reseeded. Needs `CAREPATH_DEPLOY_MIGRATE=1`. |
+
+Then redeploy `carepath-api`. The build log shows one of these lines:
+
+```
+vercel-build: migrating ep-....neon.tech
+vercel-build: ep-....neon.tech has no organizations: loading the small seed
+vercel-build: seed skipped: ep-....neon.tech already has 2 organizations (set CAREPATH_DEPLOY_RESEED=1 for one deploy to replace them)
+```
+
+The demo logins in `docs/demo-accounts.md` then work against the deployed API, all with the password listed there. The seed runs with `--anchor now` because production ignores `CAREPATH_FIXED_NOW`; a seed at the fixed default anchor (2026-11-19 16:00 UTC) would leave "today" and "due" in the past. The seeded "now" is the hour of the build that seeded, so after some days the demo drifts and is worth resetting.
+
+To reset the demo data, add `CAREPATH_DEPLOY_RESEED=1` (Production), redeploy once, then delete the variable. While it is set, every production build replaces all tenant data, including anything created in the demo since.
+
+Preview builds skip the database step even when these variables are set, because a preview may share the production database. Keep the variables in the Production environment anyway.
+
+### By hand instead
+
+From a machine that can reach Neon, at the repository root, with the direct (unpooled) connection string:
 
 ```bash
 export DATABASE_URL='postgresql://...@ep-...neon.tech/neondb?sslmode=require'   # DATABASE_URL_UNPOOLED
-
-# Apply every migration in packages/db/prisma/migrations (WebAssembly schema engine, no binary download).
 pnpm db:migrate
-
-# Load the synthetic demo world, with "now" at the current hour so "today" matches the real clock.
-# The seed deletes all tenant data first; it refuses a non-local host unless this flag is set.
-CAREPATH_ALLOW_REMOTE_SEED=1 pnpm db:seed --profile small --anchor now
+CAREPATH_ALLOW_REMOTE_SEED=1 pnpm db:seed --profile small --anchor now   # deletes all tenant data first
 ```
 
-The demo logins in `docs/demo-accounts.md` then work against the deployed API, all with the password listed there. Run the seed again whenever you want to reset the demo; it replaces the tenant data each time. `--anchor now` matters here: production ignores `CAREPATH_FIXED_NOW`, so a seed at the fixed default anchor (2026-11-19 16:00 UTC) would leave "today" and "due" in the past.
-
-The build sandbox this repository was prepared in cannot reach Neon (no DNS for `*.neon.tech`, and its proxy refuses the connection), so these two commands have not been run against a Neon database from there. They are the same commands `pnpm verify` runs against the local cluster.
+The seed refuses a non-local host unless `CAREPATH_ALLOW_REMOTE_SEED=1` is set. The sandbox this repository was prepared in cannot reach Neon (no DNS for `*.neon.tech`, and its proxy refuses the connection), which is why the build does this step. Neither path has been run against a Neon database yet; `scripts/vercel-check.sh` runs the build path against a fresh local database.
 
 ## Step 4: create the web project
 
@@ -127,12 +145,15 @@ Set for Production and Preview. Secret values are marked; mark them **Sensitive*
 | Variable | Example | Secret | Notes |
 |---|---|---|---|
 | `DATABASE_URL` | `postgresql://neondb_owner:...@ep-xxx-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require` | yes | Added by the Neon integration (pooled). |
-| `DATABASE_URL_UNPOOLED` | `postgresql://neondb_owner:...@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require` | yes | Added by the Neon integration. Not read by the API; use it for migrate and seed. |
+| `DATABASE_URL_UNPOOLED` | `postgresql://neondb_owner:...@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require` | yes | Added by the Neon integration. Not read by the running API; the build migrates and seeds through it. |
 | `SESSION_SECRET` | output of `openssl rand -base64 32` | yes | HMAC key for CSRF tokens and address hashes. The API refuses to start in production with the development default. Changing it signs everyone out. |
 | `CRON_SECRET` | output of `openssl rand -hex 32` | yes | At least 16 characters in production. Without it the cron route refuses every call. |
 | `CORS_ORIGINS` | `https://carepath-web.vercel.app` | no | Exact web origin(s), comma-separated. Used for CORS and for the Origin check on every mutating request. |
 | `TRUST_PROXY` | `loopback` | no | Vercel's runtime forwards each request from 127.0.0.1 with the visitor address in `X-Forwarded-For`. |
 | `JOBS_INLINE` | `1` | no | Deliver messages inside the send and retry requests. |
+| `CAREPATH_DEPLOY_MIGRATE` | `1` | no | Production only. Migrate during the build (step 3). |
+| `CAREPATH_DEPLOY_SEED` | `1` | no | Production only. Seed during the build when the database has no organizations (step 3). |
+| `CAREPATH_DEPLOY_RESEED` | unset; `1` for one deploy | no | Production only. Replace all tenant data with the seed on the next build, then delete it (step 3). |
 | `CRON_BUDGET_MS` | `45000` | no | Optional. Time budget for one cron pass; keep it under the function's `maxDuration` (60 s in `vercel.json`). |
 | `AI_PROVIDER` | `deterministic` | no | Optional; this is the default. The deterministic provider is rule-based demo output, not a live model. |
 | `LOG_LEVEL` | `info` | no | Optional. |
@@ -157,8 +178,8 @@ The web project needs no database variable and no secret.
 
 - A push to the production branch builds both projects. Vercel skips a project whose files and internal dependencies did not change.
 - After changing an environment variable, redeploy that project (**Deployments**, latest, **Redeploy**). Variables are read at build time by the web project and at start-up by the API.
-- After a change under `packages/db/prisma/migrations`, run `pnpm db:migrate` against `DATABASE_URL_UNPOOLED` from your machine before or right after the API deploys.
-- To reset the demo data, run the seed command from step 3 again.
+- A change under `packages/db/prisma/migrations` is applied by the next production build of `carepath-api` while `CAREPATH_DEPLOY_MIGRATE=1` is set. The migration runs before the new function goes live; if it fails, the build fails and the previous deployment keeps serving.
+- To reset the demo data, use `CAREPATH_DEPLOY_RESEED=1` for one deploy (step 3).
 
 ## Checking the configuration locally
 
@@ -166,7 +187,7 @@ The web project needs no database variable and no secret.
 scripts/vercel-check.sh        # both projects; or `api` or `web`
 ```
 
-For the API it copies the checkout, runs the install and build commands from `apps/api/vercel.json`, traces `server.mjs` with `@vercel/nft` (the tracer Vercel's Node builder uses) plus the `includeFiles`, copies only the traced files into an empty folder, and loads that copy the way Vercel's Node runtime does, with `NODE_ENV=production` against its own migrated and seeded local database. It then checks health, sign-in cookies, the Origin check, a scoped read, the FHIR export (Medplum files), inline message delivery, logout with CSRF, and the cron route with and without the secret. For the web project it runs `next build --webpack` with an `https` `API_ORIGIN` and checks the rewrite in the build output. It deploys nothing and cannot prove that Vercel's own build behaves the same way.
+For the API it copies the checkout and runs the install command from `apps/api/vercel.json`. It then runs the build command as a production build with `CAREPATH_DEPLOY_MIGRATE=1` and `CAREPATH_DEPLOY_SEED=1` against a fresh, empty local database: the first build migrates and seeds, a preview build skips the database step, a second build after the function has written data migrates without reseeding (the data written by the function is still there), a third with `CAREPATH_DEPLOY_RESEED=1` reseeds, and a build whose migration cannot connect fails. It traces `server.mjs` with `@vercel/nft` (the tracer Vercel's Node builder uses) plus the `includeFiles`, copies only the traced files into an empty folder, and loads that copy the way Vercel's Node runtime does, with `NODE_ENV=production` against that database. It checks health, sign-in cookies, the Origin check, a scoped read, the FHIR export (Medplum files), inline message delivery, logout with CSRF, and the cron route with and without the secret. For the web project it runs `next build --webpack` with an `https` `API_ORIGIN` and checks the rewrite in the build output. It deploys nothing and cannot prove that Vercel's own build behaves the same way.
 
 ## Known limitations
 
