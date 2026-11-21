@@ -29,6 +29,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 5.2 (branch `wp/5.2`): AI progress summaries and SOAP note drafts through `@carepath/ai` with a SQL evidence resolver, stored generations and append-only reviews, gated approval, note draft from approval, sign, amendment and entered in error, consent refusal, failure path, overview AI drafts; CR-7, CR-8 and CR-16 delivered as demo rules pending clinical governance review (gate output below).
 - WP 5.6a (branch `wp/5.6a`, checkpoint C3 fixes in `packages/ai`): A1 empty progress summary as `progress_summary@1.1.0` (1.0.0 unchanged and still pinned); A2 verifier allow-list of input records with reason `not_in_input`, passed by the pipeline; A3 a redaction token left after restore is `invalid_output`; A4 Anthropic `stop_reason: max_tokens` is `invalid_output`, named as truncation, not retried, and its tokens counted; A5 the three C3 3.2 statements in the eval report, re-run with `pnpm ai:eval` (gate output below).
 - D-WP-U (branch `wp/du`, DR-004 section 4): U1 to U10, the CD record edits and rulings 6.1, 6.2, 6.6 and 6.7; captures in `docs/design/after/d-wp-u/` (gate output below).
+- D-WP-10 session player and pain reporting (branch `wp/d10`, DR-002 C and D, DR-004 5.2): the phase-driven player (Work, Rest, Next, Finish, paused, stopped, complete) with one sticky control bar (full-width primary, neutral Pause and Skip, critical-tone "Stop, this hurts" in every open phase), rest and hold timers as `role="timer"` with milestone announcements, Stop that ends the session at once with an optional number (CR-6), one contact notice after a stop and the number preselected in the check-in, the emergency line before sending, the pinned send bar, set count only in `sessionStorage`; `e2e/session-player.spec.ts`; `docs/design/after/d-wp-10/` (gate output below).
 - WP 5.6b (branch `wp/5.6b`, checkpoint C3 fixes B1 to B8): migration `20261126000000_phase5_c3_fixes` (`note.mark_entered_in_error` for `clinic_admin`, partial unique index one signed note per encounter); entered in error decided by permission with a header-only answer for a caller without `clinical.read`; FHIR export reads signed notes only; `encounter_already_documented`; staff names to the redactor; stored `inputRefs` passed to the verifier on read and at approval, with `not_in_input` and `inInput` in the contract; generated-output labels without "AI" and `DEMO_PROVIDER_NOTICE`; CR-18 and CR-19 delivered (gate output below).
 
 - WP 6.3 (branch `wp/6.3`): seed NPIs carry a check digit that passes `isValidNpi` (Luhn, prefix 80840, leading 9 kept); the FHIR export check asserts every seeded NPI passes `isValidNpi`. The full profile already met the brief targets and was measured, not changed: 1,000 patients, 30 clinicians, 5 clinics, 2,000 appointments, 10,000 activity records, 51 encounters, 250 exercise rows (50 entries per clinic). Full wall time about 6.6 to 6.9 s per seed; all 1,000 exports pass the three layers. Record: `docs/evaluation/seed-full.md`. Small content hash `40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee`; full `eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54`. Gate `scripts/gate-wp-6.3.sh` (branch tip 13e3b57): exit 0.
@@ -1423,6 +1424,53 @@ Gate: `scripts/gate-wp-d8.sh` exit 0 on the rebased branch (typecheck, lint and 
 ```
   28 skipped
   128 passed (8.5m)
+### D-WP-10 (session player and pain reporting)
+
+Worktree `/home/claude/wt/d10`, branch `wp/d10`, from `main` at `bccc911`, rebased onto `main` at `04f6002` (D-WP-U merged) before any capture or gate. API 4110, web 3110.
+
+Built (owned paths `(patient)/(session)/**` and `(patient)/(app)/check-in/**`):
+- Player (`(session)/_components/session-player.tsx`): phases Work (a set), Rest (between sets), Next (between exercises, with the finished exercise's rest), Finish, and the paused, stopped, complete and abandoned views. Every open phase has the same control bar: one full-width 56 px primary ("Done with set n", "Skip rest", "Start exercise n", "Finish session", "Resume session"), neutral utilities (Pause, Skip exercise, Pause rest, Add 15 seconds, Back to Today) and "Stop, this hurts" (`secondary`, `tone="critical"`). The bar is `sticky top-0 bottom-0`, so it stays on screen while the steps scroll and rides on the bottom edge when the page is taller than the window; under 480 px of height the shared rule makes it static (CD-125). At 390 the order is name, dose, primary, then picture and steps (DR-004 5.2); from 768 the information and the bar are one sticky column beside picture and steps. An exercise without its own picture is text first (U9). Focus moves to each new phase heading (CD-120); a focused control the bar would cover is scrolled clear (`use-focus-clear.ts`, WCAG 2.4.11).
+- Timers (`use-timers.ts`): one-second ticks (the fixed test clock cannot freeze them), "Add 15 seconds", milestones only through one polite status region ("Set 1 done. Rest for 30 seconds. Next: set 2 of 2.", "10 seconds left.", "Rest is over. Start set 2 when you are ready.", "Timer started", "Timer done."); the clock is `role="timer"` with `aria-live="off"` (CD-126). A screen wake-lock request while the session runs, with a plain line when the browser cannot keep the screen on (DR-002 C item 4). No sound (not built, DR-002 C).
+- Skip (`session-sheets.tsx`): a reason is required; "It hurts" offers "Stop the session instead" in the same sheet (feature C item 7).
+- Stop: one sheet with an optional number and an optional note; "Stop session" ends the session with `discomfortLevel: null` when no number was chosen (CR-6, already on `main` from WP B-CR, so the "follow-up commit" in the rebuild plan row is part of this package). The note stays in memory.
+- Stopped view: one contact notice (clinic name, `painNoticeMessage` when a number was given, otherwise the clinic phone, and the emergency line), then "Report your pain" with the stop number preselected and "You told us 8 when you stopped."; the form shows no second notice before or after sending (feature D item 3).
+- Check-in form (`(app)/check-in/_components/check-in-form.tsx`): PainScale with anchors and "You chose n of 10." (no band word), the emergency line before sending, "Your therapist will see this" beside Send and after sending, a pinned send bar (above the tab bar below 768 on `/check-in`), the kit leave guard for an unsent answer, nothing in browser storage. `/check-in` preselects the stop number when it follows a stopped session.
+- Overview (`(session)/session/page.tsx`): "Begin session" before the list so it is on the first screen at 375 by 667.
+- Moved from the shared `(patient)/_components/` into the owned folders: `session-player.tsx`, `start-session.tsx`, `use-timers.ts`, `check-in-form.tsx` (only the session and check-in routes imported them).
+
+Tests and tools: `e2e/session-player.spec.ts` (seven tests: primary and Stop on screen at 375 by 667 and 390 by 844 in every phase, before and after scrolling; name, dose, primary, steps order; rest timer role, milestones, Add 15 seconds, Pause rest; reload keeps the set count and `sessionStorage` holds only `cp-sets:<id>` counts; pause, reload, resume; skip with "It hurts"; stop without a number and with one; preselection after a reload; one emergency line on each screen; pain scale 0 to 5 and 6 to 10 at both phone widths with 48 px items; reduced motion; keyboard-only session and check-in with focus never under a sticky bar; `/check-in` send bar above the tab bar; 1440 two-column layout). `patient.spec` and `finishExercise` follow the Next phase and the optional stop number; its keyboard test now waits for "Check-in sent" (the old wait matched the line beside Send and raced the result). `design-capture.mjs` records the new phases. Gate: `scripts/gate-wp-d10.sh`.
+
+Captures: `docs/design/after/d-wp-10/` (13 screens, 78 images, `_probe.json`, `pairs.md`, `pairs/` with eight side-by-side baseline and after images). Probe: warm 0, overflow 0, axe serious or critical 0, real targets under the floor 0, wide body-area pictures 0.
+
+Deviations and open points:
+- Files moved out of `(patient)/_components/`, which is outside the owned paths; nothing else imported them.
+- `patient.spec.ts`, `patient-helpers.ts` (`finishExercise`) and `apps/web/scripts/design-capture.mjs` were edited for the new flow; they are shared files.
+- The countdown is 40 px (`data-value-lg`), the largest patient text role. Feature C asks for distance reading; a larger display role would be a token change (`packages/ui`), not made here.
+- The rest bar has "Pause rest" and "Add 15 seconds" in place of the session Pause; Pause (session) is in every other open phase.
+- Wake lock and screen behaviour are untested on real phones (feature C, U).
+- Seen and not changed (shell, not this package): from 768 the focus shell puts "Contact care team" beside "Back to Today" rather than at the right edge.
+- No participant saw any of this; every judgement above is heuristic.
+
+Gate: `scripts/gate-wp-d10.sh` exit 0 on `wp/d10` at `f9d3735` (rebased onto `main` at `04f6002`; includes `pnpm verify`). Tail:
+
+```
+==> structure
+ok: owned folders only, set count only in sessionStorage, no band words, Stop is the only outline, sizes named
+==> end-to-end (session-player, patient, slice, shells), API 4110, web 3110
+  34 passed (4.3m)
+design-capture: 78 images in /home/claude/wt/d10/.data/capture-d-wp-10
+  warm backgrounds (not a status or chart token): 0 images
+  horizontal overflow: 0 images
+  axe serious or critical (at 375, 768, 1440): 0 images
+  interactive targets under 24 px: 0 images
+  interactive targets under the theme floor: 0 images
+  body-area pictures wider than 64 px: 0 images
+  real targets under the theme floor: 0 in 0 images (owned elsewhere, reported: 0)
+==> pnpm verify
+integrity checks: 79 passed
+content-hash: 40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee
+packages/ai 114, packages/fhir 101, packages/shared 87, packages/ui 325, packages/db 101, apps/api 339 tests passed
+  130 passed (10.8m)
 ==> docs/ unchanged by the run
 verify: PASSED
 ==> git status --porcelain
@@ -1437,3 +1485,8 @@ Deviations and open points:
 - "None of these" is optional: the contract cannot tell a skipped step from an empty one.
 - Open for D-WP-U: the date of birth parts wrap to two rows at 375 and 390.
 - The seeded required consent names text version `2026-11`, so patient.noai sees the "wording changed" banner. Seed quirk, left as it is (not my paths).
+D-WP-10 gate: PASSED
+```
+
+Earlier runs failed and were fixed, not retried blindly: `patient.spec` strict-mode match of "Exercise 3 of 4" against the paused sentence (the sentence now names the exercise); the `patient.spec` keyboard test waiting on "Your therapist will see this." (now also beside Send) and racing the result (now waits for "Check-in sent"); the `/check-in` send bar under the tab bar (visual pass 2); and, in the first full `pnpm verify`, `clinician-screens.spec` at 1440 missing the plan event in Dana Demopatient's timeline because this spec's sessions ran on her (they now run on `patient.flare`). One run was cut by the server restart and was run again from the start; the dead lease it left was pruned by the next acquire.
+

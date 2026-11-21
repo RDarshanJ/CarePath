@@ -1,0 +1,2421 @@
+[
+ {
+  "file": "patient-check-in-375.png",
+  "url": "/check-in",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Daily check-in",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-check-in-390.png",
+  "url": "/check-in",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Daily check-in",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-check-in-768.png",
+  "url": "/check-in",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Daily check-in",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-check-in-1024.png",
+  "url": "/check-in",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Daily check-in",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-check-in-1440.png",
+  "url": "/check-in",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Daily check-in",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-check-in-1920.png",
+  "url": "/check-in",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Daily check-in",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-confirm-375.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 25,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(145, 32, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-confirm-390.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 25,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-confirm-768.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 25,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-confirm-1024.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 25,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-confirm-1440.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 25,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-confirm-1920.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 25,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-pain-sheet-375.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 24,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-pain-sheet-390.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 24,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-pain-sheet-768.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 23,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 2,
+   "rgb(23, 92, 211)": 2,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-pain-sheet-1024.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 24,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-pain-sheet-1440.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 24,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-pain-sheet-1920.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 24,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(23, 43, 77) a0.50": 1,
+   "rgb(180, 35, 24)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-stopped-375.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 18,
+   "rgb(235, 239, 245)": 1,
+   "rgb(254, 247, 195)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [
+   {
+    "bg": "rgb(254, 247, 195)",
+    "el": "div.flex.items-start.gap-3 \"Fictional Desert Rehab (synthetic)You re\"",
+    "token": "warning-bg"
+   }
+  ],
+  "h1": "Session stopped",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-stopped-390.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 17,
+   "rgb(235, 239, 245)": 1,
+   "rgb(254, 247, 195)": 1,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [
+   {
+    "bg": "rgb(254, 247, 195)",
+    "el": "div.flex.items-start.gap-3 \"Fictional Desert Rehab (synthetic)You re\"",
+    "token": "warning-bg"
+   }
+  ],
+  "h1": "Session stopped",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-stopped-768.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 18,
+   "rgb(235, 239, 245)": 1,
+   "rgb(254, 247, 195)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [
+   {
+    "bg": "rgb(254, 247, 195)",
+    "el": "div.flex.items-start.gap-3 \"Fictional Desert Rehab (synthetic)You re\"",
+    "token": "warning-bg"
+   }
+  ],
+  "h1": "Session stopped",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-stopped-1024.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 18,
+   "rgb(235, 239, 245)": 1,
+   "rgb(254, 247, 195)": 1,
+   "rgb(23, 92, 211)": 1,
+   "rgb(24, 73, 169)": 1
+  },
+  "warm": [],
+  "warmToken": [
+   {
+    "bg": "rgb(254, 247, 195)",
+    "el": "div.flex.items-start.gap-3 \"Fictional Desert Rehab (synthetic)You re\"",
+    "token": "warning-bg"
+   }
+  ],
+  "h1": "Session stopped",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-stopped-1440.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 18,
+   "rgb(235, 239, 245)": 1,
+   "rgb(254, 247, 195)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [
+   {
+    "bg": "rgb(254, 247, 195)",
+    "el": "div.flex.items-start.gap-3 \"Fictional Desert Rehab (synthetic)You re\"",
+    "token": "warning-bg"
+   }
+  ],
+  "h1": "Session stopped",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-discomfort-stopped-1920.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 18,
+   "rgb(235, 239, 245)": 1,
+   "rgb(254, 247, 195)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [
+   {
+    "bg": "rgb(254, 247, 195)",
+    "el": "div.flex.items-start.gap-3 \"Fictional Desert Rehab (synthetic)You re\"",
+    "token": "warning-bg"
+   }
+  ],
+  "h1": "Session stopped",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-complete-375.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session complete",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-complete-390.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session complete",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-complete-768.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session complete",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-complete-1024.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session complete",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-complete-1440.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session complete",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-complete-1920.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 20,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session complete",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 14,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-finish-375.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "All exercises done",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-finish-390.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "All exercises done",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-finish-768.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "All exercises done",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-finish-1024.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "All exercises done",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-finish-1440.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "All exercises done",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-finish-1920.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "All exercises done",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-intro-375.png",
+  "url": "/session",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 4,
+   "rgb(235, 239, 245)": 5,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today's session",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-intro-390.png",
+  "url": "/session",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 4,
+   "rgb(235, 239, 245)": 5,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today's session",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-intro-768.png",
+  "url": "/session",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 4,
+   "rgb(235, 239, 245)": 5,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today's session",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-intro-1024.png",
+  "url": "/session",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 4,
+   "rgb(235, 239, 245)": 5,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today's session",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-intro-1440.png",
+  "url": "/session",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 4,
+   "rgb(235, 239, 245)": 5,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today's session",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-intro-1920.png",
+  "url": "/session",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 4,
+   "rgb(235, 239, 245)": 5,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today's session",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-next-375.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 10,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 3
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-next-390.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 10,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 3
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-next-768.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 10,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 3
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-next-1024.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 3,
+   "rgb(23, 92, 211)": 3
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-next-1440.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 3,
+   "rgb(23, 92, 211)": 3
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-next-1920.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 3,
+   "rgb(23, 92, 211)": 3
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-paused-375.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session paused",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-paused-390.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session paused",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-paused-768.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session paused",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-paused-1024.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session paused",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-paused-1440.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session paused",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-paused-1920.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Session paused",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-player-375.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-player-390.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-player-768.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-player-1024.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-player-1440.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-player-1920.png",
+  "url": "/session/8446da73-ca7a-42fe-ba4e-5540d8f7ca81",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 11,
+   "rgb(235, 239, 245)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 92, 211)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Shoulder blade squeeze",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-rest-375.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 9,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Rest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-rest-390.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 9,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Rest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-rest-768.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 9,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Rest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-rest-1024.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 10,
+   "rgb(235, 239, 245)": 3,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Rest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-rest-1440.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 10,
+   "rgb(235, 239, 245)": 3,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Rest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-rest-1920.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 10,
+   "rgb(235, 239, 245)": 3,
+   "rgb(23, 92, 211)": 2
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Rest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-skip-375.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 43, 77) a0.50": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-skip-390.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 43, 77) a0.50": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-skip-768.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 43, 77) a0.50": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-skip-1024.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 43, 77) a0.50": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-skip-1440.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 43, 77) a0.50": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-session-skip-1920.png",
+  "url": "/session/51f5c9f8-d68f-43ad-b9f5-318eedef48f1",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 19,
+   "rgb(235, 239, 245)": 4,
+   "rgb(23, 92, 211)": 4,
+   "rgb(239, 244, 255)": 1,
+   "rgb(23, 43, 77) a0.50": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Single knee to chest",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-today-session-persona-375.png",
+  "url": "/today",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(240, 249, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(224, 234, 255)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-today-session-persona-390.png",
+  "url": "/today",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 8,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(240, 249, 255)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(224, 234, 255)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-today-session-persona-768.png",
+  "url": "/today",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 7,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(240, 249, 255)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-today-session-persona-1024.png",
+  "url": "/today",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 7,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(240, 249, 255)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-today-session-persona-1440.png",
+  "url": "/today",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 7,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(240, 249, 255)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "violations": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ },
+ {
+  "file": "patient-today-session-persona-1920.png",
+  "url": "/today",
+  "theme": "patient",
+  "overflowX": 0,
+  "bodyBg": "rgb(245, 247, 250)",
+  "bgs": {
+   "rgb(245, 247, 250)": 3,
+   "rgb(255, 255, 255)": 7,
+   "rgb(235, 239, 245)": 1,
+   "rgb(14, 116, 144)": 1,
+   "rgb(23, 92, 211)": 2,
+   "rgb(240, 249, 255)": 1
+  },
+  "warm": [],
+  "warmToken": [],
+  "h1": "Today",
+  "smallTargets": 0,
+  "smallTargetList": [],
+  "underThemeFloor": 0,
+  "underThemeFloorList": [],
+  "excludedTargets": {
+   "hidden": 1,
+   "nativeSelect": 0,
+   "bareInput": 0,
+   "inSentence": 0
+  },
+  "wideAreaPictures": [],
+  "targetsElsewhere": [],
+  "targetsHere": 0
+ }
+]

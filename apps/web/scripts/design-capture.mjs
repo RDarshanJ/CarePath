@@ -542,8 +542,7 @@ await group(
     const dialog = page.getByRole("dialog");
     await dialog.getByRole("button", { name: "Stop session" }).waitFor();
     await capture(page, "patient-discomfort-confirm", { overlay: true });
-    await dialog.getByRole("button", { name: "Stop session" }).click();
-    await dialog.getByText("Choose how much it hurts").waitFor();
+    // CR-6 (D-WP-10): the number is optional in the same sheet; this persona gives one.
     await dialog.getByRole("radio", { name: /^8 of 10/ }).click();
     await dialog.getByLabel(/^What happened/).fill("Sharp pain on the left side.");
     await capture(page, "patient-discomfort-pain-sheet", { overlay: true });
@@ -552,6 +551,63 @@ await group(
     await capture(page, "patient-discomfort-stopped");
   },
 );
+
+// The player's other phases (D-WP-10), on the persona with a session due (patient.demo), after the
+// patient screens above: rest between sets, the skip sheet, Next between exercises, Finish, and the
+// completed session with its check-in. New states, so they have no baseline pair.
+await group(["patient-session-"], async (page) => {
+  if (
+    ![
+      "patient-session-rest",
+      "patient-session-skip",
+      "patient-session-next",
+      "patient-session-finish",
+      "patient-session-complete",
+    ].some(want)
+  )
+    return;
+  await signIn(page, "patient.demo@carepath.test");
+  await page.goto("/session");
+  await h1(page, "Today's session");
+  await page.getByRole("button", { name: "Begin session" }).click();
+  await page.waitForURL(/\/session\/[0-9a-f-]{36}$/);
+  await page.getByText(/^Exercise 1 of /).waitFor();
+  await page.getByRole("button", { name: /^Done with set 1$/ }).click();
+  await h1(page, "Rest");
+  await page.getByRole("button", { name: "Pause rest" }).click();
+  await capture(page, "patient-session-rest");
+  await page.getByRole("button", { name: "Skip rest" }).click();
+  for (let i = 0; i < 8; i++) {
+    const done = page.getByRole("button", { name: /^Done with/ });
+    await done.waitFor();
+    const label = await done.innerText();
+    await done.click();
+    if (/finish exercise|this exercise/.test(label)) break;
+    await page.getByRole("button", { name: "Skip rest" }).click();
+  }
+  await page.getByRole("button", { name: /^Start exercise 2$/ }).waitFor();
+  await page.getByRole("button", { name: "Pause rest" }).click();
+  await capture(page, "patient-session-next");
+  await page.getByRole("button", { name: /^Start exercise 2$/ }).click();
+  await page.getByRole("button", { name: "Skip exercise" }).click();
+  const sheet = page.getByRole("dialog");
+  await sheet.getByRole("radio", { name: "It hurts" }).click();
+  await sheet.getByRole("button", { name: "Stop the session instead" }).waitFor();
+  await capture(page, "patient-session-skip", { overlay: true });
+  await sheet.getByRole("radio", { name: "I am too tired today" }).click();
+  await sheet.getByRole("button", { name: "Skip exercise" }).click();
+  for (const n of [3, 4]) {
+    await page.getByText(`Exercise ${n} of 4`, { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Skip exercise" }).click();
+    await sheet.getByRole("radio", { name: "I am too tired today" }).click();
+    await sheet.getByRole("button", { name: "Skip exercise" }).click();
+  }
+  await h1(page, "All exercises done");
+  await capture(page, "patient-session-finish");
+  await page.getByRole("button", { name: "Finish session" }).click();
+  await h1(page, "Session complete");
+  await capture(page, "patient-session-complete");
+});
 
 // Clinician (therapist.demo): overview, directory, record tabs, plan builder, queue, schedule, inbox.
 await group(["clinician-"], async (page) => {

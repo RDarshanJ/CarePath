@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { exerciseSessionDetailSchema } from "@carepath/shared/contracts";
-import { SessionPlayer } from "../../../_components/session-player";
+import { SessionPlayer } from "../../_components/session-player";
 import { getClinic, isNotFound, requirePatient } from "../../../_lib/data";
 import { serverGet } from "../../../../../lib/api/server";
 

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { exerciseSessionDetailSchema } from "@carepath/shared/contracts";
 import { Banner, Button } from "@carepath/ui";
-import { api } from "../../../lib/api/client";
-import { ApiError } from "../../../lib/api/errors";
+import { api } from "../../../../lib/api/client";
+import { ApiError } from "../../../../lib/api/errors";
 
 /** Creates the session on the current published version, then opens the player on its own address so a reload resumes it. */
 export function StartSession({ patientId }: { patientId: string }) {

@@ -217,10 +217,9 @@ test.describe("Scenario C: guided session", () => {
     const sessionId = page.url().split("/").pop()!;
     const patientId = await patientIdOf(page);
 
+    // CR-6: the number is optional at the stop (D-WP-10); here the patient gives one.
     await page.getByRole("button", { name: "Stop, this hurts" }).click();
     await expect(page.getByRole("dialog", { name: "Stop this session?" })).toBeVisible();
-    await page.getByRole("dialog").getByRole("button", { name: "Stop session" }).click();
-    await expect(page.getByRole("dialog").getByText("Choose how much it hurts")).toBeVisible();
     await radio(page.getByRole("dialog"), "How much does it hurt right now?", "8 of 10").click();
     await page
       .getByRole("dialog")
@@ -255,7 +254,8 @@ test.describe("Scenario C: guided session", () => {
     await page.getByRole("button", { name: "Send check-in" }).click();
     await expect(page.getByRole("heading", { name: "Check-in sent" })).toBeVisible();
     await expect(page.getByText("Your therapist will see this.").first()).toBeVisible();
-    await expect(page.getByTestId("check-in-done").getByText(EMERGENCY_NOTICE)).toBeVisible();
+    // One contact notice per screen (feature D, item 3): the stopped screen already shows it.
+    await expect(page.getByText(EMERGENCY_NOTICE)).toHaveCount(1);
     await shots(page, "c16-checkin-high");
     await expectNoSeriousViolations(page, "check-in with pain notice");
   });
@@ -290,6 +290,11 @@ test.describe("Scenario C: guided session", () => {
     for (let guard = 0; guard < 40; guard++) {
       if (await page.getByRole("heading", { level: 1, name: "All exercises done" }).isVisible())
         break;
+      if (await page.getByRole("button", { name: /^Start exercise \d+$/ }).isVisible()) {
+        await tabTo(page, /^Start exercise \d+$/);
+        await page.keyboard.press("Enter");
+        continue;
+      }
       if (await page.getByRole("button", { name: "Skip rest" }).isVisible()) {
         await tabTo(page, "Skip rest");
         await page.keyboard.press("Enter");
@@ -310,6 +315,8 @@ test.describe("Scenario C: guided session", () => {
     await expect(page.getByText(/You chose \d+ of 10/)).toBeVisible();
     await tabTo(page, "Send check-in");
     await page.keyboard.press("Enter");
+    // "Your therapist will see this." is also beside the send button (D-WP-10), so wait for the result.
+    await expect(page.getByRole("heading", { name: "Check-in sent" })).toBeFocused();
     await expect(page.getByText("Your therapist will see this.").first()).toBeVisible();
     await tabTo(page, "Back to Today");
     await page.keyboard.press("Enter");
