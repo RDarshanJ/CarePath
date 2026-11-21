@@ -431,6 +431,14 @@ await group(["design-system"], async (page) => {
   await h1(page, "Tokens and components");
   await capture(page, "design-system");
 });
+// D-WP-5: the healthcare gallery, one page per family, at every width.
+for (const family of ["records", "data", "planning", "messaging", "ai"]) {
+  await group([`design-system-healthcare-${family}`], async (page) => {
+    await page.goto(`/design-system/healthcare/${family}`);
+    await page.getByRole("heading", { level: 1 }).first().waitFor();
+    await capture(page, `design-system-healthcare-${family}`);
+  });
+}
 if (want("design-system-reduced-motion")) {
   const ctx = await browser.newContext({
     baseURL: BASE,
