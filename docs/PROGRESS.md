@@ -1406,3 +1406,34 @@ D-WP-U gate: PASSED
 ```
 
 Earlier runs of this gate failed and were fixed, not retried blindly: the structure check matching a comment and a test, the gallery LoadMore test meeting the new status text twice, the notifications region over the staff bottom bar at 390, the ruling 6.7 failure above, and the sign-out race it exposed.
+
+### D-WP-8 (onboarding and consent)
+
+Worktree `/home/claude/wt/d8`, branch `wp/d8`, rebased onto `main` at `04f6002` (after D-WP-U). API 4108, web 3108. Owned paths: `apps/web/app/(patient)/onboarding/**`, `(patient)/(app)/consent/**`, `(patient)/_lib/consent-copy.ts`, `(patient)/_components/consent-wording.tsx`, `apps/web/e2e/onboarding*.ts`, `scripts/gate-wp-d8*.{sh,mjs}`, `docs/design/after/d-wp-8/`, one block in `apps/web/scripts/design-capture.mjs`, this section.
+
+- Onboarding (A1, DR-002 A, CD-102, 105 to 109): step 1 states the length and the safe stopping point, then asks the eligibility code and a three-field date of birth; step 2 is the account. Steps 1 and 2 stay in memory: the leave guard asks before a reload or an in-app link, and nothing goes to browser storage (R1). Steps 3 to 9 save on "Save and continue" with a polite status that names the step. Plain radios, `Checkbox` groups with an exclusive "None of these" (limitations) and for availability, `PainScale` with the two anchors and no band word, step indicator with the part name, error summary on a failed step, focus on the heading on step change, resume summary for returning patients (Done, Next, Not started in words, Change per saved step), review with "Not provided" and Change links. Form column 32rem on `surface` from 768; header Sign in link at the 48 px target; Back is `neutral`.
+- Consent step (CD-142, 143): required is an unticked checkbox, optional is a Yes or No radio pair with no preselect, plain summary and short list always visible, full wording in a disclosure, and a line saying what happens if the patient does not agree (S6b demo behaviour, with the clinic phone).
+- Sharing and consent (CD-140, 141, 143 to 145): `ConsentStatusLine` per consent, explicit "Allow automated drafting tools" or "Stop allowing automated drafting tools" with a persistent result line, no switch; the required consent offers Call and "Message your care team"; history is one line per change (Agreed, Allowed, Stopped allowing, Withdrawn) with the wording version, a list below 768 and a table from 768; the "wording changed" banner with "Read the new wording".
+- C3 item 5: the camera movement tracking entry is removed from `consent-copy.ts`; `motion_tracking` stays in the enum and is never shown.
+- Tests: `e2e/onboarding.spec.ts` (all 11 steps with errors, rejected codes, resume, None of these, consent defaults, review, done, stored consent; reload warning with `sessionStorage` and `localStorage` read empty; keyboard steps 1 and 2; returning patient; signed-out access; consent Allow and Stop allowing with history at 390 and 1440). The Scenario A block and the consent assertions left `patient.spec.ts`; `slice.spec.ts` onboards through `onboarding-helpers.ts`; `shells.spec.ts` heading follows the new step 1 (all DR-002 A).
+- Captures: `docs/design/after/d-wp-8/` (120 images, `_probe.json`, `pairs.md`). Probe: warm 0, overflow 0, axe serious or critical 0, targets under the theme floor 0, body-area pictures over 64 px 0. Two visual passes are in `pairs.md` (my own review, not the advisor's).
+
+Gate: `scripts/gate-wp-d8.sh` exit 0 on the rebased branch (typecheck, lint and format of owned paths, structure greps, e2e, capture with `PROBE_FAIL_ON=warm,overflow,axe,targets,pictures`, `pnpm verify`, clean tree). Tail:
+
+```
+  28 skipped
+  128 passed (8.5m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-8 gate: PASSED
+```
+
+Deviations and open points:
+- The full wording is a disclosure on the same page, not a link: the `(app)` layouts send a patient who has not finished onboarding back to onboarding, so a wording route would not open during the consent step. The wording itself is demonstration text, marked as such (S6a stays open).
+- The body-area picture is gone (DR-004 U9, area pictures only as 64 px tiles); CD-106's decorative picture is not shown.
+- No debounce autosave: steps save at commit (CD-109 A); Back also saves silently when the answers are valid.
+- "None of these" is optional: the contract cannot tell a skipped step from an empty one.
+- Open for D-WP-U: the date of birth parts wrap to two rows at 375 and 390.
+- The seeded required consent names text version `2026-11`, so patient.noai sees the "wording changed" banner. Seed quirk, left as it is (not my paths).
