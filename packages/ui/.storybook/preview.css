@@ -1,0 +1,6 @@
+/* Same entry as apps/web/app/globals.css: Tailwind, then the CarePath tokens, base and component layers. */
+@import "../../../apps/web/node_modules/tailwindcss/index.css";
+@import "../src/styles/index.css";
+
+/* Tailwind does not scan symlinked workspace packages by default. */
+@source "../src";
