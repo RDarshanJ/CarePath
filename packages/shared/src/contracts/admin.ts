@@ -25,7 +25,13 @@ export const metricKeySchema = z.enum(metricKeys);
 export type MetricKey = z.infer<typeof metricKeySchema>;
 
 /** What the numerator and denominator count. `appointment_utilisation` counts minutes. */
-export const metricUnits = ["patients", "minutes", "appointments", "items", "review_tasks"] as const;
+export const metricUnits = [
+  "patients",
+  "minutes",
+  "appointments",
+  "items",
+  "review_tasks",
+] as const;
 export const metricUnitSchema = z.enum(metricUnits);
 export type MetricUnit = z.infer<typeof metricUnitSchema>;
 
@@ -413,14 +419,25 @@ export const auditActions = ["C", "R", "U", "D", "E"] as const;
 export const auditActionSchema = z.enum(auditActions);
 export type AuditAction = z.infer<typeof auditActionSchema>;
 
-export const auditOutcomes = ["success", "minor_failure", "serious_failure", "major_failure"] as const;
+export const auditOutcomes = [
+  "success",
+  "minor_failure",
+  "serious_failure",
+  "major_failure",
+] as const;
 export const auditOutcomeSchema = z.enum(auditOutcomes);
 export type AuditOutcome = z.infer<typeof auditOutcomeSchema>;
 
 export const auditActorTypes = ["user", "system", "ai", "anonymous"] as const;
 export const auditActorTypeSchema = z.enum(auditActorTypes);
 
-export const auditPurposes = ["treatment", "operations", "patient_access", "admin", "export"] as const;
+export const auditPurposes = [
+  "treatment",
+  "operations",
+  "patient_access",
+  "admin",
+  "export",
+] as const;
 export const auditPurposeSchema = z.enum(auditPurposes);
 
 /**
@@ -457,7 +474,9 @@ export const auditEventSchema = z
       type: auditActorTypeSchema,
       userId: z.uuid().nullable(),
       name: z.string().nullable(),
-      role: z.enum(["patient", "physical_therapist", "care_coordinator", "clinic_admin"]).nullable(),
+      role: z
+        .enum(["patient", "physical_therapist", "care_coordinator", "clinic_admin"])
+        .nullable(),
     }),
     resourceType: z.string().nullable(),
     resourceId: z.string().nullable(),

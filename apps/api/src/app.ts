@@ -17,6 +17,7 @@ import { healthRoutes } from "./core/health/routes.js";
 import { registerHttp } from "./core/http.js";
 import { loggerOptions, registerRequestLogging } from "./core/logging.js";
 import { registerOpenApi, registerOpenApiRoute } from "./core/openapi.js";
+import { adminRoutes } from "./modules/admin/routes.js";
 import { carePlanDraftRoutes } from "./modules/care-plans/draft-routes.js";
 import { carePlanRoutes } from "./modules/care-plans/routes.js";
 import { careTeamRoutes } from "./modules/care-team/routes.js";
@@ -131,6 +132,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(fhirRoutes); // WP 5.4
   await app.register(aiRoutes, { provider: options.aiProvider }); // WP 5.2
   await app.register(noteRoutes); // WP 5.2
+  await app.register(adminRoutes); // WP 6.1
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();

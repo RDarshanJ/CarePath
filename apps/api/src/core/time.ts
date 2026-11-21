@@ -55,6 +55,14 @@ export function startOfLocalDay(date: string, timeZone: string): Date {
   return new Date(at);
 }
 
+/** The instant a local wall-clock time (`HH:MM`) on a local date occurs in the zone, DST-aware. */
+export function localInstant(date: string, time: string, timeZone: string): Date {
+  const guess = Date.parse(`${date}T${time}:00Z`);
+  let at = guess - zoneOffsetMs(new Date(guess), timeZone);
+  at = guess - zoneOffsetMs(new Date(at), timeZone);
+  return new Date(at);
+}
+
 export function addDays(date: string, days: number): string {
   return new Date(Date.parse(`${date}T00:00:00Z`) + days * D).toISOString().slice(0, 10);
 }
