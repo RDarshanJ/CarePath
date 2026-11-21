@@ -62,12 +62,13 @@ export function LoginForm({ next, section }: { next: string | null; section: "fo
                 className="group flex min-h-target w-full items-center gap-3 rounded-control px-3 py-2.5 text-left motion-fast transition-colors hover:bg-primary-subtle focus-visible:focus-ring active:bg-selected-bg disabled:cursor-not-allowed"
               >
                 <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="text-label font-medium text-link underline-offset-2 group-hover:underline group-disabled:text-disabled-ink">
+                  {/* Ink, weight 500: the row and its chevron are the control; "Sign in" stays the one cobalt action (DR-004 U10). */}
+                  <span className="text-label font-medium text-ink underline-offset-2 group-hover:underline group-disabled:text-disabled-ink">
                     {pending === account.role ? "Signing in" : `Sign in as ${account.label}`}
                   </span>
                   <span className="text-small text-ink-muted">{account.summary}</span>
                 </span>
-                <Icon name="chevron-right" size={20} className="shrink-0 text-link" />
+                <Icon name="chevron-right" size={20} className="shrink-0 text-ink-muted" />
               </button>
             </li>
           ))}

@@ -81,7 +81,8 @@ for (const role of roles) {
     await expect(
       page.getByText("Demonstration product. Synthetic data. Not for clinical use."),
     ).toBeVisible();
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    // DR-004 ruling 6.7: axe waits for the home page's own h1, not any heading; no retry is added.
+    await expect(page.getByRole("heading", { level: 1, name: account.heading })).toBeVisible();
     await expectNoSeriousViolations(page, `${role} home ${account.home}`);
     await shot(page, `${account.shell}-${role}`, width);
 
@@ -100,6 +101,7 @@ for (const role of roles) {
         "aria-current",
         "page",
       );
+      await expect(page.getByRole("heading", { level: 1, name: "Progress" })).toBeVisible();
       await expectNoSeriousViolations(page, "/progress");
       await shot(page, "patient-progress", width);
     }
@@ -113,13 +115,14 @@ for (const role of roles) {
         /Review queue/,
         /Messages/,
       ]);
-      for (const [name, url] of [
-        ["Patients", /\/patients$/],
-        [/^Review queue/, /\/review-queue$/],
+      for (const [name, url, heading] of [
+        ["Patients", /\/patients$/, "Patients"],
+        [/^Review queue/, /\/review-queue$/, "Review queue"],
       ] as const) {
         await nav.getByRole("link", { name }).click();
         await expect(page).toHaveURL(url);
         await expect(nav.getByRole("link", { name })).toHaveAttribute("aria-current", "page");
+        await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
         await expectNoSeriousViolations(page, String(name));
       }
       await shot(page, "clinician-review-queue", width);

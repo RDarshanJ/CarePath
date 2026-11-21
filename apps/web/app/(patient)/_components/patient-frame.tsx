@@ -22,21 +22,11 @@ import { SignOutButton } from "../../../components/sign-out-button";
 import { useUnreadTotal } from "../_lib/use-conversations";
 
 /** The four patient destinations (CD-500, checkpoint C2 section 5). Plan is reached from Today. */
-const destinations: { href: string; label: ReactNode; icon: IconName }[] = [
+const destinations: { href: string; label: string; icon: IconName }[] = [
   { href: "/today", label: "Today", icon: "home" },
   { href: "/progress", label: "Progress", icon: "activity" },
-  // "Appointments" is wider than a quarter of a 375 px screen: it may break after "Appoint" (CD-500).
-  {
-    href: "/appointments",
-    label: (
-      <>
-        Appoint
-        <wbr />
-        ments
-      </>
-    ),
-    icon: "calendar",
-  },
+  // One line at 375 px in the bottom bar's nav-label role (DR-004 U4); the word never breaks.
+  { href: "/appointments", label: "Appointments", icon: "calendar" },
   { href: "/messages", label: "Messages", icon: "message" },
 ];
 
@@ -110,7 +100,7 @@ export function ContactCareTeam({ clinic }: { clinic: ClinicCard }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {/* The label may wrap at 200 percent text on a phone instead of pushing the page sideways. */}
-        <Button variant="secondary" size="sm" className="h-auto! min-h-target py-1.5">
+        <Button variant="neutral" size="sm" className="h-auto! min-h-target py-1.5">
           <span className="text-center whitespace-normal">Contact care team</span>
         </Button>
       </DialogTrigger>

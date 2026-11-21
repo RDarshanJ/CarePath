@@ -15,7 +15,8 @@
 //   CAREPATH_FIXED_NOW  browser clock, default the seed anchor 2026-11-19T16:00:00.000Z.
 //   SCREENS          optional comma list of screen-name prefixes, for example "clinician-schedule,admin-".
 //   WIDTHS           optional comma list, default 375,390,768,1024,1440,1920.
-//   PROBE_FAIL_ON    optional comma list of warm, overflow, axe, small: exit 1 when the probe finds one.
+//   PROBE_FAIL_ON    optional comma list of warm, overflow, axe, targets, pictures (small is the same check under its
+//                    old name): exit 1 when the probe finds one. Targets count real targets only (DR-004 U6).
 //   PLAYWRIGHT_CHROME_PATH  default /usr/bin/google-chrome.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -162,17 +163,65 @@ function probeInPage(warmTokens) {
   const interactive = document.querySelectorAll(
     'a[href], button, input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="radio"], [role="checkbox"], [role="switch"], [role="menuitem"], [role="option"], [tabindex]:not([tabindex="-1"])',
   );
+  // Only real targets count (DR-004 U6): a visually hidden element (the skip link) is not a target until
+  // it is focused; the 1 px native select Radix keeps for forms is not one either; a checkbox, radio or
+  // switch is hit through its label, so it is measured by the box that holds the control and its label.
+  const labelBox = (el) => {
+    const labels = [
+      ...(el.labels ?? []),
+      ...(el.id ? document.querySelectorAll(`label[for="${CSS.escape(el.id)}"]`) : []),
+    ];
+    const wrap = el.closest("label");
+    if (wrap) labels.push(wrap);
+    let box = el.getBoundingClientRect();
+    for (const l of labels) {
+      const lr = l.getBoundingClientRect();
+      if (lr.width === 0 || lr.height === 0) continue;
+      const left = Math.min(box.left, lr.left);
+      const top = Math.min(box.top, lr.top);
+      box = new DOMRect(
+        left,
+        top,
+        Math.max(box.right, lr.right) - left,
+        Math.max(box.bottom, lr.bottom) - top,
+      );
+    }
+    return box;
+  };
+  const isChoice = (el) =>
+    (el.tagName === "INPUT" && /^(checkbox|radio)$/.test(el.type)) ||
+    /^(checkbox|radio|switch)$/.test(el.getAttribute("role") ?? "");
   const small = [];
   const underFloor = [];
+  const excluded = { hidden: 0, nativeSelect: 0 };
   for (const el of interactive) {
-    const r = el.getBoundingClientRect();
+    let r = el.getBoundingClientRect();
     if (!visible(el, r)) continue;
+    if (el.closest(".sr-only") && document.activeElement !== el) {
+      excluded.hidden += 1;
+      continue;
+    }
+    if (el.tagName === "SELECT" && (r.width <= 1 || r.height <= 1)) {
+      excluded.nativeSelect += 1;
+      continue;
+    }
+    if (isChoice(el)) r = labelBox(el);
+    else if (el.tagName === "INPUT" && el.getAttribute("aria-hidden") === "true") {
+      // The form input Radix keeps beside its checkbox, radio or switch button: the button is the target.
+      const control = el.previousElementSibling;
+      if (control && isChoice(control)) r = labelBox(control);
+    }
     const theme = el.closest("[data-theme]")?.getAttribute("data-theme") ?? "patient";
     const floor = theme === "patient" ? 48 : 24;
     const size = `${Math.round(r.width)}x${Math.round(r.height)}`;
     if (r.width < 24 || r.height < 24) small.push(`${describe(el)} ${size}`);
     if (r.width < floor || r.height < floor) underFloor.push(`${theme} ${describe(el)} ${size}`);
   }
+  // Body-area pictures are tiles of 64 px or less (DR-004 U9).
+  const wideAreaPictures = [...document.querySelectorAll("img")]
+    .filter((img) => /\/area-[^/]+\.webp$/.test(img.currentSrc || img.src))
+    .map((img) => Math.round(img.getBoundingClientRect().width))
+    .filter((w) => w > 64);
   const main = document.querySelector("main [data-theme], main")?.closest("[data-theme]");
   return {
     theme:
@@ -186,9 +235,11 @@ function probeInPage(warmTokens) {
     warmToken,
     h1: document.querySelector("h1")?.textContent?.trim() ?? null,
     smallTargets: small.length,
-    smallTargetList: small.slice(0, 12),
+    smallTargetList: small.slice(0, 40),
     underThemeFloor: underFloor.length,
-    underThemeFloorList: underFloor.slice(0, 12),
+    underThemeFloorList: underFloor.slice(0, 40),
+    excludedTargets: excluded,
+    wideAreaPictures,
   };
 }
 
@@ -529,6 +580,8 @@ const findings = {
   overflow: probes.filter((p) => p.overflowX > 1),
   axe: probes.filter((p) => p.violations?.length),
   small: probes.filter((p) => p.underThemeFloor > 0),
+  targets: probes.filter((p) => p.underThemeFloor > 0),
+  pictures: probes.filter((p) => p.wideAreaPictures?.length),
 };
 console.log(`\ndesign-capture: ${probes.length} images in ${out}`);
 console.log(
@@ -552,6 +605,13 @@ for (const p of findings.warm)
   );
 for (const p of findings.overflow) console.log(`  overflow: ${p.file}: ${p.overflowX}px`);
 for (const p of findings.axe) console.log(`  axe: ${p.file}: ${p.violations.join("; ")}`);
+console.log(`  body-area pictures wider than 64 px: ${findings.pictures.length} images`);
+for (const p of findings.pictures)
+  console.log(`  pictures: ${p.file}: ${p.wideAreaPictures.join(", ")} px`);
+const targetTotal = probes.reduce((n, p) => n + (p.underThemeFloor ?? 0), 0);
+console.log(`  targets under the theme floor, all images: ${targetTotal}`);
+for (const p of findings.targets)
+  console.log(`  targets: ${p.file}: ${p.underThemeFloorList.slice(0, 4).join("; ")}`);
 let status = failures.length ? 1 : 0;
 for (const f of failures) console.error(`  capture failure: ${f}`);
 for (const kind of FAIL_ON) {

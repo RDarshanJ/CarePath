@@ -6,19 +6,32 @@ export const ANCHOR = process.env["CAREPATH_FIXED_NOW"] ?? "2026-11-19T16:00:00.
 
 export const PASSWORD = "CarePath-Demo-2026";
 
+/** Demo accounts, each with its home and the home page's h1 (tests wait for it before axe, DR-004 6.7). */
 export const accounts = {
-  patient: { email: "patient.demo@carepath.test", home: "/today", shell: "patient" },
+  patient: {
+    email: "patient.demo@carepath.test",
+    home: "/today",
+    heading: "Today",
+    shell: "patient",
+  },
   physical_therapist: {
     email: "therapist.demo@carepath.test",
     home: "/overview",
+    heading: "Overview",
     shell: "clinician",
   },
   care_coordinator: {
     email: "coordinator.demo@carepath.test",
     home: "/admin/patients",
+    heading: "Patients",
     shell: "admin",
   },
-  clinic_admin: { email: "admin.demo@carepath.test", home: "/admin/patients", shell: "admin" },
+  clinic_admin: {
+    email: "admin.demo@carepath.test",
+    home: "/admin/patients",
+    heading: "Patients",
+    shell: "admin",
+  },
 } as const;
 
 export type RoleName = keyof typeof accounts;
@@ -42,7 +55,9 @@ export { expect };
  * control as "partially obscured" when the sticky bar happens to overlap it at the current scroll
  * position, so the same page passed or failed depending on where the previous page left the scroll. The
  * bar's own controls are still checked (they are at the end of the page), and focus under the bar is
- * tested separately by the keyboard passes in shells.spec.ts (WCAG 2.4.11).
+ * tested separately by the keyboard passes in shells.spec.ts (WCAG 2.4.11). DR-004 ruling 6.6: this is
+ * the only place that changes layout for axe, and every slice with a sticky bar keeps a keyboard pass
+ * asserting that no focused control's box intersects the bar.
  */
 export async function withStickyBarsInFlow<T>(page: Page, fn: () => Promise<T>): Promise<T> {
   const handle = await page.addStyleTag({
@@ -71,6 +86,9 @@ export async function expectNoSeriousViolations(page: Page, label: string) {
   const summary = blocking.map((v) => `${v.impact} ${v.id}: ${v.help} (${v.nodes.length} nodes)`);
   expect(summary, `axe serious or critical findings on ${label}`).toEqual([]);
 }
+
+/** The name DR-004 ruling 6.6 uses for the same check; slices may use either. */
+export const expectNoAxeViolations = expectNoSeriousViolations;
 
 export async function signInWithForm(page: Page, email: string, password = PASSWORD) {
   await page.goto("/login");

@@ -205,7 +205,8 @@ test("patient keyboard pass: every Tab stop on Today stays clear of the bottom b
 test("clinician shell: DR-002 H order, both badges equal the API totals, no stacked rail on a phone", async ({
   page,
 }, info) => {
-  const mobile = info.project.use.viewport!.width < 768;
+  // DR-004 U2: the sidebar starts at 1024; below it the bottom bar carries the navigation.
+  const mobile = info.project.use.viewport!.width < 1024;
   await signInWithForm(page, accounts.physical_therapist.email);
   await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
   await expectLandmarks(page, "/overview", 1);
@@ -245,7 +246,7 @@ test("clinician shell: DR-002 H order, both badges equal the API totals, no stac
   await expect(page.locator("main")).toContainText(String(totals.open));
 
   if (mobile) {
-    // Below 768 the navigation is the bottom bar and the page title starts near the top (audit: 280 px).
+    // Below 1024 the navigation is the bottom bar and the page title starts near the top (audit: 280 px).
     const box = (await nav.boundingBox())!;
     expect(box.y + box.height).toBeGreaterThan(page.viewportSize()!.height - 4);
     const h1 = (await page.getByRole("heading", { level: 1 }).boundingBox())!;
@@ -253,6 +254,79 @@ test("clinician shell: DR-002 H order, both badges equal the API totals, no stac
   }
   await expect(page.getByRole("banner").getByRole("button", { name: "Sign out" })).toBeVisible();
   await expectNoSeriousViolations(page, "/review-queue");
+});
+
+/** The sidebar's own box, its Sign out button and the document height after load (DR-004 U1, U2). */
+async function staffLayout(page: Page) {
+  return page.evaluate(() => {
+    const banner = document.querySelector("header")!;
+    const signOut = [...banner.querySelectorAll("button")].find(
+      (b) => b.textContent?.trim() === "Sign out",
+    )!;
+    const s = signOut.getBoundingClientRect();
+    const main = document.querySelector("main#main")!.getBoundingClientRect();
+    return {
+      scrollHeight: document.documentElement.scrollHeight,
+      innerHeight: window.innerHeight,
+      clientWidth: document.documentElement.clientWidth,
+      signOutTop: s.top,
+      signOutBottom: s.bottom,
+      mainWidth: main.width,
+      mainLeft: main.left,
+      sidebar: getComputedStyle(document.querySelector('nav[aria-label="Clinician"]')!).display,
+    };
+  });
+}
+
+test("clinician sidebar: never taller than the window, Sign out in view, 1024 breakpoint, 1440 cap (DR-004 U1, U2)", async ({
+  page,
+}) => {
+  await signInWithForm(page, accounts.physical_therapist.email);
+  await expect(page.getByRole("heading", { level: 1, name: "Overview" })).toBeVisible();
+  for (const [width, height] of [
+    [768, 1024],
+    [1024, 768],
+    [1440, 900],
+    [1920, 1080],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const label = `${width}x${height}`;
+    const loaded = await staffLayout(page);
+    // On load, Sign out is fully inside the window (it was cut at the fold by 29 px).
+    expect(loaded.signOutTop, `${label}: Sign out top`).toBeGreaterThanOrEqual(0);
+    expect(loaded.signOutBottom, `${label}: Sign out bottom`).toBeLessThanOrEqual(
+      loaded.innerHeight,
+    );
+    // Below 1024 the sidebar is hidden and main takes the full width; from 1024 the sidebar shows.
+    expect(loaded.sidebar, `${label}: sidebar`).toBe(width < 1024 ? "none" : "flex");
+    if (width < 1024) expect(loaded.mainWidth, `${label}: main width`).toBe(loaded.clientWidth);
+    // Content stops at 1440 and stays left-aligned beside the 240 px sidebar.
+    if (width >= 1440) {
+      expect(loaded.mainWidth, `${label}: main capped`).toBeLessThanOrEqual(1440);
+      expect(loaded.mainLeft, `${label}: main left-aligned`).toBe(240);
+    }
+    // A page shorter than the window: with main emptied, the document is exactly the window.
+    const short = await page.evaluate(() => {
+      const main = document.querySelector("main#main") as HTMLElement;
+      const kept = [...main.childNodes];
+      main.replaceChildren();
+      const out = {
+        scrollHeight: document.documentElement.scrollHeight,
+        innerHeight: window.innerHeight,
+      };
+      main.replaceChildren(...kept);
+      return out;
+    });
+    if (width >= 1024) {
+      expect(short.scrollHeight, `${label}: short page height`).toBe(short.innerHeight);
+    } else {
+      // Below 1024 the sticky bottom bar is part of the page; still nothing is forced past the window.
+      expect(short.scrollHeight, `${label}: short page height`).toBeLessThanOrEqual(
+        short.innerHeight,
+      );
+    }
+  }
 });
 
 test("clinician keyboard pass: skip link, then the navigation by Tab and Enter", async ({

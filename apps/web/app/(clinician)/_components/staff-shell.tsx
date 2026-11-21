@@ -77,53 +77,60 @@ function ShellBody({ session, children }: { session: SessionInfo; children: Reac
   const role = roleLabel[session.role];
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-bg">
+    // Below 1024 px: notice, short top bar, main, labelled bottom bar (one column). From 1024 px a grid:
+    // the sidebar spans the full window height in the first column, the demo notice and main share the
+    // second, so the page is never taller than the window because of the notice (DR-004 U1, U2).
+    <div className="flex min-h-0 flex-1 flex-col bg-bg lg:grid lg:grid-staff-shell">
       <SkipLink />
-      <DemoNotice />
-      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        {/*
-          One banner. From 768 px it is the 240 px sidebar: brand, the Clinician navigation and the signed-in
-          identity, sticky to the window so navigation and sign-out stay in reach on a long page. Below 768 px
-          it is a short top bar (brand, organisation, identity, Sign out) and the navigation moves to the
-          labelled bottom bar (CD-501).
-        */}
-        <header className="border-b border-border bg-surface md:w-60 md:shrink-0 md:border-r md:border-b-0">
-          <div className="flex flex-col md:sticky md:top-0 md:max-h-dvh md:min-h-dvh md:overflow-y-auto">
-            <div className="px-gutter pt-2.5 pb-1 md:px-4 md:pt-4 md:pb-3">
-              <Brand organization={session.organization.name} />
-            </div>
-            <SideNav
-              label="Clinician"
-              linkAs={NextLink}
-              items={items}
-              className="hidden flex-1 border-r-0 bg-transparent px-2 md:flex"
-            />
-            {/*
-              One identity block (CD-206): a compact row under the brand below 768 px, the sidebar footer with
-              the avatar from 768 px. The name wraps rather than truncating.
-            */}
-            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-gutter pb-2.5 md:flex-col md:items-stretch md:gap-3 md:border-t md:border-border md:p-4">
-              <div className="flex min-w-0 items-start gap-2.5">
-                <span className="hidden md:block">
-                  <Avatar name={session.user.displayName} />
-                </span>
-                <p className="min-w-0 text-small text-ink-muted">
-                  <span className="block text-label font-medium break-words text-ink">
-                    {session.user.displayName}
-                  </span>
-                  {role}
-                </p>
-              </div>
-              <SignOutButton variant="neutral" onSignedOut={clearSearch} />
-            </div>
+      <DemoNotice className="lg:col-start-2 lg:row-start-1" />
+      {/*
+        One banner. From 1024 px it is the 240 px sidebar: brand, the Clinician navigation and the signed-in
+        identity, sticky and exactly the window's height, so navigation and Sign out stay in reach on a
+        long page and fully visible on a short one. Below 1024 px it is a short top bar (brand,
+        organisation, identity, Sign out) and the navigation moves to the labelled bottom bar (CD-501 as
+        amended by DR-004 U2).
+      */}
+      <header className="border-b border-border bg-surface lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:border-r lg:border-b-0">
+        <div className="flex flex-col lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto">
+          <div className="px-gutter pt-2.5 pb-1 lg:px-4 lg:pt-4 lg:pb-3">
+            <Brand organization={session.organization.name} />
           </div>
-        </header>
-        <main id="main" tabIndex={-1} className="min-w-0 flex-1 px-gutter py-6">
-          {children}
-        </main>
-      </div>
+          <SideNav
+            label="Clinician"
+            linkAs={NextLink}
+            items={items}
+            className="hidden flex-1 border-r-0 bg-transparent px-2 lg:flex"
+          />
+          {/*
+            One identity block (CD-206): a compact row under the brand below 1024 px, the sidebar footer with
+            the avatar from 1024 px. The name wraps rather than truncating.
+          */}
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-gutter pb-2.5 lg:flex-col lg:items-stretch lg:gap-3 lg:border-t lg:border-border lg:p-4">
+            <div className="flex min-w-0 items-start gap-2.5">
+              <span className="hidden lg:block">
+                <Avatar name={session.user.displayName} />
+              </span>
+              <p className="min-w-0 text-small text-ink-muted">
+                <span className="block text-label font-medium break-words text-ink">
+                  {session.user.displayName}
+                </span>
+                {role}
+              </p>
+            </div>
+            <SignOutButton variant="neutral" onSignedOut={clearSearch} />
+          </div>
+        </div>
+      </header>
+      {/* Content stops at 1440 px and stays left-aligned, so 1920 does not stretch (DR-004 U2). */}
+      <main
+        id="main"
+        tabIndex={-1}
+        className="w-full max-w-staff min-w-0 flex-1 px-gutter py-6 lg:col-start-2 lg:row-start-2"
+      >
+        {children}
+      </main>
       {/* Sticky in the page flow (not fixed), so it never sits over the on-screen keyboard. */}
-      <div data-sticky-bar className="sticky bottom-0 z-10 overflow-x-clip md:hidden">
+      <div data-sticky-bar className="sticky bottom-0 z-10 overflow-x-clip lg:hidden">
         <BottomTabBar label="Clinician" items={items} linkAs={NextLink} />
       </div>
     </div>

@@ -65,9 +65,10 @@ export default async function LoginPage({
               {notice.body}
             </Banner>
           ) : null}
+          {/* The form panel stops at 26rem (DR-004 U10). */}
           <section
             aria-labelledby="signin-heading"
-            className="flex flex-col gap-6 rounded-container border border-border bg-surface p-5 sm:p-8"
+            className="flex w-full max-w-104 flex-col gap-6 rounded-container border border-border bg-surface p-5 sm:p-8"
           >
             <div className="flex flex-col gap-1.5">
               <Heading level={1} id="signin-heading">

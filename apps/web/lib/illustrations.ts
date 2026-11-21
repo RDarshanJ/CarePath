@@ -1,8 +1,14 @@
 /**
  * Generated illustrations (checkpoint C2, ruling 3.4, WP 3.5). Static files under
- * `public/assets/illustrations`, served by Next; no API route serves media. Every exercise shows its own
- * picture or the picture for its body area, never an empty box. Each file has a 960 wide version and a
- * 480 wide one (`name-480.webp`). The images are generated and have not been medically reviewed.
+ * `public/assets/illustrations`, served by Next; no API route serves media. Each file has a 960 wide
+ * version and a 480 wide one (`name-480.webp`). The images are generated and have not been medically
+ * reviewed.
+ *
+ * Manifest: `ex-*` (12) are exercise pictures, `moment-*` (3) are quiet pictures for empty or finished
+ * states, `area-*` (10) are body-area pictures. The `area-*` files are tight crops (a headless torso at
+ * player size), so they appear only as tiles of 64 px or less (library, plan rows): at the `hero` and
+ * `overview` sizes an exercise without a picture of its own gets no picture and a text-first layout,
+ * never an empty box (DR-004 U9). No further pictures are generated for this.
  */
 export const ILLUSTRATION_CAPTION =
   "Illustration only. Follow the written steps from your care team.";
@@ -43,18 +49,28 @@ export function areaIllustration(bodyArea: string): Illustration | null {
 }
 
 /**
- * The picture for an exercise: its own (`mediaPath` and `mediaAlt` from the API, set together) or the one
- * for its body area. Null only when neither exists.
+ * Where a picture is drawn: `hero` (the session player), `overview` (plan lists, the session intro, the
+ * clinician plan view, up to 320 px), `tile` (64 px or less: library and plan rows).
  */
-export function exerciseIllustration(exercise: {
-  mediaPath: string | null;
-  mediaAlt: string | null;
-  bodyArea: string;
-}): Illustration | null {
+export type IllustrationSize = "hero" | "overview" | "tile";
+
+/**
+ * The picture for an exercise: its own (`mediaPath` and `mediaAlt` from the API, set together). Only a
+ * `tile` falls back to the picture for the body area; at `hero` and `overview` an exercise without its
+ * own picture returns null and the screen lays the exercise out text first (DR-004 U9).
+ */
+export function exerciseIllustration(
+  exercise: {
+    mediaPath: string | null;
+    mediaAlt: string | null;
+    bodyArea: string;
+  },
+  size: IllustrationSize,
+): Illustration | null {
   if (exercise.mediaPath && exercise.mediaAlt) {
     return { path: exercise.mediaPath, alt: exercise.mediaAlt };
   }
-  return areaIllustration(exercise.bodyArea);
+  return size === "tile" ? areaIllustration(exercise.bodyArea) : null;
 }
 
 /** The 480 wide file next to a 960 wide path. */
