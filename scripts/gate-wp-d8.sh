@@ -7,7 +7,7 @@
 #        storage read, keyboard), the slice spec that onboards through the UI, shells and patient specs
 #        that touch these routes, at 390 and 1440 (API 4108, web 3108, web lock)
 #   G5, G8  design capture of the onboarding and consent screens at six widths with
-#        PROBE_FAIL_ON=warm,overflow,axe,targets (DR-004 5.1 rule 8); the recorded set lives in
+#        PROBE_FAIL_ON=warm,overflow,axe,targets,pictures (DR-004 5.1 rule 8); the recorded set lives in
 #        docs/design/after/d-wp-8/ and was made by the same command
 #   G9   pnpm verify, then a clean git status.
 #   GATE_SKIP_VERIFY=1   skip the final `pnpm verify`; GATE_SKIP_CAPTURE=1 skip the capture (dev loops only)
@@ -59,7 +59,7 @@ run scripts/with-web-lock.sh bash -c e2e
 
 if [ -z "${GATE_SKIP_CAPTURE:-}" ]; then
   export CAPTURE_DIR="${CAPTURE_DIR:-$PWD/.data/capture-d-wp-8}"
-  export PROBE_FAIL_ON="${PROBE_FAIL_ON:-warm,overflow,axe,targets}"
+  export PROBE_FAIL_ON="${PROBE_FAIL_ON:-warm,overflow,axe,targets,pictures}"
   export SCREENS="${SCREENS:-patient-onboarding,patient-consent}"
   run scripts/with-web-lock.sh scripts/design-capture.sh wpd8 4108 3108
   run node scripts/gate-wp-d8-probe.mjs "$CAPTURE_DIR/_probe.json"

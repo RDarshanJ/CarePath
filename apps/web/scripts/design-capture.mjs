@@ -366,26 +366,94 @@ await group(["public-"], async (page) => {
   await capture(page, "public-sign-in-errors");
 });
 
-// Onboarding, signed out: account, account with errors, eligibility code.
-await group(["patient-onboarding-1", "patient-onboarding-2"], async (page) => {
-  await page.goto("/onboarding");
-  await h1(page, "Create your account");
-  await capture(page, "patient-onboarding-1-account");
-  await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page.getByRole("alert").filter({ hasText: "to fix" }).waitFor();
-  await capture(page, "patient-onboarding-1-account-errors");
-  await page.getByLabel(/^First name/).fill("Casey");
-  await page.getByLabel(/^Last name/).fill("Morgan");
-  await page.getByLabel(/^Email/).fill("casey.morgan.capture@carepath.test");
-  await page.getByLabel(/^Password/).fill("a long enough passphrase 2026");
-  await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await h1(page, "Your eligibility code");
-  await capture(page, "patient-onboarding-2-code");
-});
+// Onboarding (D-WP-8): step 1 (code and date of birth), step 1 with errors, step 2 (account), every later
+// step with the minimal valid answers, the pain error state, the done screen. The first two names keep the
+// baseline file names so before and after pair up: "1-account" is now the code step.
+await group(
+  ["patient-onboarding-1", "patient-onboarding-2", "patient-onboarding-s"],
+  async (page) => {
+    const cont = () => page.getByRole("button", { name: /^(Continue|Save and continue)$/ }).click();
+    await page.goto("/onboarding");
+    await h1(page, "Your eligibility code");
+    await capture(page, "patient-onboarding-1-account");
+    await cont();
+    await page.getByRole("alert").filter({ hasText: "to fix" }).waitFor();
+    await capture(page, "patient-onboarding-1-account-errors");
+    await page.getByLabel(/^Eligibility code/).fill("CAREPATH-1-START-1");
+    await page.getByLabel("Day", { exact: true }).fill("2");
+    await page.getByLabel("Month", { exact: true }).selectOption({ label: "June" });
+    await page.getByLabel("Year", { exact: true }).fill("1991");
+    await cont();
+    await h1(page, "Create your account");
+    await capture(page, "patient-onboarding-2-code");
+    await page.getByLabel(/^First name/).fill("Casey");
+    await page.getByLabel(/^Last name/).fill("Morgan");
+    await page.getByLabel(/^Email/).fill("casey.morgan.capture@carepath.test");
+    await page.getByLabel(/^Create a password/).fill("a long enough passphrase 2026");
+    await page.getByRole("button", { name: "Create account" }).click();
+    await h1(page, "About you");
+    await capture(page, "patient-onboarding-s03-about");
+    await cont();
+    await h1(page, "Your goal");
+    await capture(page, "patient-onboarding-s04-goal");
+    await page
+      .getByLabel(/^What would you like/)
+      .fill("Walk to the corner shop without stopping to rest.");
+    await cont();
+    await h1(page, "Where it bothers you");
+    await capture(page, "patient-onboarding-s05-body-area");
+    await page.getByRole("radio", { name: "Lower back", exact: true }).click();
+    await page.getByRole("radio", { name: "Left side" }).click();
+    await cont();
+    await h1(page, "Pain right now and this week");
+    await cont();
+    await page.getByRole("alert").filter({ hasText: "to fix" }).waitFor();
+    await capture(page, "patient-onboarding-s06-pain-errors");
+    const pain = (group, value) =>
+      page
+        .getByRole("radiogroup", { name: group })
+        .getByRole("radio", { name: value, exact: true })
+        .click();
+    await pain("At its worst in the last week?", "6 of 10");
+    await pain("At its best in the last week?", "2 of 10");
+    await pain("How much does it hurt right now?", "4 of 10");
+    await capture(page, "patient-onboarding-s06-pain");
+    await cont();
+    await h1(page, "What is hard right now");
+    await page.getByRole("checkbox", { name: "Walking" }).click();
+    await capture(page, "patient-onboarding-s07-limitations");
+    await cont();
+    await h1(page, "Your therapist");
+    await capture(page, "patient-onboarding-s08-preferences");
+    await cont();
+    await h1(page, "When you can come in");
+    await page.getByRole("checkbox", { name: "Monday" }).click();
+    await page.getByRole("checkbox", { name: "Morning" }).click();
+    await capture(page, "patient-onboarding-s09-availability");
+    await cont();
+    await h1(page, "Sharing and consent");
+    await capture(page, "patient-onboarding-s10-consent");
+    await cont();
+    await page.getByRole("alert").filter({ hasText: "to fix" }).waitFor();
+    await capture(page, "patient-onboarding-s10-consent-errors");
+    await page.getByRole("checkbox", { name: /I agree to treatment and data use/ }).click();
+    await page.getByRole("radio", { name: "No, do not allow them" }).click();
+    await cont();
+    await h1(page, "Review and send");
+    await capture(page, "patient-onboarding-s11-review");
+    await page.getByRole("checkbox", { name: "These answers are right." }).click();
+    await page.getByRole("button", { name: "Send to the clinic" }).click();
+    await h1(page, "Your details are with the clinic");
+    await capture(page, "patient-onboarding-s12-done");
+  },
+);
 
-// Onboarding resume: the intake persona lands on its first open step.
+// Onboarding resume: the intake persona sees the summary, then lands on its first open step.
 await group(["patient-onboarding-resume"], async (page) => {
   await signIn(page, "patient.intake@carepath.test");
+  await h1(page, "Welcome back");
+  await capture(page, "patient-onboarding-resume-summary");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await h1(page, "Pain right now and this week");
   await capture(page, "patient-onboarding-resume-step");
 });
@@ -433,6 +501,14 @@ await group(patientScreens, async (page) => {
     await capture(page, "patient-message-thread");
   }
   await visit("patient-consent", "/consent", "Sharing and consent");
+  if (want("patient-consent-allowed")) {
+    // The optional consent allowed: the result line and the history (D-WP-8). Restored afterwards.
+    await page.getByRole("button", { name: "Allow automated drafting tools" }).click();
+    await page.getByRole("status").filter({ hasText: "are now allowed" }).waitFor();
+    await capture(page, "patient-consent-allowed");
+    await page.getByRole("button", { name: "Stop allowing automated drafting tools" }).click();
+    await page.getByRole("status").filter({ hasText: "no longer allowed" }).waitFor();
+  }
 });
 
 // Session and discomfort chain, on one persona with a rest day (patient.flare): Today, the session overview,
