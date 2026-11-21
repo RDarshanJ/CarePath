@@ -31,10 +31,13 @@ import {
 import { findCheckIn, markReviewed } from "../check-ins/repo.js";
 import {
   activePractitioner,
+  activeTaskIdsForCheckIn,
   closeTask,
   findRule,
   findTask,
+  insertTaskEvent,
   listRules,
+  lockTask,
   setTaskAssignee,
   updateRule,
 } from "./repo.js";
@@ -132,8 +135,22 @@ export const reviewActionRoutes: FastifyPluginAsyncZod = async (app) => {
       }
       return withTx(request, async ({ tx }) => {
         const at = now();
+        // CR-11: lock the task so the history records the assignee this change replaced.
+        const locked = await lockTask(tx, ctx, patientId, taskId);
+        if (!locked) throw new AppError("not_found");
+        const previous = locked.assignedPractitionerId;
         if (!(await setTaskAssignee(tx, ctx, patientId, taskId, practitionerId, at))) {
           throw new AppError("invalid_transition");
+        }
+        // No event when nothing changed (assigning the same person, unassigning an open task).
+        if (practitionerId !== previous) {
+          await insertTaskEvent(tx, ctx, {
+            taskId,
+            kind: practitionerId ? "assigned" : "unassigned",
+            actorUserId: ctx.userId,
+            practitionerId: practitionerId ?? previous,
+            at,
+          });
         }
         const row = await findTask(tx, ctx, patientId, taskId);
         return toReviewTask(row!, at, await isOnCareTeam(tx, ctx, patientId));
@@ -171,6 +188,13 @@ export const reviewActionRoutes: FastifyPluginAsyncZod = async (app) => {
             at,
           });
           if (!closed) throw new AppError("invalid_transition");
+          await insertTaskEvent(tx, ctx, {
+            taskId,
+            kind: status === "resolved" ? "resolved" : "dismissed",
+            actorUserId: ctx.userId,
+            note: request.body.note,
+            at,
+          });
           await auditTx({
             eventName: "review_task.resolve",
             action: "U",
@@ -207,8 +231,13 @@ export const reviewActionRoutes: FastifyPluginAsyncZod = async (app) => {
       await requireChild(request, "PatientCheckIn", patientId, checkInId);
       const ctx = await requirePatientWrite(request, patientId, { careTeamOnly: true });
       return withTx(request, async ({ tx }) => {
-        if (!(await markReviewed(tx, ctx, patientId, checkInId, ctx.userId, now()))) {
+        const at = now();
+        if (!(await markReviewed(tx, ctx, patientId, checkInId, ctx.userId, at))) {
           throw new AppError("already_exists");
+        }
+        // CR-11: each active task that reads this check-in records who reviewed it.
+        for (const taskId of await activeTaskIdsForCheckIn(tx, ctx, patientId, checkInId)) {
+          await insertTaskEvent(tx, ctx, { taskId, kind: "reviewed", actorUserId: ctx.userId, at });
         }
         return (await findCheckIn(tx, ctx, patientId, checkInId))!;
       });

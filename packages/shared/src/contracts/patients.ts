@@ -41,8 +41,6 @@ export type PlanStage = z.infer<typeof planStageSchema>;
 const booleanQuery = z.enum(["true", "false"]).transform((v) => v === "true");
 
 export const patientDirectoryQuerySchema = z.object({
-  /** Name or MRN, case-insensitive substring. */
-  q: z.string().trim().min(1).max(100).optional(),
   status: patientStatusSchema.optional(),
   /** Practitioner id: patients whose active care team includes this clinician. */
   clinicianId: z.uuid().optional(),
@@ -58,6 +56,21 @@ export const patientDirectoryQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(25),
 });
 export type PatientDirectoryQuery = z.input<typeof patientDirectoryQuerySchema>;
+
+/**
+ * CR-12, DR-002 R2. The search term travels in a request body so a name or MRN is never part of a
+ * URL. `POST /patients/search` reads nothing and writes nothing: it is a read with the same
+ * result and permission as `GET /patients`. `GET /patients` no longer takes `q`; the other
+ * filters, `sort`, `cursor` and `limit` stay in the query string of both routes.
+ */
+export const patientSearchBodySchema = z
+  .object({
+    /** Name or MRN, case-insensitive substring. */
+    q: z.string().trim().min(1).max(100),
+  })
+  .strict()
+  .meta({ id: "PatientSearchBody" });
+export type PatientSearchBody = z.infer<typeof patientSearchBodySchema>;
 
 const directoryBase = {
   id: z.uuid(),

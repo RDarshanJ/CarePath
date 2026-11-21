@@ -5,12 +5,14 @@ import {
   appointmentIdParamsSchema,
   appointmentRescheduleSchema,
   appointmentSchema,
+  idempotencyHeadersSchema,
   patientIdParamsSchema,
   type Appointment,
   type AppointmentType,
 } from "@carepath/shared/contracts";
 import type { RequestCtx } from "../../core/context.js";
 import type { DbTx, TxOptions } from "../../core/db/repo.js";
+import { withIdempotencyKey } from "../../core/idempotency/index.js";
 import { withTx, type TxScope } from "../../core/db/tx.js";
 import { AppError, errorResponses } from "../../core/errors.js";
 import { requireChild, requirePatientWrite } from "../../core/scope/patient-scope.js";
@@ -185,6 +187,7 @@ export const schedulingWriteRoutes: FastifyPluginAsyncZod = async (app) => {
         summary:
           "Book an open slot. 409 booking_conflict when the slot was just taken or the patient is busy then.",
         params: patientIdParamsSchema,
+        headers: idempotencyHeadersSchema,
         body: appointmentBookSchema,
         response: { 201: appointmentSchema, ...errorResponses(400, 401, 403, 404, 409, 429) },
       },
@@ -194,26 +197,37 @@ export const schedulingWriteRoutes: FastifyPluginAsyncZod = async (app) => {
       const ctx = await requirePatientWrite(request, patientId, { careTeamOnly: false });
       const { slotId, type, reason } = request.body;
       const clinic = await findClinic(db, ctx);
+      const key = request.headers["idempotency-key"];
       const result = await withTx(
         request,
         async (scope) => {
           const at = now();
-          const slots = await lockSlots(scope.tx, ctx, [slotId]);
-          const id = await bookInto(scope, ctx, {
-            patientId,
-            slot: slots.get(slotId),
-            type,
-            reason: reason ?? null,
-            timezone: clinic.timezone,
-            at,
-            rescheduledFromId: null,
-            typePath: "body.type",
-          });
-          return reread(scope.tx, ctx, patientId, id, clinic.timezone);
+          const book = async () => {
+            const slots = await lockSlots(scope.tx, ctx, [slotId]);
+            const id = await bookInto(scope, ctx, {
+              patientId,
+              slot: slots.get(slotId),
+              type,
+              reason: reason ?? null,
+              timezone: clinic.timezone,
+              at,
+              rescheduledFromId: null,
+              typePath: "body.type",
+            });
+            return reread(scope.tx, ctx, patientId, id, clinic.timezone);
+          };
+          if (!key) return { status: 201, body: await book(), replayed: false };
+          return withIdempotencyKey(
+            scope.tx,
+            ctx,
+            { key, scope: `book:${patientId}`, body: request.body, at, status: 201 },
+            book,
+          );
         },
         BOOKING_TX,
       );
-      return reply.code(201).send(result);
+      if (result.replayed) void reply.header("idempotency-replayed", "true");
+      return reply.code(201).send(result.body);
     },
   );
 
@@ -267,6 +281,7 @@ export const schedulingWriteRoutes: FastifyPluginAsyncZod = async (app) => {
         summary:
           "Move a coming booking to another open slot: cancel and book in one transaction. If the new slot is taken, the original stays.",
         params: appointmentIdParamsSchema,
+        headers: idempotencyHeadersSchema,
         body: appointmentRescheduleSchema,
         response: { 201: appointmentSchema, ...errorResponses(400, 401, 403, 404, 409, 429) },
       },
@@ -281,35 +296,56 @@ export const schedulingWriteRoutes: FastifyPluginAsyncZod = async (app) => {
       if (oldSlotId === slotId) {
         throw slotError("body.slotId", "same_slot", "Choose a different time.");
       }
+      const key = request.headers["idempotency-key"];
       const result = await withTx(
         request,
         async (scope) => {
           const at = now();
-          const slots = await lockSlots(scope.tx, ctx, oldSlotId ? [oldSlotId, slotId] : [slotId]);
-          const appt = await lockAppointment(scope.tx, ctx, patientId, appointmentId);
-          await cancelLocked(scope, ctx, {
-            patientId,
-            appt,
-            slot: oldSlotId ? slots.get(oldSlotId) : undefined,
-            reason: "Rescheduled",
-            at,
-            rescheduled: true,
-          });
-          const id = await bookInto(scope, ctx, {
-            patientId,
-            slot: slots.get(slotId),
-            type: (appt as LockedAppointment).type,
-            reason: (appt as LockedAppointment).reason,
-            timezone: clinic.timezone,
-            at,
-            rescheduledFromId: appointmentId,
-            typePath: "body.slotId",
-          });
-          return reread(scope.tx, ctx, patientId, id, clinic.timezone);
+          const move = async () => {
+            const slots = await lockSlots(
+              scope.tx,
+              ctx,
+              oldSlotId ? [oldSlotId, slotId] : [slotId],
+            );
+            const appt = await lockAppointment(scope.tx, ctx, patientId, appointmentId);
+            await cancelLocked(scope, ctx, {
+              patientId,
+              appt,
+              slot: oldSlotId ? slots.get(oldSlotId) : undefined,
+              reason: "Rescheduled",
+              at,
+              rescheduled: true,
+            });
+            const id = await bookInto(scope, ctx, {
+              patientId,
+              slot: slots.get(slotId),
+              type: (appt as LockedAppointment).type,
+              reason: (appt as LockedAppointment).reason,
+              timezone: clinic.timezone,
+              at,
+              rescheduledFromId: appointmentId,
+              typePath: "body.slotId",
+            });
+            return reread(scope.tx, ctx, patientId, id, clinic.timezone);
+          };
+          if (!key) return { status: 201, body: await move(), replayed: false };
+          return withIdempotencyKey(
+            scope.tx,
+            ctx,
+            {
+              key,
+              scope: `reschedule:${patientId}:${appointmentId}`,
+              body: request.body,
+              at,
+              status: 201,
+            },
+            move,
+          );
         },
         BOOKING_TX,
       );
-      return reply.code(201).send(result);
+      if (result.replayed) void reply.header("idempotency-replayed", "true");
+      return reply.code(201).send(result.body);
     },
   );
 };

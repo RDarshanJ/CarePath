@@ -281,7 +281,8 @@ export const sessionWriteRoutes: FastifyPluginAsyncZod = async (app) => {
       schema: {
         operationId: "stopSessionForDiscomfort",
         tags: ["sessions"],
-        summary: '"Stop, this hurts": end as stopped_discomfort and request a pain report (AC-C4).',
+        summary:
+          '"Stop, this hurts": end as stopped_discomfort and request a pain report (AC-C4). discomfortLevel may be null; the rating then follows as a check-in (CR-6).',
         params: sessionIdParamsSchema,
         body: sessionStopRequestSchema,
         response: responses,
@@ -304,12 +305,24 @@ export const sessionWriteRoutes: FastifyPluginAsyncZod = async (app) => {
       return withTx(request, async ({ tx }) => {
         await lockFor(tx, ctx, patientId, sessionId, ["in_progress", "paused"]);
         const at = now();
-        await updateActivity(tx, ctx, sessionId, activityId, {
-          discomfortReported: true,
-          discomfortLevel,
-          discomfortNote: note ?? null,
-          updatedAt: at,
-        });
+        // CR-6: Stop ends the session at once. Without a rating nothing is recorded as a pain
+        // number (the row check requires a level whenever discomfortReported is true, and a
+        // number the patient did not give is never invented). A level reported earlier on this
+        // activity stays; the rating follows as a check-in that references the session.
+        await updateActivity(
+          tx,
+          ctx,
+          sessionId,
+          activityId,
+          discomfortLevel === null
+            ? { ...(note ? { discomfortNote: note } : {}), updatedAt: at }
+            : {
+                discomfortReported: true,
+                discomfortLevel,
+                discomfortNote: note ?? null,
+                updatedAt: at,
+              },
+        );
         await updateSession(tx, ctx, patientId, sessionId, {
           status: "stopped_discomfort",
           stoppedAt: at,

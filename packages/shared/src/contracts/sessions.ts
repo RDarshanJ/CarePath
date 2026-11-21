@@ -141,11 +141,16 @@ export const sessionActivityUpdateSchema = z
   .meta({ id: "SessionActivityUpdate" });
 export type SessionActivityUpdate = z.input<typeof sessionActivityUpdateSchema>;
 
-/** "Stop, this hurts" (AC-C4): ends the session as stopped_discomfort. */
+/**
+ * "Stop, this hurts" (AC-C4): ends the session as stopped_discomfort at once (CR-6).
+ * `discomfortLevel` is null (or left out) when the patient stops before rating the pain: the
+ * session still ends, no discomfort number is stored for the activity, and the rating follows
+ * as a check-in that references the session. A number is stored exactly as given.
+ */
 export const sessionStopRequestSchema = z
   .object({
     activityId: z.uuid(),
-    discomfortLevel: z.number().int().min(0).max(10),
+    discomfortLevel: z.number().int().min(0).max(10).nullable().default(null),
     note: z.string().trim().max(500).nullable().default(null),
   })
   .strict()

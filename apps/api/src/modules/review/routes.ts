@@ -16,10 +16,12 @@ import {
   countTasks,
   listPatientTasks,
   listTasks,
+  patientRuleTotals,
+  ruleTotals,
   rulesLastRunAt,
 } from "./repo.js";
 import { TIME_RULES_QUEUE } from "./queues.js";
-import { toReviewTask } from "./view.js";
+import { toReviewTask, toRuleTotals } from "./view.js";
 
 /** Review queue reads (delivery step 3). Task actions and rules are in action-routes.ts. */
 export const reviewRoutes: FastifyPluginAsyncZod = async (app) => {
@@ -64,6 +66,12 @@ export const reviewRoutes: FastifyPluginAsyncZod = async (app) => {
         items: page.items.map((r) => toReviewTask(r, at, mine.has(r.patientId))),
         nextCursor: page.nextCursor,
         total: await countTasks(db, ctx, filter),
+        ruleTotals: toRuleTotals(
+          await ruleTotals(db, ctx, {
+            status: filter.status,
+            assignedPractitionerId: filter.assignedPractitionerId,
+          }),
+        ),
         lastCheckedAt: at.toISOString(),
         rulesLastRunAt: (await rulesLastRunAt(db, ctx, TIME_RULES_QUEUE))?.toISOString() ?? null,
       };
@@ -95,6 +103,7 @@ export const reviewRoutes: FastifyPluginAsyncZod = async (app) => {
         items: page.items.map((r) => toReviewTask(r, at, onCareTeam)),
         nextCursor: page.nextCursor,
         total: await countPatientTasks(db, ctx, patientId),
+        ruleTotals: toRuleTotals(await patientRuleTotals(db, ctx, patientId)),
         lastCheckedAt: at.toISOString(),
         rulesLastRunAt: (await rulesLastRunAt(db, ctx, TIME_RULES_QUEUE))?.toISOString() ?? null,
       };

@@ -5,7 +5,7 @@ import { appointmentStatuses, appointmentTypes } from "../contracts/scheduling.j
 import { exerciseSessionStatuses, sessionActivityStatusSchema } from "../contracts/sessions.js";
 import { messageStatusSchema } from "../contracts/messaging.js";
 import { patientStatusSchema, planStageSchema } from "../contracts/patients.js";
-import { reviewTaskStatusSchema } from "../contracts/review.js";
+import { reviewTaskEventKindSchema, reviewTaskStatusSchema } from "../contracts/review.js";
 import {
   aiDraftState,
   aiDraftStateLabels,
@@ -21,6 +21,7 @@ import {
   patientStatusLabels,
   planStageLabels,
   priorityLevelLabels,
+  reviewTaskEventLabels,
   reviewTaskStatusLabels,
   sessionActivityStatusLabels,
   sessionStatusLabels,
@@ -56,6 +57,7 @@ describe("status maps cover the database enums", () => {
     ["AppointmentStatus", appointmentStatusLabels],
     ["AppointmentType", appointmentTypeLabels],
     ["ReviewTaskStatus", reviewTaskStatusLabels],
+    ["ReviewTaskEventKind", reviewTaskEventLabels],
     ["MessageStatus", messageStatusLabels],
     ["ExerciseSessionStatus", sessionStatusLabels],
     ["SessionActivityStatus", sessionActivityStatusLabels],
@@ -80,6 +82,7 @@ describe("status maps cover the contract enums", () => {
     ["appointmentStatuses", appointmentStatusLabels, appointmentStatuses],
     ["appointmentTypes", appointmentTypeLabels, appointmentTypes],
     ["reviewTaskStatusSchema", reviewTaskStatusLabels, reviewTaskStatusSchema.options],
+    ["reviewTaskEventKindSchema", reviewTaskEventLabels, reviewTaskEventKindSchema.options],
     ["messageStatusSchema", messageStatusLabels, messageStatusSchema.options],
     ["exerciseSessionStatuses", sessionStatusLabels, exerciseSessionStatuses],
     [
@@ -153,6 +156,7 @@ describe("wording rules", () => {
       ...Object.values(carePlanStatusLabels).map((v) => v.label),
       ...Object.values(versionMarkerLabels).map((v) => v.label),
       ...Object.values(reviewTaskStatusLabels).map((v) => v.label),
+      ...Object.values(reviewTaskEventLabels),
       ...Object.values(messageStatusLabels).map((v) => v.label),
       ...Object.values(sessionStatusLabels).map((v) => v.label),
       ...Object.values(clinicalNoteStatusLabels).map((v) => v.label),

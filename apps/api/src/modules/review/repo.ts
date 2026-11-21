@@ -56,6 +56,11 @@ export async function insertRuleTask(db: DbClient, ctx: Scope, t: NewTask): Prom
 
 export type TaskJson = Prisma.JsonValue;
 
+const eventOrder: Prisma.ReviewTaskEventOrderByWithRelationInput[] = [
+  { occurredAt: "asc" },
+  { seq: "asc" },
+];
+
 export const taskSelect = {
   id: true,
   status: true,
@@ -75,6 +80,26 @@ export const taskSelect = {
   resolvedBy: {
     select: {
       user: { select: { id: true, displayName: true, practitioner: { select: { id: true } } } },
+    },
+  },
+  // CR-11: the task's history, oldest first.
+  events: {
+    orderBy: eventOrder,
+    select: {
+      id: true,
+      kind: true,
+      occurredAt: true,
+      note: true,
+      actor: {
+        select: {
+          user: {
+            select: { id: true, displayName: true, practitioner: { select: { id: true } } },
+          },
+        },
+      },
+      practitioner: {
+        select: { id: true, userId: true, givenName: true, familyName: true, credentials: true },
+      },
     },
   },
 } as const;
@@ -110,6 +135,37 @@ function taskWhere(ctx: Scope, filter: TaskListFilter): Prisma.ReviewTaskWhereIn
     ...(filter.ruleKey ? { rule: { key: filter.ruleKey } } : {}),
     ...(filter.patientIds ? { patientId: { in: filter.patientIds } } : {}),
   };
+}
+
+/**
+ * CR-10: tasks per rule for the queue's scope. The rule filter is left out on purpose, so every
+ * rule keeps its count while one is selected. Every rule of the organization appears, with zero
+ * when it has no task in scope; highest rule priority first.
+ */
+export async function ruleTotals(
+  db: DbClient,
+  ctx: Scope,
+  filter: Omit<TaskListFilter, "ruleKey">,
+) {
+  return countRuleTotals(db, ctx, taskWhere(ctx, { ...filter }));
+}
+
+/** CR-10 for one patient's task list (every status). */
+export async function patientRuleTotals(db: DbClient, ctx: Scope, patientId: string) {
+  return countRuleTotals(db, ctx, { organizationId: ctx.orgId, patientId });
+}
+
+async function countRuleTotals(db: DbClient, ctx: Scope, where: Prisma.ReviewTaskWhereInput) {
+  const [rules, groups] = await Promise.all([
+    db.reviewRule.findMany({
+      where: { organizationId: ctx.orgId },
+      orderBy: [{ priority: "desc" }, { key: "asc" }],
+      select: { id: true, key: true, name: true },
+    }),
+    db.reviewTask.groupBy({ by: ["ruleId"], where, _count: { _all: true } }),
+  ]);
+  const counts = new Map(groups.map((g) => [g.ruleId, g._count._all]));
+  return rules.map((r) => ({ ...r, total: counts.get(r.id) ?? 0 }));
 }
 
 /** Highest priority first, then oldest. */
@@ -186,6 +242,61 @@ export async function rulesLastRunAt(
 }
 
 // ---- task actions and rules (delivery step 5) -------------------------------------------------
+
+/** Locks the task row for an action and returns what the action needs to decide. */
+export async function lockTask(db: DbClient, ctx: Scope, patientId: string, taskId: string) {
+  const rows = await db.$queryRaw<{ assignedPractitionerId: string | null; status: string }[]>`
+    SELECT "assignedPractitionerId", status::text AS status FROM "ReviewTask"
+    WHERE id = ${taskId}::uuid AND "organizationId" = ${ctx.orgId}::uuid
+      AND "patientId" = ${patientId}::uuid
+    FOR UPDATE`;
+  return rows[0] ?? null;
+}
+
+export type TaskEventKind = "assigned" | "unassigned" | "reviewed" | "resolved" | "dismissed";
+
+/** Appends to the task's history (CR-11). Call it in the transaction of the change it records. */
+export async function insertTaskEvent(
+  db: DbClient,
+  ctx: Scope,
+  e: {
+    taskId: string;
+    kind: TaskEventKind;
+    actorUserId: string;
+    practitionerId?: string | null;
+    note?: string | null;
+    at: Date;
+  },
+): Promise<void> {
+  await db.reviewTaskEvent.create({
+    data: {
+      organizationId: ctx.orgId,
+      taskId: e.taskId,
+      kind: e.kind,
+      actorUserId: e.actorUserId,
+      practitionerId: e.practitionerId ?? null,
+      note: e.note ?? null,
+      occurredAt: e.at,
+    },
+  });
+}
+
+/** Open and in-review tasks of the patient that read this check-in (evidence source). */
+export async function activeTaskIdsForCheckIn(
+  db: DbClient,
+  ctx: Scope,
+  patientId: string,
+  checkInId: string,
+): Promise<string[]> {
+  const rows = await db.$queryRaw<{ id: string }[]>`
+    SELECT id FROM "ReviewTask"
+    WHERE "organizationId" = ${ctx.orgId}::uuid AND "patientId" = ${patientId}::uuid
+      AND status IN ('open', 'in_review')
+      AND evidence @> jsonb_build_array(
+        jsonb_build_object('type', 'PatientCheckIn', 'id', ${checkInId}::text))
+    ORDER BY "createdAt", id`;
+  return rows.map((r) => r.id);
+}
 
 export async function setTaskAssignee(
   db: DbClient,

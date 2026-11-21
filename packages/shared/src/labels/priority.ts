@@ -1,11 +1,12 @@
+import type { PriorityLevel } from "../contracts/review.js";
 import type { StatusLabel } from "./types.js";
 
+export type { PriorityLevel };
+
 /**
- * CD-235, conditional on CR-9 (`ReviewTask.priorityLevel`). Thresholds belong to the server rules;
+ * CD-235 and CR-9 (`ReviewTask.priorityLevel`, delivered). Thresholds belong to the server rules;
  * the client never turns the stored integer into a band. Standard tasks show no mark.
  */
-export type PriorityLevel = "high" | "standard";
-
 export const priorityLevelLabels: Record<PriorityLevel, StatusLabel | null> = {
   high: { label: "High priority", tone: "warning", form: "tag" },
   standard: null,

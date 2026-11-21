@@ -127,6 +127,48 @@ export const reviewTaskSourceSchema = z.object({
 });
 export type ReviewTaskSource = z.infer<typeof reviewTaskSourceSchema>;
 
+/**
+ * CR-9. Two levels, derived on the server from the task's own stored `priority` (a copy of the
+ * rule's priority when the task was created): `high` when it is HIGH_PRIORITY_MIN or more,
+ * otherwise `standard`. With the seeded rule priorities only reported pain is high. An
+ * administrator who changes a rule's priority changes the level of tasks created afterwards.
+ * The level is an ordering aid set by clinic rules; it is not a measure of medical risk.
+ */
+export const HIGH_PRIORITY_MIN = 70;
+export const priorityLevelSchema = z.enum(["high", "standard"]);
+export type PriorityLevel = z.infer<typeof priorityLevelSchema>;
+export function priorityLevelOf(priority: number): PriorityLevel {
+  return priority >= HIGH_PRIORITY_MIN ? "high" : "standard";
+}
+
+/**
+ * CR-11. What happened to a task, oldest first. Creation is the task's `createdAt`, not an event.
+ * `reviewed` is the care team marking a check-in the task reads as reviewed.
+ */
+export const reviewTaskEventKindSchema = z.enum([
+  "assigned",
+  "unassigned",
+  "reviewed",
+  "resolved",
+  "dismissed",
+]);
+export type ReviewTaskEventKind = z.infer<typeof reviewTaskEventKindSchema>;
+
+export const reviewTaskEventSchema = z
+  .object({
+    id: z.uuid(),
+    kind: reviewTaskEventKindSchema,
+    occurredAt: instantSchema,
+    /** Who did it. */
+    actor: personRefSchema,
+    /** Assigned to (kind assigned) or taken from (kind unassigned); null otherwise. */
+    practitioner: personRefSchema.nullable(),
+    /** The resolution or dismissal note; null for the other kinds. */
+    note: z.string().nullable(),
+  })
+  .meta({ id: "ReviewTaskEvent" });
+export type ReviewTaskEvent = z.infer<typeof reviewTaskEventSchema>;
+
 export const reviewTaskSchema = z
   .object({
     id: z.uuid(),
@@ -147,6 +189,8 @@ export const reviewTaskSchema = z
     unit: z.string().nullable(),
     sources: z.array(reviewTaskSourceSchema),
     priority: z.number().int(),
+    /** CR-9: "high" or "standard", derived on the server from `priority` (see priorityLevelOf). */
+    priorityLevel: priorityLevelSchema,
     assignedTo: personRefSchema.nullable(),
     createdAt: instantSchema,
     dueAt: instantSchema.nullable(),
@@ -155,6 +199,8 @@ export const reviewTaskSchema = z
     resolvedAt: instantSchema.nullable(),
     resolvedBy: personRefSchema.nullable(),
     resolutionNote: z.string().nullable(),
+    /** CR-11: assigned, unassigned, reviewed, resolved and dismissed, oldest first. */
+    events: z.array(reviewTaskEventSchema),
     /**
      * Whether the signed-in user is an active member of the patient's active care team (CR-2).
      * Assigning a task, and resolving or dismissing a clinical one, need it (403 `not_on_care_team`).
@@ -177,8 +223,24 @@ export const reviewTaskQuerySchema = z.object({
 });
 export type ReviewTaskQuery = z.input<typeof reviewTaskQuerySchema>;
 
+/** CR-10. Tasks of one rule in the page's scope. */
+export const reviewRuleTotalSchema = z.object({
+  ruleId: z.uuid(),
+  key: reviewRuleKeySchema,
+  name: z.string(),
+  total: z.number().int().min(0),
+});
+export type ReviewRuleTotal = z.infer<typeof reviewRuleTotalSchema>;
+
 export const reviewTaskPageSchema = pageOf(reviewTaskSchema)
   .extend({
+    /**
+     * CR-10: one entry per rule of the organization, highest rule priority first, with zeros
+     * included. Counts follow the query's `status` and `assignedTo` but ignore `ruleKey`, so the
+     * count chips keep their numbers while one rule is selected. Without `ruleKey` the totals add
+     * up to `total`.
+     */
+    ruleTotals: z.array(reviewRuleTotalSchema),
     /** When the queue was read. The empty state shows it (AC-D6). */
     lastCheckedAt: instantSchema,
     /** When the time-based rules last ran for this organization, or null if never. */

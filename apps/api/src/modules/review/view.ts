@@ -1,6 +1,8 @@
 import {
   clinicalReviewRuleKeys,
+  priorityLevelOf,
   type ReviewRuleKey,
+  type ReviewRuleTotal,
   type ReviewTask,
   type ReviewTaskSource,
 } from "@carepath/shared/contracts";
@@ -57,6 +59,7 @@ export function toReviewTask(row: TaskRow, now: Date, onCareTeam: boolean): Revi
     unit: measured?.unit ?? null,
     sources,
     priority: row.priority,
+    priorityLevel: priorityLevelOf(row.priority),
     assignedTo: row.assignedTo ? practitionerRef(row.assignedTo) : null,
     createdAt: row.createdAt.toISOString(),
     dueAt: row.dueAt?.toISOString() ?? null,
@@ -64,6 +67,25 @@ export function toReviewTask(row: TaskRow, now: Date, onCareTeam: boolean): Revi
     resolvedAt: row.resolvedAt?.toISOString() ?? null,
     resolvedBy: userRef(row.resolvedBy?.user ?? null),
     resolutionNote: row.resolutionNote,
+    events: row.events.map((e) => ({
+      id: e.id,
+      kind: e.kind,
+      occurredAt: e.occurredAt.toISOString(),
+      actor: userRef(e.actor.user)!,
+      practitioner: e.practitioner ? practitionerRef(e.practitioner) : null,
+      note: e.note,
+    })),
     onCareTeam,
   };
+}
+
+export function toRuleTotals(
+  rows: { id: string; key: string; name: string; total: number }[],
+): ReviewRuleTotal[] {
+  return rows.map((r) => ({
+    ruleId: r.id,
+    key: r.key as ReviewRuleKey,
+    name: r.name,
+    total: r.total,
+  }));
 }

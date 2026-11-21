@@ -177,3 +177,15 @@ export const nextAppointmentSchema = z
   })
   .meta({ id: "NextAppointment" });
 export type NextAppointment = z.infer<typeof nextAppointmentSchema>;
+
+/**
+ * CR-17. Optional on booking and rescheduling. The same key with the same body answers with the
+ * first success again (header `Idempotency-Replayed: true`); the same key with another body is
+ * 409 `idempotency_key_reused`. A key is honoured for 24 hours. Only successful answers are kept.
+ */
+export const idempotencyHeadersSchema = z.object({
+  "idempotency-key": z
+    .string()
+    .regex(/^[A-Za-z0-9_.:-]{1,128}$/, "1 to 128 letters, digits and _ . : -")
+    .optional(),
+});

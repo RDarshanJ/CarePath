@@ -82,7 +82,8 @@ describe("directory (REQ-DIR-01)", () => {
 
   it("returns clinical rows with filters applied in SQL", async () => {
     const call = as(app, therapist);
-    const byName = await call({ method: "GET", url: "/patients?q=quint" });
+    // CR-12: the term goes in the body of POST /patients/search, never in the URL.
+    const byName = await call({ method: "POST", url: "/patients/search", payload: { q: "quint" } });
     expect(ids(byName)).toEqual([org.patient.patientId]);
     expect(byName.json().items[0]).toMatchObject({
       view: "clinical",

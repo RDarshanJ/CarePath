@@ -1,4 +1,4 @@
-import type { ReviewTaskStatus } from "../contracts/review.js";
+import type { ReviewTaskEventKind, ReviewTaskStatus } from "../contracts/review.js";
 import type { StatusLabel } from "./types.js";
 
 /**
@@ -25,3 +25,12 @@ export const checkInReviewLabels = {
 export function checkInReviewLabel(reviewedAt: string | null): string {
   return reviewedAt ? checkInReviewLabels.reviewed.label : checkInReviewLabels.notReviewed.label;
 }
+
+/** CR-11. One line per history entry in the task detail; the actor and time are shown beside it. */
+export const reviewTaskEventLabels: Record<ReviewTaskEventKind, string> = {
+  assigned: "Assigned",
+  unassigned: "Unassigned",
+  reviewed: "Check-in reviewed",
+  resolved: "Resolved",
+  dismissed: "Dismissed",
+};

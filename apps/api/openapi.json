@@ -1926,6 +1926,7 @@
                   "session_closed",
                   "plan_not_published",
                   "slot_unavailable",
+                  "idempotency_key_reused",
                   "ai_consent_required",
                   "ai_generation_failed",
                   "ai_consent_withdrawn",
@@ -3079,6 +3080,126 @@
         ],
         "additionalProperties": false
       },
+      "ReviewTaskEventInput": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "assigned",
+              "unassigned",
+              "reviewed",
+              "resolved",
+              "dismissed"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "actor": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "practitionerId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "userId",
+              "practitionerId",
+              "name"
+            ]
+          },
+          "practitioner": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "practitionerId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "practitionerId",
+                  "name"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "occurredAt",
+          "actor",
+          "practitioner",
+          "note"
+        ]
+      },
       "ReviewTaskInput": {
         "type": "object",
         "properties": {
@@ -3219,6 +3340,13 @@
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
           },
+          "priorityLevel": {
+            "type": "string",
+            "enum": [
+              "high",
+              "standard"
+            ]
+          },
           "assignedTo": {
             "anyOf": [
               {
@@ -3347,6 +3475,12 @@
               "null"
             ]
           },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewTaskEventInput"
+            }
+          },
           "onCareTeam": {
             "type": "boolean"
           }
@@ -3363,6 +3497,7 @@
           "unit",
           "sources",
           "priority",
+          "priorityLevel",
           "assignedTo",
           "createdAt",
           "dueAt",
@@ -3370,6 +3505,7 @@
           "resolvedAt",
           "resolvedBy",
           "resolutionNote",
+          "events",
           "onCareTeam"
         ]
       },
@@ -3387,6 +3523,43 @@
               "string",
               "null"
             ]
+          },
+          "ruleTotals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "reported_pain",
+                    "missed_sessions",
+                    "unreviewed_checkin",
+                    "upcoming_followup",
+                    "missing_intake"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "ruleId",
+                "key",
+                "name",
+                "total"
+              ]
+            }
           },
           "lastCheckedAt": {
             "type": "string",
@@ -3414,6 +3587,7 @@
         "required": [
           "items",
           "nextCursor",
+          "ruleTotals",
           "lastCheckedAt",
           "rulesLastRunAt",
           "total"
@@ -3952,6 +4126,20 @@
           "preferredLanguage",
           "onCareTeam"
         ]
+      },
+      "PatientSearchBodyInput": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "additionalProperties": false
       },
       "PatientDirectoryRowInput": {
         "type": "object",
@@ -5211,9 +5399,17 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "discomfortLevel": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 10
+            "default": null,
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "note": {
             "default": null,
@@ -5229,8 +5425,7 @@
           }
         },
         "required": [
-          "activityId",
-          "discomfortLevel"
+          "activityId"
         ],
         "additionalProperties": false
       },
@@ -10720,6 +10915,7 @@
                   "session_closed",
                   "plan_not_published",
                   "slot_unavailable",
+                  "idempotency_key_reused",
                   "ai_consent_required",
                   "ai_generation_failed",
                   "ai_consent_withdrawn",
@@ -11900,6 +12096,129 @@
         ],
         "additionalProperties": false
       },
+      "ReviewTaskEvent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "assigned",
+              "unassigned",
+              "reviewed",
+              "resolved",
+              "dismissed"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "actor": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "practitionerId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "userId",
+              "practitionerId",
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "practitioner": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "practitionerId": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "practitionerId",
+                  "name"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "occurredAt",
+          "actor",
+          "practitioner",
+          "note"
+        ],
+        "additionalProperties": false
+      },
       "ReviewTask": {
         "type": "object",
         "properties": {
@@ -12043,6 +12362,13 @@
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
           },
+          "priorityLevel": {
+            "type": "string",
+            "enum": [
+              "high",
+              "standard"
+            ]
+          },
           "assignedTo": {
             "anyOf": [
               {
@@ -12173,6 +12499,12 @@
               "null"
             ]
           },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewTaskEvent"
+            }
+          },
           "onCareTeam": {
             "type": "boolean"
           }
@@ -12189,6 +12521,7 @@
           "unit",
           "sources",
           "priority",
+          "priorityLevel",
           "assignedTo",
           "createdAt",
           "dueAt",
@@ -12196,6 +12529,7 @@
           "resolvedAt",
           "resolvedBy",
           "resolutionNote",
+          "events",
           "onCareTeam"
         ],
         "additionalProperties": false
@@ -12214,6 +12548,44 @@
               "string",
               "null"
             ]
+          },
+          "ruleTotals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "ruleId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "reported_pain",
+                    "missed_sessions",
+                    "unreviewed_checkin",
+                    "upcoming_followup",
+                    "missing_intake"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "ruleId",
+                "key",
+                "name",
+                "total"
+              ],
+              "additionalProperties": false
+            }
           },
           "lastCheckedAt": {
             "type": "string",
@@ -12241,6 +12613,7 @@
         "required": [
           "items",
           "nextCursor",
+          "ruleTotals",
           "lastCheckedAt",
           "rulesLastRunAt",
           "total"
@@ -12795,6 +13168,20 @@
           "timezone",
           "preferredLanguage",
           "onCareTeam"
+        ],
+        "additionalProperties": false
+      },
+      "PatientSearchBody": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "q"
         ],
         "additionalProperties": false
       },
@@ -14082,9 +14469,17 @@
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "discomfortLevel": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 10
+            "default": null,
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "note": {
             "default": null,
@@ -17963,7 +18358,7 @@
     "/patients": {
       "get": {
         "operationId": "listPatients",
-        "summary": "Patient directory with search, filters and sort in SQL. Roles without clinical.read get administrative rows.",
+        "summary": "Patient directory with filters and sort in SQL. Roles without clinical.read get administrative rows. Search goes through POST /patients/search, never the URL.",
         "tags": [
           "patients"
         ],
@@ -17971,13 +18366,185 @@
           {
             "schema": {
               "type": "string",
-              "minLength": 1,
-              "maxLength": 100
+              "enum": [
+                "intake_incomplete",
+                "awaiting_assignment",
+                "active",
+                "inactive",
+                "discharged"
+              ]
             },
             "in": "query",
-            "name": "q",
+            "name": "status",
             "required": false
           },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "in": "query",
+            "name": "clinicianId",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            },
+            "in": "query",
+            "name": "lastActivityBefore",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "in": "query",
+            "name": "hasUpcomingAppointment",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "none",
+                "draft",
+                "published"
+              ]
+            },
+            "in": "query",
+            "name": "planStage",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "in": "query",
+            "name": "hasOpenReview",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": "name",
+              "type": "string",
+              "enum": [
+                "name",
+                "-name",
+                "lastActivity",
+                "-lastActivity",
+                "status",
+                "-status"
+              ]
+            },
+            "in": "query",
+            "name": "sort",
+            "required": false
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "in": "query",
+            "name": "cursor",
+            "required": false
+          },
+          {
+            "schema": {
+              "default": 25,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "in": "query",
+            "name": "limit",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientDirectoryPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/patients/search": {
+      "post": {
+        "operationId": "searchPatients",
+        "summary": "The directory filtered by a name or MRN in the request body, so the term is never in a URL (CR-12, DR-002 R2). A read: same result shape, scope and permission as GET /patients, nothing is written.",
+        "tags": [
+          "patients"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientSearchBodyInput"
+              }
+            }
+          }
+        },
+        "parameters": [
           {
             "schema": {
               "type": "string",
@@ -19786,7 +20353,7 @@
     "/patients/{patientId}/sessions/{sessionId}/stop": {
       "post": {
         "operationId": "stopSessionForDiscomfort",
-        "summary": "\"Stop, this hurts\": end as stopped_discomfort and request a pain report (AC-C4).",
+        "summary": "\"Stop, this hurts\": end as stopped_discomfort and request a pain report (AC-C4). discomfortLevel may be null; the rating then follows as a check-in (CR-6).",
         "tags": [
           "sessions"
         ],
@@ -23028,6 +23595,15 @@
             "in": "path",
             "name": "patientId",
             "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false
           }
         ],
         "responses": {
@@ -23368,6 +23944,15 @@
             "in": "path",
             "name": "appointmentId",
             "required": true
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+            },
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false
           }
         ],
         "responses": {

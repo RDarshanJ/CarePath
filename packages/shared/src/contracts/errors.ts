@@ -63,6 +63,11 @@ export const errorCodes = {
     status: 409,
     message: "That time can no longer be booked. Choose another time.",
   },
+  // CR-17: an Idempotency-Key reused with a different request body.
+  idempotency_key_reused: {
+    status: 409,
+    message: "This key was already used for a different request.",
+  },
   // Phase 5 AI and notes (WP 5.2).
   ai_consent_required: {
     status: 409,
