@@ -1,6 +1,5 @@
 import type { Appointment } from "@carepath/shared/contracts";
-import { Banner, EmptyState, Heading, StatusChip } from "@carepath/ui";
-import { ButtonLink } from "../../_components/button-link";
+import { Banner, EmptyState, Heading, StatusChip, Button } from "@carepath/ui";
 import { CancelVisit } from "../../_components/cancel-visit";
 import { getAppointments, getCareTeam, getToday, requirePatient } from "../../_lib/data";
 import { formatLocalDate } from "../../_lib/format";
@@ -67,10 +66,10 @@ function Visit({
       ) : null}
       {actions && appt.status === "booked" ? (
         <div className="flex flex-wrap gap-2">
-          <ButtonLink href={`/appointments/${appt.id}/reschedule`} variant="secondary" size="sm">
+          <Button href={`/appointments/${appt.id}/reschedule`} variant="secondary" size="sm">
             Reschedule
             <span className="sr-only"> visit on {summary}</span>
-          </ButtonLink>
+          </Button>
           <CancelVisit patientId={patientId} appointmentId={appt.id} summary={summary} />
         </div>
       ) : null}
@@ -133,9 +132,9 @@ export default async function AppointmentsPage({
 
       {canBook ? (
         <div>
-          <ButtonLink href="/appointments/book" className="w-full sm:w-auto">
+          <Button href="/appointments/book" className="w-full sm:w-auto">
             Book a visit
-          </ButtonLink>
+          </Button>
         </div>
       ) : null}
 

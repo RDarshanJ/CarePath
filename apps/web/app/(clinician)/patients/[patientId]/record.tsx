@@ -5,10 +5,9 @@ import NextLink from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { PatientHeader } from "@carepath/shared/contracts";
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@carepath/ui";
+import { Button, Tabs, TabsContent, TabsList, TabsTrigger, Link } from "@carepath/ui";
 import { ApiError } from "../../../../lib/api/errors";
 import {
-  AppLink,
   ListSkeleton,
   NOT_ON_CARE_TEAM_REASON,
   PageHeader,
@@ -68,10 +67,7 @@ export function PatientRecord({ patientId }: { patientId: string }) {
   if (header.isError) {
     return (
       <div className="flex flex-col gap-4">
-        <PageHeader
-          title="Patient record"
-          eyebrow={<AppLink href="/patients">All patients</AppLink>}
-        />
+        <PageHeader title="Patient record" eyebrow={<Link href="/patients">All patients</Link>} />
         <QueryError error={header.error} onRetry={() => void header.refetch()} />
       </div>
     );
@@ -148,7 +144,7 @@ function RecordHeader({
   return (
     <div className="sticky top-0 z-10 -mx-1 border-b border-border bg-bg px-1 pb-3 pt-1">
       <PageHeader
-        eyebrow={<AppLink href="/patients">All patients</AppLink>}
+        eyebrow={<Link href="/patients">All patients</Link>}
         title={fullName(patient)}
         description={
           <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-body">

@@ -13,9 +13,10 @@ export default async function PatientAppLayout({ children }: { children: ReactNo
       organizationName={session.organization.name}
       clinic={clinic}
     >
-      {/* Keeps a focused or scrolled-to control clear of the bottom tab bar. */}
-      <style>{"html{scroll-padding-bottom:6rem}"}</style>
-      {children}
+      {/* Keeps a focused or scrolled-to control clear of the bottom tab bar (CD-125 sticky offsets). */}
+      <div data-sticky-layout="patient-app" className="contents">
+        {children}
+      </div>
     </PatientFrame>
   );
 }

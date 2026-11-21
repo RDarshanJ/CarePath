@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import NextLink from "next/link";
 import {
   CONSENT_TEXT_VERSIONS,
   INTAKE_TOTAL_STEPS,
@@ -27,6 +26,9 @@ import {
   Switch,
   TextInput,
   Textarea,
+  Link,
+  FieldError as InlineFieldError,
+  ErrorSummary,
 } from "@carepath/ui";
 import { IllustrationFigure } from "../../../components/illustration";
 import { api, apiRequest, rememberCsrfToken } from "../../../lib/api/client";
@@ -47,7 +49,6 @@ import {
   type FieldError,
   type OnboardingForm,
 } from "../_lib/onboarding";
-import { ButtonLink } from "./button-link";
 
 export type Stage = "account" | "code" | IntakeStep | "done";
 
@@ -342,13 +343,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
           <p className="text-small font-medium text-ink-muted">
             Step {INTAKE_TOTAL_STEPS} of {INTAKE_TOTAL_STEPS}
           </p>
-          <h1
-            ref={headingRef}
-            tabIndex={-1}
-            className="font-heading text-h1 font-semibold focus:outline-none"
-          >
+          <Heading level={1} ref={headingRef} tabIndex={-1}>
             Your details are with the clinic
-          </h1>
+          </Heading>
         </div>
         <p className="flex items-start gap-2 text-body" role="status">
           <Icon name="check-circle" size={22} className="mt-0.5 shrink-0 text-success-ink" />
@@ -361,7 +358,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
           You can change what you shared at any time in Sharing and consent.
         </p>
         <div>
-          <ButtonLink href="/today">Go to Today</ButtonLink>
+          <Button href="/today">Go to Today</Button>
         </div>
       </div>
     );
@@ -405,44 +402,18 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
           valueText={`Step ${n} of ${INTAKE_TOTAL_STEPS}`}
         />
         <div className="flex flex-col gap-1.5">
-          <h1
-            id="step-heading"
-            ref={headingRef}
-            tabIndex={-1}
-            className="font-heading text-h1 font-semibold focus:outline-none"
-          >
+          <Heading level={1} id="step-heading" ref={headingRef} tabIndex={-1}>
             {title.title}
-          </h1>
+          </Heading>
           <p className="max-w-measure text-body text-ink-muted">{title.intro}</p>
         </div>
       </div>
 
-      {errors.length > 0 ? (
-        <div
-          ref={summaryRef}
-          role="alert"
-          tabIndex={-1}
-          className="rounded-container border-2 border-error-ink bg-error-bg p-4 text-error-ink focus:outline-none"
-        >
-          <p className="flex items-center gap-2 text-label font-semibold">
-            <Icon name="alert-circle" size={18} />
-            {errors.length === 1 ? "One thing to fix" : `${errors.length} things to fix`}
-          </p>
-          <ul className="mt-2 flex flex-col gap-1.5 text-body">
-            {errors.map((er) => (
-              <li key={er.field + er.message}>
-                <button
-                  type="button"
-                  onClick={() => focusField(er.field)}
-                  className="rounded-control text-left underline underline-offset-2 focus-visible:focus-ring"
-                >
-                  {er.message}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      <ErrorSummary
+        ref={summaryRef}
+        title={errors.length === 1 ? "One thing to fix" : `${errors.length} things to fix`}
+        errors={errors.map((er) => ({ message: er.message, onSelect: () => focusField(er.field) }))}
+      />
 
       {banner ? (
         <Banner tone="error" title={banner.title}>
@@ -525,13 +496,7 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
             />
           </div>
           <p className="text-small text-ink-muted">
-            Already have an account?{" "}
-            <NextLink
-              href="/login"
-              className="rounded-control text-primary underline underline-offset-2 focus-visible:focus-ring"
-            >
-              Sign in
-            </NextLink>
+            Already have an account? <Link href="/login">Sign in</Link>
           </p>
         </div>
       ) : null}
@@ -713,7 +678,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
               value={form.pain.current}
               onValueChange={(v) => patch("pain", { ...form.pain, current: v })}
             />
-            <InlineError message={errorFor("painCurrent")} />
+            {errorFor("painCurrent") ? (
+              <InlineFieldError>{errorFor("painCurrent")}</InlineFieldError>
+            ) : null}
           </div>
           <div data-field="painWorst" className="flex flex-col gap-1.5">
             <PainScale
@@ -721,7 +688,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
               value={form.pain.worst}
               onValueChange={(v) => patch("pain", { ...form.pain, worst: v })}
             />
-            <InlineError message={errorFor("painWorst")} />
+            {errorFor("painWorst") ? (
+              <InlineFieldError>{errorFor("painWorst")}</InlineFieldError>
+            ) : null}
           </div>
           <div data-field="painBest" className="flex flex-col gap-1.5">
             <PainScale
@@ -729,7 +698,9 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
               value={form.pain.best}
               onValueChange={(v) => patch("pain", { ...form.pain, best: v })}
             />
-            <InlineError message={errorFor("painBest")} />
+            {errorFor("painBest") ? (
+              <InlineFieldError>{errorFor("painBest")}</InlineFieldError>
+            ) : null}
           </div>
           <p className="max-w-measure text-small text-ink-muted">
             These are your own ratings. If you are worried about how you feel right now, contact
@@ -934,19 +905,6 @@ export function OnboardingFlow(props: OnboardingFlowProps) {
 /** `exactOptionalPropertyTypes` friendly: pass `error` only when there is one. */
 function optErr(message: string | undefined): { error?: string } {
   return message ? { error: message } : {};
-}
-
-function InlineError({ message }: { message: string | undefined }) {
-  if (!message) return null;
-  return (
-    <p className="flex items-start gap-1.5 text-small font-medium text-error-ink">
-      <Icon name="alert-circle" size={16} className="mt-0.5 shrink-0" />
-      <span>
-        <span className="sr-only">Error: </span>
-        {message}
-      </span>
-    </p>
-  );
 }
 
 function ConsentStep({

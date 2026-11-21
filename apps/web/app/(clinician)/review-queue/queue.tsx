@@ -27,10 +27,14 @@ import {
   Textarea,
   Tr,
   useToast,
+  Link,
+  EmptyState,
+  Banner,
+  isDirtyText,
+  LoadMore,
+  FilterField,
 } from "@carepath/ui";
 import {
-  AppLink,
-  Empty,
   ListSkeleton,
   NOT_ON_CARE_TEAM_REASON,
   PageHeader,
@@ -40,6 +44,7 @@ import {
   taskStatusText,
 } from "../_components/common";
 import { moments } from "../../../lib/illustrations";
+import { MomentImage } from "../../../components/illustration";
 import { useClinician } from "../_lib/context";
 import {
   formatAgeHours,
@@ -190,30 +195,30 @@ export function ReviewQueue() {
         onSubmit={(e) => e.preventDefault()}
         className="flex flex-wrap items-end gap-3 rounded-container border border-border bg-surface p-3"
       >
-        <Filter label="Show" id="rq-status">
+        <FilterField label="Show" id="rq-status" className="min-w-44 md:w-auto">
           <Select
             id="rq-status"
             options={statusOptions}
             value={status}
             onValueChange={(v) => update({ status: v, task: null })}
           />
-        </Filter>
-        <Filter label="Assigned" id="rq-assigned">
+        </FilterField>
+        <FilterField label="Assigned" id="rq-assigned" className="min-w-44 md:w-auto">
           <Select
             id="rq-assigned"
             options={assignedOptions}
             value={assigned}
             onValueChange={(v) => update({ assigned: v, task: null })}
           />
-        </Filter>
-        <Filter label="Rule" id="rq-rule">
+        </FilterField>
+        <FilterField label="Rule" id="rq-rule" className="min-w-44 md:w-auto">
           <Select
             id="rq-rule"
             options={ruleOptions}
             value={rule}
             onValueChange={(v) => update({ rule: v, task: null })}
           />
-        </Filter>
+        </FilterField>
         {filtersActive ? (
           <Button
             variant="quiet"
@@ -230,9 +235,12 @@ export function ReviewQueue() {
         <ListSkeleton rows={6} label="Loading review tasks" />
       ) : tasks.length === 0 ? (
         <Section id="queue-empty" title="Review tasks">
-          <Empty
+          <EmptyState
+            padded
             icon="check-circle"
-            {...(!filtersActive && status !== "closed" ? { image: moments.nothingToReview } : {})}
+            {...(!filtersActive && status !== "closed"
+              ? { image: <MomentImage path={moments.nothingToReview} className="max-w-48" /> }
+              : {})}
             title={
               filtersActive
                 ? "No tasks match these filters"
@@ -263,7 +271,7 @@ export function ReviewQueue() {
             {lastPage?.rulesLastRunAt
               ? `. Time-based rules last ran at ${formatTime(lastPage.rulesLastRunAt, timezone)}.`
               : "."}
-          </Empty>
+          </EmptyState>
         </Section>
       ) : (
         <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-8">
@@ -277,12 +285,12 @@ export function ReviewQueue() {
             <div ref={listRef} className="p-2">
               <Table caption="Review tasks">
                 <THead>
-                  <tr>
+                  <Tr header>
                     <Th>Patient</Th>
                     <Th>Why it appeared</Th>
                     <Th numeric>Age</Th>
                     <Th>Assigned to</Th>
-                  </tr>
+                  </Tr>
                 </THead>
                 <TBody onKeyDown={onListKey}>
                   {tasks.map((t) => (
@@ -334,15 +342,14 @@ export function ReviewQueue() {
             </div>
             {list.hasNextPage ? (
               <div className="border-t border-border px-4 py-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
+                <LoadMore
+                  label="Show more tasks"
+                  noun="tasks"
+                  hasMore={true}
                   loading={list.isFetchingNextPage}
-                  loadingLabel="Loading"
-                  onClick={() => void list.fetchNextPage()}
-                >
-                  Load more tasks
-                </Button>
+                  shown={tasks.length}
+                  onLoadMore={() => void list.fetchNextPage()}
+                />
               </div>
             ) : null}
           </Section>
@@ -350,9 +357,9 @@ export function ReviewQueue() {
           {isWide ? (
             (detail ?? (
               <Section id="detail" title="Task" className="xl:col-span-3">
-                <Empty icon="clipboard" title="Choose a task">
+                <EmptyState padded icon="clipboard" title="Choose a task">
                   Select a task to see why it appeared and what you can do.
-                </Empty>
+                </EmptyState>
               </Section>
             ))
           ) : (
@@ -368,17 +375,6 @@ export function ReviewQueue() {
           )}
         </div>
       )}
-    </div>
-  );
-}
-
-function Filter({ label, id, children }: { label: string; id: string; children: React.ReactNode }) {
-  return (
-    <div className="flex min-w-44 flex-col gap-1">
-      <label htmlFor={id} className="text-small font-medium text-ink">
-        {label}
-      </label>
-      {children}
     </div>
   );
 }
@@ -413,14 +409,14 @@ function TaskDetail({
   const blockedDescribedBy = teamBlocked ? { "aria-describedby": "team-reason" } : {};
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["clinician"] });
-  const fail = (e: unknown) => {
-    const t = errorText(e);
-    toast({ tone: "error", title: t.title, description: t.body });
-  };
+  // CD-442: a failed action is shown above the action group and stays until the next attempt.
+  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null);
+  const fail = (e: unknown) => setFailure(errorText(e));
 
   const assign = useMutation({
     mutationFn: (practitionerId: string | null) =>
       writes.assignTask(task.patient.id, task.id, practitionerId),
+    onMutate: () => setFailure(null),
     onSuccess: (_t, practitionerId) => {
       toast({
         tone: "success",
@@ -432,6 +428,7 @@ function TaskDetail({
   });
   const acknowledge = useMutation({
     mutationFn: () => writes.reviewCheckIn(task.patient.id, checkInSource?.id ?? ""),
+    onMutate: () => setFailure(null),
     onSuccess: () => {
       toast({
         tone: "success",
@@ -440,10 +437,7 @@ function TaskDetail({
       });
       void refresh();
     },
-    onError: (e) => {
-      const t = errorText(e);
-      toast({ tone: "error", title: t.title, description: t.body });
-    },
+    onError: fail,
   });
 
   return (
@@ -458,7 +452,7 @@ function TaskDetail({
           {task.kind === "administrative" ? <Tag>Administrative</Tag> : null}
         </span>
       }
-      actions={<AppLink href={`/patients/${task.patient.id}`}>Open patient record</AppLink>}
+      actions={<Link href={`/patients/${task.patient.id}`}>Open patient record</Link>}
     >
       <div className="flex flex-col gap-5 p-4">
         <section aria-labelledby="why-heading" className="flex flex-col gap-2">
@@ -511,13 +505,13 @@ function TaskDetail({
             {task.sources.map((s) => (
               <li key={`${s.type}-${s.id}`}>
                 {s.type === "PatientCheckIn" ? (
-                  <AppLink href={`/patients/${task.patient.id}?tab=check-ins&checkIn=${s.id}`}>
+                  <Link href={`/patients/${task.patient.id}?tab=check-ins&checkIn=${s.id}`}>
                     Open the check-in this came from
-                  </AppLink>
+                  </Link>
                 ) : s.type === "CarePlanVersion" ? (
-                  <AppLink href={`/patients/${task.patient.id}?tab=plan`}>
+                  <Link href={`/patients/${task.patient.id}?tab=plan`}>
                     Open the care plan version
-                  </AppLink>
+                  </Link>
                 ) : s.type === "Appointment" ? (
                   <span>Appointment record, read for its start time.</span>
                 ) : (
@@ -536,6 +530,11 @@ function TaskDetail({
             <h3 id="actions-heading" className="text-label font-semibold text-ink">
               What you can do
             </h3>
+            {failure ? (
+              <Banner tone="error" title={failure.title} focusOnMount>
+                {failure.body}
+              </Banner>
+            ) : null}
             {mayAct ? (
               <>
                 <div className="flex flex-wrap gap-2">
@@ -657,20 +656,19 @@ function NoteDialog({
 }) {
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const toast = useToast();
+  // CD-449 and CD-528: a failed save is shown inside the dialog; the typed note stays.
+  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null);
   const save = useMutation({
     mutationFn: (text: string) =>
       action === "dismiss"
         ? writes.dismissTask(task.patient.id, task.id, text)
         : writes.resolveTask(task.patient.id, task.id, text),
+    onMutate: () => setFailure(null),
     onSuccess: () => {
       setNote("");
       onSaved();
     },
-    onError: (e) => {
-      const t = errorText(e);
-      toast({ tone: "error", title: t.title, description: t.body });
-    },
+    onError: (e) => setFailure(errorText(e)),
   });
   const verb = action === "dismiss" ? "Dismiss" : "Resolve";
   return (
@@ -679,12 +677,22 @@ function NoteDialog({
       onOpenChange={(open) => {
         if (!open) {
           setError(null);
+          setFailure(null);
           onClose();
         }
       }}
     >
       <DialogContent
         title={`${verb} this task`}
+        dirty={isDirtyText("", note)}
+        discard={{ question: "Discard your note?", confirmLabel: "Discard note" }}
+        feedback={
+          failure ? (
+            <Banner tone="error" title="Not saved. Your note is still here." focusOnMount>
+              {failure.body}
+            </Banner>
+          ) : null
+        }
         description={
           action === "dismiss"
             ? "Dismiss when the task needs no action. Your note is kept with the task."

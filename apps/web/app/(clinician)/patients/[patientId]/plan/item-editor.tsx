@@ -1,6 +1,15 @@
 "use client";
 
-import { Button, Checkbox, FieldGroup, IconButton, Tag, TextInput, Textarea } from "@carepath/ui";
+import {
+  Button,
+  Checkbox,
+  FieldGroup,
+  IconButton,
+  Tag,
+  TextInput,
+  Textarea,
+  FieldError,
+} from "@carepath/ui";
 import { weekdayLabels } from "../../../_lib/format";
 import type { ExerciseMeta, ItemState } from "./builder-state";
 
@@ -200,12 +209,7 @@ export function ItemEditor({
         />
       </div>
 
-      {error ? (
-        <p role="alert" className="text-small font-medium text-error-ink">
-          <span className="sr-only">Error: </span>
-          {error}
-        </p>
-      ) : null}
+      {error ? <FieldError live>{error}</FieldError> : null}
     </li>
   );
 }

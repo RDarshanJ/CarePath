@@ -11,9 +11,8 @@ import {
   type MessagePage,
 } from "@carepath/shared/contracts";
 import { MESSAGE_RETRYING_LABEL, actionLabels, messageStatusLabels } from "@carepath/shared";
-import { Banner, Button, Field, Heading, Icon, Textarea, cx } from "@carepath/ui";
+import { Banner, Button, Field, Heading, Icon, Textarea, cx, Link } from "@carepath/ui";
 import { api } from "../../../lib/api/client";
-import { TextLink } from "./text-link";
 import { formatInstantDateTime } from "../_lib/format";
 import { THREAD_POLL_MS, conversationsKey } from "../_lib/use-conversations";
 
@@ -181,7 +180,9 @@ export function ThreadView({
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
         <p>
-          <TextLink href="/messages">All messages</TextLink>
+          <Link variant="standalone" href="/messages">
+            All messages
+          </Link>
         </p>
         <Heading level={1}>{data.conversation.subject}</Heading>
         <p className="text-body text-ink-muted">

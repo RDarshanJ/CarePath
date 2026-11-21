@@ -1,10 +1,8 @@
 import type { ReactNode } from "react";
 import type { CarePlanView, TodayView } from "@carepath/shared/contracts";
-import { Heading, Icon, Progress } from "@carepath/ui";
+import { Heading, Icon, Progress, Button, Link } from "@carepath/ui";
 import { MomentImage } from "../../../../components/illustration";
 import { moments } from "../../../../lib/illustrations";
-import { ButtonLink } from "../../_components/button-link";
-import { TextLink } from "../../_components/text-link";
 import { PlanChangeNote } from "../../_components/plan-change-note";
 import {
   getCarePlan,
@@ -112,7 +110,7 @@ export default async function TodayPage() {
                 </p>
                 {state === "done" ? null : (
                   <div>
-                    <ButtonLink
+                    <Button
                       href={
                         today.checkIn.sessionId
                           ? `/check-in?session=${today.checkIn.sessionId}`
@@ -121,7 +119,7 @@ export default async function TodayPage() {
                       variant="secondary"
                     >
                       Check in
-                    </ButtonLink>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -155,7 +153,9 @@ export default async function TodayPage() {
               .
             </p>
             <p>
-              <TextLink href="/progress">See all progress</TextLink>
+              <Link variant="standalone" href="/progress">
+                See all progress
+              </Link>
             </p>
           </Section>
 
@@ -172,7 +172,9 @@ export default async function TodayPage() {
               </p>
             </div>
             <p>
-              <TextLink href="/plan">View full care plan</TextLink>
+              <Link variant="standalone" href="/plan">
+                View full care plan
+              </Link>
             </p>
           </Section>
         </>
@@ -213,9 +215,9 @@ function Hero({
           published.
         </p>
         <div>
-          <ButtonLink href="/consent" variant="secondary">
+          <Button href="/consent" variant="secondary">
             Review Sharing and consent
-          </ButtonLink>
+          </Button>
         </div>
         <MomentImage path={moments.detailsWithClinic} />
       </section>
@@ -261,9 +263,9 @@ function Hero({
       </>
     );
     action = (
-      <ButtonLink href="/session" className="w-full sm:w-auto">
+      <Button href="/session" className="w-full sm:w-auto">
         Start today&apos;s session
-      </ButtonLink>
+      </Button>
     );
   } else if (state === "in_progress" || state === "paused") {
     eyebrow = state === "paused" ? "Session paused" : "Session in progress";
@@ -271,12 +273,9 @@ function Hero({
       <p className="text-body text-ink-muted">Your place is saved. Pick up where you stopped.</p>
     );
     action = (
-      <ButtonLink
-        href={`/session/${today.session.openSessionId ?? ""}`}
-        className="w-full sm:w-auto"
-      >
+      <Button href={`/session/${today.session.openSessionId ?? ""}`} className="w-full sm:w-auto">
         {state === "paused" ? "Resume session" : "Continue session"}
-      </ButtonLink>
+      </Button>
     );
   } else if (state === "done") {
     eyebrow = "Today's session";
@@ -292,14 +291,14 @@ function Hero({
     );
     if (checkInDue) {
       action = (
-        <ButtonLink
+        <Button
           href={
             today.checkIn.sessionId ? `/check-in?session=${today.checkIn.sessionId}` : "/check-in"
           }
           className="w-full sm:w-auto"
         >
           Add your check-in
-        </ButtonLink>
+        </Button>
       );
     }
   } else {
@@ -312,9 +311,9 @@ function Hero({
       </p>
     );
     action = (
-      <ButtonLink href="/session" variant="secondary" className="w-full sm:w-auto">
+      <Button href="/session" variant="secondary" className="w-full sm:w-auto">
         Start a session anyway
-      </ButtonLink>
+      </Button>
     );
   }
 
@@ -337,7 +336,9 @@ function NextVisit({ today }: { today: TodayView }) {
       <Section id="visit-heading" title="Next appointment">
         <p className="text-body text-ink-muted">No visit is booked.</p>
         <p>
-          <TextLink href="/appointments/book">Book a visit</TextLink>
+          <Link variant="standalone" href="/appointments/book">
+            Book a visit
+          </Link>
         </p>
       </Section>
     );
@@ -357,7 +358,9 @@ function NextVisit({ today }: { today: TodayView }) {
         </p>
       </div>
       <p>
-        <TextLink href="/appointments">See appointments</TextLink>
+        <Link variant="standalone" href="/appointments">
+          See appointments
+        </Link>
       </p>
     </Section>
   );
@@ -382,7 +385,9 @@ function MessagesNote({ today }: { today: TodayView }) {
         )}
       </p>
       <p>
-        <TextLink href="/messages">{unreadCount > 0 ? "Read messages" : "Open messages"}</TextLink>
+        <Link variant="standalone" href="/messages">
+          {unreadCount > 0 ? "Read messages" : "Open messages"}
+        </Link>
       </p>
     </Section>
   );

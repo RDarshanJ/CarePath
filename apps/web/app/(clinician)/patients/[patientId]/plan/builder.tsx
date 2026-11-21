@@ -17,11 +17,12 @@ import {
   TextInput,
   Textarea,
   useToast,
+  Link,
+  EmptyState,
+  FieldError,
 } from "@carepath/ui";
 import { ApiError } from "../../../../../lib/api/errors";
 import {
-  AppLink,
-  Empty,
   ListSkeleton,
   NOT_ON_CARE_TEAM_REASON,
   PageHeader,
@@ -91,9 +92,9 @@ export function PlanBuilder({ patientId }: { patientId: string }) {
   const patientName = header.data ? fullName(header.data) : "this patient";
   const crumbs = (
     <span className="flex flex-wrap items-center gap-2">
-      <AppLink href="/patients">All patients</AppLink>
+      <Link href="/patients">All patients</Link>
       <span aria-hidden="true">/</span>
-      <AppLink href={`/patients/${patientId}?tab=plan`}>{patientName}</AppLink>
+      <Link href={`/patients/${patientId}?tab=plan`}>{patientName}</Link>
     </span>
   );
 
@@ -132,7 +133,7 @@ export function PlanBuilder({ patientId }: { patientId: string }) {
         />
         <Banner tone="warning" title="Editing this plan is unavailable">
           {NOT_ON_CARE_TEAM_REASON} You can read the current plan on the{" "}
-          <AppLink href={`/patients/${patientId}?tab=plan`}>patient&apos;s record</AppLink>.
+          <Link href={`/patients/${patientId}?tab=plan`}>patient&apos;s record</Link>.
         </Banner>
       </div>
     );
@@ -532,7 +533,8 @@ function Builder({
               >
                 <div className="p-4">
                   {state.items.length === 0 ? (
-                    <Empty
+                    <EmptyState
+                      padded
                       icon="list"
                       title="No exercises yet"
                       action={
@@ -550,7 +552,7 @@ function Builder({
                       {isWide
                         ? "Search the library on the left and add exercises. Each one gets a dose and a weekly schedule here."
                         : "Open the library and add exercises. Each one gets a dose and a weekly schedule here."}
-                    </Empty>
+                    </EmptyState>
                   ) : (
                     <ol aria-label="Exercises in this plan" className="flex flex-col gap-3">
                       {state.items.map((item, i) => (
@@ -793,12 +795,7 @@ function GoalRow({
           Remove
         </Button>
       </div>
-      {error ? (
-        <p role="alert" className="text-small font-medium text-error-ink">
-          <span className="sr-only">Error: </span>
-          {error}
-        </p>
-      ) : null}
+      {error ? <FieldError live>{error}</FieldError> : null}
     </div>
   );
 }
@@ -852,9 +849,9 @@ function PreviewPane({
             <ListSkeleton rows={5} label="Loading preview" />
           )
         ) : none ? (
-          <Empty icon="file" title="Nothing to preview yet">
+          <EmptyState padded icon="file" title="Nothing to preview yet">
             Give the plan a title and add an exercise. The preview appears once the draft has saved.
-          </Empty>
+          </EmptyState>
         ) : preview.isError ? (
           <QueryError error={preview.error} onRetry={() => void preview.refetch()} />
         ) : preview.data?.plan ? (
@@ -885,9 +882,9 @@ function VersionsPane({ patientId, onOpen }: { patientId: string; onOpen: (id: s
           <ListSkeleton rows={3} label="Loading versions" />
         </div>
       ) : versions.data.items.length === 0 ? (
-        <Empty icon="file" title="No versions yet">
+        <EmptyState padded icon="file" title="No versions yet">
           The first version you publish is listed here with your note to the patient.
-        </Empty>
+        </EmptyState>
       ) : (
         <VersionList items={versions.data.items} onOpen={onOpen} />
       )}

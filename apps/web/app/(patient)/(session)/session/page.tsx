@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
-import { Heading } from "@carepath/ui";
+import { Heading, Button } from "@carepath/ui";
 import { IllustrationFigure } from "../../../../components/illustration";
 import { exerciseIllustration } from "../../../../lib/illustrations";
-import { ButtonLink } from "../../_components/button-link";
 import { StartSession } from "../../_components/start-session";
 import { getCarePlan, getToday, requirePatient } from "../../_lib/data";
 import { doseText, plural, restText } from "../../_lib/format";
@@ -83,9 +82,9 @@ export default async function SessionOverviewPage() {
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <StartSession patientId={patientId} />
-        <ButtonLink href="/today" variant="quiet">
+        <Button href="/today" variant="quiet">
           Not now
-        </ButtonLink>
+        </Button>
       </div>
     </div>
   );

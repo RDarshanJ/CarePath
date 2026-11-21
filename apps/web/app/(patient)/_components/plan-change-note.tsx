@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CarePlanDiff } from "@carepath/shared/contracts";
-import { Button, Heading, Icon } from "@carepath/ui";
+import { Button, FieldError, Banner } from "@carepath/ui";
 import { api } from "../../../lib/api/client";
 import { ApiError } from "../../../lib/api/errors";
 import { DiffList } from "./diff-list";
@@ -50,37 +50,19 @@ export function PlanChangeNote(props: PlanChangeNoteProps) {
   // Version 1 is the first plan: nothing changed, so it is announced as ready and lists no changes.
   const first = props.versionNumber === 1;
   return (
-    <section
-      aria-labelledby="plan-change-heading"
-      className="rounded-container border border-info-ink bg-info-bg p-5 text-info-ink"
-    >
-      <div className="flex items-start gap-3">
-        <Icon name="info" size={22} className="mt-1 shrink-0" />
-        <div className="min-w-0 flex-1">
-          <Heading level={3} id="plan-change-heading" className="text-info-ink">
-            {first ? "Your plan is ready" : "Your plan changed"}
-          </Heading>
-          <p className="mt-0.5 text-small">
-            Version {props.versionNumber}, published {props.publishedOn} by {props.clinicianName}
-          </p>
-          <div className="mt-3 flex flex-col gap-3 text-ink">
-            {props.note ? (
-              <blockquote className="border-l-2 border-info-ink pl-3 text-body">
-                <p className="text-small font-medium text-ink-muted">
-                  Note from {props.clinicianName}
-                </p>
-                <p className="mt-0.5">{props.note}</p>
-              </blockquote>
-            ) : null}
-            {props.diff && !first ? <DiffList diff={props.diff} /> : null}
-          </div>
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+    <section aria-labelledby="plan-change-heading">
+      <Banner
+        tone="info"
+        titleAs="h3"
+        titleId="plan-change-heading"
+        title={first ? "Your plan is ready" : "Your plan changed"}
+        action={
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <Button
               variant="secondary"
               onClick={acknowledge}
               loading={pending}
               loadingLabel="Saving"
-              className="text-ink"
             >
               Got it
             </Button>
@@ -88,14 +70,28 @@ export function PlanChangeNote(props: PlanChangeNoteProps) {
               This note stays in your plan history after you close it.
             </p>
           </div>
-          {error ? (
-            <p role="alert" className="mt-2 text-small font-medium text-error-ink">
-              <span className="sr-only">Error: </span>
-              {error}
-            </p>
+        }
+      >
+        <p className="text-small">
+          Version {props.versionNumber}, published {props.publishedOn} by {props.clinicianName}
+        </p>
+        <div className="mt-3 flex flex-col gap-3 text-ink">
+          {props.note ? (
+            <blockquote className="border-l-2 border-info-ink pl-3 text-body">
+              <p className="text-small font-medium text-ink-muted">
+                Note from {props.clinicianName}
+              </p>
+              <p className="mt-0.5">{props.note}</p>
+            </blockquote>
           ) : null}
+          {props.diff && !first ? <DiffList diff={props.diff} /> : null}
         </div>
-      </div>
+        {error ? (
+          <FieldError live className="mt-2">
+            {error}
+          </FieldError>
+        ) : null}
+      </Banner>
     </section>
   );
 }

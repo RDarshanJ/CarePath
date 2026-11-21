@@ -3,14 +3,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Permission, SessionInfo } from "@carepath/shared/contracts";
-import {
-  Banner,
-  Button,
-  SkeletonGroup,
-  Skeleton,
-  ToastProvider,
-  TooltipProvider,
-} from "@carepath/ui";
+import { Banner, Button, SkeletonGroup, Skeleton, ToastProvider } from "@carepath/ui";
 import { keys, reads } from "./queries";
 
 interface ClinicianContext {
@@ -72,9 +65,7 @@ export function ClinicianProviders({
   }
   return (
     <Ctx.Provider value={value}>
-      <TooltipProvider delayDuration={300}>
-        <ToastProvider>{children}</ToastProvider>
-      </TooltipProvider>
+      <ToastProvider>{children}</ToastProvider>
     </Ctx.Provider>
   );
 }

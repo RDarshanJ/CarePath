@@ -25,11 +25,13 @@ import {
   Tag,
   Tr,
   useToast,
+  Link,
+  EmptyState,
+  Banner,
+  LoadMore,
 } from "@carepath/ui";
 import { ApiError } from "../../../../lib/api/errors";
 import {
-  AppLink,
-  Empty,
   ListSkeleton,
   PainText,
   QueryError,
@@ -61,33 +63,6 @@ function usePaged<T>(
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
-}
-
-function LoadMore({
-  hasNext,
-  loading,
-  onClick,
-  what,
-}: {
-  hasNext: boolean;
-  loading: boolean;
-  onClick: () => void;
-  what: string;
-}) {
-  if (!hasNext) return null;
-  return (
-    <div className="border-t border-border px-4 py-2">
-      <Button
-        variant="secondary"
-        size="sm"
-        loading={loading}
-        loadingLabel="Loading"
-        onClick={onClick}
-      >
-        Load more {what}
-      </Button>
-    </div>
-  );
 }
 
 /* ------------------------------------------------------------------ overview */
@@ -135,9 +110,9 @@ export function OverviewTab({ patientId }: { patientId: string }) {
                   ? `, published ${formatDate(plan.data.plan.version.publishedAt, timezone)}`
                   : ""}
               </p>
-              <AppLink href={`/patients/${patientId}?tab=plan`} className="text-small">
+              <Link href={`/patients/${patientId}?tab=plan`} className="text-small">
                 See the plan
-              </AppLink>
+              </Link>
             </>
           ) : (
             <p className="text-body text-ink-muted">No plan has been published yet.</p>
@@ -171,12 +146,12 @@ export function OverviewTab({ patientId }: { patientId: string }) {
                 Submitted {formatDateTime(latest.submittedAt, timezone)}.{" "}
                 {checkInReviewLabel(latest.reviewedAt)}.
               </p>
-              <AppLink
+              <Link
                 href={`/patients/${patientId}?tab=check-ins&checkIn=${latest.id}`}
                 className="text-small"
               >
                 Open check-in
-              </AppLink>
+              </Link>
             </>
           ) : (
             <p className="text-body text-ink-muted">No check-ins yet.</p>
@@ -189,7 +164,7 @@ export function OverviewTab({ patientId }: { patientId: string }) {
             <ul className="flex flex-col gap-1">
               {openTasks.slice(0, 3).map((t) => (
                 <li key={t.id} className="text-small">
-                  <AppLink href={`/review-queue?task=${t.id}`}>{t.rule.name}</AppLink>
+                  <Link href={`/review-queue?task=${t.id}`}>{t.rule.name}</Link>
                   <span className="text-ink-muted">, {formatAgeHours(t.ageHours)} old</span>
                 </li>
               ))}
@@ -228,16 +203,20 @@ export function OverviewTab({ patientId }: { patientId: string }) {
                 ))}
             </ol>
             {timeline.data.pages[0]?.items.length === 0 ? (
-              <Empty icon="clock" title="Nothing on the timeline yet">
+              <EmptyState padded icon="clock" title="Nothing on the timeline yet">
                 Published plans, sessions and check-ins appear here as they happen.
-              </Empty>
+              </EmptyState>
             ) : null}
-            <LoadMore
-              hasNext={!!timeline.hasNextPage}
-              loading={timeline.isFetchingNextPage}
-              onClick={() => void timeline.fetchNextPage()}
-              what="events"
-            />
+            <div className="border-t border-border px-4 py-2">
+              <LoadMore
+                label="Show more events"
+                noun="events"
+                hasMore={!!timeline.hasNextPage}
+                loading={timeline.isFetchingNextPage}
+                shown={timeline.data.pages.flatMap((p) => p.items).length}
+                onLoadMore={() => void timeline.fetchNextPage()}
+              />
+            </div>
           </>
         )}
       </Section>
@@ -284,9 +263,9 @@ function TimelineRow({ item, patientId }: { item: TimelineItem; patientId: strin
       label = "Plan version";
       body = (
         <>
-          <AppLink href={`/patients/${patientId}?tab=plan`}>
+          <Link href={`/patients/${patientId}?tab=plan`}>
             Version {item.versionNumber} published
-          </AppLink>{" "}
+          </Link>{" "}
           by {item.publishedBy.name}
           {item.changeNoteForPatient ? (
             <span className="block text-small text-ink-muted">
@@ -300,9 +279,9 @@ function TimelineRow({ item, patientId }: { item: TimelineItem; patientId: strin
       label = "Session";
       body = (
         <>
-          <AppLink href={`/patients/${patientId}?tab=activity`}>
+          <Link href={`/patients/${patientId}?tab=activity`}>
             Session on version {item.versionNumber}
-          </AppLink>
+          </Link>
           : {item.completedActivities} of {item.totalActivities} exercises done
           {item.skippedActivities > 0 ? `, ${item.skippedActivities} skipped` : ""}
         </>
@@ -316,15 +295,15 @@ function TimelineRow({ item, patientId }: { item: TimelineItem; patientId: strin
     case "check_in":
       label = "Check-in";
       body = (
-        <AppLink href={`/patients/${patientId}?tab=check-ins&checkIn=${item.id}`}>
+        <Link href={`/patients/${patientId}?tab=check-ins&checkIn=${item.id}`}>
           <PainText score={item.painScore} />
-        </AppLink>
+        </Link>
       );
       chip = <ReviewedChip reviewedAt={item.reviewedAt} />;
       break;
     case "review_task":
       label = "Review task";
-      body = <AppLink href={`/review-queue?task=${item.id}`}>{item.explanation}</AppLink>;
+      body = <Link href={`/review-queue?task=${item.id}`}>{item.explanation}</Link>;
       chip = <Tag>{taskStatusText[item.status] ?? "Unknown"}</Tag>;
       break;
   }
@@ -395,10 +374,10 @@ export function PlanTab({ patientId }: { patientId: string }) {
             {plan.data.plan ? (
               <PlanView plan={plan.data.plan} />
             ) : (
-              <Empty icon="file" title="No care plan yet">
+              <EmptyState padded icon="file" title="No care plan yet">
                 This patient has no published plan. Build one from the exercise library; the patient
                 sees it once you publish.
-              </Empty>
+              </EmptyState>
             )}
           </div>
         </Section>
@@ -419,9 +398,9 @@ export function PlanTab({ patientId }: { patientId: string }) {
               <ListSkeleton rows={3} label="Loading versions" />
             </div>
           ) : versions.data.items.length === 0 ? (
-            <Empty icon="file" title="No versions yet">
+            <EmptyState padded icon="file" title="No versions yet">
               The first published version appears here.
-            </Empty>
+            </EmptyState>
           ) : (
             <VersionList items={versions.data.items} onOpen={setOpenVersion} />
           )}
@@ -543,14 +522,14 @@ export function ActivityTab({ patientId }: { patientId: string }) {
         <div className="p-3">
           <Table caption="Weekly sessions, assigned and completed">
             <THead>
-              <tr>
+              <Tr header>
                 <Th>Week of</Th>
                 <Th numeric>Assigned</Th>
                 <Th numeric>Completed</Th>
                 <Th numeric>{sessionStatusLabels.stopped_discomfort.label}</Th>
                 <Th numeric>Exercises done</Th>
                 <Th numeric>Exercises skipped</Th>
-              </tr>
+              </Tr>
             </THead>
             <TBody>
               {weeks.map((w) => (
@@ -574,19 +553,19 @@ export function ActivityTab({ patientId }: { patientId: string }) {
         <Section id="sessions" title="Sessions" count={d.sessions.length}>
           <div className="p-3">
             {d.sessions.length === 0 ? (
-              <Empty icon="activity" title="No sessions yet">
+              <EmptyState padded icon="activity" title="No sessions yet">
                 Sessions the patient starts from Today appear here.
-              </Empty>
+              </EmptyState>
             ) : (
               <Table caption="Sessions in the last weeks">
                 <THead>
-                  <tr>
+                  <Tr header>
                     <Th>Started</Th>
                     <Th>Outcome</Th>
                     <Th numeric>Plan</Th>
                     <Th numeric>Done</Th>
                     <Th numeric>Skipped</Th>
-                  </tr>
+                  </Tr>
                 </THead>
                 <TBody>
                   {[...d.sessions].reverse().map((s) => (
@@ -619,16 +598,16 @@ export function ActivityTab({ patientId }: { patientId: string }) {
         >
           <div className="p-3">
             {pain.length === 0 ? (
-              <Empty icon="activity" title="No pain reports yet">
+              <EmptyState padded icon="activity" title="No pain reports yet">
                 Pain the patient reports in a check-in appears here.
-              </Empty>
+              </EmptyState>
             ) : (
               <Table caption="Patient-reported pain, 0 to 10">
                 <THead>
-                  <tr>
+                  <Tr header>
                     <Th>Reported</Th>
                     <Th numeric>Pain (0 to 10)</Th>
-                  </tr>
+                  </Tr>
                 </THead>
                 <TBody>
                   {pain.map((p) => (
@@ -693,8 +672,11 @@ export function CheckInsTab({
   });
   // CR-2: reviewing a check-in is a clinical write, so it needs care-team membership.
   const notOnTeam = header.data?.onCareTeam === false;
+  // CD-442: a failed review is shown in the section, not as a toast.
+  const [failure, setFailure] = useState<{ title: string; body: string } | null>(null);
   const review = useMutation({
     mutationFn: (checkInId: string) => writes.reviewCheckIn(patientId, checkInId),
+    onMutate: () => setFailure(null),
     onSuccess: () => {
       toast({ tone: "success", title: "Check-in marked reviewed" });
       void qc.invalidateQueries({ queryKey: ["clinician"] });
@@ -709,8 +691,7 @@ export function CheckInsTab({
         void qc.invalidateQueries({ queryKey: keys.checkIns(patientId) });
         return;
       }
-      const t = errorText(e);
-      toast({ tone: "error", title: t.title, description: t.body });
+      setFailure(errorText(e));
     },
   });
   const rowRef = useRef<HTMLTableRowElement | null>(null);
@@ -735,11 +716,16 @@ export function CheckInsTab({
       description="Reported by the patient after a session or on their own. Pain is on a scale of 0 to 10."
     >
       {items.length === 0 ? (
-        <Empty icon="clipboard" title="No check-ins yet">
+        <EmptyState padded icon="clipboard" title="No check-ins yet">
           Check-ins appear here after the patient submits one from Today.
-        </Empty>
+        </EmptyState>
       ) : (
         <div className="p-3">
+          {failure ? (
+            <Banner tone="error" title={failure.title} focusOnMount className="mb-3">
+              {failure.body}
+            </Banner>
+          ) : null}
           {notOnTeam ? (
             <p id="check-in-team-reason" className="mb-2 text-small text-ink-muted">
               Marking a check-in reviewed is unavailable. {NOT_ON_CARE_TEAM_REASON}
@@ -747,13 +733,13 @@ export function CheckInsTab({
           ) : null}
           <Table caption="Check-ins, newest first">
             <THead>
-              <tr>
+              <Tr header>
                 <Th>Submitted</Th>
                 <Th numeric>Pain (patient-reported)</Th>
                 <Th>Difficulty</Th>
                 <Th>Notes</Th>
                 <Th>Review</Th>
-              </tr>
+              </Tr>
             </THead>
             <TBody>
               {items.map((c) => (
@@ -807,12 +793,16 @@ export function CheckInsTab({
           </Table>
         </div>
       )}
-      <LoadMore
-        hasNext={!!list.hasNextPage}
-        loading={list.isFetchingNextPage}
-        onClick={() => void list.fetchNextPage()}
-        what="check-ins"
-      />
+      <div className="border-t border-border px-4 py-2">
+        <LoadMore
+          label="Show more check-ins"
+          noun="check-ins"
+          hasMore={!!list.hasNextPage}
+          loading={list.isFetchingNextPage}
+          shown={items.length}
+          onLoadMore={() => void list.fetchNextPage()}
+        />
+      </div>
     </Section>
   );
 }
@@ -843,19 +833,19 @@ export function HistoryTab({ patientId }: { patientId: string }) {
       description="Changes to this record, built from the records themselves: who did what and when."
     >
       {items.length === 0 ? (
-        <Empty icon="file" title="No record changes yet">
+        <EmptyState padded icon="file" title="No record changes yet">
           Plan publications, reviews and consent changes are listed here.
-        </Empty>
+        </EmptyState>
       ) : (
         <div className="p-3">
           <Table caption="Record history, newest first">
             <THead>
-              <tr>
+              <Tr header>
                 <Th>When</Th>
                 <Th>Change</Th>
                 <Th>Detail</Th>
                 <Th>By</Th>
-              </tr>
+              </Tr>
             </THead>
             <TBody>
               {items.map((h) => (
@@ -874,12 +864,16 @@ export function HistoryTab({ patientId }: { patientId: string }) {
           </Table>
         </div>
       )}
-      <LoadMore
-        hasNext={!!list.hasNextPage}
-        loading={list.isFetchingNextPage}
-        onClick={() => void list.fetchNextPage()}
-        what="history"
-      />
+      <div className="border-t border-border px-4 py-2">
+        <LoadMore
+          label="Show more record changes"
+          noun="record changes"
+          hasMore={!!list.hasNextPage}
+          loading={list.isFetchingNextPage}
+          shown={items.length}
+          onLoadMore={() => void list.fetchNextPage()}
+        />
+      </div>
     </Section>
   );
 }

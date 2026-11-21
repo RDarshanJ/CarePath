@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import NextLink from "next/link";
 import {
   Banner,
   Button,
@@ -12,8 +11,8 @@ import {
   Tag,
   StatusChip,
   cx,
+  Link,
 } from "@carepath/ui";
-import type { IconName } from "@carepath/ui";
 import {
   PATIENT_REPORTED,
   type PatientStatus,
@@ -24,35 +23,13 @@ import {
   reviewTaskStatusLabels,
 } from "@carepath/shared";
 import type { PlanStage } from "@carepath/shared/contracts";
-import { MomentImage } from "../../../components/illustration";
 import { ApiError } from "../../../lib/api/errors";
 
-/** In-app link with the design system's link styling. */
-export function AppLink({
-  href,
-  className,
-  children,
-  ...rest
-}: {
-  href: string;
-  className?: string;
-  children: ReactNode;
-  "aria-label"?: string;
-  "data-row-link"?: string;
-}) {
-  return (
-    <NextLink
-      href={href}
-      className={cx(
-        "rounded-control text-primary underline underline-offset-2 hover:decoration-2 focus-visible:focus-ring",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </NextLink>
-  );
-}
+/**
+ * Alias of the one text link (`@carepath/ui` Link, CD-530), kept only for `patients/directory.tsx`, which
+ * WP B-CR edits during D-WP-2. D-WP-13 replaces that import and deletes this line.
+ */
+export const AppLink = Link;
 
 export function PageHeader({
   title,
@@ -176,44 +153,6 @@ export function Section({
       </div>
       <div>{children}</div>
     </section>
-  );
-}
-
-export function Empty({
-  icon,
-  title,
-  children,
-  action,
-  image,
-}: {
-  icon?: IconName;
-  title: string;
-  children: ReactNode;
-  action?: ReactNode;
-  /** Public path of a decorative picture beside the text (a `moments` entry). */
-  image?: string;
-}) {
-  const state = (
-    <EmptyState
-      icon={icon ?? "list"}
-      title={title}
-      {...(image ? { className: "min-w-0 flex-1" } : {})}
-      {...(action ? { action } : {})}
-    >
-      {children}
-    </EmptyState>
-  );
-  return (
-    <div className="p-4">
-      {image ? (
-        <div className="flex flex-wrap items-center gap-4">
-          {state}
-          <MomentImage path={image} className="max-w-48" />
-        </div>
-      ) : (
-        state
-      )}
-    </div>
   );
 }
 
