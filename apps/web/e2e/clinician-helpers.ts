@@ -53,7 +53,13 @@ export async function patientApi(email: string, baseURL: string): Promise<Patien
 /** The first patient record whose name matches, found through the real directory search. */
 export async function findPatientId(page: Page, query: string): Promise<string> {
   const result = await page.evaluate(async (q) => {
-    const res = await fetch(`/api/patients?q=${encodeURIComponent(q)}&limit=5`);
+    // Through the real search route: the term travels in the body, never in the URL (CR-12).
+    const csrf = (await (await fetch("/api/auth/session")).json()) as { csrfToken: string };
+    const res = await fetch("/api/patients/search?limit=5", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-csrf-token": csrf.csrfToken },
+      body: JSON.stringify({ q }),
+    });
     return (await res.json()) as { items: { id: string; givenName: string; familyName: string }[] };
   }, query);
   const first = result.items[0];

@@ -178,8 +178,10 @@ test("the slice: onboarding, assignment in the UI, plan, session, pain check-in,
   await expect(tp).toHaveURL(/\/overview$/);
   await tp.goto("/patients");
   await tp.getByLabel(/^Search by name/).fill(PATIENT.last);
-  // The search is applied to the address after a short pause; click only once it has been.
-  await expect(tp).toHaveURL(/q=Slice/);
+  // The search runs after a short pause. The term goes to the server in a request body and never
+  // appears in the address (CR-12, DR-002 R2).
+  await expect(tp.getByRole("link", { name: FULL_NAME })).toBeVisible();
+  expect(tp.url()).not.toContain(PATIENT.last);
   await tp.getByRole("link", { name: FULL_NAME }).click();
   await expect(tp).toHaveURL(/\/patients\/[0-9a-f-]{36}/);
   const patientId = tp.url().match(/\/patients\/([0-9a-f-]{36})/)![1]!;

@@ -36,7 +36,8 @@ import { api } from "../../../lib/api/client";
  */
 export const keys = {
   overview: ["clinician", "overview"] as const,
-  directory: (params: string) => ["clinician", "directory", params] as const,
+  // The search term is part of the key (memory only); it is never in a URL (DR-002 R2).
+  directory: (params: string, q = "") => ["clinician", "directory", params, q] as const,
   practitioners: ["clinician", "practitioners"] as const,
   header: (id: string) => ["clinician", "patient", id, "header"] as const,
   careTeam: (id: string) => ["clinician", "patient", id, "care-team"] as const,
@@ -78,7 +79,11 @@ const pid = (id: string) => `/patients/${id}`;
 
 export const reads = {
   overview: () => api.get("/overview", clinicianOverviewSchema),
-  directory: (query: string) => api.get(`/patients${query}`, patientDirectoryPageSchema),
+  /** A search term goes in the body of POST /patients/search, never in the URL (CR-12, R2). */
+  directory: (query: string, q = "") =>
+    q
+      ? api.post(`/patients/search${query}`, patientDirectoryPageSchema, { q })
+      : api.get(`/patients${query}`, patientDirectoryPageSchema),
   practitioners: () => api.get("/practitioners", practitionerListSchema),
   header: (id: string) => api.get(pid(id), patientHeaderSchema),
   careTeam: (id: string) => api.get(`${pid(id)}/care-team`, careTeamCardSchema),

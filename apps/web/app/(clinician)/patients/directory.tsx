@@ -76,7 +76,6 @@ export function Directory() {
   const params = useSearchParams();
   const { session, timezone } = useClinician();
 
-  const q = params.get("q") ?? "";
   const status = params.get("status") ?? "any";
   const clinician = params.get("clinician") ?? "any";
   const plan = params.get("plan") ?? "any";
@@ -84,6 +83,10 @@ export function Directory() {
   const review = params.get("review") ?? "any";
   const sort = (params.get("sort") ?? "name") as SortKey;
   const limit = params.get("limit") ?? "25";
+
+  // The search term lives in memory only. It is never written to the URL, which would put a name
+  // or MRN in history, a shared screen and referrers (DR-002 R1, R2).
+  const [q, setQ] = useState("");
 
   // Cursor pages: index 0 is the first page. Any change to the query resets to page 1.
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
@@ -106,13 +109,12 @@ export function Directory() {
   }
 
   // Search: typed text is sent to the server after a short pause.
-  const [search, setSearch] = useState(q);
-  useEffect(() => setSearch(q), [q]);
+  const [search, setSearch] = useState("");
   useEffect(() => {
-    if (search === q) return;
-    const t = setTimeout(() => update({ q: search.trim() }), 300);
+    if (search.trim() === q) return;
+    const t = setTimeout(() => setQ(search.trim()), 300);
     return () => clearTimeout(t);
-  }, [search]);
+  }, [search, q]);
 
   const searchRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -156,7 +158,6 @@ export function Directory() {
 
   const cursor = cursors[page];
   const query = qs({
-    q: q || undefined,
     status: status === "any" ? undefined : status,
     clinicianId:
       clinician === "any" ? undefined : clinician === "me" ? session.practitionerId : clinician,
@@ -168,8 +169,8 @@ export function Directory() {
     cursor,
   });
   const result = useQuery({
-    queryKey: keys.directory(query),
-    queryFn: () => reads.directory(query),
+    queryKey: keys.directory(query, q),
+    queryFn: () => reads.directory(query, q),
     placeholderData: keepPreviousData,
   });
 
@@ -278,6 +279,7 @@ export function Directory() {
             variant="quiet"
             onClick={() => {
               setSearch("");
+              setQ("");
               router.replace(pathname, { scroll: false });
             }}
           >
@@ -295,6 +297,7 @@ export function Directory() {
           filtered={filtersActive}
           onClear={() => {
             setSearch("");
+            setQ("");
             router.replace(pathname, { scroll: false });
           }}
         />

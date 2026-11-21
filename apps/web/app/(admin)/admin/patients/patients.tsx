@@ -68,10 +68,11 @@ export function AdminPatients() {
   const params = useSearchParams();
   const queryClient = useQueryClient();
 
-  const q = params.get("q") ?? "";
   const status = params.get("status") ?? "awaiting_assignment";
   const limit = params.get("limit") ?? "25";
 
+  // The search term lives in memory only, never in the URL (DR-002 R1, R2).
+  const [q, setQ] = useState("");
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [page, setPage] = useState(0);
   useEffect(() => {
@@ -90,24 +91,22 @@ export function AdminPatients() {
     router.replace(s ? `${pathname}?${s}` : pathname, { scroll: false });
   }
 
-  const [search, setSearch] = useState(q);
-  useEffect(() => setSearch(q), [q]);
+  const [search, setSearch] = useState("");
   useEffect(() => {
-    if (search === q) return;
-    const t = setTimeout(() => update({ q: search.trim() }), 300);
+    if (search.trim() === q) return;
+    const t = setTimeout(() => setQ(search.trim()), 300);
     return () => clearTimeout(t);
-  }, [search]);
+  }, [search, q]);
 
   const query = qs({
-    q: q || undefined,
     status: status === "any" ? undefined : status,
     sort: "name",
     limit,
     cursor: cursors[page],
   });
   const result = useQuery({
-    queryKey: keys.directory(query),
-    queryFn: () => reads.directory(query),
+    queryKey: keys.directory(query, q),
+    queryFn: () => reads.directory(query, q),
     placeholderData: keepPreviousData,
   });
   const rows = (result.data?.items ?? []).flatMap((r) => (r.view === "administrative" ? [r] : []));
@@ -179,6 +178,7 @@ export function AdminPatients() {
             variant="quiet"
             onClick={() => {
               setSearch("");
+              setQ("");
               router.replace(pathname, { scroll: false });
             }}
           >
