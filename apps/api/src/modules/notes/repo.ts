@@ -3,6 +3,7 @@
  * database enforces version numbering, amendment rules, signer = author and the frozen signed
  * header (constraints and phase3_alignment migrations).
  */
+import { DbErrorCode, dbErrorInfo } from "@carepath/db";
 import type { Prisma } from "@carepath/db/client";
 import type { RequestCtx } from "../../core/context.js";
 import type { DbClient, DbTx } from "../../core/db/repo.js";
@@ -173,6 +174,33 @@ export async function signNote(
       updatedAt: n.at,
     },
   });
+}
+
+/** Partial unique index of migration phase5_c3_fixes (checkpoint C3, B4). */
+export const ONE_SIGNED_PER_ENCOUNTER = "ClinicalNote_one_signed_per_encounter_key";
+
+export function isOneSignedPerEncounterViolation(err: unknown): boolean {
+  const info = dbErrorInfo(err);
+  return info?.code === DbErrorCode.uniqueViolation && info.constraint === ONE_SIGNED_PER_ENCOUNTER;
+}
+
+/** Another note of the encounter that is signed now; an entered-in-error note does not count. */
+export async function signedNoteForEncounter(
+  db: DbClient,
+  ctx: Org,
+  encounterId: string,
+  exceptNoteId: string,
+): Promise<boolean> {
+  const row = await db.clinicalNote.findFirst({
+    where: {
+      organizationId: ctx.orgId,
+      encounterId,
+      status: "signed",
+      id: { not: exceptNoteId },
+    },
+    select: { id: true },
+  });
+  return row !== null;
 }
 
 /** Version times strictly after the note's last change, so history order holds under a fixed clock. */

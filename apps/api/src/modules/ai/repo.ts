@@ -334,11 +334,25 @@ export async function aiConsentStatus(
   return row ? "active" : "none";
 }
 
-/** Identifiers the redactor must remove before any external call. */
-export async function patientIdentifiers(db: DbClient, ctx: Org, patientId: string) {
+const personNames = (given: string, family: string) => [given, family, `${given} ${family}`];
+
+/**
+ * Identifiers the redactor must remove before any external call: the patient's own, and the
+ * names of the staff a transcript or message can mention (checkpoint C3, B5): every member of
+ * the patient's care team, past or present, the people who sent the messages in the input
+ * (`senderUserIds`) and the practitioners named on the input records (`practitionerIds`, the
+ * visit's clinician for a note draft).
+ */
+export async function patientIdentifiers(
+  db: DbClient,
+  ctx: Org,
+  patientId: string,
+  people: { senderUserIds?: readonly string[]; practitionerIds?: readonly string[] } = {},
+) {
   const p = await db.patient.findFirstOrThrow({
     where: { id: patientId, organizationId: ctx.orgId },
     select: {
+      userId: true,
       givenName: true,
       familyName: true,
       birthDate: true,
@@ -347,8 +361,46 @@ export async function patientIdentifiers(db: DbClient, ctx: Org, patientId: stri
       mrn: true,
     },
   });
+  const members = await db.careTeamMember.findMany({
+    where: { organizationId: ctx.orgId, careTeam: { patientId, organizationId: ctx.orgId } },
+    select: { userId: true },
+  });
+  const userIds = [
+    ...new Set([...members.map((m) => m.userId), ...(people.senderUserIds ?? [])]),
+  ].filter((id) => id !== p.userId);
+  const users = userIds.length
+    ? await db.organizationMembership.findMany({
+        where: { organizationId: ctx.orgId, userId: { in: userIds } },
+        select: {
+          user: {
+            select: {
+              displayName: true,
+              practitioner: { select: { givenName: true, familyName: true } },
+            },
+          },
+        },
+      })
+    : [];
+  const practitioners = people.practitionerIds?.length
+    ? await db.practitioner.findMany({
+        where: { organizationId: ctx.orgId, id: { in: [...people.practitionerIds] } },
+        select: { givenName: true, familyName: true },
+      })
+    : [];
+  const staffNames = [
+    ...users.flatMap(({ user }) => [
+      user.displayName,
+      ...(user.practitioner
+        ? personNames(user.practitioner.givenName, user.practitioner.familyName)
+        : []),
+    ]),
+    ...practitioners.flatMap((x) => personNames(x.givenName, x.familyName)),
+  ];
+  const names = [...new Set([...personNames(p.givenName, p.familyName), ...staffNames])].filter(
+    (n) => n.trim().length > 0,
+  );
   return {
-    names: [p.givenName, p.familyName, `${p.givenName} ${p.familyName}`],
+    names,
     birthDates: [p.birthDate.toISOString().slice(0, 10)],
     emails: p.email ? [p.email] : [],
     phones: p.phone ? [p.phone] : [],
@@ -431,7 +483,7 @@ export async function progressRecords(
 export async function findEncounter(db: DbClient, ctx: Org, patientId: string, id: string) {
   return db.encounter.findFirst({
     where: { id, organizationId: ctx.orgId, patientId },
-    select: { id: true, typeCode: true, transcript: true, startedAt: true },
+    select: { id: true, typeCode: true, transcript: true, startedAt: true, practitionerId: true },
   });
 }
 

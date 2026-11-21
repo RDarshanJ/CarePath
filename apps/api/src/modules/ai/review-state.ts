@@ -15,11 +15,16 @@ import { z } from "zod";
 import {
   OUTPUT_SCHEMAS,
   listStatements,
+  verifyOutput,
+  type AllowedRecord,
+  type AllowListReason,
+  type EvidenceResolver,
   type GenerationKind,
   type ProgressSummaryOutput,
   type SoapNoteDraftOutput,
   type SourceRef,
   type StatementVerdict,
+  type UnsupportedReason,
   type VerificationResult,
 } from "@carepath/ai";
 import type { AiRevisionChange } from "@carepath/shared/contracts";
@@ -55,9 +60,14 @@ const callSchema = z.object({
   latencyMs: z.number(),
 });
 
+/** One record (and field) the prompt was built from, as the pipeline stored it. */
+const inputRefSchema = z.object({ type: z.string(), id: z.string(), field: z.string() });
+
 const inputJsonSchema = z.object({
   schema: z.literal(INPUT_SCHEMA),
   request: requestSchema,
+  /** Absent on rows written before the pipeline stored it; then the allow list is not applied. */
+  inputRefs: z.array(inputRefSchema).optional(),
   run: z.object({
     calls: z.array(callSchema),
     costLabel: z.string(),
@@ -67,6 +77,8 @@ const inputJsonSchema = z.object({
 
 export interface ParsedInput {
   request: GenerationRequest | null;
+  /** The records the generation was given; null for an older row that did not store them. */
+  inputRefs: AllowedRecord[] | null;
   attempts: number;
   costLabel: string;
   errorCode: string | null;
@@ -75,9 +87,19 @@ export interface ParsedInput {
 /** Reads `AIGeneration.input`; rows written before WP 5.2 (older seed format) read as unknown. */
 export function parseInputJson(value: unknown): ParsedInput {
   const p = inputJsonSchema.safeParse(value);
-  if (!p.success) return { request: null, attempts: 0, costLabel: "Not recorded", errorCode: null };
+  if (!p.success)
+    return {
+      request: null,
+      inputRefs: null,
+      attempts: 0,
+      costLabel: "Not recorded",
+      errorCode: null,
+    };
   return {
     request: p.data.request as GenerationRequest,
+    inputRefs: p.data.inputRefs
+      ? p.data.inputRefs.map((r) => ({ type: r.type as AllowedRecord["type"], id: r.id }))
+      : null,
     attempts: p.data.run.calls.length,
     costLabel: p.data.run.costLabel,
     errorCode: p.data.run.errorCode,
@@ -214,6 +236,25 @@ export function addEvidenceOpen(
   };
 }
 
+export type Verification = VerificationResult<UnsupportedReason | AllowListReason>;
+
+/**
+ * Verifies a stored draft as it is read or approved (checkpoint C3, B8): against the records
+ * that exist now in scope and, when the row stored them, against the records the generation was
+ * given (`not_in_input`). An older row without `inputRefs` verifies as before.
+ */
+export function verifyStored(
+  kind: GenerationKind,
+  draft: DraftOutput,
+  resolver: EvidenceResolver,
+  scope: { organizationId: string; patientId: string },
+  inputRefs: readonly AllowedRecord[] | null,
+): Promise<Verification> {
+  return inputRefs
+    ? verifyOutput(kind, draft, resolver, scope, { allowedRecords: inputRefs })
+    : verifyOutput(kind, draft, resolver, scope);
+}
+
 export interface StatementView {
   id: string;
   section: string;
@@ -221,7 +262,7 @@ export interface StatementView {
   originalText: string;
   resolution: "unchanged" | "edited" | "removed" | "acknowledged";
   note: string | null;
-  verdict: StatementVerdict;
+  verdict: StatementVerdict<UnsupportedReason | AllowListReason>;
   needsResolution: boolean;
   evidenceOpened: boolean;
   sourceRefs: SourceRef[];
@@ -232,7 +273,7 @@ export function statementViews(
   kind: GenerationKind,
   draft: DraftOutput,
   state: ReviewState,
-  verification: VerificationResult,
+  verification: Verification,
 ): StatementView[] {
   const verdicts = new Map(verification.statements.map((v) => [v.statementId, v]));
   return listStatements(kind, draft).map(({ section, statement }) => {

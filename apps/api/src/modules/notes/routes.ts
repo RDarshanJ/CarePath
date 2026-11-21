@@ -38,6 +38,8 @@ import {
   lockNote,
   markEnteredInError,
   nextTime,
+  isOneSignedPerEncounterViolation,
+  signedNoteForEncounter,
   signNote,
   type NoteRow,
 } from "./repo.js";
@@ -75,29 +77,39 @@ const isAuthor = (ctx: RequestCtx, n: NoteRow) =>
 const allEmpty = (v: { subjective: string; objective: string; assessment: string; plan: string }) =>
   [v.subjective, v.objective, v.assessment, v.plan].every((t) => t.trim() === "");
 
+/** May mark a signed note entered in error: its author, or a holder of the permission (C3 4.3). */
+const mayMarkEnteredInError = (ctx: RequestCtx, n: NoteRow) =>
+  isAuthor(ctx, n) || ctx.permissions.has("note.mark_entered_in_error");
+
+/**
+ * The full note. A caller without `clinical.read` (a clinic administrator marking a note entered
+ * in error) gets the header only: no version and no SOAP text (checkpoint C3, ruling 4.3).
+ */
 async function toNote(db: DbClient, ctx: RequestCtx, n: NoteRow): Promise<ClinicalNote> {
-  const versions = (await listVersions(db, ctx, n.id)).map((v) => ({
-    id: v.id,
-    versionNumber: v.versionNumber,
-    subjective: v.subjective,
-    objective: v.objective,
-    assessment: v.assessment,
-    plan: v.plan,
-    source: v.source,
-    aiGenerationId: v.aiGenerationId,
-    isAmendment: v.isAmendment,
-    amendmentReason: v.amendmentReason,
-    createdBy: userRef(v.createdBy.user),
-    createdAt: v.createdAt.toISOString(),
-  }));
+  const readsText = ctx.permissions.has("clinical.read");
+  const versions = readsText
+    ? (await listVersions(db, ctx, n.id)).map((v) => ({
+        id: v.id,
+        versionNumber: v.versionNumber,
+        subjective: v.subjective,
+        objective: v.objective,
+        assessment: v.assessment,
+        plan: v.plan,
+        source: v.source,
+        aiGenerationId: v.aiGenerationId,
+        isAmendment: v.isAmendment,
+        amendmentReason: v.amendmentReason,
+        createdBy: userRef(v.createdBy.user),
+        createdAt: v.createdAt.toISOString(),
+      }))
+    : [];
   return {
     ...toSummary(n),
     currentVersion: versions.find((v) => v.id === n.currentVersionId) ?? null,
     versions,
     canSign: isAuthor(ctx, n) && n.status === "draft",
     canAmend: isAuthor(ctx, n) && n.status === "signed",
-    canMarkEnteredInError:
-      n.status === "signed" && (isAuthor(ctx, n) || ctx.role === "clinic_admin"),
+    canMarkEnteredInError: n.status === "signed" && mayMarkEnteredInError(ctx, n),
   };
 }
 
@@ -264,7 +276,7 @@ export const noteRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "signClinicalNote",
         tags: ["notes"],
         summary:
-          "The author signs the version they read. The only way a note becomes signed; approval of an AI draft never signs.",
+          "The author signs the version they read. The only way a note becomes signed; approval of a generated draft never signs. A visit has at most one signed note: signing a second answers 409 encounter_already_documented until the first is marked entered in error.",
         params: noteIdParamsSchema,
         body: signNoteSchema,
         response: { 200: clinicalNoteSchema, ...errorResponses(400, 401, 403, 404, 409, 429) },
@@ -287,11 +299,21 @@ export const noteRoutes: FastifyPluginAsyncZod = async (app) => {
         );
         // CR-8 (demo rule): empty sections warn in the UI; all four empty cannot be signed.
         if (!current || allEmpty(current)) throw new AppError("note_empty");
-        await signNote(tx, ctx, {
-          noteId: n.id,
-          practitionerId: ctx.practitionerId!,
-          at: nextTime(fresh.updatedAt, now()),
-        });
+        // C3 B4: one signed note per encounter. The check gives the readable error; the partial
+        // unique index ClinicalNote_one_signed_per_encounter_key is the guarantee under a race.
+        if (fresh.encounterId && (await signedNoteForEncounter(tx, ctx, fresh.encounterId, n.id)))
+          throw new AppError("encounter_already_documented");
+        try {
+          await signNote(tx, ctx, {
+            noteId: n.id,
+            practitionerId: ctx.practitionerId!,
+            at: nextTime(fresh.updatedAt, now()),
+          });
+        } catch (err) {
+          if (isOneSignedPerEncounterViolation(err))
+            throw new AppError("encounter_already_documented");
+          throw err;
+        }
         await audit({
           eventName: "note.sign",
           action: "U",
@@ -364,14 +386,17 @@ export const noteRoutes: FastifyPluginAsyncZod = async (app) => {
   app.post(
     "/patients/:patientId/notes/:noteId/entered-in-error",
     {
-      // Clinicians (author only) or clinic administrators. settings.manage is the
-      // administrator-only permission; the author check is below.
-      config: { access: { permission: ["note.sign", "settings.manage"] }, rateLimit },
+      // The author (note.sign) or a holder of note.mark_entered_in_error (clinic administrators,
+      // checkpoint C3 ruling 4.3). The handler decides by permission, never by role name.
+      config: {
+        access: { permission: ["note.sign", "note.mark_entered_in_error"] },
+        rateLimit,
+      },
       schema: {
         operationId: "markClinicalNoteEnteredInError",
         tags: ["notes"],
         summary:
-          "Mark a signed note entered in error, with a reason, by its author or a clinic administrator (CR-8, demo rule). Irreversible; the text stays readable and the note is no longer exportable.",
+          "Mark a signed note entered in error, with a reason, by its author or a holder of note.mark_entered_in_error (CR-8, CR-18, demo rule). Irreversible. The note leaves the FHIR export and the visit may be documented by a new signed note. A caller without clinical.read gets the note header only, with no versions and no text.",
         params: noteIdParamsSchema,
         body: markNoteEnteredInErrorSchema,
         response: { 200: clinicalNoteSchema, ...errorResponses(400, 401, 403, 404, 409, 429) },
@@ -381,7 +406,9 @@ export const noteRoutes: FastifyPluginAsyncZod = async (app) => {
       const { patientId, noteId } = request.params;
       const ctx = await requirePatientRead(request, patientId);
       const n = await requireNote(request, ctx, patientId, noteId);
-      if (ctx.role !== "clinic_admin" && !isAuthor(ctx, n)) throw new AppError("not_note_author");
+      const asAuthor = isAuthor(ctx, n);
+      if (!asAuthor && !ctx.permissions.has("note.mark_entered_in_error"))
+        throw new AppError("not_note_author");
       await withTx(request, async ({ tx, audit }) => {
         await lockNote(tx, ctx, n.id);
         const fresh = (await findNote(tx, ctx, patientId, n.id))!;
@@ -398,8 +425,8 @@ export const noteRoutes: FastifyPluginAsyncZod = async (app) => {
           resourceType: "ClinicalNote",
           resourceId: n.id,
           patientId,
-          purposeOfUse: ctx.role === "clinic_admin" ? "operations" : "treatment",
-          detailCode: ctx.role === "clinic_admin" ? "clinic_admin" : "author",
+          purposeOfUse: asAuthor ? "treatment" : "operations",
+          detailCode: asAuthor ? "author" : "mark_entered_in_error_permission",
         });
       });
       return toNote(db, ctx, (await findNote(db, ctx, patientId, n.id))!);

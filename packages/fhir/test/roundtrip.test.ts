@@ -140,7 +140,7 @@ describe("practitioner NPI", () => {
 });
 
 describe("signed notes only", () => {
-  const [signed, draft, error] = sampleNotes();
+  const [signed, draft, error, evaluation] = sampleNotes();
 
   it("exports the signed version and each amendment, never working drafts", () => {
     const docs = signedNoteDocuments(signed!);
@@ -153,12 +153,15 @@ describe("signed notes only", () => {
     expect(docs[1]!.amendmentReason).toBe("Corrected the number of home sessions.");
   });
 
-  it("exports nothing for a draft, and marks every version of a note entered in error", () => {
+  it("exports nothing for a draft or for a note marked entered in error (C3 ruling 4.1)", () => {
     expect(signedNoteDocuments(draft!)).toEqual([]);
     expect(
       signedNoteDocuments({ ...error!, signedAt: null, signedByPractitionerId: null }),
     ).toEqual([]);
-    expect(signedNoteDocuments(error!).map((d) => d.status)).toEqual(["entered_in_error"]);
+    // Signed, then marked entered in error: still carries signedAt and the signer.
+    expect(error!.signedAt).not.toBeNull();
+    expect(signedNoteDocuments(error!)).toEqual([]);
+    expect(signedNoteDocuments(evaluation!).map((d) => d.status)).toEqual(["current"]);
   });
 
   it("writes amendments as docStatus amended replacing the earlier version", () => {
@@ -166,9 +169,9 @@ describe("signed notes only", () => {
     const docs = bundle
       .entry!.map((e) => e.resource!)
       .filter((r) => r.resourceType === "DocumentReference") as DocumentReference[];
-    expect(docs.map((d) => d.id)).toEqual([ids.noteErrorV1, ids.noteSignedV2, ids.noteSignedV3]);
+    expect(docs.map((d) => d.id)).toEqual([ids.noteEvalV1, ids.noteSignedV2, ids.noteSignedV3]);
     expect(docs.map((d) => [d.status, d.docStatus])).toEqual([
-      ["entered-in-error", "final"],
+      ["current", "final"],
       ["superseded", "final"],
       ["current", "amended"],
     ]);
@@ -183,6 +186,8 @@ describe("signed notes only", () => {
     expect(docs.every((d) => d.custodian?.reference === `urn:uuid:${ids.org}`)).toBe(true);
     expect(JSON.stringify(bundle)).not.toContain(ids.noteDraftV1);
     expect(JSON.stringify(bundle)).not.toContain(ids.noteSignedV1);
+    expect(JSON.stringify(bundle)).not.toContain(ids.noteError);
+    expect(JSON.stringify(bundle)).not.toContain(ids.noteErrorV1);
   });
 });
 

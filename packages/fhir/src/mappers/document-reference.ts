@@ -43,13 +43,15 @@ export interface ClinicalNoteSource {
 
 /**
  * The exportable versions of one note: only clinician-signed content (advisor plan revision 1).
- * A note that was never signed (a draft, an AI draft, a draft entered in error) yields nothing.
- * Otherwise: the version that was signed (the last version that is not an amendment, since a
- * signed note takes amendments only), then each amendment in order. The newest is `current`,
- * earlier ones `superseded`; every version of a note entered in error is `entered_in_error`.
+ * Only a note whose status is `signed` yields anything. A draft, a generated draft and a note
+ * marked entered in error yield nothing (checkpoint C3, ruling 4.1: an entered-in-error note
+ * leaves the export entirely, because the commonest reason is a note written on the wrong
+ * patient). Otherwise: the version that was signed (the last version that is not an amendment,
+ * since a signed note takes amendments only), then each amendment in order. The newest is
+ * `current`, earlier ones `superseded`.
  */
 export function signedNoteDocuments(note: ClinicalNoteSource): ClinicalNoteDocumentRecord[] {
-  if (!note.signedAt || !note.signedByPractitionerId || note.status === "draft") return [];
+  if (note.status !== "signed" || !note.signedAt || !note.signedByPractitionerId) return [];
   const ordered = [...note.versions].sort((a, b) => a.versionNumber - b.versionNumber);
   const signed = ordered.filter((v) => !v.isAmendment).at(-1);
   if (!signed) return [];
@@ -70,12 +72,7 @@ export function signedNoteDocuments(note: ClinicalNoteSource): ClinicalNoteDocum
     assessment: v.assessment,
     plan: v.plan,
     signedAt: i === 0 ? note.signedAt! : v.createdAt,
-    status:
-      note.status === "entered_in_error"
-        ? "entered_in_error"
-        : i === chain.length - 1
-          ? "current"
-          : "superseded",
+    status: i === chain.length - 1 ? "current" : "superseded",
     replacesVersionId: i > 0 ? chain[i - 1]!.id : null,
   }));
 }

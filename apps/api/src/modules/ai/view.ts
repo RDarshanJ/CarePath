@@ -1,9 +1,4 @@
-import {
-  verifyOutput,
-  type EvidenceResolver,
-  type GenerationKind,
-  type ResolvedRef,
-} from "@carepath/ai";
+import { type EvidenceResolver, type GenerationKind, type ResolvedRef } from "@carepath/ai";
 import type {
   AiGeneration,
   AiGenerationSummary,
@@ -19,6 +14,7 @@ import {
   parseInputJson,
   parseState,
   statementViews,
+  verifyStored,
   type StatementView,
 } from "./review-state.js";
 
@@ -93,6 +89,7 @@ function refView(r: ResolvedRef): AiSourceRef {
     field: r.ref.field,
     status: r.status,
     value: r.status === "resolved" ? (r.value ?? null) : null,
+    inInput: r.inInput ?? null,
   };
 }
 
@@ -131,7 +128,7 @@ export async function toGenerationView(
   let notices: AiGeneration["notices"] = [];
   let verification: AiGeneration["verification"] = null;
   if (draft) {
-    const result = await verifyOutput(kind, draft, resolver, scope);
+    const result = await verifyStored(kind, draft, resolver, scope, input.inputRefs);
     views = statementViews(kind, draft, state, result);
     refsByStatement = new Map(views.map((s) => [s.id, s.verdict.refs.map(refView)]));
     const resolveNotice = async (refs: { type: string; id: string; field: string }[]) =>

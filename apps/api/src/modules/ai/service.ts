@@ -70,10 +70,12 @@ export async function buildInput(
   req: GenerationRequest,
 ): Promise<Built> {
   const scope = { organizationId: ctx.orgId, patientId };
-  const identifiers = await patientIdentifiers(db, ctx, patientId);
   if (req.kind === "encounter") {
     const e = await findEncounter(db, ctx, patientId, req.encounterId);
     if (!e) throw new AppError("not_found");
+    const identifiers = await patientIdentifiers(db, ctx, patientId, {
+      practitionerIds: [e.practitionerId],
+    });
     const transcript = parseTranscriptText(e.transcript ?? "").slice(0, 400);
     if (transcript.length === 0) throw new AppError("encounter_no_transcript");
     return {
@@ -87,6 +89,9 @@ export async function buildInput(
     };
   }
   const r = await progressRecords(db, ctx, patientId, new Date(req.from), new Date(req.to));
+  const identifiers = await patientIdentifiers(db, ctx, patientId, {
+    senderUserIds: r.messages.map((m) => m.senderUserId),
+  });
   return {
     kind: "progress_summary",
     input: {

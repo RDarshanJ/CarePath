@@ -334,9 +334,10 @@ export async function loadPatientExport(
         orderBy: [{ startedAt: "asc" }, { id: "asc" }],
         select: encounterSelect,
       }),
-      // Notes that were signed at some point; drafts are not read at all.
+      // Signed notes only (checkpoint C3, ruling 4.1): drafts and notes marked entered in error
+      // are not read at all.
       db.clinicalNote.findMany({
-        where: { organizationId: ctx.orgId, patientId, signedAt: { not: null } },
+        where: { organizationId: ctx.orgId, patientId, status: "signed", signedAt: { not: null } },
         orderBy: [{ signedAt: "asc" }, { id: "asc" }],
         select: {
           id: true,

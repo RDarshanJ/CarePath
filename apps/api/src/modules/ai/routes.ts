@@ -69,10 +69,10 @@ import {
   parseState,
   soapText,
   statementViews,
+  verifyStored,
 } from "./review-state.js";
 import { createSqlResolver, progressRequest, runGeneration, type AiRuntime } from "./service.js";
 import { toGenerationView, toSummary } from "./view.js";
-import { verifyOutput } from "@carepath/ai";
 
 export interface AiRoutesOptions {
   /** Tests inject a provider; otherwise it comes from configuration (deterministic by default). */
@@ -481,10 +481,13 @@ export const aiRoutes: FastifyPluginAsyncZod<AiRoutesOptions> = async (app, opts
         const current = revisions[revisions.length - 1] ?? null;
         if ((current?.id ?? null) !== request.body.revisionId) throw new AppError("revision_stale");
         const state = current ? parseState(current.editedOutput) : emptyState();
-        const verification = await verifyOutput(kind, draft, createSqlResolver(tx, ctx), {
-          organizationId: ctx.orgId,
-          patientId,
-        });
+        const verification = await verifyStored(
+          kind,
+          draft,
+          createSqlResolver(tx, ctx),
+          { organizationId: ctx.orgId, patientId },
+          parseInputJson(g.input).inputRefs,
+        );
         const views = statementViews(kind, draft, state, verification);
         const blockers = approvalBlockers(kind, draft, state, views, true);
         if (blockers.length)

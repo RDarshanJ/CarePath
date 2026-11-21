@@ -54,7 +54,7 @@ export const fhirRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "exportPatientFhir",
         tags: ["fhir"],
         summary:
-          "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Appointment, Encounter for visits that took place, Condition, Goal, CarePlan per published version, Observation, DocumentReference per signed note version; drafts are never exported). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
+          "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Appointment, Encounter for visits that took place, Condition, Goal, CarePlan per published version, Observation, DocumentReference per version of a signed note; drafts and notes marked entered in error are never exported). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
         params: patientIdParamsSchema,
         response: { 200: fhirBundleSchema, ...errorResponses(400, 401, 403, 404, 429, 500) },
       },

@@ -37,6 +37,8 @@ export const ids = {
   noteDraftV1: "0b6c2f6e-0000-4000-8000-000000000095",
   noteError: "0b6c2f6e-0000-4000-8000-000000000096",
   noteErrorV1: "0b6c2f6e-0000-4000-8000-000000000097",
+  noteEval: "0b6c2f6e-0000-4000-8000-000000000098",
+  noteEvalV1: "0b6c2f6e-0000-4000-8000-000000000099",
 } as const;
 
 const soap = (n: number) => ({
@@ -48,7 +50,8 @@ const soap = (n: number) => ({
 
 /**
  * Notes as stored: one signed after two working drafts and then amended, one still a draft (never
- * exported), and one signed then entered in error.
+ * exported), one signed then entered in error (never exported, checkpoint C3 ruling 4.1), and one
+ * signed initial evaluation.
  */
 export function sampleNotes(): ClinicalNoteSource[] {
   return [
@@ -125,6 +128,26 @@ export function sampleNotes(): ClinicalNoteSource[] {
           isAmendment: false,
           amendmentReason: null,
           createdAt: "2026-10-01T15:50:00.000Z",
+        },
+      ],
+    },
+    {
+      id: ids.noteEval,
+      patientId: ids.patient,
+      encounterId: null,
+      authorPractitionerId: ids.therapist,
+      noteType: "initial_evaluation",
+      status: "signed",
+      signedAt: "2026-10-02T16:00:00.000Z",
+      signedByPractitionerId: ids.therapist,
+      versions: [
+        {
+          id: ids.noteEvalV1,
+          versionNumber: 1,
+          ...soap(1),
+          isAmendment: false,
+          amendmentReason: null,
+          createdAt: "2026-10-02T15:50:00.000Z",
         },
       ],
     },
