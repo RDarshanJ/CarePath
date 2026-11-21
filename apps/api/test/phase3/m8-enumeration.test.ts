@@ -9,7 +9,13 @@ import {
   createTestDb,
   type OrgFixture,
 } from "../support/repo.js";
-import { createClinicalFixture, type ClinicalFixture } from "../support/fixtures/repo.js";
+import {
+  createClinicalFixture,
+  createEnrollmentCode,
+  enrollmentCodeByHash,
+  type ClinicalFixture,
+} from "../support/fixtures/repo.js";
+import { hashEnrollmentCode } from "@carepath/shared/enrollment-code";
 import { createConversation } from "../support/fixtures/messaging.js";
 import { createSlots } from "../support/scheduling/repo.js";
 import { createEncounter, createGenerationAndNote } from "../support/fixtures/ai.js";
@@ -143,6 +149,17 @@ function bodyFor(ids: Ids): Record<string, unknown> {
       reason: "probe",
     },
     "POST /patients/{patientId}/notes/{noteId}/entered-in-error": { reason: "probe" },
+    // WP 6.1 administration.
+    "POST /practitioners/{practitionerId}/availability": {
+      date: "2027-06-01",
+      startTime: "09:00",
+      endTime: "10:00",
+      slotMinutes: 30,
+      appointmentTypes: ["follow_up"],
+    },
+    "POST /availability/slots/{slotId}/block": {},
+    "POST /availability/slots/{slotId}/unblock": {},
+    "POST /enrollment-codes/{codeId}/revoke": {},
   };
 }
 
@@ -226,6 +243,9 @@ beforeAll(async () => {
     new Date(NOW.getTime() + 5 * day),
   ]);
   let nextSlot = 0;
+  // WP 6.1: an eligibility code of organization A, for the {codeId} route.
+  const code = await createEnrollmentCode(db, orgA.orgId, new Date(NOW.getTime() + 30 * day));
+  const codeId = (await enrollmentCodeByHash(db, hashEnrollmentCode(code)))!.id;
 
   // Real child rows for both patients, made through the API.
   async function children(
@@ -304,6 +324,7 @@ beforeAll(async () => {
       appointmentId: appointment.id,
       practitionerId: orgA.therapist.practitionerId,
       slotId: slotIds[2]!,
+      codeId,
     };
     for (const [k, v] of Object.entries(ids)) {
       if (!v) throw new Error(`fixture ${k} missing for ${patientEmail}`);
