@@ -578,7 +578,8 @@ export function ConsentStep({
       </section>
       <p className="max-w-measure text-small text-ink-muted">
         You can see and change the optional choice at any time in Sharing and consent, in the footer
-        of every page. Wording version {CONSENT_TEXT_VERSIONS.treatment_and_data_use}.
+        of every page. Wording version{" "}
+        <span className="whitespace-nowrap">{CONSENT_TEXT_VERSIONS.treatment_and_data_use}</span>.
       </p>
     </>
   );
