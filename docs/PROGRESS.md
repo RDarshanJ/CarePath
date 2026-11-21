@@ -27,6 +27,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - D-WP-1 tokens, type and capture tooling (branch `wp/d1`): DR-001 colour set as one map for both themes (all roles including link, selected, critical, accent, AI, `chart-1..8`, `seq-1..7`, `div-1..5`), patient and clinician type scales and `textExtra` roles, IBM Plex Sans 400/400 italic/500/600 and Plex Mono 400 with Source Serif 4 removed, scrim and overlay shadow on `ink`, token tests rewritten per DR-001 section 8, `apps/web/scripts/design-capture.mjs` with its probe, and the tokens-only capture in `docs/design/after/d-wp-1/` (gate output below).
 
 - WP 5.2 (branch `wp/5.2`): AI progress summaries and SOAP note drafts through `@carepath/ai` with a SQL evidence resolver, stored generations and append-only reviews, gated approval, note draft from approval, sign, amendment and entered in error, consent refusal, failure path, overview AI drafts; CR-7, CR-8 and CR-16 delivered as demo rules pending clinical governance review (gate output below).
+- WP 5.6a (branch `wp/5.6a`, checkpoint C3 fixes in `packages/ai`): A1 empty progress summary as `progress_summary@1.1.0` (1.0.0 unchanged and still pinned); A2 verifier allow-list of input records with reason `not_in_input`, passed by the pipeline; A3 a redaction token left after restore is `invalid_output`; A4 Anthropic `stop_reason: max_tokens` is `invalid_output`, named as truncation, not retried, and its tokens counted; A5 the three C3 3.2 statements in the eval report, re-run with `pnpm ai:eval` (gate output below).
 
 ## Outstanding
 
@@ -939,4 +940,51 @@ Deviations and open points:
 - `apps/web/components/illustration.tsx` was not touched (D-WP-7 owns it and has already changed it). `apps/web/app/icon.svg` and `docs/design-system/components.md` were outside the listed paths and were edited for the colour change only.
 - Interaction-state rules in `design-tokens.md` section 3 (hover `primary-subtle`, selected edge bar, outline secondary button) are not applied to components; that is D-WP-2. Heading `h4` weight 500 for patients is not applied either (the `Heading` component uses one weight).
 - The baseline capture script was not in the repository, so this one was written from the audit's description; its file names match the baseline, its states are close but not identical (one persona for the session chain, `/review-queue` without a task selected at 1440).
+
+### WP 5.6a (checkpoint C3 fixes A1 to A5 in packages/ai)
+
+Worktree `/home/claude/wt/5.6a`, branch `wp/5.6a`, from main at `dc80bf3`. Owned paths only: `packages/ai/**`, `docs/evaluation/ai-eval.md`, `docs/evaluation/ai-eval.json`, this section.
+
+- A1: `ProgressSummaryOutput.summary` may be empty. `progress_summary@1.1.0` is registered with a change note and its fingerprint pinned (`e7f86b44…dcb2a`). Version 1.0.0 renders its contract from `ProgressSummaryOutputV1_0`, the schema it was written against, so its pinned fingerprint is unchanged; a test checks that 1.0.0's contract still requires one summary statement and 1.1.0's does not. Pipeline tests: an empty window and a window with one patient message both succeed in one attempt with no summary statements and the expected `missingInformation` (five and four items).
+- A2: `verifyOutput` takes an optional `{ allowedRecords }` (type and id). A ref that resolves but names a record outside the list makes its statement unsupported with reason `not_in_input`; each ref then carries `inInput`. An unresolved ref is still reported as `unresolved_source_ref`. The pipeline passes the generation's own `inputRefs`, so `unsupportedStatementCount` stored at generation now counts `not_in_input`. Called without the option (the API read path and the approval transaction today), behaviour and the return type are unchanged; B8 in WP 5.6b passes stored `inputRefs` and adds the reason to the shared contract. Tests: verifier unit test, and a pipeline test with a provider citing an in-scope check-in it was not given.
+- A3: after `restore`, any `[[KIND_n]]` token left in an external provider's output is `invalid_output` ("Output contains n redaction token(s) that match no redacted value."). Tests: an invented `[[NAME_9]]` fails all three attempts with no output; a token the redactor issued is restored and accepted.
+- A4: the Anthropic provider reads `stop_reason`; `max_tokens` is `invalid_output` with a message naming truncation and the output limit, `retryable: false`. Usage reported on a failed reply (truncated, or not JSON) now travels on the error (`AIError.attemptUsage`) and is counted in that attempt's record and the totals. Tests with the injected `fetch`: one call, tokens and cost recorded; a non-JSON reply is still retried three times with tokens summed.
+- A5: the report renders three statements beside the table: the unsupported-statement rate and citation accuracy are true by construction for the demo provider; the injection results are in-sample (patterns written after reading case-06 and case-19, two of the four probes; n = 4); the report covers note drafts only and progress summaries have no evaluation. `pnpm ai:eval` re-run at `87d71dd` and committed.
+- C3 1.1 item 5 (short name parts as names) is recorded as a limitation in the header of `packages/ai/test/redaction.test.ts`.
+
+Measured results of the re-run (`docs/evaluation/ai-eval.md`, demo provider, 25 cases): structured-output validity 25 of 25; first-attempt validity 25 of 25; unsupported statements 0 of 181; expected-fact recall 146 of 195; recall in any section 155 of 195; citation accuracy of recalled facts 146 of 146; missing-information precision 55 of 75, recall 55 of 58, exact match 9 of 25; injection probes kept in schema 4 of 4, followed 0 of 4, notice raised 4 of 4. Identical to the WP 5.1 run; the allow-list changed nothing because the demo provider cites only its input.
+
+Gate: `scripts/gate-wp-5.1.sh` exit 0 (including `pnpm verify`). Tail:
+
+```
+==> all packages/ai tests
+ Test Files  9 passed (9)
+      Tests  114 passed (114)
+==> eval cases match EvalCase v1
+==> eval smoke run (scratch output)
+==> pnpm verify
+==> seed (small profile)
+integrity checks: 78 passed
+content-hash: 26a0d46314c2ff22a9a969d8e6d09647b3f9d5ea8e57969e5d97083f2ea9c5e9
+packages/ai test:       Tests  114 passed (114)
+packages/fhir test:       Tests  101 passed (101)
+packages/shared test:       Tests  70 passed (70)
+packages/ui test:       Tests  227 passed (227)
+packages/db test:       Tests  78 passed (78)
+apps/api test:       Tests  243 passed (243)
+  25 skipped
+  53 passed (4.9m)
+==> docs/ unchanged by the run
+verify: PASSED
+db: lease 5387 released
+==> git status clean
+WP 5.1 gate: PASSED
+EXIT=0
+```
+
+Deviations and notes:
+- Seed: no file in `packages/db` was changed. The seed stores `getPrompt(kind).version`, so seeded progress summaries now carry `progress_summary@1.1.0` and the content hash moved from `9950d0b8…a5425` to `26a0d463…c5e9`. No seed test pins the hash; 78 of 78 integrity checks pass.
+- The C3 note names API port 4051 for this gate; `scripts/gate-wp-5.1.sh` starts no API of its own, and its `pnpm verify` stage uses 4090 and 3090 as `scripts/verify.sh` sets them.
+- `AIError` gained `attemptUsage` (not in the item list) so that a truncated reply, which is not retried, still has its tokens and cost recorded, as C3 1.1 requires of failed attempts.
+- The WP 5.1 lines in this file that C3 3.2 and 3.3 name (deviation 2 on the empty summary, "two rules were adjusted") are left for the orchestrator, as C3 section 6 assigns.
 
