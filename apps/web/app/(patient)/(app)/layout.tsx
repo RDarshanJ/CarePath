@@ -11,6 +11,7 @@ export default async function PatientAppLayout({ children }: { children: ReactNo
       variant="app"
       unreadMessages={today.messages.unreadCount}
       organizationName={session.organization.name}
+      displayName={session.user.displayName}
       clinic={clinic}
     >
       {/* Keeps a focused or scrolled-to control clear of the bottom tab bar (CD-125 sticky offsets). */}

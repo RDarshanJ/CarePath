@@ -8,7 +8,12 @@ export default async function PatientSessionLayout({ children }: { children: Rea
   await requireOnboarded(patientId);
   const clinic = await getClinic(patientId);
   return (
-    <PatientFrame variant="focus" organizationName={session.organization.name} clinic={clinic}>
+    <PatientFrame
+      variant="focus"
+      organizationName={session.organization.name}
+      displayName={session.user.displayName}
+      clinic={clinic}
+    >
       {children}
     </PatientFrame>
   );

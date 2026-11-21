@@ -2,12 +2,23 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button, FieldError } from "@carepath/ui";
+import { Button, FieldError, type ButtonVariant } from "@carepath/ui";
 import { apiRequest, rememberCsrfToken } from "../lib/api/client";
 import { ApiError } from "../lib/api/errors";
 
-/** Ends the session on the API, clears cached data, and returns to sign-in with a hard navigation. */
-export function SignOutButton({ className }: { className?: string }) {
+/**
+ * Ends the session on the API, clears cached data and any in-memory shell state (`onSignedOut`), and
+ * returns to sign-in with a hard navigation, which also drops everything else held in memory.
+ */
+export function SignOutButton({
+  className,
+  variant = "secondary",
+  onSignedOut,
+}: {
+  className?: string;
+  variant?: ButtonVariant;
+  onSignedOut?: () => void;
+}) {
   const queryClient = useQueryClient();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,13 +38,14 @@ export function SignOutButton({ className }: { className?: string }) {
     }
     rememberCsrfToken(null);
     queryClient.clear();
+    onSignedOut?.();
     window.location.assign("/login?reason=signed-out");
   }
 
   return (
     <div className={className}>
       <Button
-        variant="secondary"
+        variant={variant}
         size="sm"
         iconLeft="lock"
         loading={pending}

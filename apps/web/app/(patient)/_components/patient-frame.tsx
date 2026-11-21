@@ -5,7 +5,9 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import type { ClinicCard } from "@carepath/shared/contracts";
 import {
+  BottomTabBar,
   Button,
+  CountBadge,
   Dialog,
   DialogContent,
   DialogTrigger,
@@ -13,96 +15,67 @@ import {
   Link,
   cx,
   type IconName,
-  CountBadge,
-  SkipLink,
+  type NavItem,
 } from "@carepath/ui";
+import { BackLink, useTrackPreviousPath } from "../../../components/back-link";
 import { SignOutButton } from "../../../components/sign-out-button";
 import { useUnreadTotal } from "../_lib/use-conversations";
 
-/** The four patient destinations (checkpoint C2, section 5): tabs on a phone, the header from md up. */
-const tabs: { href: string; label: string; icon: IconName }[] = [
+/** The four patient destinations (CD-500, checkpoint C2 section 5). Plan is reached from Today. */
+const destinations: { href: string; label: string; icon: IconName }[] = [
   { href: "/today", label: "Today", icon: "home" },
   { href: "/progress", label: "Progress", icon: "activity" },
   { href: "/appointments", label: "Appointments", icon: "calendar" },
   { href: "/messages", label: "Messages", icon: "message" },
 ];
 
-/**
- * One nav element for each width, never both at once: the other is `display: none`, so assistive
- * technology and axe see a single "Patient" landmark. Phone: bottom tabs. md and up: a row in the
- * header (checkpoint C2, section 1.5 item 6).
- */
-function useNavItems(unread: number) {
+/** One list for both navs; nested routes keep their destination current (`/messages/[id]` is Messages). */
+function useNavItems(unread: number): NavItem[] {
   const pathname = usePathname();
-  return tabs.map((t) => ({
-    ...t,
-    current: pathname === t.href || pathname.startsWith(`${t.href}/`),
-    count: t.href === "/messages" ? unread : 0,
+  return destinations.map((d) => ({
+    ...d,
+    current: pathname === d.href || pathname.startsWith(`${d.href}/`),
+    ...(d.href === "/messages" ? { count: unread, countUnit: "unread" } : {}),
   }));
 }
 
-function BottomNav({ unread }: { unread: number }) {
-  const items = useNavItems(unread);
+/**
+ * Header tab row from md (CD-500). The bottom bar below md is the ui `BottomTabBar` with the same items.
+ * Only one of the two is displayed at any width, so assistive technology meets one "Patient" landmark.
+ */
+function HeaderTabs({ items }: { items: NavItem[] }) {
   return (
-    <nav
-      aria-label="Patient"
-      className="sticky bottom-0 z-10 border-t border-border bg-surface md:hidden"
-    >
-      <ul className="mx-auto flex w-full max-w-3xl flex-wrap">
-        {items.map((it) => (
-          <li key={it.href} className="min-w-20 flex-1">
-            <NextLink
-              href={it.href}
-              aria-current={it.current ? "page" : undefined}
-              className={cx(
-                "relative flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 py-2 text-small motion-fast transition-colors focus-visible:focus-ring",
-                it.current
-                  ? "font-semibold text-primary"
-                  : "font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink",
-              )}
-            >
-              {it.current ? (
-                <span aria-hidden="true" className="absolute inset-x-3 top-0 h-0.5 bg-primary" />
-              ) : null}
-              <span className="relative">
-                <Icon name={it.icon} size={22} />
-                {it.count > 0 ? (
-                  <span className="absolute -right-3 -top-2">
-                    <CountBadge count={it.count} unit="unread" />
-                  </span>
-                ) : null}
-              </span>
-              <span>{it.label}</span>
-            </NextLink>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
-
-function HeaderNav({ unread }: { unread: number }) {
-  const items = useNavItems(unread);
-  return (
-    <nav aria-label="Patient" className="hidden border-t border-border md:block">
-      <ul className="mx-auto flex w-full max-w-3xl gap-1 px-gutter">
+    <nav aria-label="Patient" className="hidden md:block">
+      <ul className="-mb-px flex gap-1">
         {items.map((it) => (
           <li key={it.href}>
             <NextLink
               href={it.href}
               aria-current={it.current ? "page" : undefined}
               className={cx(
-                "relative flex min-h-target items-center gap-2 rounded-control px-3 text-label motion-fast transition-colors focus-visible:focus-ring",
+                "relative flex min-h-target items-center gap-2 rounded-t-control px-3 text-label motion-fast transition-colors focus-visible:focus-ring",
                 it.current
-                  ? "font-semibold text-primary"
-                  : "font-medium text-ink-muted hover:bg-surface-sunken hover:text-ink",
+                  ? "font-semibold text-selected-ink"
+                  : "font-medium text-ink-muted hover:bg-primary-subtle hover:text-ink",
               )}
             >
               <Icon name={it.icon} size={20} />
               <span>{it.label}</span>
-              <CountBadge count={it.count} unit="unread" />
+              {it.count ? (
+                <>
+                  <span aria-hidden="true">
+                    <CountBadge count={it.count} unit={it.countUnit ?? "unread"} />
+                  </span>
+                  <span className="sr-only">
+                    , {it.count} {it.countUnit}
+                  </span>
+                </>
+              ) : null}
               {it.current ? (
-                <span aria-hidden="true" className="absolute inset-x-3 bottom-0 h-0.5 bg-primary" />
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-2 bottom-0 h-0.5 bg-selected-edge"
+                />
               ) : null}
             </NextLink>
           </li>
@@ -173,60 +146,80 @@ export function ContactCareTeam({ clinic }: { clinic: ClinicCard }) {
 
 export interface PatientFrameProps {
   organizationName: string;
+  /** The signed-in patient's display name (CD-205). Shown in the app header, not in the session. */
+  displayName: string;
   clinic: ClinicCard;
-  /** `app`: tab bar and footer. `focus`: the guided session, which hides navigation to keep one task on screen. */
+  /** `app`: navigation and footer. `focus`: the guided session, which hides navigation to keep one task on screen. */
   variant: "app" | "focus";
   /** Unread messages at page load; the nav badge then follows the conversation poll. */
   unreadMessages?: number;
   children: ReactNode;
 }
 
+/**
+ * Patient shell (CD-500, CD-205, CD-505, CD-507). Landmarks: one `banner` (brand, identity, Contact care
+ * team, Sign out, and the tab row from md), `main#main`, a `contentinfo` footer and one "Patient"
+ * navigation. The skip link and the demo notice come from the patient route-group layout, so onboarding
+ * has them too. "Contact care team" keeps the same place in the header on every screen (WCAG 3.2.6).
+ */
 export function PatientFrame({
   organizationName,
+  displayName,
   clinic,
   variant,
   unreadMessages = 0,
   children,
 }: PatientFrameProps) {
+  useTrackPreviousPath();
   const unread = useUnreadTotal(unreadMessages, variant === "app");
+  const items = useNavItems(unread);
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-bg">
-      <SkipLink />
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 sm:px-gutter">
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-4 gap-y-1 px-gutter py-2">
           {variant === "focus" ? (
-            <NextLink
-              href="/today"
-              className="inline-flex min-h-target items-center gap-1.5 rounded-control text-label font-medium text-primary focus-visible:focus-ring"
-            >
-              <Icon name="chevron-right" size={18} className="rotate-180" />
-              Today
-            </NextLink>
+            <BackLink href="/today">Back to Today</BackLink>
           ) : (
-            <p className="font-heading text-h4 font-semibold text-ink">CarePath</p>
+            <p className="flex min-h-target items-center gap-2 text-h4 font-semibold text-ink">
+              <span aria-hidden="true" className="size-2.5 rounded-full bg-accent" />
+              CarePath
+            </p>
           )}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Same place on every screen: the top right (WCAG 3.2.6). */}
+          <div className="ml-auto md:order-last md:ml-0">
             <ContactCareTeam clinic={clinic} />
-            {variant === "app" ? <SignOutButton /> : null}
           </div>
+          {variant === "app" ? (
+            // Below md this is the header's second row; from md it sits before Contact care team.
+            <div className="flex w-full flex-wrap items-center justify-between gap-x-3 md:ml-auto md:w-auto md:justify-end">
+              <p className="min-w-0 text-small text-ink-muted">
+                Signed in as <span className="font-medium text-ink">{displayName}</span>
+              </p>
+              <SignOutButton variant="quiet" />
+            </div>
+          ) : null}
         </div>
-        {variant === "app" ? <HeaderNav unread={unread} /> : null}
+        {variant === "app" ? (
+          <div className="mx-auto w-full max-w-3xl px-gutter">
+            <HeaderTabs items={items} />
+          </div>
+        ) : null}
       </header>
-      <main
-        id="main"
-        tabIndex={-1}
-        className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-gutter"
-      >
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-3xl flex-1 px-gutter py-6">
         {children}
       </main>
       {variant === "app" ? (
         <>
-          <footer className="mx-auto w-full max-w-3xl px-4 pb-6 sm:px-gutter text-small text-ink-muted">
-            <p>
-              {organizationName}. <Link href="/consent">Sharing and consent</Link>
-            </p>
+          <footer className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-2 px-gutter pb-6 text-small text-ink-muted">
+            <p>{organizationName}.</p>
+            <Link href="/consent" variant="standalone">
+              Sharing and consent
+            </Link>
           </footer>
-          <BottomNav unread={unread} />
+          {/* Sticky in the page flow, not fixed, so it never rides above the on-screen keyboard (CD-500). */}
+          <div data-sticky-bar className="sticky bottom-0 z-10 md:hidden">
+            <BottomTabBar label="Patient" items={items} linkAs={NextLink} />
+          </div>
         </>
       ) : null}
     </div>
