@@ -255,6 +255,16 @@ enum ReviewTaskStatus {
   dismissed
 }
 
+/// What happened to a review task (CR-11). A task's creation is its own createdAt; there is no
+/// created event. `reviewed` records the check-in a task reads being marked reviewed.
+enum ReviewTaskEventKind {
+  assigned
+  unassigned
+  reviewed
+  resolved
+  dismissed
+}
+
 enum AIGenerationKind {
   progress_summary
   note_draft
@@ -362,6 +372,8 @@ model Organization {
   notifications        Notification[]
   reviewRules          ReviewRule[]
   reviewTasks          ReviewTask[]
+  reviewTaskEvents     ReviewTaskEvent[]
+  idempotencyKeys      IdempotencyKey[]
   aiGenerations        AIGeneration[]
   aiReviews            AIReview[]
   auditEvents          AuditEvent[]
@@ -429,6 +441,8 @@ model OrganizationMembership {
   participants          ConversationParticipant[]
   notifications         Notification[]
   reviewTasksResolved   ReviewTask[]
+  reviewTaskEvents      ReviewTaskEvent[]
+  idempotencyKeys       IdempotencyKey[]
   aiGenerations         AIGeneration[]
   aiReviews             AIReview[]
 
@@ -541,6 +555,7 @@ model Practitioner {
   notesSigned        ClinicalNote[]     @relation("NoteSigner")
   observations       Observation[]
   reviewTasks        ReviewTask[]
+  reviewTaskEvents   ReviewTaskEvent[]
 
   @@unique([id, organizationId])
   @@unique([organizationId, staffId])
@@ -1220,9 +1235,60 @@ model ReviewTask {
   rule         ReviewRule              @relation(fields: [ruleId, organizationId], references: [id, organizationId], onDelete: Restrict)
   assignedTo   Practitioner?           @relation(fields: [assignedPractitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
   resolvedBy   OrganizationMembership? @relation(fields: [resolvedByUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+  events       ReviewTaskEvent[]
 
+  @@unique([id, organizationId])
   @@index([organizationId, status, priority])
   @@index([organizationId, patientId])
+}
+
+/// Append-only history of one review task (CR-11): who assigned, unassigned, reviewed, resolved
+/// or dismissed it, when, and the note when there is one. UPDATE and DELETE are rejected by
+/// trigger. Written in the same transaction as the change it records.
+model ReviewTaskEvent {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  /// Insertion order: events with the same instant keep the order they were written in.
+  seq                    Int                 @default(autoincrement())
+  organizationId         String              @db.Uuid
+  taskId                 String              @db.Uuid
+  kind                   ReviewTaskEventKind
+  actorUserId            String              @db.Uuid
+  /// The practitioner a task was assigned to (kind assigned) or taken from (kind unassigned).
+  practitionerId         String?             @db.Uuid
+  note                   String?
+  occurredAt             DateTime            @default(now()) @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  task         ReviewTask             @relation(fields: [taskId, organizationId], references: [id, organizationId], onDelete: Restrict)
+  actor        OrganizationMembership @relation(fields: [actorUserId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+  practitioner Practitioner?          @relation(fields: [practitionerId, organizationId], references: [id, organizationId], onDelete: Restrict)
+
+  @@index([taskId, occurredAt, seq])
+}
+
+/// Replay record for a request that carried an Idempotency-Key header (CR-17). One row per
+/// (organization, user, scope, key). The row is written in the same transaction as the booking,
+/// so a request that fails stores nothing. Rows are ignored after expiresAt and removed the next
+/// time the same key is used.
+model IdempotencyKey {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizationId String   @db.Uuid
+  userId         String   @db.Uuid
+  /// Operation and target, for example "book:<patientId>".
+  scope          String
+  key            String
+  /// SHA-256 of the canonical request body.
+  requestHash    String
+  statusCode     Int
+  responseBody   Json
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  expiresAt      DateTime @db.Timestamptz(3)
+
+  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user         OrganizationMembership @relation(fields: [userId, organizationId], references: [userId, organizationId], onDelete: Restrict)
+
+  @@unique([organizationId, userId, scope, key])
+  @@index([expiresAt])
 }
 
 // ---------------------------------------------------------------------------

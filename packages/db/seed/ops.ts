@@ -386,6 +386,39 @@ export function buildOps(ctx: Ctx, unread: UnreadMessage[]): void {
       read: false,
     });
   }
+  // CR-11: history for the seeded tasks. Assigned tasks get an assigned event shortly after they
+  // were created; closed ones a resolved or dismissed event with the stored note. The seed does
+  // not model who assigned a task, so the assignee is the actor.
+  for (const r of t.ReviewTask) {
+    const th = r.assignedPractitionerId
+      ? ctx.orgs
+          .flatMap((o) => o.therapists)
+          .find((x) => x.practitionerId === r.assignedPractitionerId)
+      : undefined;
+    if (!th) continue;
+    t.ReviewTaskEvent.push({
+      id: ctx.id("taskevent", `${r.id}/assigned`),
+      organizationId: r.organizationId,
+      taskId: r.id,
+      kind: "assigned",
+      actorUserId: th.userId,
+      practitionerId: th.practitionerId,
+      note: null,
+      occurredAt: iso(Date.parse(r.createdAt) + 5 * MIN),
+    } as never);
+    if (r.resolvedAt && r.resolutionNote) {
+      t.ReviewTaskEvent.push({
+        id: ctx.id("taskevent", `${r.id}/closed`),
+        organizationId: r.organizationId,
+        taskId: r.id,
+        kind: r.status === "dismissed" ? "dismissed" : "resolved",
+        actorUserId: th.userId,
+        practitionerId: null,
+        note: r.resolutionNote,
+        occurredAt: r.resolvedAt,
+      } as never);
+    }
+  }
   for (const r of t.ReviewTask) {
     if (r.assignedPractitionerId && (r.status === "open" || r.status === "in_review")) {
       const th = ctx.orgs

@@ -58,6 +58,7 @@ export interface Tables {
   Notification: Wire<M.Notification>[];
   ReviewRule: Wire<M.ReviewRule>[];
   ReviewTask: Wire<M.ReviewTask>[];
+  ReviewTaskEvent: Wire<M.ReviewTaskEvent>[];
   AuditEvent: Wire<M.AuditEvent>[];
   Job: Wire<M.Job>[];
 }
@@ -103,6 +104,7 @@ export const insertOrder: readonly TableName[] = [
   "Notification",
   "ReviewRule",
   "ReviewTask",
+  "ReviewTaskEvent",
   "AuditEvent",
   "Job",
 ];

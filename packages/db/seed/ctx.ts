@@ -166,6 +166,7 @@ export function emptyTables(): Tables {
     Notification: [],
     ReviewRule: [],
     ReviewTask: [],
+    ReviewTaskEvent: [],
     AuditEvent: [],
     Job: [],
   };
