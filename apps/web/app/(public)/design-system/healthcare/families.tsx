@@ -74,7 +74,10 @@ export function FamilyPage({
       <header className="border-b border-border bg-surface px-gutter py-6">
         <div className="mx-auto max-w-[1400px]">
           <p className="text-caption font-semibold text-ink-muted">
-            <Link href="/design-system">CarePath design system</Link> / healthcare components
+            <Link href="/design-system" className="inline-flex min-h-6 items-center">
+              CarePath design system
+            </Link>{" "}
+            / healthcare components
           </p>
           <Heading level={1} className="mt-1">
             {heading ?? family?.title}
