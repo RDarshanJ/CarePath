@@ -86,7 +86,7 @@ export function SkipLink({
   return (
     <a
       href={href}
-      className="sr-only rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus-visible:focus-ring"
+      className="sr-only rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:min-h-target focus:items-center focus-visible:focus-ring"
     >
       {children}
     </a>

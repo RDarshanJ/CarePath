@@ -101,6 +101,8 @@ run scripts/with-web-lock.sh bash -c e2e
 
 export CAPTURE_DIR="${CAPTURE_DIR:-$PWD/.data/capture-d-wp-u}"
 export PROBE_FAIL_ON="${PROBE_FAIL_ON:-warm,overflow,axe,targets,pictures}"
+# The onboarding header "Sign in" link is D-WP-8's (DR-004 section 5.2, 48 px target); reported, not failed.
+export PROBE_TARGETS_ELSEWHERE="${PROBE_TARGETS_ELSEWHERE:-patient-onboarding-~\"Sign in\"}"
 export CAPTURE_SKIP_BUILD=1
 run scripts/with-web-lock.sh scripts/design-capture.sh wpdu 4120 3120
 

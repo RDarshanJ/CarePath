@@ -696,7 +696,7 @@ export default function DesignSystemPage() {
               <a
                 href="#main"
                 data-demo="focus"
-                className="inline-block rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus-visible:focus-ring"
+                className="inline-flex min-h-target items-center rounded-control bg-surface px-3 py-2 text-label font-medium text-link underline focus-visible:focus-ring"
               >
                 Skip to main content
               </a>

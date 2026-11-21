@@ -31,11 +31,16 @@ export const useLinkComponent = (): ElementType => useContext(LinkContext);
 /** True for links that leave the app (other origin, tel:, mailto:). Those use a plain `a`. */
 export const isExternalHref = (href: string): boolean => /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href);
 
+/*
+ * Hit areas (DR-004 U5, ruling 6.5). `inline` adds 4 px of vertical padding: on an inline box it grows the
+ * hit and focus area without moving the line, so a 13 px clinician link is 25 px tall in a 36 px row.
+ * `standalone` is the theme's full target (48 px patient, 32 px clinician) in both directions.
+ */
 export const linkClasses = {
   inline:
-    "rounded-control text-link underline underline-offset-2 hover:text-primary-hover hover:decoration-2 focus-visible:focus-ring",
+    "rounded-control py-1 text-link underline underline-offset-2 hover:text-primary-hover hover:decoration-2 focus-visible:focus-ring",
   standalone:
-    "inline-flex min-h-target items-center rounded-control text-label font-medium text-link underline underline-offset-2 hover:text-primary-hover hover:decoration-2 focus-visible:focus-ring",
+    "inline-flex min-h-target min-w-target items-center rounded-control text-label font-medium text-link underline underline-offset-2 hover:text-primary-hover hover:decoration-2 focus-visible:focus-ring",
 } as const;
 
 export interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {

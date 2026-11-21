@@ -185,7 +185,9 @@ export function Td({
   return (
     <td
       className={cx(
-        "px-3 py-1 align-middle",
+        // Links and name buttons in a cell get a 24 px minimum hit height; the 36 px row is unchanged
+        // (DR-004 U5).
+        "px-3 py-1 align-middle [&_a[href]]:inline-flex [&_a[href]]:min-h-6 [&_a[href]]:items-center [&_button]:min-h-6",
         wrap ? "max-w-80 whitespace-normal" : "whitespace-nowrap",
         numeric && "text-right tabular-nums",
         mono && "font-mono",

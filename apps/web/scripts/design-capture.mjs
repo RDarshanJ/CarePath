@@ -163,9 +163,14 @@ function probeInPage(warmTokens) {
   const interactive = document.querySelectorAll(
     'a[href], button, input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="tab"], [role="radio"], [role="checkbox"], [role="switch"], [role="menuitem"], [role="option"], [tabindex]:not([tabindex="-1"])',
   );
-  // Only real targets count (DR-004 U6): a visually hidden element (the skip link) is not a target until
-  // it is focused; the 1 px native select Radix keeps for forms is not one either; a checkbox, radio or
-  // switch is hit through its label, so it is measured by the box that holds the control and its label.
+  // Only real targets count (DR-004 U6):
+  // - a visually hidden element (the skip link) is not a target until it is focused;
+  // - the 1 px native select Radix keeps for forms is not one, nor the bare form input Radix keeps beside
+  //   a checkbox, radio or switch (aria-hidden, out of the tab order, pointer-events none);
+  // - a checkbox, radio or switch is hit through its label, so it is measured by the box that holds the
+  //   control and its label;
+  // - a transform (the pressed-state scale) does not shrink a target: the layout box is measured;
+  // - a text link inside a sentence is excepted, as WCAG 2.5.8 excepts it; it is counted separately.
   const labelBox = (el) => {
     const labels = [
       ...(el.labels ?? []),
@@ -173,6 +178,7 @@ function probeInPage(warmTokens) {
     ];
     const wrap = el.closest("label");
     if (wrap) labels.push(wrap);
+    // The control and its label together: the box that holds both (they sit side by side in a row).
     let box = el.getBoundingClientRect();
     for (const l of labels) {
       const lr = l.getBoundingClientRect();
@@ -191,9 +197,33 @@ function probeInPage(warmTokens) {
   const isChoice = (el) =>
     (el.tagName === "INPUT" && /^(checkbox|radio)$/.test(el.type)) ||
     /^(checkbox|radio|switch)$/.test(el.getAttribute("role") ?? "");
+  const isBareInput = (el) =>
+    el.tagName === "INPUT" &&
+    el.getAttribute("aria-hidden") === "true" &&
+    el.tabIndex < 0 &&
+    getComputedStyle(el).pointerEvents === "none";
+  const hasWords = (n) => /\w/.test(n.textContent ?? "");
+  const inSentence = (el) => {
+    if (el.tagName !== "A" || getComputedStyle(el).display !== "inline") return false;
+    let node = el;
+    while (node.parentElement) {
+      const parent = node.parentElement;
+      const display = getComputedStyle(parent).display;
+      if (/flex|grid/.test(display)) return false;
+      for (const sib of parent.childNodes) {
+        if (sib === node) continue;
+        if (sib.nodeType === 3 && hasWords(sib)) return true;
+        if (sib.nodeType === 1 && getComputedStyle(sib).display === "inline" && hasWords(sib))
+          return true;
+      }
+      if (display !== "inline") return false;
+      node = parent;
+    }
+    return false;
+  };
   const small = [];
   const underFloor = [];
-  const excluded = { hidden: 0, nativeSelect: 0 };
+  const excluded = { hidden: 0, nativeSelect: 0, bareInput: 0, inSentence: 0 };
   for (const el of interactive) {
     let r = el.getBoundingClientRect();
     if (!visible(el, r)) continue;
@@ -205,15 +235,23 @@ function probeInPage(warmTokens) {
       excluded.nativeSelect += 1;
       continue;
     }
-    if (isChoice(el)) r = labelBox(el);
-    else if (el.tagName === "INPUT" && el.getAttribute("aria-hidden") === "true") {
-      // The form input Radix keeps beside its checkbox, radio or switch button: the button is the target.
-      const control = el.previousElementSibling;
-      if (control && isChoice(control)) r = labelBox(control);
+    if (isBareInput(el)) {
+      excluded.bareInput += 1;
+      continue;
     }
+    if (isChoice(el)) r = labelBox(el);
+    else if (
+      el.offsetWidth > 0 &&
+      (getComputedStyle(el).transform !== "none" || getComputedStyle(el).scale !== "none")
+    )
+      r = { width: el.offsetWidth, height: el.offsetHeight };
     const theme = el.closest("[data-theme]")?.getAttribute("data-theme") ?? "patient";
     const floor = theme === "patient" ? 48 : 24;
     const size = `${Math.round(r.width)}x${Math.round(r.height)}`;
+    if ((r.width < floor || r.height < floor) && inSentence(el)) {
+      excluded.inSentence += 1;
+      continue;
+    }
     if (r.width < 24 || r.height < 24) small.push(`${describe(el)} ${size}`);
     if (r.width < floor || r.height < floor) underFloor.push(`${theme} ${describe(el)} ${size}`);
   }
@@ -572,15 +610,30 @@ if (want("design-system-zoom-200")) {
 await browser.close();
 
 probes.sort((a, b) => a.file.localeCompare(b.file, "en", { numeric: true }));
-writeFileSync(`${out}/_probe.json`, JSON.stringify(probes, null, 1) + "\n");
 
+// PROBE_TARGETS_ELSEWHERE: comma list of `<screen prefix>~<text in the entry>`; a target under the floor
+// that matches is page content another package owns (for example the onboarding header link, D-WP-8,
+// DR-004 section 5.2). It is listed in the summary and in `_probe.json`, but does not fail `targets`.
+const elsewhere = (process.env.PROBE_TARGETS_ELSEWHERE ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean)
+  .map((s) => s.split("~"));
+for (const p of probes) {
+  const list = p.underThemeFloorList ?? [];
+  const isElsewhere = (e) =>
+    elsewhere.some(([pre, text]) => p.file.startsWith(pre) && e.includes(text));
+  p.targetsElsewhere = list.filter(isElsewhere);
+  p.targetsHere = (p.underThemeFloor ?? 0) - p.targetsElsewhere.length;
+}
+writeFileSync(`${out}/_probe.json`, JSON.stringify(probes, null, 1) + "\n");
 const count = (pred) => probes.filter(pred).length;
 const findings = {
   warm: probes.filter((p) => p.warm.length),
   overflow: probes.filter((p) => p.overflowX > 1),
   axe: probes.filter((p) => p.violations?.length),
   small: probes.filter((p) => p.underThemeFloor > 0),
-  targets: probes.filter((p) => p.underThemeFloor > 0),
+  targets: probes.filter((p) => p.targetsHere > 0),
   pictures: probes.filter((p) => p.wideAreaPictures?.length),
 };
 console.log(`\ndesign-capture: ${probes.length} images in ${out}`);
@@ -608,10 +661,25 @@ for (const p of findings.axe) console.log(`  axe: ${p.file}: ${p.violations.join
 console.log(`  body-area pictures wider than 64 px: ${findings.pictures.length} images`);
 for (const p of findings.pictures)
   console.log(`  pictures: ${p.file}: ${p.wideAreaPictures.join(", ")} px`);
-const targetTotal = probes.reduce((n, p) => n + (p.underThemeFloor ?? 0), 0);
-console.log(`  targets under the theme floor, all images: ${targetTotal}`);
+const sum = (f) => probes.reduce((n, p) => n + (f(p) ?? 0), 0);
+console.log(
+  `  real targets under the theme floor: ${sum((p) => p.targetsHere)} in ${findings.targets.length} images` +
+    ` (owned elsewhere, reported: ${sum((p) => p.targetsElsewhere?.length)})`,
+);
+const ex = (k) => sum((p) => p.excludedTargets?.[k]);
+console.log(
+  `  not counted as targets: hidden ${ex("hidden")}, 1 px native select ${ex("nativeSelect")},` +
+    ` bare form input ${ex("bareInput")}, link inside a sentence ${ex("inSentence")}`,
+);
 for (const p of findings.targets)
-  console.log(`  targets: ${p.file}: ${p.underThemeFloorList.slice(0, 4).join("; ")}`);
+  console.log(
+    `  targets: ${p.file}: ${p.underThemeFloorList
+      .filter((e) => !p.targetsElsewhere.includes(e))
+      .slice(0, 4)
+      .join("; ")}`,
+  );
+for (const p of probes.filter((q) => q.targetsElsewhere.length))
+  console.log(`  targets owned elsewhere: ${p.file}: ${p.targetsElsewhere.join("; ")}`);
 let status = failures.length ? 1 : 0;
 for (const f of failures) console.error(`  capture failure: ${f}`);
 for (const kind of FAIL_ON) {
