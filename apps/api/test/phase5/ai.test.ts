@@ -546,7 +546,8 @@ describe("Scenario F: SOAP note draft from a synthetic transcript", () => {
       expect.objectContaining({ eventName: "note.sign", detailCode: "amendment" }),
     ]);
 
-    // Entered in error: author or clinic administrator, reason required, irreversible.
+    // Entered in error: author or a holder of note.mark_entered_in_error (clinic administrator),
+    // reason required, irreversible.
     const coordinatorEie = await coordinator({
       method: "POST",
       url: `${base()}/notes/${noteId}/entered-in-error`,
@@ -574,7 +575,11 @@ describe("Scenario F: SOAP note draft from a synthetic transcript", () => {
       },
       canMarkEnteredInError: false,
       canAmend: false,
+      // C3 ruling 4.3: the administrator has no clinical.read, so no note text comes back.
+      versions: [],
+      currentVersion: null,
     });
+    expect(eie.body).not.toContain("Amended.");
     const eieEvents = await auditEventsForRequest(db, eie.headers["x-request-id"] as string);
     expect(eieEvents.map((e) => e.eventName)).toEqual(["note.entered_in_error"]);
     const again2 = await therapist({

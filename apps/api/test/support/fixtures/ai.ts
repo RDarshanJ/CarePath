@@ -105,7 +105,8 @@ export async function createGenerationAndNote(
       input: {
         schema: "carepath.ai.generation-input.v1",
         request: { kind: "encounter", encounterId },
-        inputRefs: [],
+        // The record the statement cites was given to the generation (C3 B8 allow list).
+        inputRefs: [{ type: "encounter", id: encounterId, field: "transcript.turn.1" }],
         run: { calls: [], costLabel: "fixture", errorCode: null },
       },
       output: { schema: "carepath.ai.generation-output.v1", draft, verification: null },
