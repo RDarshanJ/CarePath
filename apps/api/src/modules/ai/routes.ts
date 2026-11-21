@@ -249,7 +249,7 @@ export const aiRoutes: FastifyPluginAsyncZod<AiRoutesOptions> = async (app, opts
         operationId: "getAiGeneration",
         tags: ["ai"],
         summary:
-          "One generation with statements, each source reference resolved now inside this patient and organization, missing information, revisions, decision and approval blockers.",
+          "One generation with statements, each source reference resolved now inside this patient and organization and checked against the records the generation was given (inInput; not_in_input when it cites one it was not given), missing information, revisions, decision and approval blockers. Supported means the cited record exists for this patient, not that it says what the statement says.",
         params: aiGenerationIdParamsSchema,
         response: { 200: aiGenerationSchema, ...errorResponses(400, 401, 403, 404, 429) },
       },
@@ -447,7 +447,7 @@ export const aiRoutes: FastifyPluginAsyncZod<AiRoutesOptions> = async (app, opts
         operationId: "approveAiGeneration",
         tags: ["ai"],
         summary:
-          "The one decision: approve the draft as revised. Refused (409 ai_approval_blocked) while unsupported statements are unresolved. For a note draft, creates a draft ClinicalNote authored by the approving clinician; it is not signed.",
+          "The one decision: approve the draft as revised. Statements are verified again in the same transaction, against the records in scope and the records the generation was given. Refused (409 ai_approval_blocked) while unsupported statements are unresolved. For a note draft, creates a draft ClinicalNote authored by the approving clinician; it is not signed.",
         params: aiGenerationIdParamsSchema,
         body: approveAiGenerationSchema,
         response: { 200: aiGenerationSchema, ...generationResponses },

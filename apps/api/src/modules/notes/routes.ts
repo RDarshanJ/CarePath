@@ -174,7 +174,8 @@ export const noteRoutes: FastifyPluginAsyncZod = async (app) => {
       schema: {
         operationId: "listClinicalNotes",
         tags: ["notes"],
-        summary: "Clinical notes of a patient, newest first, drafts and signed.",
+        summary:
+          "Clinical notes of a patient, newest first: drafts, signed notes and notes marked entered in error.",
         params: patientIdParamsSchema,
         querystring: cursorQuerySchema,
         response: { 200: clinicalNotePageSchema, ...errorResponses(400, 401, 403, 404, 429) },

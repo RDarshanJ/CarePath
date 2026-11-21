@@ -116,6 +116,7 @@
                 "careplan.publish",
                 "note.write",
                 "note.sign",
+                "note.mark_entered_in_error",
                 "ai.generate",
                 "ai.review",
                 "review_task.read",
@@ -1937,6 +1938,7 @@
                   "encounter_no_transcript",
                   "not_note_author",
                   "note_empty",
+                  "encounter_already_documented",
                   "payload_too_large",
                   "unsupported_media_type",
                   "rate_limited",
@@ -5863,6 +5865,7 @@
                       "careplan.publish",
                       "note.write",
                       "note.sign",
+                      "note.mark_entered_in_error",
                       "ai.generate",
                       "ai.review",
                       "review_task.read",
@@ -5922,6 +5925,7 @@
                     "careplan.publish",
                     "note.write",
                     "note.sign",
+                    "note.mark_entered_in_error",
                     "ai.generate",
                     "ai.review",
                     "review_task.read",
@@ -6938,6 +6942,12 @@
               "boolean",
               "null"
             ]
+          },
+          "inInput": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         },
         "required": [
@@ -6945,7 +6955,8 @@
           "id",
           "field",
           "status",
-          "value"
+          "value",
+          "inInput"
         ]
       },
       "AiSourceRecordInput": {
@@ -7105,7 +7116,8 @@
                 "type": "string",
                 "enum": [
                   "no_source_refs",
-                  "unresolved_source_ref"
+                  "unresolved_source_ref",
+                  "not_in_input"
                 ]
               },
               {
@@ -9066,6 +9078,7 @@
                 "careplan.publish",
                 "note.write",
                 "note.sign",
+                "note.mark_entered_in_error",
                 "ai.generate",
                 "ai.review",
                 "review_task.read",
@@ -10926,6 +10939,7 @@
                   "encounter_no_transcript",
                   "not_note_author",
                   "note_empty",
+                  "encounter_already_documented",
                   "payload_too_large",
                   "unsupported_media_type",
                   "rate_limited",
@@ -14944,6 +14958,7 @@
                       "careplan.publish",
                       "note.write",
                       "note.sign",
+                      "note.mark_entered_in_error",
                       "ai.generate",
                       "ai.review",
                       "review_task.read",
@@ -15004,6 +15019,7 @@
                     "careplan.publish",
                     "note.write",
                     "note.sign",
+                    "note.mark_entered_in_error",
                     "ai.generate",
                     "ai.review",
                     "review_task.read",
@@ -16044,6 +16060,12 @@
               "boolean",
               "null"
             ]
+          },
+          "inInput": {
+            "type": [
+              "boolean",
+              "null"
+            ]
           }
         },
         "required": [
@@ -16051,7 +16073,8 @@
           "id",
           "field",
           "status",
-          "value"
+          "value",
+          "inInput"
         ],
         "additionalProperties": false
       },
@@ -16215,7 +16238,8 @@
                 "type": "string",
                 "enum": [
                   "no_source_refs",
-                  "unresolved_source_ref"
+                  "unresolved_source_ref",
+                  "not_in_input"
                 ]
               },
               {
@@ -24231,7 +24255,7 @@
     "/patients/{patientId}/fhir/export": {
       "get": {
         "operationId": "exportPatientFhir",
-        "summary": "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Appointment, Encounter for visits that took place, Condition, Goal, CarePlan per published version, Observation, DocumentReference per signed note version; drafts are never exported). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
+        "summary": "One patient's record as a FHIR R4 collection Bundle (Organization, Practitioner, Patient, Appointment, Encounter for visits that took place, Condition, Goal, CarePlan per published version, Observation, DocumentReference per version of a signed note; drafts and notes marked entered in error are never exported). US Core-aligned shapes, validated by CarePath's defined checks before it is sent.",
         "tags": [
           "fhir"
         ],
@@ -24842,7 +24866,7 @@
     "/patients/{patientId}/ai/generations/{generationId}": {
       "get": {
         "operationId": "getAiGeneration",
-        "summary": "One generation with statements, each source reference resolved now inside this patient and organization, missing information, revisions, decision and approval blockers.",
+        "summary": "One generation with statements, each source reference resolved now inside this patient and organization and checked against the records the generation was given (inInput; not_in_input when it cites one it was not given), missing information, revisions, decision and approval blockers. Supported means the cited record exists for this patient, not that it says what the statement says.",
         "tags": [
           "ai"
         ],
@@ -25443,7 +25467,7 @@
     "/patients/{patientId}/ai/generations/{generationId}/approve": {
       "post": {
         "operationId": "approveAiGeneration",
-        "summary": "The one decision: approve the draft as revised. Refused (409 ai_approval_blocked) while unsupported statements are unresolved. For a note draft, creates a draft ClinicalNote authored by the approving clinician; it is not signed.",
+        "summary": "The one decision: approve the draft as revised. Statements are verified again in the same transaction, against the records in scope and the records the generation was given. Refused (409 ai_approval_blocked) while unsupported statements are unresolved. For a note draft, creates a draft ClinicalNote authored by the approving clinician; it is not signed.",
         "tags": [
           "ai"
         ],
@@ -25906,7 +25930,7 @@
     "/patients/{patientId}/notes": {
       "get": {
         "operationId": "listClinicalNotes",
-        "summary": "Clinical notes of a patient, newest first, drafts and signed.",
+        "summary": "Clinical notes of a patient, newest first: drafts, signed notes and notes marked entered in error.",
         "tags": [
           "notes"
         ],
@@ -26246,7 +26270,7 @@
     "/patients/{patientId}/notes/{noteId}/sign": {
       "post": {
         "operationId": "signClinicalNote",
-        "summary": "The author signs the version they read. The only way a note becomes signed; approval of an AI draft never signs.",
+        "summary": "The author signs the version they read. The only way a note becomes signed; approval of a generated draft never signs. A visit has at most one signed note: signing a second answers 409 encounter_already_documented until the first is marked entered in error.",
         "tags": [
           "notes"
         ],
@@ -26520,7 +26544,7 @@
     "/patients/{patientId}/notes/{noteId}/entered-in-error": {
       "post": {
         "operationId": "markClinicalNoteEnteredInError",
-        "summary": "Mark a signed note entered in error, with a reason, by its author or a clinic administrator (CR-8, demo rule). Irreversible; the text stays readable and the note is no longer exportable.",
+        "summary": "Mark a signed note entered in error, with a reason, by its author or a holder of note.mark_entered_in_error (CR-8, CR-18, demo rule). Irreversible. The note leaves the FHIR export and the visit may be documented by a new signed note. A caller without clinical.read gets the note header only, with no versions and no text.",
         "tags": [
           "notes"
         ],
