@@ -501,14 +501,20 @@ await group(patientScreens, async (page) => {
     await capture(page, "patient-message-thread");
   }
   await visit("patient-consent", "/consent", "Sharing and consent");
-  if (want("patient-consent-allowed")) {
-    // The optional consent allowed: the result line and the history (D-WP-8). Restored afterwards.
-    await page.getByRole("button", { name: "Allow automated drafting tools" }).click();
-    await page.getByRole("status").filter({ hasText: "are now allowed" }).waitFor();
-    await capture(page, "patient-consent-allowed");
-    await page.getByRole("button", { name: "Stop allowing automated drafting tools" }).click();
-    await page.getByRole("status").filter({ hasText: "no longer allowed" }).waitFor();
-  }
+});
+
+// Consent with the optional choice off, then allowed with its result line (D-WP-8). patient.noai, restored.
+await group(["patient-consent-not-allowed", "patient-consent-allowed"], async (page) => {
+  await signIn(page, "patient.noai@carepath.test");
+  await page.goto("/consent");
+  await h1(page, "Sharing and consent");
+  await capture(page, "patient-consent-not-allowed");
+  if (!want("patient-consent-allowed")) return;
+  await page.getByRole("button", { name: "Allow automated drafting tools" }).click();
+  await page.getByRole("status").filter({ hasText: "are now allowed" }).waitFor();
+  await capture(page, "patient-consent-allowed");
+  await page.getByRole("button", { name: "Stop allowing automated drafting tools" }).click();
+  await page.getByRole("status").filter({ hasText: "no longer allowed" }).waitFor();
 });
 
 // Session and discomfort chain, on one persona with a rest day (patient.flare): Today, the session overview,
