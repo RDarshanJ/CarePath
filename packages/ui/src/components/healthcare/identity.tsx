@@ -239,7 +239,7 @@ export function PatientRowIdentity({
   return (
     <span className={cx("flex min-w-0 flex-col", className)}>
       {href ? (
-        <Link href={href} className="font-medium break-words">
+        <Link href={href} variant="standalone" className="self-start break-words">
           {name}
         </Link>
       ) : (

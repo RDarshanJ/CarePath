@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   daysBetween,
   formatAgeHours,
@@ -38,6 +38,26 @@ import {
 
 const PAD = { top: 24, right: 16, bottom: 44, left: 32 };
 
+/**
+ * Draws the chart at its real pixel width (up to `max`), so axis text keeps the theme's caption size
+ * at every width instead of scaling with the SVG. Server render and first paint use `max`.
+ */
+function useChartWidth(max: number): [RefObject<HTMLDivElement | null>, number] {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(max);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = Math.floor(entry?.contentRect.width ?? max);
+      if (w > 0) setWidth(Math.max(240, Math.min(max, w)));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [max]);
+  return [ref, width];
+}
+
 export interface PainChartProps {
   points: PainPointInput[];
   /** First and last day of the window, so the time axis shows the whole period asked for. */
@@ -47,7 +67,7 @@ export interface PainChartProps {
   showPlanTicks?: boolean;
   /** Short accessible name; the values are in the table. */
   label: string;
-  /** Drawing width in px; the chart never renders wider, so axis text keeps its size. */
+  /** Largest drawing width in px; narrower containers draw narrower, text stays at caption size. */
   width?: number;
 }
 
@@ -65,7 +85,7 @@ export function PainChart({
   width = 360,
 }: PainChartProps) {
   const H = 220;
-  const W = width;
+  const [box, W] = useChartWidth(width);
   const plotW = W - PAD.left - PAD.right;
   const plotH = H - PAD.top - PAD.bottom;
   const sorted = [...points].sort((a, b) => a.date.localeCompare(b.date));
@@ -78,109 +98,116 @@ export function PainChart({
   const { segments } = painSegments(sorted);
   const labelled = sorted.length <= 12;
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      width="100%"
-      role="img"
-      aria-label={label}
-      style={{ maxWidth: W }}
-      className="block h-auto w-full"
-      data-chart="pain"
-    >
-      {[0, 5, 10].map((t) => (
-        <g key={t}>
-          <line
-            x1={PAD.left}
-            x2={W - PAD.right}
-            y1={y(t)}
-            y2={y(t)}
-            className="stroke-border"
-            strokeWidth={1}
-          />
+    <div ref={box} className="w-full min-w-0">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        width="100%"
+        role="img"
+        aria-label={label}
+        style={{ maxWidth: W }}
+        className="block h-auto w-full"
+        data-chart="pain"
+      >
+        {[0, 5, 10].map((t) => (
+          <g key={t}>
+            <line
+              x1={PAD.left}
+              x2={W - PAD.right}
+              y1={y(t)}
+              y2={y(t)}
+              className="stroke-border"
+              strokeWidth={1}
+            />
+            <text
+              x={PAD.left - 8}
+              y={y(t) + 4}
+              textAnchor="end"
+              className="fill-ink-muted text-caption"
+            >
+              {t}
+            </text>
+          </g>
+        ))}
+        {segments
+          .filter((s) => s.length > 1)
+          .map((s) => (
+            <path
+              key={s[0]!.checkInId}
+              data-mark="segment"
+              d={s
+                .map(
+                  (p, i) =>
+                    `${i === 0 ? "M" : "L"}${x(p.date).toFixed(1)} ${y(p.painScore).toFixed(1)}`,
+                )
+                .join(" ")}
+              fill="none"
+              className="stroke-chart-1"
+              strokeWidth={2}
+              strokeLinejoin="round"
+            />
+          ))}
+        {sorted.map((p) => (
+          <g key={p.checkInId} data-mark="point" data-value={p.painScore} data-date={p.date}>
+            <circle
+              cx={x(p.date)}
+              cy={y(p.painScore)}
+              r={4.5}
+              className="fill-chart-1 stroke-surface"
+              strokeWidth={2}
+            />
+            {labelled ? (
+              <text
+                x={x(p.date)}
+                y={y(p.painScore) - 10}
+                textAnchor="middle"
+                className="fill-ink text-caption font-medium tabular-nums"
+              >
+                {p.painScore}
+              </text>
+            ) : null}
+          </g>
+        ))}
+        {showPlanTicks
+          ? planUpdates
+              .filter((u) => u.date >= from && u.date <= to)
+              .map((u) => (
+                <g key={u.versionNumber} data-mark="plan-tick">
+                  <line
+                    x1={x(u.date)}
+                    x2={x(u.date)}
+                    y1={y(0) - 6}
+                    y2={y(0) + 6}
+                    className="stroke-ink-muted"
+                    strokeWidth={1.5}
+                  />
+                  <text
+                    x={x(u.date)}
+                    y={y(0) + 18}
+                    textAnchor="middle"
+                    className="fill-ink-muted text-caption"
+                  >
+                    v{u.versionNumber}
+                  </text>
+                </g>
+              ))
+          : null}
+        {from ? (
+          <text x={PAD.left} y={H - 6} textAnchor="start" className="fill-ink-muted text-caption">
+            {formatCalendarDay(from)}
+          </text>
+        ) : null}
+        {to && to !== from ? (
           <text
-            x={PAD.left - 8}
-            y={y(t) + 4}
+            x={W - PAD.right}
+            y={H - 6}
             textAnchor="end"
             className="fill-ink-muted text-caption"
           >
-            {t}
+            {formatCalendarDay(to)}
           </text>
-        </g>
-      ))}
-      {segments
-        .filter((s) => s.length > 1)
-        .map((s) => (
-          <path
-            key={s[0]!.checkInId}
-            data-mark="segment"
-            d={s
-              .map(
-                (p, i) =>
-                  `${i === 0 ? "M" : "L"}${x(p.date).toFixed(1)} ${y(p.painScore).toFixed(1)}`,
-              )
-              .join(" ")}
-            fill="none"
-            className="stroke-chart-1"
-            strokeWidth={2}
-            strokeLinejoin="round"
-          />
-        ))}
-      {sorted.map((p) => (
-        <g key={p.checkInId} data-mark="point" data-value={p.painScore} data-date={p.date}>
-          <circle
-            cx={x(p.date)}
-            cy={y(p.painScore)}
-            r={4.5}
-            className="fill-chart-1 stroke-surface"
-            strokeWidth={2}
-          />
-          {labelled ? (
-            <text
-              x={x(p.date)}
-              y={y(p.painScore) - 10}
-              textAnchor="middle"
-              className="fill-ink text-caption font-medium tabular-nums"
-            >
-              {p.painScore}
-            </text>
-          ) : null}
-        </g>
-      ))}
-      {showPlanTicks
-        ? planUpdates
-            .filter((u) => u.date >= from && u.date <= to)
-            .map((u) => (
-              <g key={u.versionNumber} data-mark="plan-tick">
-                <line
-                  x1={x(u.date)}
-                  x2={x(u.date)}
-                  y1={y(0) - 6}
-                  y2={y(0) + 6}
-                  className="stroke-ink-muted"
-                  strokeWidth={1.5}
-                />
-                <text
-                  x={x(u.date)}
-                  y={y(0) + 18}
-                  textAnchor="middle"
-                  className="fill-ink-muted text-caption"
-                >
-                  v{u.versionNumber}
-                </text>
-              </g>
-            ))
-        : null}
-      {from ? (
-        <text x={PAD.left} y={H - 6} textAnchor="start" className="fill-ink-muted text-caption">
-          {formatCalendarDay(from)}
-        </text>
-      ) : null}
-      {to && to !== from ? (
-        <text x={W - PAD.right} y={H - 6} textAnchor="end" className="fill-ink-muted text-caption">
-          {formatCalendarDay(to)}
-        </text>
-      ) : null}
-    </svg>
+        ) : null}
+      </svg>
+    </div>
   );
 }
 
@@ -223,7 +250,7 @@ export function WeeklySessionsChart({
 }: WeeklySessionsChartProps) {
   const rows = weeklyRows(weeks, today);
   const H = 230;
-  const W = width;
+  const [box, W] = useChartWidth(width);
   const plotW = W - PAD.left - PAD.right;
   const plotH = H - PAD.top - PAD.bottom;
   const max = niceMax(Math.max(1, ...rows.map((r) => Math.max(r.assigned, r.completed))));
@@ -234,98 +261,105 @@ export function WeeklySessionsChart({
   const everyOther = rows.length > 8;
   const roomy = rows.length <= 6;
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      width="100%"
-      role="img"
-      aria-label={label}
-      style={{ maxWidth: W }}
-      className="block h-auto w-full"
-      data-chart="weekly"
-    >
-      {ticks.map((t) => (
-        <g key={t}>
-          <line
-            x1={PAD.left}
-            x2={W - PAD.right}
-            y1={y(t)}
-            y2={y(t)}
-            className="stroke-border"
-            strokeWidth={1}
-          />
-          <text
-            x={PAD.left - 8}
-            y={y(t) + 4}
-            textAnchor="end"
-            className="fill-ink-muted text-caption"
-          >
-            {t}
-          </text>
-        </g>
-      ))}
-      {rows.map((r, i) => {
-        const cx0 = PAD.left + slot * i + slot / 2;
-        return (
-          <g
-            key={r.key}
-            data-mark="week"
-            data-week={r.weekStart}
-            data-assigned={r.assigned}
-            data-completed={r.completed}
-          >
-            <rect
-              x={cx0 - barW - 1}
-              y={y(r.assigned)}
-              width={barW}
-              height={Math.max(0, y(0) - y(r.assigned))}
-              rx={2}
-              className="fill-surface stroke-chart-1"
-              strokeWidth={2}
-              strokeDasharray={r.current ? "4 3" : undefined}
-            />
-            <rect
-              x={cx0 + 1}
-              y={y(r.completed)}
-              width={barW}
-              height={Math.max(0, y(0) - y(r.completed))}
-              rx={2}
-              className={r.current ? "fill-chart-1 stroke-chart-1" : "fill-chart-1"}
-              strokeDasharray={r.current ? "4 3" : undefined}
+    <div ref={box} className="w-full min-w-0">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        width="100%"
+        role="img"
+        aria-label={label}
+        style={{ maxWidth: W }}
+        className="block h-auto w-full"
+        data-chart="weekly"
+      >
+        {ticks.map((t) => (
+          <g key={t}>
+            <line
+              x1={PAD.left}
+              x2={W - PAD.right}
+              y1={y(t)}
+              y2={y(t)}
+              className="stroke-border"
+              strokeWidth={1}
             />
             <text
-              x={cx0 - barW / 2 - 1}
-              y={y(r.assigned) - 5}
-              textAnchor="middle"
-              className="fill-ink text-caption tabular-nums"
+              x={PAD.left - 8}
+              y={y(t) + 4}
+              textAnchor="end"
+              className="fill-ink-muted text-caption"
             >
-              {r.assigned}
+              {t}
             </text>
-            <text
-              x={cx0 + barW / 2 + 1}
-              y={y(r.completed) - 5}
-              textAnchor="middle"
-              className="fill-ink text-caption font-medium tabular-nums"
-            >
-              {r.completed}
-            </text>
-            {!everyOther || i % 2 === rows.length % 2 || r.current ? (
-              <text x={cx0} y={H - 24} textAnchor="middle" className="fill-ink-muted text-caption">
-                {formatCalendarDay(r.weekStart)}
-              </text>
-            ) : null}
-            {r.current ? (
-              <text x={cx0} y={H - 8} textAnchor="middle" className="fill-ink text-caption">
-                so far
-              </text>
-            ) : roomy && r.stopped > 0 ? (
-              <text x={cx0} y={H - 8} textAnchor="middle" className="fill-ink text-caption">
-                {r.stopped} stopped
-              </text>
-            ) : null}
           </g>
-        );
-      })}
-    </svg>
+        ))}
+        {rows.map((r, i) => {
+          const cx0 = PAD.left + slot * i + slot / 2;
+          return (
+            <g
+              key={r.key}
+              data-mark="week"
+              data-week={r.weekStart}
+              data-assigned={r.assigned}
+              data-completed={r.completed}
+            >
+              <rect
+                x={cx0 - barW - 1}
+                y={y(r.assigned)}
+                width={barW}
+                height={Math.max(0, y(0) - y(r.assigned))}
+                rx={2}
+                className="fill-surface stroke-chart-1"
+                strokeWidth={2}
+                strokeDasharray={r.current ? "4 3" : undefined}
+              />
+              <rect
+                x={cx0 + 1}
+                y={y(r.completed)}
+                width={barW}
+                height={Math.max(0, y(0) - y(r.completed))}
+                rx={2}
+                className={r.current ? "fill-chart-1 stroke-chart-1" : "fill-chart-1"}
+                strokeDasharray={r.current ? "4 3" : undefined}
+              />
+              <text
+                x={cx0 - barW / 2 - 1}
+                y={y(r.assigned) - 5}
+                textAnchor="middle"
+                className="fill-ink text-caption tabular-nums"
+              >
+                {r.assigned}
+              </text>
+              <text
+                x={cx0 + barW / 2 + 1}
+                y={y(r.completed) - 5}
+                textAnchor="middle"
+                className="fill-ink text-caption font-medium tabular-nums"
+              >
+                {r.completed}
+              </text>
+              {!everyOther || i % 2 === rows.length % 2 || r.current ? (
+                <text
+                  x={cx0}
+                  y={H - 24}
+                  textAnchor="middle"
+                  className="fill-ink-muted text-caption"
+                >
+                  {formatCalendarDay(r.weekStart)}
+                </text>
+              ) : null}
+              {r.current ? (
+                <text x={cx0} y={H - 8} textAnchor="middle" className="fill-ink text-caption">
+                  so far
+                </text>
+              ) : roomy && r.stopped > 0 ? (
+                <text x={cx0} y={H - 8} textAnchor="middle" className="fill-ink text-caption">
+                  {r.stopped} stopped
+                </text>
+              ) : null}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
   );
 }
 

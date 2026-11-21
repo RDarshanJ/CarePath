@@ -83,7 +83,7 @@ export function EmergencyNotice({
             ) : contactHref ? (
               <a
                 href={contactHref}
-                className="rounded-control text-link underline underline-offset-2 focus-visible:focus-ring"
+                className="inline-flex min-h-target items-center rounded-control text-link underline underline-offset-2 focus-visible:focus-ring"
               >
                 {URGENT_NOTICE_NO_PHONE}
               </a>

@@ -104,7 +104,7 @@ export function AppointmentRecord({
   const who = staff ? (
     <span className="flex min-w-0 flex-col">
       {patientHref ? (
-        <Link href={patientHref} className="font-medium break-words">
+        <Link href={patientHref} variant="standalone" className="self-start break-words">
           {a.patient.name}
         </Link>
       ) : (
@@ -121,7 +121,7 @@ export function AppointmentRecord({
   const moved =
     replacement && a.rescheduledToId ? (
       <p className="text-small text-ink">
-        <Link href={replacement.href}>
+        <Link href={replacement.href} variant="standalone" className="font-normal">
           Moved to {formatDayShort(replacement.startsAt, a.timezone)},{" "}
           {
             formatVisitTime(replacement.startsAt, {

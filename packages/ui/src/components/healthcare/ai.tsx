@@ -163,7 +163,7 @@ export function ProvenanceLine({
       {edited ? <p>{edited}</p> : null}
       {reviewed ? <p>{reviewed}</p> : null}
       <Popover>
-        <PopoverTrigger className="self-start rounded-control text-caption font-medium text-link underline underline-offset-2 hover:text-primary-hover focus-visible:focus-ring">
+        <PopoverTrigger className="inline-flex min-h-6 items-center self-start rounded-control text-caption font-medium text-link underline underline-offset-2 hover:text-primary-hover focus-visible:focus-ring">
           How this draft was made
         </PopoverTrigger>
         <PopoverContent>
