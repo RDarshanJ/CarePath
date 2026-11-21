@@ -28,6 +28,8 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 
 - WP 5.2 (branch `wp/5.2`): AI progress summaries and SOAP note drafts through `@carepath/ai` with a SQL evidence resolver, stored generations and append-only reviews, gated approval, note draft from approval, sign, amendment and entered in error, consent refusal, failure path, overview AI drafts; CR-7, CR-8 and CR-16 delivered as demo rules pending clinical governance review (gate output below).
 - WP 5.6a (branch `wp/5.6a`, checkpoint C3 fixes in `packages/ai`): A1 empty progress summary as `progress_summary@1.1.0` (1.0.0 unchanged and still pinned); A2 verifier allow-list of input records with reason `not_in_input`, passed by the pipeline; A3 a redaction token left after restore is `invalid_output`; A4 Anthropic `stop_reason: max_tokens` is `invalid_output`, named as truncation, not retried, and its tokens counted; A5 the three C3 3.2 statements in the eval report, re-run with `pnpm ai:eval` (gate output below).
+- WP 5.6b (branch `wp/5.6b`, checkpoint C3 fixes B1 to B8): migration `20261126000000_phase5_c3_fixes` (`note.mark_entered_in_error` for `clinic_admin`, partial unique index one signed note per encounter); entered in error decided by permission with a header-only answer for a caller without `clinical.read`; FHIR export reads signed notes only; `encounter_already_documented`; staff names to the redactor; stored `inputRefs` passed to the verifier on read and at approval, with `not_in_input` and `inInput` in the contract; generated-output labels without "AI" and `DEMO_PROVIDER_NOTICE`; CR-18 and CR-19 delivered (gate output below).
+
 
 ## Outstanding
 
@@ -35,7 +37,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 3.3 is committed by its own worker; WP 3.2b is listed above. Route table: `docs/architecture/api-phase3.md`.
 - WP 6.3 tunes and times the `full` seed profile (the profile exists and runs, see WP 2.6 notes).
 - Seed NPIs (WP 6.3, `packages/db/seed/people.ts`): the fictitious `9…` NPIs fail the us-core-17 check digit. Since WP 5.4b the FHIR export leaves such an NPI out (staff identifier kept); on main before 5.4b merges, exporting a seeded patient whose plans or observations name such a practitioner answers 500. Generating check-digit-valid `9…` values would let the export carry them.
-- WP 5.4b depends on WP 5.2 only by reading: the DocumentReference mapping uses main's ClinicalNote and ClinicalNoteVersion columns; 5.2's entered-in-error columns do not change the signing model and are not exported. Re-run `scripts/gate-wp-5.4b.sh` after 5.2 merges.
+- WP 5.4b depends on WP 5.2 only by reading. `scripts/gate-wp-5.4b.sh` was re-run on branch `wp/5.6b` after WP 5.2 merged (exit 0, `GATE_SKIP_VERIFY=1`; WP 5.6b's own gate ran `pnpm verify`); since WP 5.6b an entered-in-error note is not exported at all.
 - Phases 4 to 9 per `docs/decisions/advisor-plan.md` as amended by C1.
 - PRD section 9 still differs from the schema; C1 section 3.7 assigns a pass to align it now that M2 has landed.
 - Interim pages from WP 3.2a (Today, Progress, Overview, Patients, Review queue, Administration) are honest empty states; WP 3.2b, 3.3 and a later admin phase replace them.
@@ -1013,3 +1015,40 @@ WP B-CR gate: PASSED
 - CR-6: stop with no rating stores no number and writes no observation; the rating follows as a check-in. CR-9: `priorityLevel` is high at stored priority 70 or more (`HIGH_PRIORITY_MIN`). CR-10: `ruleTotals` on both task lists. CR-11: new table rather than the audit log (audit has no notes, did not record assign, and has no key to the task); events on every task response. CR-12: `POST /patients/search`; `q` removed from `GET /patients`; clinician directory and admin patients keep the term in component state. CR-17: `Idempotency-Key` on book and reschedule, 24 hour window, advisory lock on the key, concurrency tests. Details are in `docs/decisions/contract-requests.md`.
 - Deviations: (1) Idempotency also covers reschedule. (2) The seed now writes assigned and closed events for seeded tasks, and the content checksum leaves out `ReviewTaskEvent.seq`. (3) `GET /patients` ignores an unknown `q` instead of answering 400. (4) Search state is component-local, not the layout-level store of DR-002 I (D-WP-13). (5) Existing tests and the `slice` and empty-queue e2e specs were updated for the new contracts (`ruleTotals`, search by POST). (6) A second concurrent run of the gate was started by mistake and stopped; the passing run is the single one.
 - Not done: `packages/ui` untouched; the review queue UI does not yet show the tag, chips or history (later UI packages).
+
+### WP 5.6b (checkpoint C3 fixes B1 to B8)
+
+Worktree `/home/claude/wt/5.6b`, branch `wp/5.6b`, from `main` at `e5db911` (after WP 5.6a and WP B-CR). `scripts/gate-wp-5.6b.sh` (API 4056, own database, includes `pnpm verify`) exit 0:
+
+```
+==> migrate, migrate:check                       (migration 20261126000000_phase5_c3_fixes)
+==> phase5-c3-fixes + phase5-ai-review db tests  Tests  22 passed (22)
+seed: integrity checks: 79 passed
+content-hash: 230b13e29af6443b636fb230b6f87d5a8c72b80f5131547626fa0602e65d3b38
+seed check: 79/79 integrity checks passed
+==> c3-fixes, ai, fhir, authz API tests          Tests  54 passed (54)
+==> m8-enumeration.test.ts                       Tests  5 passed (5)
+==> shared tests                                 Tests  74 passed (74)
+==> fhir tests                                   Tests  101 passed (101)
+patients exported: 40, bundles failing the three layers: 0
+  DocumentReference 6; unsigned notes in the database: 3; draft version ids found in exports: 0
+openapi: valid OpenAPI 3.1.0, 82 operations, house rules pass
+pnpm verify: packages/ai 114, packages/fhir 101, packages/shared 74, packages/ui 227,
+  packages/db 99, apps/api 271 tests passed; e2e: 57 passed (4.9m); docs/ unchanged by the run
+verify: PASSED
+(clean)
+WP 5.6b gate: PASSED
+```
+
+`GATE_SKIP_VERIFY=1 FHIR_EVAL_OUT=docs/evaluation/fhir-validation.json scripts/gate-wp-5.4b.sh` on the same branch, exit 0: round trip 10 of 10 types equal and stable (DocumentReference records=3), sample export 27 entries 0 errors, broken fixtures 55 of 55 fail with the expected rule (layer 1 flags 13), Synthea files 0 errors and re-import 409 with 42 duplicates, seeded export 40 of 40 pass (9 Encounter, 6 DocumentReference); `fhir-validation.json` unchanged by the run.
+
+- B1 (CR-18): `note.mark_entered_in_error` in the shared vocabulary and the API role matrix, granted to `clinic_admin` by migration. The route admits `note.sign` or `note.mark_entered_in_error`; the handler allows the author or a holder of the permission; no role name is compared in `modules/notes`. Without `clinical.read` the answer is the header with `versions: []`, `currentVersion: null`. Audit: author `treatment`/`author`, permission `operations`/`mark_entered_in_error_permission`.
+- B2: `loadPatientExport` reads notes with `status = signed`; `signedNoteDocuments` returns nothing unless the status is `signed`. The fixture set swaps the exported entered-in-error note for a signed initial evaluation, so 34117-2 is still covered and the counts in `fhir-validation.md` do not change. API test: sign, amend, mark, export, no id of the note or its versions.
+- B3: summaries of entered-in-error, sign, list notes, export, get generation and approve; `openapi.json` regenerated.
+- B4 (CR-19): index `ClinicalNote_one_signed_per_encounter_key`; `POST …/sign` answers 409 `encounter_already_documented` (pre-check under the note lock, and the index violation mapped to the same code); entered in error frees the visit; seed integrity check (content hash unchanged).
+- B5: `patientIdentifiers` adds every care-team member's names (display name and practitioner names), the senders of the messages in the input and, for a note draft, the visit's practitioner. Only an external provider uses them.
+- B6: `packages/db/test/phase5-c3-fixes.test.ts`, 15 tests: each branch of `ClinicalNote_entered_in_error_check` (insert and update), the freeze trigger (field change, new version, current version), the grant, and the index.
+- B7: "Draft, generated, not reviewed", "Generated, reviewed and approved", "Generated, edited and approved", "Started from a generated draft", `AI_GENERATED_NAME` "Generated draft"; `DEMO_PROVIDER_NOTICE` "Rule-based demo output. No AI model was used." in `packages/shared/src/copy.ts`, in the banned-word set and with a test that no generated-output label says AI.
+- B8: `verifyStored` passes the row's `inputRefs` as `allowedRecords` on read and inside the approval transaction; a row without `inputRefs` verifies as before. Contract: `unsupportedReason` gains `not_in_input`; `AiSourceRef.inInput` (boolean, null for older rows and notices).
+- Deviations: (1) `apps/api/src/core/authz/permissions.ts` and `packages/db/seed/integrity.ts` are outside the listed ownership; the role matrix must match the migration (tested) and B4 asks for the seed check. (2) The test fixture `createGenerationAndNote` now stores the record it cites in `inputRefs`; with an empty list its statement would read `not_in_input`. (3) A draft note on a visit that already has a signed note can still be created and edited; only signing is refused. (4) The FHIR record type keeps its `entered_in_error` status value and the mapper still writes `entered-in-error` for such a record, though the export no longer produces one.
+
