@@ -23,6 +23,7 @@ import { denyOutOfScope } from "../../core/scope/patient-scope.js";
 import { findClinic } from "../clinic/repo.js";
 import { requireConversation } from "./access.js";
 import { MESSAGE_DELIVER_QUEUE } from "./delivery.js";
+import { deliverInline } from "./inline.js";
 import {
   conversationFacts,
   findConversation,
@@ -141,14 +142,14 @@ export const messagingRoutes: FastifyPluginAsyncZod = async (app) => {
         request.params.conversationId,
         "write",
       );
-      const message = await withTx(request, async ({ tx }) => {
+      const created = await withTx(request, async ({ tx }) => {
         const createdAt = await nextMessageTime(tx, ctx, conversation.id, now());
         const id = await insertMessage(tx, ctx, {
           conversationId: conversation.id,
           body: request.body.body,
           createdAt,
         });
-        await insertJob(tx, {
+        const jobId = await insertJob(tx, {
           queue: MESSAGE_DELIVER_QUEUE,
           payload: { messageId: id },
           organizationId: ctx.orgId,
@@ -157,8 +158,13 @@ export const messagingRoutes: FastifyPluginAsyncZod = async (app) => {
         });
         const row = await findMessage(tx, ctx, conversation.id, id);
         if (!row) throw new Error("message vanished inside its transaction");
-        return row;
+        return { row, jobId };
       });
+      let message = created.row;
+      if (app.deps.config.jobs.inline) {
+        await deliverInline(app.deps, request.log, created.jobId);
+        message = (await findMessage(db, ctx, conversation.id, message.id)) ?? message;
+      }
       return reply.code(201).send(message);
     },
   );
@@ -209,11 +215,11 @@ export const messagingRoutes: FastifyPluginAsyncZod = async (app) => {
       const existing = await findMessage(db, ctx, conversation.id, messageId);
       if (!existing) return denyOutOfScope(request, "Message", messageId, conversation.patientId);
       if (!existing.mine) throw new AppError("forbidden");
-      return withTx(request, async ({ tx }) => {
+      const requeued = await withTx(request, async ({ tx }) => {
         if (!(await requeueFailed(tx, ctx, conversation.id, messageId))) {
           throw new AppError("invalid_transition");
         }
-        await insertJob(tx, {
+        const jobId = await insertJob(tx, {
           queue: MESSAGE_DELIVER_QUEUE,
           payload: { messageId },
           organizationId: ctx.orgId,
@@ -222,8 +228,11 @@ export const messagingRoutes: FastifyPluginAsyncZod = async (app) => {
         });
         const row = await findMessage(tx, ctx, conversation.id, messageId);
         if (!row) throw new Error("message vanished inside its transaction");
-        return row;
+        return { row, jobId };
       });
+      if (!app.deps.config.jobs.inline) return requeued.row;
+      await deliverInline(app.deps, request.log, requeued.jobId);
+      return (await findMessage(db, ctx, conversation.id, messageId)) ?? requeued.row;
     },
   );
 };

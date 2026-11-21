@@ -108,8 +108,11 @@ export class JobRunner {
     return requeueDead(this.options.db, id, this.now());
   }
 
-  /** One pass: recover stale locks, claim due jobs, run them one by one. */
-  async runOnce(): Promise<RunStats> {
+  /**
+   * One pass: recover stale locks, claim due jobs, run them one by one. With `only.ids` it claims
+   * just those jobs (when due and queued), so a request can run the job it enqueued.
+   */
+  async runOnce(only?: { ids: string[] }): Promise<RunStats> {
     const { db, handlers } = this.options;
     const stats: RunStats = { claimed: 0, succeeded: 0, retried: 0, dead: 0 };
     const at = this.now();
@@ -126,6 +129,7 @@ export class JobRunner {
       workerId: this.workerId,
       now: at,
       limit: this.batchSize,
+      ...(only ? { ids: only.ids } : {}),
     });
     stats.claimed = jobs.length;
 

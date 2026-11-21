@@ -37,6 +37,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - D-WP-5 healthcare components kit (branch `wp/d5`): `packages/ui/src/components/healthcare` with patient identity (banner, list rows), clinical data (pain and weekly sessions charts with equal tables, figure, day strip, missing, partial, failed and stale states), planning (exercise row, dose editor, move buttons, plan diff, version list, plan state line), appointment record, messaging (thread, composer, delivery state, emergency and urgent lines), generated drafts (six-state draft block with the demo notice, provenance line, evidence refs, statement support, decision bar shell) and consent status; `/design-system/healthcare` gallery pages, unit and browser tests, `docs/design/after/d-wp-5/` (gate output below).
 - D-WP-6 shells, navigation and sign-in (branch `wp/d6`): patient header with "Signed in as" and tab row, ui bottom bar below 768; clinician sidebar from 768 and labelled bottom bar below, DR-002 H order, Review queue and Messages badges from API totals; admin shell without navigation; one skip link per page; `BackLink`; demo notice inside each route group; sign-in with the form primary and the demo chooser secondary; staff search store in memory; `docs/design/after/d-wp-6/` (gate output below).
 - D-WP-4 Storybook (branch `wp/d4`): Storybook 10.6.8 for `packages/ui` (`.storybook/`: patient and clinician theme switch through `data-theme`, self-hosted fonts and `tokens.css`, a11y addon, 375 and 1440 viewports), 96 stories with states on synthetic content (primitives, composed, healthcare kit; reuses the gallery's fixtures), `pnpm --filter @carepath/ui storybook:build` to the gitignored `packages/ui/.storybook-static`, a Playwright spec that runs axe on every story in both themes at 375 and 1440 (`apps/web/storybook-e2e/`, `pnpm --filter @carepath/web e2e:storybook`), and a unit test that the story count equals the exported component count less a reasoned exclusion list. The `/design-system` gallery stays until D-WP-19.
+- WP Deploy (branch `wp/deploy`): configuration for two Vercel projects and a Neon database, documented step by step in `docs/deployment.md`. `apps/api/server.mjs` is the Fastify entry Vercel detects; `pnpm run vercel-build` compiles the runtime TypeScript beside itself; `apps/api/vercel.json` and `apps/web/vercel.json` set install and build commands, the function's `includeFiles` for the Medplum R4 files, a 60 s `maxDuration` and a daily cron. New API behaviour: `GET /internal/cron/jobs` (Bearer `CRON_SECRET`, enqueue recurring jobs then run due jobs for `CRON_BUDGET_MS`), and `JOBS_INLINE=1` delivery of the message a send or retry enqueued, claimed by job id. The production API build can migrate (`CAREPATH_DEPLOY_MIGRATE=1`, fails the build on error) and seed an empty database (`CAREPATH_DEPLOY_SEED=1`, small profile, `--anchor now`, never over existing organizations unless `CAREPATH_DEPLOY_RESEED=1`); preview builds skip it. `scripts/vercel-check.sh` traces and runs the function as Vercel's Node runtime loads it and builds the web app with an https `API_ORIGIN`. Nothing has been deployed (gate output below).
 
 ## Outstanding
 
@@ -51,6 +52,9 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - `docs/evaluation/ai-eval.md` numbers are not yet in `docs/evaluation/metrics.json` (WP 8.1 owns that file); `ai-eval.json` beside the report is the raw output of the recorded run.
 
 ## Blockers
+
+- No deployment has been made: creating the Vercel projects and the Neon database needs the owner's accounts (`docs/deployment.md`). The configuration is checked only locally by `scripts/vercel-check.sh`.
+- This sandbox cannot reach Neon (`*.neon.tech` does not resolve and the egress proxy answers 403 to a CONNECT on port 5432), so migrations and the seed have not been run against Neon. The production API build runs them on Vercel (`docs/deployment.md`, step 3); that path is checked only against a local database.
 
 - No Docker daemon: `docker-compose.yml` is unverified.
 - `.github/workflows/ci.yml` has never run (no GitHub remote in this workspace).
@@ -1490,3 +1494,101 @@ D-WP-10 gate: PASSED
 
 Earlier runs failed and were fixed, not retried blindly: `patient.spec` strict-mode match of "Exercise 3 of 4" against the paused sentence (the sentence now names the exercise); the `patient.spec` keyboard test waiting on "Your therapist will see this." (now also beside Send) and racing the result (now waits for "Check-in sent"); the `/check-in` send bar under the tab bar (visual pass 2); and, in the first full `pnpm verify`, `clinician-screens.spec` at 1440 missing the plan event in Dana Demopatient's timeline because this spec's sessions ran on her (they now run on `patient.flare`). One run was cut by the server restart and was run again from the start; the dead lease it left was pruned by the next acquire.
 
+### WP Deploy (Vercel and Neon configuration)
+
+Scope: `apps/api/src/jobs/cron.ts`, `apps/api/src/modules/messaging/inline.ts`, `apps/api/src/vercel.ts`, `apps/api/server.mjs`, `apps/api/scripts/vercel-build.mjs`, `apps/api/vercel.json`, `apps/web/vercel.json`, small edits to `apps/api/src/{app.ts,config.ts}`, `core/jobs/{repo.ts,runner.ts}` (claim by id), `modules/messaging/routes.ts`, `apps/api/openapi.json` (94 operations, adds `runCronJobs`), `apps/api/test/core/serverless.test.ts`, `packages/db/scripts/organization-count.ts`, `scripts/vercel-{check.sh,harness.mjs,trace.mjs}`, `.env.example`, `docs/deployment.md`. No dependency added: the tracer is the copy of `@vercel/nft` compiled into Next.js, and the compile step uses `typescript`, already an API dev dependency.
+
+Command: `scripts/vercel-check.sh` at 722bdd5 (exit 0). Output, deprecation warnings from `pg` removed:
+
+```
+==> gate environment (fresh, empty database)
+db: lease 634 acquired (database carepath_vercel_634)
+database: carepath_vercel_634
+==> copy checkout to /tmp/carepath-vercel.Y7vaOW/repo
+==> install (apps/api/vercel.json installCommand, offline)
+Done in 4.2s using pnpm v10.28.0
+==> build 1 (empty database): expect migrate and seed
+vercel-build: migrating 127.0.0.1
+vercel-build: 127.0.0.1 has no organizations: loading the small seed
+seed: profile=small seed=carepath-seed-1 anchor=2026-11-21T17:00:00.000Z
+total rows: 6559
+content-hash: ffbbc8772a99f0bbcfc6b61775939a141907137025f53185f3615d3c6de04275
+vercel-build: compiled 259 files; retargeted 4 package manifests
+organizations after build 1: 2
+==> preview build: expect the database step to be skipped
+vercel-build: database step skipped: only production builds on Vercel run it (VERCEL_ENV=preview)
+vercel-build: compiled 259 files; retargeted 4 package manifests
+==> trace the function files
+vercel-trace: 1096 files, 46.6 MiB, 0 warnings
+==> run the traced function as Vercel loads it (NODE_ENV=production)
+harness: entry loaded and server captured in 474 ms
+ok   GET /health: {"status":"ok","checks":{"database":"ok"}}
+ok   POST /auth/login with the web origin: Set-Cookie is __Host-, Secure, HttpOnly, SameSite=Lax, Path=/, host-only
+ok   POST /auth/login from another origin is refused
+ok   GET /auth/session with the cookie: role patient
+ok   GET /patients/:id/today (Prisma query compiler, scoped repositories)
+ok   GET /patients/:id/fhir/export (Medplum R4 definitions on disk): 36 entries
+ok   POST /conversations/:id/messages is delivered inline (JOBS_INLINE=1): status sent in the response
+ok   POST /auth/logout with CSRF token
+ok   GET /internal/cron/jobs without the secret is refused
+ok   GET /internal/cron/jobs with Authorization: Bearer CRON_SECRET: {"enqueued":6,"claimed":6,"succeeded":6,"retried":0,"dead":0,"complete":true}
+harness: all checks passed
+==> build 2 (database has tenant data): expect migrate only, no reseed
+vercel-build: migrating 127.0.0.1
+vercel-build: seed skipped: 127.0.0.1 already has 2 organizations (set CAREPATH_DEPLOY_RESEED=1 for one deploy to replace them)
+vercel-build: compiled 259 files; retargeted 4 package manifests
+harness message still present after build 2: the database was not reseeded
+==> build 3 with CAREPATH_DEPLOY_RESEED=1: expect a reseed
+vercel-build: migrating 127.0.0.1
+vercel-build: CAREPATH_DEPLOY_RESEED=1: replacing the tenant data on 127.0.0.1 with the small seed
+seed: profile=small seed=carepath-seed-1 anchor=2026-11-21T17:00:00.000Z
+total rows: 6559
+content-hash: ffbbc8772a99f0bbcfc6b61775939a141907137025f53185f3615d3c6de04275
+vercel-build: compiled 259 files; retargeted 4 package manifests
+harness message gone after build 3: the forced reseed replaced the data
+==> a failing migration fails the build
+vercel-build: FAILED: migration failed on 127.0.0.1 (exit 1); the build stops here
+==> copy checkout to /tmp/carepath-vercel.NGPfen/repo
+==> install (apps/web/vercel.json installCommand, offline)
+Done in 2.5s using pnpm v10.28.0
+==> build (apps/web/vercel.json buildCommand) with API_ORIGIN=https://carepath-api.example.vercel.app
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+rewrite /api/:path* -> https://carepath-api.example.vercel.app/:path*
+
+vercel-check: PASSED (all)
+db: lease 634 released
+```
+
+Command: `pnpm verify` at 722bdd5 (exit 0). Stage lines and counts:
+
+```
+==> gate environment
+==> migrate
+==> seed (small profile)
+==> typecheck
+==> lint
+==> unit + API tests
+packages/ai test:  Test Files  9 passed (9)
+packages/ai test:       Tests  114 passed (114)
+packages/fhir test:  Test Files  4 passed (4)
+packages/fhir test:       Tests  101 passed (101)
+packages/shared test:  Test Files  3 passed (3)
+packages/shared test:       Tests  87 passed (87)
+packages/ui test:  Test Files  6 passed (6)
+packages/ui test:       Tests  325 passed (325)
+packages/db test:  Test Files  11 passed (11)
+packages/db test:       Tests  101 passed (101)
+apps/api test:  Test Files  34 passed (34)
+apps/api test:       Tests  346 passed (346)
+==> build
+==> end-to-end (API + next start + Playwright + axe)
+  25 skipped
+  123 passed (8.4m)
+==> docs/ unchanged by the run
+verify: PASSED
+```
+
+The 25 skipped end-to-end tests are skipped by conditions in the existing specs (for example the failed-delivery spec, which needs `MESSAGE_FORCE_FAILURE=true`); this package adds, changes and skips no end-to-end test.

@@ -45,9 +45,38 @@ export async function insertJob(db: DbClient, input: EnqueueInput): Promise<stri
  */
 export async function claimJobs(
   db: Db,
-  input: { queues: string[]; workerId: string; now: Date; limit: number },
+  input: {
+    queues: string[];
+    workerId: string;
+    now: Date;
+    limit: number;
+    /** Claim only these job ids (inline delivery runs the job its own request enqueued). */
+    ids?: string[];
+  },
 ): Promise<ClaimedJob[]> {
   if (input.queues.length === 0) return [];
+  if (input.ids) {
+    if (input.ids.length === 0) return [];
+    return db.$queryRaw<ClaimedJob[]>`
+    UPDATE "Job" AS j
+    SET status = 'running',
+        "lockedAt" = ${input.now}::timestamptz,
+        "lockedBy" = ${input.workerId},
+        attempts = j.attempts + 1,
+        "updatedAt" = ${input.now}::timestamptz
+    WHERE j.id IN (
+      SELECT id FROM "Job"
+      WHERE status = 'queued'
+        AND "runAt" <= ${input.now}::timestamptz
+        AND queue = ANY(${input.queues}::text[])
+        AND attempts < "maxAttempts"
+        AND id = ANY(${input.ids}::uuid[])
+      ORDER BY "runAt", "createdAt"
+      LIMIT ${input.limit}::int
+      FOR UPDATE SKIP LOCKED
+    )
+    RETURNING j.id, j.queue, j.payload, j.attempts, j."maxAttempts", j."organizationId"`;
+  }
   return db.$queryRaw<ClaimedJob[]>`
     UPDATE "Job" AS j
     SET status = 'running',

@@ -30,6 +30,14 @@ const envSchema = z.object({
   // Test hook, ignored in production: "fail" makes every attempt return invalid output;
   // "unsupported" adds one statement with no source to each deterministic draft.
   AI_PROBE: z.enum(["none", "fail", "unsupported"]).default("none"),
+  // Serverless deployment (docs/deployment.md). Bearer secret for GET /internal/cron/jobs; the
+  // route refuses every call while it is unset. Vercel Cron sends it as `Authorization: Bearer`.
+  CRON_SECRET: z.string().optional(),
+  // Time budget for one cron pass, in milliseconds. Kept well under the function's max duration.
+  CRON_BUDGET_MS: z.coerce.number().int().positive().default(45_000),
+  // "1": a sent or retried message is delivered in the same request, so it does not wait in
+  // queued for the next cron pass when no worker loop runs (Vercel Hobby runs cron once a day).
+  JOBS_INLINE: z.enum(["0", "1"]).default("0"),
 });
 
 export interface AppConfig {
@@ -65,6 +73,14 @@ export interface AppConfig {
     routesPerMinute: number;
     probe: "none" | "fail" | "unsupported";
   };
+  jobs: {
+    /** Deliver message jobs inside the send and retry requests (JOBS_INLINE=1). */
+    inline: boolean;
+    /** Bearer secret for the cron route, or null when cron is not configured. Never logged. */
+    cronSecret: string | null;
+    /** Wall-clock budget for one cron pass. */
+    cronBudgetMs: number;
+  };
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -72,6 +88,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const production = parsed.NODE_ENV === "production";
   if (production && parsed.SESSION_SECRET === "change-me-dev-only") {
     throw new Error("SESSION_SECRET must be set in production");
+  }
+  if (production && parsed.CRON_SECRET !== undefined && parsed.CRON_SECRET.length < 16) {
+    throw new Error("CRON_SECRET must be at least 16 characters in production");
   }
   const secure = parsed.COOKIE_SECURE ? parsed.COOKIE_SECURE === "true" : production;
   return {
@@ -103,6 +122,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       generationsPerMinute: parsed.AI_GENERATIONS_PER_MINUTE,
       routesPerMinute: parsed.AI_ROUTES_PER_MINUTE,
       probe: production ? "none" : parsed.AI_PROBE,
+    },
+    jobs: {
+      inline: parsed.JOBS_INLINE === "1",
+      cronSecret: parsed.CRON_SECRET ? parsed.CRON_SECRET : null,
+      cronBudgetMs: parsed.CRON_BUDGET_MS,
     },
     logLevel: parsed.LOG_LEVEL ?? (parsed.NODE_ENV === "test" ? "silent" : "info"),
   };

@@ -43,6 +43,7 @@ import { progressRoutes } from "./modules/progress/routes.js";
 import { sessionRoutes } from "./modules/sessions/routes.js";
 import { sessionWriteRoutes } from "./modules/sessions/write-routes.js";
 import { todayRoutes } from "./modules/today/routes.js";
+import { cronRoutes, type CronRouteOptions } from "./jobs/cron.js";
 
 export interface BuildAppOptions {
   config?: Partial<AppConfig>;
@@ -55,6 +56,8 @@ export interface BuildAppOptions {
   extraRoutes?: (app: FastifyInstance) => void | Promise<void>;
   /** WP 5.2: AI provider override for tests; otherwise chosen from configuration. */
   aiProvider?: LLMProvider;
+  /** Serverless cron route overrides for tests (handlers and enqueue step). */
+  cron?: CronRouteOptions;
 }
 
 /**
@@ -133,6 +136,7 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   await app.register(aiRoutes, { provider: options.aiProvider }); // WP 5.2
   await app.register(noteRoutes); // WP 5.2
   await app.register(adminRoutes); // WP 6.1
+  await app.register(cronRoutes, options.cron ?? {}); // Vercel deployment
   if (options.extraRoutes) await options.extraRoutes(app);
 
   await app.ready();
