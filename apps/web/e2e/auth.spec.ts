@@ -199,6 +199,10 @@ test("signing out after the session already ended still lands on sign-in", async
 }) => {
   await signInWithForm(page, accounts.patient.email);
   await expect(page).toHaveURL(/\/today$/);
+  // Sign-in ends in a full page load: let Today finish its first requests before the session goes,
+  // or one of them meets the 401 first and sends the page to "Sign in to continue".
+  await expect(page.getByRole("heading", { level: 1, name: "Today" })).toBeVisible();
+  await page.waitForLoadState("networkidle");
   await context.clearCookies();
   // The shell is already on screen but the session is gone; sign-out treats that as done.
   await page.getByRole("button", { name: "Sign out" }).click();
