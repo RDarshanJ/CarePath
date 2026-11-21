@@ -33,6 +33,7 @@ Date: 2026-11-20. Synthetic data only; not for clinical use.
 - WP 6.3 (branch `wp/6.3`): seed NPIs carry a check digit that passes `isValidNpi` (Luhn, prefix 80840, leading 9 kept); the FHIR export check asserts every seeded NPI passes `isValidNpi`. The full profile already met the brief targets and was measured, not changed: 1,000 patients, 30 clinicians, 5 clinics, 2,000 appointments, 10,000 activity records, 51 encounters, 250 exercise rows (50 entries per clinic). Full wall time about 6.6 to 6.9 s per seed; all 1,000 exports pass the three layers. Record: `docs/evaluation/seed-full.md`. Small content hash `40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee`; full `eb3c2ae0fe9245a86d70fbf19357cd42d6717738c3e43742a3400986e4366c54`. Gate `scripts/gate-wp-6.3.sh` (branch tip 13e3b57): exit 0.
 - D-WP-2 primitives, feedback, overlays and accessibility infrastructure (branch `wp/d2`): primitive and composed layers in `packages/ui` with `lib/` helpers, the duplicates of `component-usage-matrix.md` removed from `apps/web` (except two files owned by WP B-CR at the time), the `/design-system` gallery with a per-specimen axe and keyboard spec, gallery captures at six widths, reduced motion and 200 percent zoom, and `docs/design/after/d-wp-2/` (gate output below).
 - D-WP-5 healthcare components kit (branch `wp/d5`): `packages/ui/src/components/healthcare` with patient identity (banner, list rows), clinical data (pain and weekly sessions charts with equal tables, figure, day strip, missing, partial, failed and stale states), planning (exercise row, dose editor, move buttons, plan diff, version list, plan state line), appointment record, messaging (thread, composer, delivery state, emergency and urgent lines), generated drafts (six-state draft block with the demo notice, provenance line, evidence refs, statement support, decision bar shell) and consent status; `/design-system/healthcare` gallery pages, unit and browser tests, `docs/design/after/d-wp-5/` (gate output below).
+- D-WP-6 shells, navigation and sign-in (branch `wp/d6`): patient header with "Signed in as" and tab row, ui bottom bar below 768; clinician sidebar from 768 and labelled bottom bar below, DR-002 H order, Review queue and Messages badges from API totals; admin shell without navigation; one skip link per page; `BackLink`; demo notice inside each route group; sign-in with the form primary and the demo chooser secondary; staff search store in memory; `docs/design/after/d-wp-6/` (gate output below).
 
 ## Outstanding
 
@@ -1214,3 +1215,62 @@ Deviations and open points:
 - Unsupported statements read "No supporting record found" and the blocker sentence "1 statement has no supporting record"; the shared `unsupportedStatementsText` ("has no source") is not used, so the two wordings on one screen agree. A request to align the shared helper can go to D-WP-U.
 - Storybook is not set up in this branch (D-WP-4); the gallery pages are the catalogue for the kit until stories exist.
 - Not built here (no row item): review-queue task components, note editor, evidence panel drawer content, missing-information list actions (WP 5.3 and D-WP-13 compose them from these parts).
+
+### D-WP-6 (shells, navigation and sign-in)
+
+Worktree `/home/claude/wt/d6`, branch `wp/d6`, from `main` at `b5441b5` (after D-WP-2). API 4106, web 3106.
+
+- Patient shell (CD-500, CD-205, CD-505): header with the brand, "Signed in as {name}" beside Sign out (a quiet button), and Contact care team at the top right on every screen; tab row from 768 px; the ui `BottomTabBar` below 768 px, sticky in the page flow (never fixed), 64 px, badge read after the label ("Messages, 1 unread"), "Appointments" breaks after "Appoint" at 375 instead of clipping under its neighbour. The hand-built `BottomNav` and `HeaderNav` are removed. The guided session hides navigation and identity and shows the back link "Back to Today". Footer "Sharing and consent" link at the 48 px target.
+- Clinician shell (CD-501 as amended by DR-002 H, CD-506, CD-508): one `banner` that is the 240 px sidebar from 768 px (brand, organisation, "Clinician" navigation, identity with avatar and wrapping name, Sign out) and a short top bar below 768 px, with a labelled bottom bar. Order Overview, Schedule, Patients, Review queue, Messages. Review queue badge is `total` of `GET /review-tasks?status=active&limit=1` (the queue's default view, under the `["clinician", ...]` key so queue actions refresh it); Messages badge is `unreadTotal`. No badge until the number is known.
+- Admin shell (CD-502): no navigation element for one destination; a banner with brand, "Administration", organisation, avatar, name, role and Sign out.
+- Landmarks and skip link (CD-507): one `SkipLink` per page, the first Tab stop: patient group layout (so onboarding has it), staff shell, admin layout, sign-in page. One banner, one main, at most one shell navigation per page.
+- Back links (CD-505): `apps/web/components/back-link.tsx`, named for the destination, chevron-left, with `restoreState` for lists (goes back in history when the previous in-app path was the parent; the previous path is kept in memory, pathname only). The session uses plain navigation so Today shows the finished session.
+- Demo notice: rendered inside each route group in that group's theme (patient, clinician, admin, public) instead of once above the theme scope in the root layout, on `surface-sunken`.
+- Sign-in: the form is a white panel with the page's only filled button; the demo chooser is a level-2 section after it with one compact list (no emails), each button still the real login call; below 1024 px a link at the top, "Exploring the demo? Choose a role", jumps to it; "Create your account" links to onboarding. `(public)/page.tsx` keeps its redirect (landing art is cut, C3 section 5).
+- Staff search store (DR-002 I): `(clinician)/_components/staff-search.tsx`, a memory-only `useStaffSearch(scope)` in the clinician shell and the admin layout, cleared on sign-out; no browser storage. The directory and the admin list still hold their term in component state; D-WP-13 and WP 6.2 switch to the store.
+- Overflow: the three shell-related overflow failures of `audit.md` section 4 are gone at 375, 390 and 768 (admin 401, 386, 248 px; clinician schedule 260, 245, 107 px; record appointments 253, 238, 100 px; now 0 on all 278 images). The schedule and appointments tables still scroll inside their own box at phone widths (D-WP-14, D-WP-15). The clinician page title now starts at about 165 px at 390 (was below a 280 px rail).
+- Tests: new `e2e/shells.spec.ts` (both projects): skip link first and moving focus to main on sign-in, onboarding, Today, Overview and admin; landmarks; shell targets at the theme floor; Signed in as; patient badge equals the API unread total; aria-current on a nested route; session without navigation and the back link; patient keyboard pass with focus never under the bottom bar; clinician DR-002 H order, both badges equal the API totals, the queue states the same total, the page title within 200 px at 390; clinician keyboard pass to Schedule; admin without a shell navigation landmark.
+- Captures: `docs/design/after/d-wp-6/` (278 images, `_probe.json`, `pairs.md`). Probe: no warm background, overflow 0 of 278, no axe serious or critical at 375, 768, 1440. Two visual passes are recorded in `pairs.md`; pass 2 was my own review of the fresh set against `audit.md`, not the advisor's (that is D2).
+
+Changes outside the row's paths (each small and noted):
+- `packages/ui` (tiny, additive, D-WP-5 owns only `components/healthcare/**`): `nav.tsx` badge read after the label and `NavItem.label` widened to `ReactNode` (for `<wbr />`); `table.tsx` scroll wrapper `relative`, so its visually hidden header text cannot widen the document (this was the admin overflow); `styles/components.css` sticky layout token `staff-bar` (scroll padding for the staff bottom bar below 768).
+- `apps/web/app/layout.tsx` and `(public)/layout.tsx`: the demo notice moved into the groups. `(patient)/(app)/layout.tsx`, `(session)/layout.tsx`: pass the display name. `apps/web/components/shells.tsx` removed (its successor is `(clinician)/_components/staff-shell.tsx`); `sign-out-button.tsx` takes a variant and an `onSignedOut`; `lib/api/client.ts` `markSigningOut`, because a badge poll answering 401 during sign-out sent the browser to "Sign in to continue" instead of "You are signed out".
+- e2e (rule 5): `auth.spec.ts` order per DR-002 H, badge text after the label, admin without navigation per CD-502; `patient.spec.ts` and `slice.spec.ts` click the page's own "Back to Today" inside `main` (the CD-505 header link has the same name); `slice.spec.ts` follows "Create your account" (renamed sign-in link). `fixtures.ts`, `patient-helpers.ts` and `apps/web/scripts/design-capture.mjs` run axe with sticky bottom bars in the page flow: axe's target-size rule counted chips under the tab bar as obscured depending on the scroll position the previous page left (the reschedule step failed or passed by a few pixels; measured: 4 nodes at scroll 0 and 40, none at 10 and 60). Focus under the bar is covered by the keyboard passes.
+
+Deviations and open points:
+- CD-501's own order (Overview, Patients, Review queue, Schedule, Messages) is superseded by DR-002 H, as the task states.
+- The patient header row order: below 768 the DOM order is brand, Contact care team, identity and Sign out; from 768 identity is placed visually before Contact care team (CSS order), so keyboard order there is Contact care team, then Sign out.
+- 127 captured images still list a page-content target under the theme floor (mainly 13 px links in clinician tables); those belong to the screen slices. The probe also counts the visually hidden skip link and Radix's 1 px native select.
+- The admin search term is not cleared by an explicit call on sign-out (the admin sign-out sits outside the store); the hard navigation after sign-out drops it with the page's memory.
+- Not done here: Patients-page `/` shortcut and the directory's use of the store (D-WP-13); record and builder back links (D-WP-15, D-WP-16).
+
+Gate: `scripts/gate-wp-d6.sh` exit 0 on `wp/d6` rebased onto `main` at `d6eccbf` (after D-WP-5, WP 6.1 and WP 6.3; includes `pnpm verify`). Tail:
+
+```
+==> pnpm --filter @carepath/ui exec vitest run --reporter=dot
+      Tests  314 passed (314)
+==> structure
+ok: no hand-built patient nav, no old shells file, DR-002 H order, one SkipLink per shell, demo notice in the groups, no browser storage
+==> end-to-end (shells, auth, patient-scheduling, clinician-scenario-d), API 4106, web 3106
+  45 passed (2.2m)
+design-capture: 278 images in /home/claude/wt/d6/.data/capture-d-wp-6
+  warm backgrounds (not a status or chart token): 0 images
+  horizontal overflow: 0 images
+  axe serious or critical (at 375, 768, 1440): 0 images
+probe: 278 images
+  overflow on screens owned elsewhere (reported): 0
+  shell overflow and owned-screen targets: none
+==> pnpm verify
+integrity checks: 79 passed
+content-hash: 40b299619465b947cc075a59fbdb41cb164d29935f48bbe9a819ce6de5a582ee
+packages/fhir 101, packages/ai 114, packages/shared 87, packages/ui 314, packages/db 101, apps/api 339 tests passed
+  25 skipped
+  121 passed (7.6m)
+==> docs/ unchanged by the run
+verify: PASSED
+==> git status --porcelain
+(clean)
+D-WP-6 gate: PASSED
+```
+
+Earlier runs of the same gate on this branch failed and were fixed, not retried blindly: the reschedule axe target-size finding under the tab bar (see the axe note above), a sign-out overtaken by a polling 401, the "Back to Today" name shared by the header link and the page button, "Appointments" clipped at 375, and the Contact care team button pushing the page sideways at 200 percent text. One run before the rebase failed once on `auth.spec` with axe `document-title` on `/admin/patients` straight after sign-in (the title is set by the page's metadata; the next two runs passed); recorded here as a possible flake, not changed.
