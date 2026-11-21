@@ -24,6 +24,7 @@ import { addDays, daysBetween, localDate, startOfLocalDay } from "../../core/tim
 import { findClinic } from "../clinic/repo.js";
 import {
   findPractitionerRef,
+  listAgendaOpenTimes,
   listDayAppointments,
   listOpenSlots,
   listPatientAppointments,
@@ -134,7 +135,7 @@ export const schedulingRoutes: FastifyPluginAsyncZod = async (app) => {
         operationId: "listDayAppointments",
         tags: ["scheduling"],
         summary:
-          "One practitioner's appointments on one clinic-zone day, every status, by start time (CR-1).",
+          "One practitioner's appointments on one clinic-zone day, every status, by start time (CR-1), with that day's open times, earlier ones included (CR-14).",
         querystring: appointmentDayQuerySchema,
         response: { 200: appointmentListSchema, ...errorResponses(400, 401, 403, 429) },
       },
@@ -155,12 +156,15 @@ export const schedulingRoutes: FastifyPluginAsyncZod = async (app) => {
       }
       const clinic = await findClinic(db, ctx);
       const tz = clinic.timezone;
-      const items = await listDayAppointments(db, ctx, practitionerId, {
-        from: startOfLocalDay(date, tz),
-        to: startOfLocalDay(addDays(date, 1), tz),
-        timezone: tz,
+      const from = startOfLocalDay(date, tz);
+      const to = startOfLocalDay(addDays(date, 1), tz);
+      const items = await listDayAppointments(db, ctx, practitionerId, { from, to, timezone: tz });
+      const openTimes = await listAgendaOpenTimes(db, ctx, practitionerId, {
+        from,
+        to,
+        now: now(),
       });
-      return { date, timezone: tz, practitioner, items };
+      return { date, timezone: tz, practitioner, items, openTimes };
     },
   );
 };

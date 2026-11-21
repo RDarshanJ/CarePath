@@ -128,6 +128,19 @@ export const appointmentDayQuerySchema = z.object({
 });
 export type AppointmentDayQuery = z.input<typeof appointmentDayQuerySchema>;
 
+/** An open time on the agenda day. Unlike the patient slot list it includes times already past. */
+export const agendaOpenTimeSchema = z
+  .object({
+    id: z.uuid(),
+    startsAt: instantSchema,
+    endsAt: instantSchema,
+    appointmentTypes: z.array(appointmentTypeSchema),
+    /** True when the time started before the API's clock (earlier today); it can no longer be booked. */
+    past: z.boolean(),
+  })
+  .meta({ id: "AgendaOpenTime" });
+export type AgendaOpenTime = z.infer<typeof agendaOpenTimeSchema>;
+
 export const appointmentListSchema = z
   .object({
     date: localDateSchema,
@@ -135,6 +148,8 @@ export const appointmentListSchema = z
     practitioner: personRefSchema,
     /** Every appointment starting that day, cancelled ones included, by start time. */
     items: z.array(appointmentSchema),
+    /** CR-14: the practitioner's open times starting that day, earlier ones included, by start time. */
+    openTimes: z.array(agendaOpenTimeSchema),
   })
   .meta({ id: "AppointmentList" });
 export type AppointmentList = z.infer<typeof appointmentListSchema>;

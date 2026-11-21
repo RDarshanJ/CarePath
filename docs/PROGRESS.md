@@ -1102,3 +1102,32 @@ Deviations and open points:
 - Not migrated, because WP B-CR owned the files during D-WP-2: `(clinician)/patients/directory.tsx` (local `FilterField`, pagination block; uses `AppLink`, kept as an alias of the ui `Link` in `common.tsx` until D-WP-13) and `(admin)/admin/patients/**` (pagination block, `assign-dialog.tsx` inline error). `TablePagination` and `FilterBar` are built and tested in the gallery; D-WP-13 and WP 6.2 adopt them.
 - Left for their slices (not duplicates in the row's list): `BottomNav` and `HeaderNav` in `patient-frame.tsx` (D-WP-6), the session player's local `use-timers` (D-WP-10 can use `useCountdown` and `Timer`), queue "Show" select to `SegmentedControl` (D-WP-13), wiring `useLeaveGuard` into the builder (D-WP-16), `ErrorSummary` titles per CD-441 in onboarding (kept "n things to fix"; D-WP-8), row-level error placement for overview and record check-ins (region banner now).
 - Storage: nothing added to `localStorage` or `sessionStorage`; the leave guard and drafts stay in memory (R1).
+
+### WP 6.1 (admin API: CR-13, CR-14, CR-15, eligibility codes)
+
+Branch `wp/6.1`. Delivered CR-13 (`GET /metrics`, `GET /metrics/rows`), CR-14 (availability reads and writes, agenda `openTimes`) and CR-15 (`GET /audit-events`), plus eligibility codes (`GET`/`POST /enrollment-codes`, `POST /enrollment-codes/:codeId/revoke`). Review-rule settings already existed (`GET /review-rules`, `PUT /review-rules/:ruleId`), so none were added. No permission keys were added.
+
+- Metrics: six metrics, each with numerator, denominator, window, computedAt, previous window (null with a reason for the two snapshot metrics), printed definition and drill-down lists whose row count equals the number; tested for every metric and checked against independent SQL on the seeded database (small seed 2 organizations, full seed 5 organizations, 0 differences). Care plan activation uses status `active` as the denominator (S3).
+- Availability: add times for a therapist and day, block, unblock, remove an open time (409 `slot_booked` when booked), all audited in the same transaction and under the same row lock as booking. The agenda returns open times including earlier today.
+- Audit: filters actor, action, resource, patient, date range and outcome, keyset cursor, admin only, and the query is itself audited as `audit.query`.
+- Eligibility codes: the raw code is returned once on creation only; stored as a hash with a last-four label; revoked codes cannot be redeemed. Migration `20261127000000_wp61_admin_api` adds `EnrollmentCode.revokedAt` and a CHECK. The seed content hash changed because the row now carries `revokedAt` (now 07f619e21fd257ea7e8bf0304ea8794eebcb8ff8e8057ffd7aa6ad9bc31305f0; was 230b13e2...).
+- Deviations: (1) utilisation counts in_progress visits as used; (2) cancellations follow the PRD literally and moved visits are disclosed separately; (3) a slot that ever held a visit is blocked, not deleted (`blocked_instead`), because of the foreign key; (4) drill-down is `GET /metrics/rows?metric=&list=` so M8 needs no extra path id; (5) added a read `GET /practitioners/:id/availability` and an unblock endpoint; (6) adding a time in the past answers 400 `past_time`; (7) the scheduling module, `core/time.ts` and the db seed were touched outside `modules/admin`; (8) review bands use whole hours: under 24, 24 to 47, 48 or more. Organization settings (name, phone, reply time) still have no endpoint; `settings.manage` remains unused.
+
+`scripts/gate-wp-6.1.sh`, exit 0 (tail):
+
+```
+
+  25 skipped
+  57 passed (4.9m)
+
+==> docs/ unchanged by the run
+
+verify: PASSED
+db: lease 10502 released
+
+==> git status --porcelain
+(clean)
+
+WP 6.1 gate: PASSED
+db: lease 9377 released
+```

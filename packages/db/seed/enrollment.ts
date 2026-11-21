@@ -39,6 +39,7 @@ export function buildEnrollmentCodes(ctx: Ctx): void {
         expiresAt: iso(expiresMs),
         redeemedAt: patient ? iso(patient.createdAtMs) : null,
         redeemedByPatientId: patient ? patient.id : null,
+        revokedAt: null,
         createdAt: iso(createdMs),
       });
     for (const code of codes.unused) row(code, ctx.anchorMs + 90 * D, issuedMs, null);

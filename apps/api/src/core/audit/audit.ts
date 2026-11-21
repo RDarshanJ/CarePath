@@ -1,4 +1,5 @@
 import type { FastifyRequest } from "fastify";
+import { auditEventNames, type AuditEventName } from "@carepath/shared/contracts";
 import type { RoleKey } from "../authz/permissions.js";
 import type { Db, DbClient } from "../db/repo.js";
 import { insertAuditEvent } from "./repo.js";
@@ -9,35 +10,7 @@ import { insertAuditEvent } from "./repo.js";
  * other patient content (AC-I7): `metadata` accepts only short scalar values, and callers pass
  * route templates, not raw URLs.
  */
-export const auditEventNames = [
-  "auth.login",
-  "auth.login_failed",
-  "auth.logout",
-  "account.create",
-  "consent.grant",
-  "consent.revoke",
-  "phi.read",
-  "careplan.publish",
-  "note.sign",
-  // WP 5.2, not in PRD section 13: a working version of a draft note, and a signed note
-  // marked entered in error (CR-8).
-  "note.version",
-  "note.entered_in_error",
-  "ai.generate",
-  "ai.refused",
-  "ai.review",
-  "review_task.resolve",
-  "review_rule.update",
-  "appointment.book",
-  "appointment.cancel",
-  "assignment.create",
-  "availability.update",
-  "settings.update",
-  "export.fhir",
-  "import.fhir",
-  "security.access_denied",
-] as const;
-export type AuditEventName = (typeof auditEventNames)[number];
+export { auditEventNames, type AuditEventName };
 
 type Scalar = string | number | boolean;
 

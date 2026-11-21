@@ -1,6 +1,7 @@
 import type { Prisma } from "@carepath/db/client";
 import { initialStatus } from "@carepath/db";
 import type {
+  AgendaOpenTime,
   Appointment,
   AppointmentStatus,
   AppointmentType,
@@ -75,6 +76,35 @@ export async function listOpenSlots(
     startsAt: r.startsAt.toISOString(),
     endsAt: r.endsAt.toISOString(),
     appointmentTypes: r.appointmentTypes,
+  }));
+}
+
+/**
+ * CR-14: a practitioner's open times starting in [from, to), earlier ones included, by start time.
+ * Unlike listOpenSlots it does not drop times that have started; `past` says which have.
+ */
+export async function listAgendaOpenTimes(
+  db: DbClient,
+  ctx: Scope,
+  practitionerId: string,
+  window: { from: Date; to: Date; now: Date },
+): Promise<AgendaOpenTime[]> {
+  const rows = await db.availabilitySlot.findMany({
+    where: {
+      organizationId: ctx.orgId,
+      practitionerId,
+      status: "open",
+      startsAt: { gte: window.from, lt: window.to },
+    },
+    orderBy: [{ startsAt: "asc" }, { id: "asc" }],
+    select: { id: true, startsAt: true, endsAt: true, appointmentTypes: true },
+  });
+  return rows.map((r) => ({
+    id: r.id,
+    startsAt: r.startsAt.toISOString(),
+    endsAt: r.endsAt.toISOString(),
+    appointmentTypes: r.appointmentTypes,
+    past: r.startsAt <= window.now,
   }));
 }
 

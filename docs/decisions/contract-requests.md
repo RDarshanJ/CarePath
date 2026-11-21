@@ -166,8 +166,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 N; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): WP 6.1
 - Blocking: Yes, WP 6.2.
-- Status: open
-- Answer: pending
+- Status: delivered (WP 6.1, branch `wp/6.1`)
+- Answer: `GET /metrics` (permission `metrics.read`): six metrics, each with `numerator`, `denominator`, `ratio` (null with `ratioUnavailableReason` when there is no denominator or it is 0), `window`, `windowLabel`, `computedAt`, a printed `definition`, `calculation`, `source` and `supports`, `previous` (the same calculation over the window before, recomputed from current rows; null with `previousNote` for the two snapshot metrics), `breakdown` and `lists`. `GET /metrics/rows?metric=&list=&cursor=&limit=` returns one list; its total equals the `count` the metric states, and a list with role `numerator`, `denominator` or `remainder` reconciles to that number (for utilisation, minutes: `minutes` on the list and on each slot row). The filters named in this request are lists: `enrollment_completion/not_submitted`, `care_plan_activation/without_plan`, `cancellations/cancelled` (also by patient and by clinic), `pending_review_items/under_24h|24_to_48h|over_48h`. Denominator of care plan activation is status `active` (S3). Review bands are the S7 demo default, on whole hours: under 24, 24 to 47, 48 or more. No per-clinician figure, no peer figure. Contract: `packages/shared/src/contracts/admin.ts`; words: `packages/shared/src/labels/admin.ts`.
 
 ### CR-14: Availability writes and agenda open times
 
@@ -178,8 +178,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 N, CD-312, CD-313; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): WP 6.1
 - Blocking: Yes, WP 6.2 availability. The agenda part does not block D-WP-14.
-- Status: open
-- Answer: pending
+- Status: delivered (WP 6.1, branch `wp/6.1`)
+- Answer: Reads and writes need `availability.manage` (any clinician) or `availability.manage_own` (own times; another therapist's answer 403). `GET /practitioners/:id/availability?from&to` lists every time of the range by clinic-zone day with open, booked and blocked counts and the live visit of a booked time. `POST /practitioners/:id/availability` adds times for one day (`date`, `startTime`, `endTime`, `slotMinutes`, `appointmentTypes`, `status` open or blocked), returns `created` and `leftoverMinutes`, and is all or none: an overlap answers 409 `availability_overlap`. `POST /availability/slots/:slotId/block` and `/unblock`; `DELETE /availability/slots/:slotId` removes an unbooked time. A booked time answers 409 `slot_booked`; a time that has started answers 409 `availability_past`; a time that once held a cancelled visit cannot be deleted (the visit's history points at it), so it is blocked and the answer says `blocked_instead`. Every write is audited as `availability.update` in its own transaction and takes the same row lock as booking. Agenda: `GET /appointments` gains `openTimes` (open times starting that day, earlier ones included, each with `past`).
 
 ### CR-15: Audit query with filters and cursor paging
 
@@ -190,8 +190,8 @@ Copy this block to the end of the file and fill every line.
 - Why: DR-002 N, CD-413; filed from `docs/design/rebuild-plan.md` section 5.
 - Owner (WP): WP 6.1
 - Blocking: Yes, WP 6.2 audit viewer.
-- Status: open
-- Answer: pending
+- Status: delivered (WP 6.1, branch `wp/6.1`)
+- Answer: `GET /audit-events` (permission `audit.read`, clinic administrator only; the coordinator is refused). Filters: `actorUserId`, `eventName`, `action` (C, R, U, D, E), `resourceType`, `resourceId`, `patientId`, `from` (inclusive), `to` (exclusive), `outcome`; combined with AND. Newest first, keyset cursor on time and id (`cursor`, `limit` 1 to 100), so a cursor stays valid while events arrive. Rows carry the actor's name and role and the patient's name. Reading is audited as `audit.query` after the page is built, with the filters used and the row count, never the rows. Only the caller's organization is read.
 
 ### CR-16: Overview: AI drafts awaiting review
 
