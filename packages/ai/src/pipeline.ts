@@ -8,7 +8,7 @@ import {
 import { getPrompt, type RenderedPrompt } from "./prompts/registry.js";
 import type { LLMProvider, ProviderCall, ProviderResult } from "./providers/types.js";
 import { noRateLimit, type RateLimitHook } from "./ratelimit.js";
-import { createRedactor, findIdentifierLeaks } from "./redaction.js";
+import { createRedactor, findIdentifierLeaks, findRedactionTokens } from "./redaction.js";
 import {
   OUTPUT_SCHEMAS,
   duplicateStatementIds,
@@ -17,7 +17,13 @@ import {
   type SourceRef,
 } from "./schemas.js";
 import { sourceRecords } from "./sources.js";
-import { verifyOutput, type EvidenceResolver, type VerificationResult } from "./verifier.js";
+import {
+  verifyOutput,
+  type AllowListReason,
+  type EvidenceResolver,
+  type UnsupportedReason,
+  type VerificationResult,
+} from "./verifier.js";
 
 /**
  * The shared generation pipeline (ADR-5): consent gate, rate-limit hook, input validation, prompt
@@ -91,7 +97,8 @@ export interface GenerationRecord<K extends GenerationKind> {
   costLabel: string;
   latencyMs: number;
   redaction: { applied: boolean; tokenCount: number; counts: Record<string, number> };
-  verification: VerificationResult | null;
+  /** Checked against the generation's own `inputRefs`, so `not_in_input` can appear. */
+  verification: VerificationResult<UnsupportedReason | AllowListReason> | null;
   unsupportedStatementCount: number | null;
 }
 
@@ -199,6 +206,15 @@ export async function generate<K extends GenerationKind>(
       result = await Promise.race([provider.generate(makeCall(controller.signal)), timeout]);
       answeredModel = result.model ?? answeredModel;
       const restored = provider.external ? redactor.restore(result.output) : result.output;
+      if (provider.external) {
+        const leftover = findRedactionTokens(restored);
+        if (leftover.length) {
+          throw new AIError(
+            "invalid_output",
+            `Output contains ${leftover.length} redaction token(s) that match no redacted value.`,
+          );
+        }
+      }
       const parsed = OUTPUT_SCHEMAS[kind].safeParse(restored);
       if (!parsed.success) {
         throw new AIError(
@@ -212,6 +228,10 @@ export async function generate<K extends GenerationKind>(
       output = parsed.data as OutputFor<K>;
       lastError = null;
     } catch (err) {
+      if (isAIError(err) && err.attemptUsage && !result) {
+        result = { output: null, ...err.attemptUsage };
+        answeredModel = err.attemptUsage.model ?? answeredModel;
+      }
       lastError = isAIError(err)
         ? err
         : new AIError("provider_error", err instanceof Error ? err.message : "Provider failed.", {
@@ -249,9 +269,11 @@ export async function generate<K extends GenerationKind>(
   };
   const costLabels = [...new Set(calls.map((c) => c.costLabel).filter((l): l is string => !!l))];
 
-  let verification: VerificationResult | null = null;
+  let verification: VerificationResult<UnsupportedReason | AllowListReason> | null = null;
   if (output && opts.resolver)
-    verification = await verifyOutput(kind, output, opts.resolver, input.scope);
+    verification = await verifyOutput(kind, output, opts.resolver, input.scope, {
+      allowedRecords: inputRefs,
+    });
 
   return {
     kind,

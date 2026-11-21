@@ -1,3 +1,12 @@
+/**
+ * Redaction tests.
+ *
+ * Known limitation (checkpoint C3, 1.1 item 5): every part of a known name that is three letters or
+ * longer is treated as a name anywhere in the text. A patient called May, Will or Rose therefore
+ * turns the ordinary words "may", "will" and "rose" into name tokens. `restore` puts the text
+ * back, so stored output is correct; the cost is lower-quality input to an external model. Not
+ * fixed; recorded here as the checkpoint asked.
+ */
 import { describe, expect, it } from "vitest";
 import { ProgressSummaryInput } from "../src/inputs.js";
 import { generate } from "../src/pipeline.js";
