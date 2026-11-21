@@ -283,6 +283,7 @@ test.describe("leftovers from WP 3.4b", () => {
           lastCheckedAt: "2026-11-19T16:00:00.000Z",
           rulesLastRunAt: null,
           total: 0,
+          ruleTotals: [],
         },
       }),
     );
