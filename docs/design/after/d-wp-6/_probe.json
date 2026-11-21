@@ -5051,7 +5051,7 @@
  },
  {
   "file": "patient-discomfort-confirm-375.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5078,7 +5078,7 @@
  },
  {
   "file": "patient-discomfort-confirm-390.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5105,7 +5105,7 @@
  },
  {
   "file": "patient-discomfort-confirm-768.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5133,7 +5133,7 @@
  },
  {
   "file": "patient-discomfort-confirm-1024.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5159,7 +5159,7 @@
  },
  {
   "file": "patient-discomfort-confirm-1440.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5186,7 +5186,7 @@
  },
  {
   "file": "patient-discomfort-confirm-1920.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5212,7 +5212,7 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-375.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5239,7 +5239,7 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-390.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5266,7 +5266,7 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-768.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5293,7 +5293,7 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-1024.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5319,7 +5319,7 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-1440.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5346,7 +5346,7 @@
  },
  {
   "file": "patient-discomfort-pain-sheet-1920.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5372,7 +5372,7 @@
  },
  {
   "file": "patient-discomfort-stopped-375.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5399,18 +5399,18 @@
   "underThemeFloor": 7,
   "underThemeFloorList": [
    "patient a.sr-only.rounded-control.bg-surface \"Skip to main content\" 24x16",
-   "patient button#_r_27_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_24_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_29_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_26_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_2b_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_28_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24"
   ],
   "violations": []
  },
  {
   "file": "patient-discomfort-stopped-390.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5437,17 +5437,17 @@
   "underThemeFloor": 7,
   "underThemeFloorList": [
    "patient a.sr-only.rounded-control.bg-surface \"Skip to main content\" 24x16",
-   "patient button#_r_27_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_24_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_29_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_26_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_2b_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_28_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24"
   ]
  },
  {
   "file": "patient-discomfort-stopped-768.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5474,18 +5474,18 @@
   "underThemeFloor": 7,
   "underThemeFloorList": [
    "patient a.sr-only.rounded-control.bg-surface \"Skip to main content\" 24x16",
-   "patient button#_r_27_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_24_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_29_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_26_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_2b_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_28_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24"
   ],
   "violations": []
  },
  {
   "file": "patient-discomfort-stopped-1024.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5512,17 +5512,17 @@
   "underThemeFloor": 7,
   "underThemeFloorList": [
    "patient a.sr-only.rounded-control.bg-surface \"Skip to main content\" 24x16",
-   "patient button#_r_27_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_24_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_29_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_26_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_2b_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_28_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24"
   ]
  },
  {
   "file": "patient-discomfort-stopped-1440.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5549,18 +5549,18 @@
   "underThemeFloor": 7,
   "underThemeFloorList": [
    "patient a.sr-only.rounded-control.bg-surface \"Skip to main content\" 24x16",
-   "patient button#_r_27_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_24_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_29_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_26_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_2b_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_28_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24"
   ],
   "violations": []
  },
  {
   "file": "patient-discomfort-stopped-1920.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -5587,11 +5587,11 @@
   "underThemeFloor": 7,
   "underThemeFloorList": [
    "patient a.sr-only.rounded-control.bg-surface \"Skip to main content\" 24x16",
-   "patient button#_r_27_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_24_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_29_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_26_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24",
-   "patient button#_r_2b_.mt-0.5.inline-flex.size-6 24x24",
+   "patient button#_r_28_.mt-0.5.inline-flex.size-6 24x24",
    "patient input 24x24"
   ]
  },
@@ -7229,7 +7229,7 @@
  },
  {
   "file": "patient-session-paused-375.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7255,7 +7255,7 @@
  },
  {
   "file": "patient-session-paused-390.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7280,7 +7280,7 @@
  },
  {
   "file": "patient-session-paused-768.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7305,7 +7305,7 @@
  },
  {
   "file": "patient-session-paused-1024.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7329,7 +7329,7 @@
  },
  {
   "file": "patient-session-paused-1440.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7354,7 +7354,7 @@
  },
  {
   "file": "patient-session-paused-1920.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7378,7 +7378,7 @@
  },
  {
   "file": "patient-session-player-375.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7403,7 +7403,7 @@
  },
  {
   "file": "patient-session-player-390.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7427,7 +7427,7 @@
  },
  {
   "file": "patient-session-player-768.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7452,7 +7452,7 @@
  },
  {
   "file": "patient-session-player-1024.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7476,7 +7476,7 @@
  },
  {
   "file": "patient-session-player-1440.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
@@ -7501,7 +7501,7 @@
  },
  {
   "file": "patient-session-player-1920.png",
-  "url": "/session/6df741b7-308e-437a-bdb3-2ab5e3b773ee",
+  "url": "/session/5c24667c-1158-49f9-bc72-880dc6dd20e0",
   "theme": "patient",
   "overflowX": 0,
   "bodyBg": "rgb(245, 247, 250)",
