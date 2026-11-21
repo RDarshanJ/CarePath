@@ -23,7 +23,9 @@ import {
  *  - Reduced motion: the decorative rest bar has no transition.
  *  - Keyboard only: every focused control stays clear of the sticky control bar (WCAG 2.4.11).
  * The file sorts after patient.spec.ts on purpose: it starts its own sessions for personas that spec has
- * already used, and stops any session an earlier run left open, so either order of runs works.
+ * already used, and stops any session an earlier run left open, so either order of runs works. Sessions
+ * run on patient.flare, never patient.demo: every session adds to Dana Demopatient's record timeline,
+ * and clinician-screens.spec (desktop project, after this file's phone run) expects the plan event there.
  */
 const phones = [
   { width: 375, height: 667 },
@@ -123,7 +125,7 @@ test.describe("D-WP-10 session player", () => {
     page,
   }) => {
     test.setTimeout(150_000);
-    await signInWithForm(page, personas.demo);
+    await signInWithForm(page, personas.flare);
     await overview(page);
     await expectReachable(
       page,
@@ -391,7 +393,7 @@ test.describe("D-WP-10 session player", () => {
     page,
   }) => {
     test.setTimeout(120_000);
-    await signInWithForm(page, personas.demo);
+    await signInWithForm(page, personas.flare);
     await overview(page);
     await page.setViewportSize(phones[0]!);
     await tabTo(page, "Begin session");
