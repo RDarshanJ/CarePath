@@ -132,7 +132,7 @@ export function DeliveryState({
       </p>
       {message.canRetry && onRetry ? (
         <Button
-          variant="secondary"
+          variant="neutral"
           size="sm"
           onClick={onRetry}
           loading={retrying}

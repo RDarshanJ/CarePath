@@ -120,6 +120,8 @@
   --text-component-title--line-height: var(--cp-text-component-title-lh);
   --text-overline: var(--cp-text-overline);
   --text-overline--line-height: var(--cp-text-overline-lh);
+  --text-nav-label: var(--cp-text-nav-label);
+  --text-nav-label--line-height: var(--cp-text-nav-label-lh);
 }
 
 /* Density-driven sizes. */
@@ -153,6 +155,19 @@
 }
 @utility px-gutter {
   padding-inline: var(--cp-page-gutter);
+}
+
+/*
+ * Staff shell from 1024 px (DR-004 U1, U2): a 240 px sidebar spanning the full window height beside
+ * the demo notice and main, so the sidebar never adds the notice's height to the page.
+ */
+@utility grid-staff-shell {
+  grid-template-columns: 15rem minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+}
+/* Staff page content stops at 1440 px and stays left-aligned (DR-004 U2). */
+@utility max-w-staff {
+  max-width: 90rem;
 }
 
 /* Motion: 120 ms and 200 ms ease-out; durations are zeroed under prefers-reduced-motion. */

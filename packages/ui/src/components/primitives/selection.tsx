@@ -83,10 +83,12 @@ export function SegmentedControl<T extends string>({
 /* ---------- ToggleChip (CD-311, CD-534) ---------- */
 
 /**
- * A group of independent on and off filters (booking days and times of day), in a fieldset with a
- * legend. Each chip is a toggle button with `aria-pressed` (CD-311); its state shows as fill plus a
- * check mark, not colour alone. CD-534 proposed a styled checkbox instead; the toggle button keeps the
- * behaviour the booking specs assert and is recorded as a deviation for the advisor.
+ * A group of independent on and off filters that take effect at once (booking days and times of day,
+ * queue rule chips), in a fieldset with a visible legend. Each chip is a toggle button with
+ * `aria-pressed` (CD-311, DR-004 ruling 6.1); its state shows as fill plus a check mark, not colour alone.
+ * Only for instant filters: a choice that is a form value saved on submit (onboarding limitations and
+ * availability, plan schedule days) is a `Checkbox` group in a fieldset, and no chip-styled checkbox is
+ * built (CD-534 as narrowed by ruling 6.1).
  */
 export function ToggleChipGroup({
   legend,
@@ -196,7 +198,9 @@ export interface SlotButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
 /**
  * A time slot. Choosing one is an action that moves the booking on, so it is a button, not a radio.
  * Times never truncate. Disabled only while a request is in flight, with the reason in the status text
- * around the list.
+ * around the list. Neutral at rest (`border-control` and ink, hover `primary-subtle`), so a screen of
+ * slots does not compete with the one filled action; selected keeps the selected fill, edge and check
+ * (DR-004 U3). 48 px tall in the patient theme (DR-004 ruling 6.8).
  */
 export const SlotButton = forwardRef<HTMLButtonElement, SlotButtonProps>(function SlotButton(
   { time, fullLabel, selected = false, className, type, ...rest },
@@ -214,7 +218,7 @@ export const SlotButton = forwardRef<HTMLButtonElement, SlotButtonProps>(functio
         "disabled:cursor-not-allowed disabled:border-border disabled:bg-disabled-bg disabled:text-disabled-ink",
         selected
           ? "border-selected-edge bg-selected-bg text-selected-ink"
-          : "border-secondary-border bg-surface text-link hover:bg-secondary-hover-bg active:bg-selected-bg",
+          : "border-border-control bg-surface text-ink hover:bg-primary-subtle active:bg-selected-bg",
         className,
       )}
       {...rest}

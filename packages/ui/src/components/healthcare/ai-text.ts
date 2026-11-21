@@ -1,11 +1,13 @@
 import {
   AI_CONSENT_NAME,
   AI_GENERATED_NAME,
+  UNSUPPORTED_STATEMENT_LABEL,
   formatDateTime,
   formatCalendarDay,
   localDayOf,
   plural,
   tzAbbreviation,
+  unsupportedStatementsText,
 } from "@carepath/shared";
 import type { AiGeneration, AiSourceType, AiStatement } from "@carepath/shared/contracts";
 
@@ -93,7 +95,7 @@ export function statementSupportKind(
 
 export const statementSupportWords: Record<StatementSupportKind, string> = {
   supported: "Supported: the cited record exists for this patient",
-  unsupported: "No supporting record found",
+  unsupported: UNSUPPORTED_STATEMENT_LABEL,
   edited: "Edited, not re-checked",
   removed: "Removed from the approved text",
   kept: "Kept without a supporting record",
@@ -108,11 +110,9 @@ export function reviewSummaryText(
   return `${plural(v.statementCount, "statement")}: ${v.supportedCount} supported, ${v.unsupportedCount} with no supporting record.${missingPart}`;
 }
 
-/** "1 statement has no supporting record", the words the statement chip uses. */
+/** "1 statement has no supporting record": the shared helper, so there is no second string (U7). */
 export function supportCountText(n: number): string {
-  return n === 1
-    ? "1 statement has no supporting record"
-    : `${n} statements have no supporting record`;
+  return unsupportedStatementsText(n);
 }
 
 /** One phrase per approval blocker (CD-407). Rejecting is always available. */
@@ -135,7 +135,7 @@ export function blockerPhrase(b: AiBlocker): string {
   }
 }
 
-/** "Approve is unavailable: 2 statements have no source, and missing information is not acknowledged." */
+/** "Approve is unavailable: 2 statements have no supporting record, and missing information is not acknowledged." */
 export function approvalUnavailableText(blockers: AiBlocker[]): string {
   const phrases = blockers.map(blockerPhrase);
   if (phrases.length === 0) return "";

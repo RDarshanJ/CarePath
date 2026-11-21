@@ -186,7 +186,9 @@ export type TextExtraRole =
   | "page-title"
   | "section-heading"
   | "component-title"
-  | "overline";
+  | "overline"
+  /** Bottom-bar tab labels beside an icon, both themes; the one patient text below 15 (DR-004 U4). */
+  | "nav-label";
 
 export interface DensityTokens {
   "font-heading": string;
@@ -233,6 +235,7 @@ export const density: Record<ThemeName, DensityTokens> = {
       "section-heading": [24, 32],
       "component-title": [20, 28],
       overline: [15, 22],
+      "nav-label": [13, 16],
     },
     "control-h": 48,
     "control-h-sm": 48,
@@ -266,6 +269,7 @@ export const density: Record<ThemeName, DensityTokens> = {
       "section-heading": [18, 24],
       "component-title": [15, 20],
       overline: [12, 16],
+      "nav-label": [13, 16],
     },
     "control-h": 32,
     "control-h-sm": 24,

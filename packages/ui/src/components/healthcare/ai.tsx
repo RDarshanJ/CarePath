@@ -115,14 +115,15 @@ export function AIDraftBlock({
           <span className={state === "failed" ? "text-error-ink" : undefined}>{label.label}</span>
           {decisionLine ? <span className="font-normal text-ink">{decisionLine}</span> : null}
         </p>
-        <p className="text-small text-ink-muted">
-          Provider:{" "}
-          <span className="font-medium text-ink">
-            {provider?.label.trim() ? provider.label : PROVIDER_NOT_RECORDED}
-          </span>
+        {/*
+          Provider and demo notice at the small size, weight 400, ink-muted, still on every block: the state
+          label above stays 600 and the draft text below is the heaviest body text in the block (DR-004 U8).
+        */}
+        <p className="text-small font-normal text-ink-muted">
+          Provider: {provider?.label.trim() ? provider.label : PROVIDER_NOT_RECORDED}
         </p>
         {provider?.isDemo ? (
-          <p data-demo-provider="" className="text-small font-medium text-ink">
+          <p data-demo-provider="" className="text-small font-normal text-ink-muted">
             {DEMO_PROVIDER_NOTICE}
           </p>
         ) : null}
@@ -229,7 +230,9 @@ export const EvidenceRef = forwardRef<HTMLButtonElement, EvidenceRefProps>(funct
 /** Where a statement has no ref: words, not a disabled control (CD-400). */
 export function NoSupportingRecord() {
   return (
-    <span className="text-small font-medium text-warning-ink">No supporting record found</span>
+    <span className="text-small font-medium text-warning-ink">
+      {statementSupportWords.unsupported}
+    </span>
   );
 }
 
@@ -415,7 +418,7 @@ export function ReviewDecisionBar({
           </Field>
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="secondary"
+              variant="neutral"
               onClick={submitReject}
               loading={pending === "reject"}
               loadingLabel="Rejecting"
@@ -439,7 +442,7 @@ export function ReviewDecisionBar({
             {hasEdits ? DECISION_LABELS.approveWithEdits : DECISION_LABELS.approve}
           </Button>
           <Button
-            variant="secondary"
+            variant="neutral"
             onClick={() => setRejecting(true)}
             unavailable={pending !== null}
           >

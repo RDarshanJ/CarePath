@@ -73,6 +73,8 @@ Hue angles (HSL) of the inks: primary 218, accent 193, info 201, success 155, wa
 
 Hover and selected are deliberately different fills (`#EFF4FF` and `#E0EAFF`); in candidate A they were the same value.
 
+**Which button (DR-004 section 5.1, rule 1).** One `primary` per view. The cobalt outline (`secondary`) appears at most once per view, and only for the single supporting action that sits beside or stands in for the primary. Neutral is the default second button: everything repeated per row or per card, and every utility (Refresh, Pause, Skip, day navigation, Got it, Reschedule, Cancel visit, Mark reviewed, Add, Assign, table toggles, Load more, Retry) uses `neutral`. Remove and Clear are `quiet`. A time slot (`SlotButton`) is neutral at rest (`border-control` + `ink`, hover `primary-subtle`); selected keeps `selected-bg` + `selected-edge` + check.
+
 ## 4. Type
 
 Family: IBM Plex Sans 400, 500, 600 and 400 italic for all text and headings in both themes. IBM Plex Mono 400 for identifiers only (MRN, record IDs, audit hashes). Source Serif 4 is removed. Self-hosted through Fontsource. `font-variant-numeric: tabular-nums` on every numeric column, vital strip and chart axis (Plex digits are already tabular; keep the declaration).
@@ -92,13 +94,14 @@ Colours are identical. These differ:
 | `h4` | 20 / 28, 500 | 14 / 20, 600 |
 | Body | 17 / 26 | 14 / 20 |
 | Label (form, button, nav) | 17 / 24, 500 | 13 / 18, 500 |
+| Bottom-bar tab label (`nav-label`) | 13 / 16, 500 | 13 / 16, 500 |
 | Supporting `small` | 15 / 22 | 13 / 18 |
 | Caption | 15 / 22 | 12 / 16 |
 | Table or list row text | 17 / 26 | 13 / 18 |
 | Data value, large | 40 / 44, 500 | 24 / 28, 600 |
 | Data value, inline | 20 / 28, 600 | 14 / 20, 500 |
 | Clinical notes / care-team message | 17 / 28 | 14 / 22 |
-| Smallest text allowed | 15 | 12 |
+| Smallest text allowed | 15 (13 for `nav-label` only, a tab label beside its icon; DR-004 U4) | 12 |
 | Control height | 48 | 32 (24 small) |
 | Minimum target / floor | 48 / 48 | 32 / 24 (24 only with the spacing exception, never destructive) |
 | Row height | 56 | 36 |

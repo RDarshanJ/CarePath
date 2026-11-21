@@ -245,6 +245,16 @@ describe("choice controls (CD-534, CD-532, CD-311)", () => {
     );
     expect(chosen).toContain("Selected");
     expect(chosen).toContain("bg-selected-bg");
+    expect(chosen).toContain("border-selected-edge");
+  });
+
+  it("SlotButton is neutral at rest: control border and ink, hover primary-subtle (DR-004 U3)", () => {
+    const plain = html(<SlotButton time="9:00 AM" fullLabel="Friday, November 20, 9:00 AM" />);
+    expect(plain).toContain("border-border-control");
+    expect(plain).toContain("text-ink");
+    expect(plain).toContain("hover:bg-primary-subtle");
+    expect(plain).not.toContain("border-secondary-border");
+    expect(plain).not.toContain("text-link");
   });
 });
 

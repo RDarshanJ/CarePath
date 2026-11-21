@@ -132,6 +132,8 @@
   --cp-text-component-title-lh: 28px;
   --cp-text-overline: 15px;
   --cp-text-overline-lh: 22px;
+  --cp-text-nav-label: 13px;
+  --cp-text-nav-label-lh: 16px;
   --cp-control-h: 48px;
   --cp-control-h-sm: 48px;
   --cp-target-min: 48px;
@@ -248,6 +250,8 @@
   --cp-text-component-title-lh: 20px;
   --cp-text-overline: 12px;
   --cp-text-overline-lh: 16px;
+  --cp-text-nav-label: 13px;
+  --cp-text-nav-label-lh: 16px;
   --cp-control-h: 32px;
   --cp-control-h-sm: 24px;
   --cp-target-min: 32px;

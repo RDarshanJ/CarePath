@@ -164,9 +164,11 @@ export interface LoadMoreProps {
 }
 
 /**
- * The one "show more" control for feeds and task lists (CD-335, CD-530): a secondary medium button,
- * full width below 600 px. After a load, focus moves to the first new item and a polite status says how
- * many arrived; at the end the button is replaced by text.
+ * The one "show more" control for feeds and task lists (CD-335, CD-530): a neutral medium button, full
+ * width below 600 px. Focus after a load (DR-004 ruling 6.2, the one exception in CD-530): focus moves to
+ * the first new item, scrolled to the middle of the window so it never lands under a sticky bar, and a
+ * polite status says how many arrived and "Showing N of M"; on failure focus stays on the button, with
+ * the inline error and the button reading "Try again"; at the end the button is replaced by the end text.
  */
 export function LoadMore({
   label,
@@ -201,13 +203,19 @@ export function LoadMore({
     }
     before.current = null;
     sawLoading.current = false;
-    announce(`${added} more ${noun} loaded`);
+    announce(
+      `${added} more ${noun} loaded.${total !== null ? ` Showing ${shown} of ${total}.` : ""}`,
+    );
     const first = listRef?.current?.children[from] as HTMLElement | undefined;
     if (first) {
       const target = first.querySelector<HTMLElement>("a[href], button:not([disabled])") ?? first;
-      focusStatic(target);
+      if (!target.hasAttribute("tabindex") && target === first)
+        target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+      // The middle of the window is clear of the sticky header and bottom bars at every width.
+      target.scrollIntoView?.({ block: "center" });
     }
-  }, [loading, shown, noun, announce, listRef]);
+  }, [loading, shown, total, noun, announce, listRef]);
   return (
     <div className={cx("flex flex-col items-stretch gap-2 min-[600px]:items-start", className)}>
       {total !== null ? (
@@ -218,7 +226,7 @@ export function LoadMore({
       {error ? <FieldError live>{error}</FieldError> : null}
       {hasMore ? (
         <Button
-          variant="secondary"
+          variant="neutral"
           loading={loading}
           loadingLabel="Loading"
           className="w-full min-[600px]:w-auto"

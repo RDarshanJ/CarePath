@@ -174,7 +174,7 @@ describe("TablePagination and LoadMore (CD-334, CD-335)", () => {
     expect(out).toContain("Patients 1 to 10 of 10");
     expect(rangeText("Patients", 0, 0, 0)).toBe("No patients");
   });
-  it("LoadMore: secondary button with the direction, count line, end text", () => {
+  it("LoadMore: neutral button with the direction, count line, end text", () => {
     const more = html(
       <LoadMore
         label="Show more tasks"
@@ -187,7 +187,8 @@ describe("TablePagination and LoadMore (CD-334, CD-335)", () => {
     );
     expect(more).toContain("Show more tasks");
     expect(more).toContain("Showing 25 of 87");
-    expect(more).toContain("border-secondary-border");
+    expect(more).toContain("border-border-control");
+    expect(more).not.toContain("border-secondary-border");
     const end = html(
       <LoadMore
         label="Show more tasks"
@@ -359,5 +360,24 @@ describe("Timer, loading, tabs, toast, dialog panel, nav, AI block", () => {
       <BottomTabBar label="Patient" items={[{ href: "/today", label: "Today", icon: "home" }]} />,
     );
     expect(bottom).toContain('aria-label="Patient"');
+  });
+
+  it("BottomTabBar: nav-label role, no word break, badge beside the icon's top-right corner (DR-004 U4)", () => {
+    const out = html(
+      <BottomTabBar
+        label="Patient"
+        items={[
+          { href: "/appointments", label: "Appointments", icon: "calendar" },
+          { href: "/messages", label: "Messages", icon: "message", count: 2, countUnit: "unread" },
+        ]}
+      />,
+    );
+    expect(out).toContain("text-nav-label");
+    expect(out).not.toContain("<wbr");
+    expect(out).toContain(">Appointments<");
+    // The badge starts at the icon's right edge (left-full), above its top, so the icon stays whole.
+    expect(out).toContain("absolute -top-2 left-full");
+    expect(out).toContain("min-h-16");
+    expect(out).toContain(", 2 unread");
   });
 });

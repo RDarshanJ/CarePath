@@ -9,6 +9,8 @@ import {
   appointmentStatusLabels,
   doseText,
   patientStatusLabels,
+  UNSUPPORTED_STATEMENT_LABEL,
+  unsupportedStatementsText,
   type AIDraftState,
 } from "@carepath/shared";
 import type {
@@ -21,6 +23,8 @@ import type {
 } from "@carepath/shared/contracts";
 import {
   AIDraftBlock,
+  statementSupportWords,
+  supportCountText,
   AppointmentRecord,
   ChartFigure,
   ConsentStatusLine,
@@ -693,6 +697,35 @@ describe("messaging (CD-510 to CD-513)", () => {
 
 const demo = { label: "Demo provider, rule-based", isDemo: true };
 
+describe("DR-004 U7 and U8: one unsupported wording; the draft text outweighs the header lines", () => {
+  it("the kit calls the shared helper: no second string", () => {
+    expect(statementSupportWords.unsupported).toBe(UNSUPPORTED_STATEMENT_LABEL);
+    expect(UNSUPPORTED_STATEMENT_LABEL).toBe("No supporting record");
+    for (const n of [1, 2, 7]) expect(supportCountText(n)).toBe(unsupportedStatementsText(n));
+    expect(supportCountText(1)).toBe("1 statement has no supporting record");
+    expect(supportCountText(3)).toBe("3 statements have no supporting record");
+  });
+
+  it("provider line and demo notice are weight 400 in ink-muted at the small size; the label stays 600", () => {
+    const out = html(
+      <AIDraftBlock state="unreviewed" provider={demo}>
+        Statement.
+      </AIDraftBlock>,
+    );
+    const lineOf = (needle: string) => {
+      const i = out.indexOf(needle);
+      return out.slice(out.lastIndexOf("<p", i), i);
+    };
+    for (const line of [lineOf("Provider: "), lineOf(DEMO_PROVIDER_NOTICE)]) {
+      expect(line).toContain("text-small");
+      expect(line).toContain("font-normal");
+      expect(line).toContain("text-ink-muted");
+      expect(line).not.toMatch(/font-(medium|semibold)/);
+    }
+    expect(lineOf(aiDraftStateLabels.unreviewed.label)).toContain("font-semibold");
+  });
+});
+
 describe("generated content (CD-236, CD-404 to CD-407, C3 3.1)", () => {
   it("six states with their fixed labels; the demo notice on every block from the demo provider", () => {
     for (const state of Object.keys(aiDraftStateLabels) as AIDraftState[]) {
@@ -770,7 +803,7 @@ describe("generated content (CD-236, CD-404 to CD-407, C3 3.1)", () => {
           />,
         ),
       ),
-    ).toBe("No supporting record found");
+    ).toBe("No supporting record");
     expect(
       text(
         html(

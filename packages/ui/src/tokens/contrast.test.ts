@@ -133,15 +133,24 @@ describe("shape, type and target rules", () => {
     expect(density.clinician.text.body).toEqual([14, 20]);
   });
 
-  it("keeps every text role on its theme's scale", () => {
+  it("keeps every text role on its theme's scale, except the bottom-bar nav-label", () => {
     for (const t of themes) {
       for (const [role, [size]] of Object.entries({
         ...density[t].text,
         ...density[t].textExtra,
       })) {
+        if (role === "nav-label") continue;
         expect(density[t].scale, `${t} ${role}`).toContain(size);
       }
     }
+  });
+
+  it("keeps nav-label at 13/16 in both themes, the only patient text below 15 (DR-004 U4)", () => {
+    for (const t of themes) expect(density[t].textExtra["nav-label"]).toEqual([13, 16]);
+    const below = Object.entries({ ...density.patient.text, ...density.patient.textExtra })
+      .filter(([, [size]]) => size < 15)
+      .map(([role]) => role);
+    expect(below).toEqual(["nav-label"]);
   });
 
   it("meets minimum target sizes and row height", () => {

@@ -128,7 +128,7 @@ export function ExerciseSummary({
           {variant === "library" && onAdd ? (
             <div className="flex flex-col items-end gap-0.5">
               <Button
-                variant="secondary"
+                variant="neutral"
                 size="sm"
                 iconLeft={inPlan ? "check" : "plus"}
                 unavailable={inPlan}

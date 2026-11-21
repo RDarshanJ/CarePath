@@ -13,10 +13,13 @@ import { Icon, type IconName } from "./icons";
 import { isExternalHref, useLinkComponent } from "./link";
 
 /**
- * Button hierarchy (CD-420, design-tokens section 3):
- * - primary: the one main action of the current context (filled cobalt);
- * - secondary: outline, cobalt border and label, for the supporting action of a view;
- * - neutral: utility actions (Edit, Pause, Refresh), grey control border and ink label;
+ * Button hierarchy (CD-420, design-tokens section 3, DR-004 section 5.1 rule 1):
+ * - primary: the one main action of the view (filled cobalt), once per view;
+ * - secondary: outline, cobalt border and label, at most once per view, only for the single supporting
+ *   action that sits beside or stands in for the primary;
+ * - neutral: the default second button. Every action repeated per row or card and every utility
+ *   (Refresh, Pause, Skip, day navigation, Got it, Reschedule, Cancel visit, Mark reviewed, Add, Assign,
+ *   table toggles, Load more, Retry), grey control border and ink label;
  * - quiet: tertiary, text only (Remove, Clear filters);
  * - danger: only the confirming button inside a destructive ConfirmDialog (CD-421, CD-521).
  * `tone="critical"` on secondary marks the control that starts a safety action ("Stop, this hurts"):

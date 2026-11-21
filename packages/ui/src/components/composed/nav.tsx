@@ -5,7 +5,7 @@ import { CountBadge } from "../primitives/status";
 
 export interface NavItem {
   href: string;
-  /** Visible label; may carry a `<wbr />` so a long word breaks onto two lines in the bottom bar. */
+  /** Visible label. In the bottom bar it is `nav-label` (13/16) and a single word never breaks. */
   label: ReactNode;
   icon: IconName;
   current?: boolean;
@@ -23,7 +23,11 @@ interface NavProps {
   className?: string;
 }
 
-/** Bottom tab bar: text-labelled destinations, 64 px tall; current page: selected fill, edge bar and aria-current. */
+/**
+ * Bottom tab bar: text-labelled destinations, 64 px tall; current page: selected fill, edge bar and
+ * aria-current. Labels use the `nav-label` role (13/16, weight 500, both themes, DR-004 U4); a label of
+ * two words may wrap at its space and still fits the 64 px bar.
+ */
 export function BottomTabBar({ items, label, linkAs: Link = "a", className }: NavProps) {
   return (
     <nav aria-label={label} className={cx("border-t border-border bg-surface", className)}>
@@ -37,9 +41,9 @@ export function BottomTabBar({ items, label, linkAs: Link = "a", className }: Na
               href={it.href}
               aria-current={it.current ? "page" : undefined}
               className={cx(
-                "relative flex min-h-16 flex-col items-center justify-center gap-0.5 px-1 py-2 text-small motion-fast transition-colors focus-visible:focus-ring",
+                "relative flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 py-1 text-nav-label motion-fast transition-colors focus-visible:focus-ring",
                 it.current
-                  ? "bg-selected-bg font-semibold text-selected-ink"
+                  ? "bg-selected-bg font-medium text-selected-ink"
                   : "font-medium text-ink-muted hover:bg-primary-subtle hover:text-ink",
               )}
             >
@@ -49,19 +53,22 @@ export function BottomTabBar({ items, label, linkAs: Link = "a", className }: Na
                   className="absolute inset-x-4 top-0 h-0.5 bg-selected-edge"
                 />
               ) : null}
-              {/* The badge sits on the icon but is read after the label: "Messages, 2 unread" (CD-508). */}
+              {/*
+                The badge is anchored to the icon's top-right corner with its centre outside the icon box,
+                so the icon stays whole (DR-004 U4). It is read after the label: "Messages, 2 unread" (CD-508).
+              */}
               <span className="relative" aria-hidden="true">
                 <Icon name={it.icon} size={22} />
                 {typeof it.count === "number" ? (
                   <CountBadge
                     count={it.count}
                     unit={it.countUnit ?? "new"}
-                    className="absolute -top-2 left-4"
+                    className="absolute -top-2 left-full"
                   />
                 ) : null}
               </span>
-              {/* A long label wraps (at its `<wbr />` or a space) instead of clipping under its neighbour. */}
-              <span className="max-w-full text-center">{it.label}</span>
+              {/* A two-word label may wrap at its space; a single word never breaks. */}
+              <span className="max-w-full text-center break-normal">{it.label}</span>
               {typeof it.count === "number" && it.count > 0 ? (
                 <span className="sr-only">
                   , {it.count} {it.countUnit ?? "new"}

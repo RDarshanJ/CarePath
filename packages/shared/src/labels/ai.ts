@@ -86,7 +86,16 @@ export function aiDraftState(
   return aiGenerationStatusStates[generation];
 }
 
-/** Count line when `unsupportedStatementCount` is above zero. */
+/**
+ * Unsupported statements, one source for every screen (DR-004 ruling 6.4). "Found" is not used: the
+ * check confirms that a cited record exists, it does not search. "No source" is not used: it can be read
+ * as the draft having had no input at all.
+ */
+export const UNSUPPORTED_STATEMENT_LABEL = "No supporting record";
+
+/** Count line when `unsupportedStatementCount` is above zero: "1 statement has no supporting record". */
 export function unsupportedStatementsText(count: number): string {
-  return count === 1 ? "1 statement has no source" : `${count} statements have no source`;
+  return count === 1
+    ? "1 statement has no supporting record"
+    : `${count} statements have no supporting record`;
 }
