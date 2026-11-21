@@ -89,32 +89,30 @@ function ShellBody({ session, children }: { session: SessionInfo; children: Reac
         */}
         <header className="border-b border-border bg-surface md:w-60 md:shrink-0 md:border-r md:border-b-0">
           <div className="flex flex-col md:sticky md:top-0 md:max-h-dvh md:min-h-dvh md:overflow-y-auto">
-            <div className="flex items-start justify-between gap-3 px-gutter py-2.5 md:px-4 md:pt-4 md:pb-3">
+            <div className="px-gutter pt-2.5 pb-1 md:px-4 md:pt-4 md:pb-3">
               <Brand organization={session.organization.name} />
-              <div className="flex shrink-0 flex-col items-end gap-0.5 md:hidden">
-                <SignOutButton variant="neutral" onSignedOut={clearSearch} />
-              </div>
             </div>
-            <p className="-mt-1.5 px-gutter pb-2.5 text-small text-ink-muted md:hidden">
-              Signed in as <span className="font-medium text-ink">{session.user.displayName}</span>,{" "}
-              {role}
-            </p>
             <SideNav
               label="Clinician"
               linkAs={NextLink}
               items={items}
               className="hidden flex-1 border-r-0 bg-transparent px-2 md:flex"
             />
-            <div className="hidden flex-col gap-3 border-t border-border p-4 md:flex">
-              <div className="flex items-start gap-2.5">
-                <Avatar name={session.user.displayName} />
-                {/* The name wraps rather than truncating (CD-206). */}
-                <div className="min-w-0">
-                  <p className="text-label font-medium break-words text-ink">
+            {/*
+              One identity block (CD-206): a compact row under the brand below 768 px, the sidebar footer with
+              the avatar from 768 px. The name wraps rather than truncating.
+            */}
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-gutter pb-2.5 md:flex-col md:items-stretch md:gap-3 md:border-t md:border-border md:p-4">
+              <div className="flex min-w-0 items-start gap-2.5">
+                <span className="hidden md:block">
+                  <Avatar name={session.user.displayName} />
+                </span>
+                <p className="min-w-0 text-small text-ink-muted">
+                  <span className="block text-label font-medium break-words text-ink">
                     {session.user.displayName}
-                  </p>
-                  <p className="text-small text-ink-muted">{role}</p>
-                </div>
+                  </span>
+                  {role}
+                </p>
               </div>
               <SignOutButton variant="neutral" onSignedOut={clearSearch} />
             </div>
