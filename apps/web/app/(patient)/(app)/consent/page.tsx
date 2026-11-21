@@ -1,5 +1,5 @@
 import { Heading } from "@carepath/ui";
-import { ConsentManager } from "../../_components/consent-manager";
+import { ConsentManager } from "./_components/consent-manager";
 import { getClinic, getConsents, requirePatient } from "../../_lib/data";
 
 export const metadata = { title: "Sharing and consent | CarePath" };
@@ -8,7 +8,7 @@ export default async function ConsentPage() {
   const { patientId } = await requirePatient();
   const [consents, clinic] = await Promise.all([getConsents(patientId), getClinic(patientId)]);
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-1">
         <Heading level={1}>Sharing and consent</Heading>
         <p className="max-w-measure text-body text-ink-muted">

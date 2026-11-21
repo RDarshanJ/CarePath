@@ -1,6 +1,7 @@
 import type { Browser, BrowserContext, Page } from "@playwright/test";
 import { EMERGENCY_NOTICE } from "@carepath/shared";
 import { ANCHOR, accounts, expect, signInWithForm, test } from "./fixtures";
+import { completeIntake, createAccount } from "./onboarding-helpers";
 import {
   expectNoSeriousViolations,
   finishExercise,
@@ -45,75 +46,21 @@ async function open(
   return { context, page };
 }
 
-const next = (page: Page) => page.getByRole("button", { name: "Continue", exact: true }).click();
-
 async function onboard(page: Page) {
   await page.goto("/login");
   await page.getByRole("link", { name: "Create your account" }).click();
   await expect(page).toHaveURL(/\/onboarding$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Create your account" })).toBeVisible();
-  await page.getByLabel(/^First name/).fill(PATIENT.first);
-  await page.getByLabel(/^Last name/).fill(PATIENT.last);
-  await page.getByLabel(/^Email/).fill(PATIENT.email);
-  await page.getByLabel(/^Password/).fill(PATIENT.password);
-  await next(page);
-
-  await page.getByLabel(/^Date of birth/).fill("1991-06-02");
-  await page.getByLabel(/^Eligibility code/).fill(PATIENT.code);
-  await page.getByRole("button", { name: "Create account" }).click();
-
-  await expect(page.getByRole("heading", { level: 1, name: "About you" })).toBeVisible();
-  await page.getByLabel(/^Phone number/).fill("(555) 555-0188");
-  await next(page);
-
-  await expect(page.getByRole("heading", { level: 1, name: "Your goal" })).toBeVisible();
-  await page.getByLabel(/^What would you like/).fill(PATIENT.goal);
-  await next(page);
-
-  await expect(page.getByRole("heading", { level: 1, name: "Where it bothers you" })).toBeVisible();
-  await page.getByRole("radio", { name: "Lower back", exact: true }).click();
-  await page.getByRole("radio", { name: "Left side" }).click();
-  // The body-area picture appears with its caption and a plain description.
-  await expect(
-    page.getByRole("img", { name: /seen from behind, from the lower ribs/ }),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Illustration only. Follow the written steps from your care team."),
-  ).toBeVisible();
-  await next(page);
-
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Pain right now and this week" }),
-  ).toBeVisible();
-  await radio(page, "At its worst in the last week?", "6 of 10").click();
-  await radio(page, "At its best in the last week?", "2 of 10").click();
-  await radio(page, "How much does it hurt right now?", "4 of 10").click();
-  await next(page);
-
-  await expect(
-    page.getByRole("heading", { level: 1, name: "What is hard right now" }),
-  ).toBeVisible();
-  await page.getByRole("checkbox", { name: "Walking" }).click();
-  await next(page);
-
-  await expect(page.getByRole("heading", { level: 1, name: "Your therapist" })).toBeVisible();
-  await next(page);
-
-  await expect(page.getByRole("heading", { level: 1, name: "When you can come in" })).toBeVisible();
-  await page.getByRole("checkbox", { name: "Monday" }).click();
-  await page.getByRole("checkbox", { name: "Morning" }).click();
-  await next(page);
-
-  await expect(page.getByRole("heading", { level: 1, name: "Sharing and consent" })).toBeVisible();
-  await page.getByRole("checkbox", { name: /I agree to treatment and data use/ }).click();
-  await next(page);
-
-  await expect(page.getByRole("heading", { level: 1, name: "Review and send" })).toBeVisible();
-  await page.getByRole("checkbox", { name: "These answers are right." }).click();
-  await page.getByRole("button", { name: "Send to the clinic" }).click();
-  await expect(
-    page.getByRole("heading", { level: 1, name: "Your details are with the clinic" }),
-  ).toBeVisible();
+  const p = {
+    first: PATIENT.first,
+    last: PATIENT.last,
+    email: PATIENT.email,
+    password: PATIENT.password,
+    code: PATIENT.code,
+    goal: PATIENT.goal,
+    phone: "(555) 555-0188",
+  };
+  await createAccount(page, p);
+  await completeIntake(page, p);
 }
 
 test("the slice: onboarding, assignment in the UI, plan, session, pain check-in, review task", async ({

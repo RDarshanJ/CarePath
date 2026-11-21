@@ -127,7 +127,9 @@ test("sign-in: the form is primary, the demo chooser is secondary and real, onbo
 
 test("onboarding carries the one skip link and the demo notice", async ({ page }) => {
   await page.goto("/onboarding");
-  await expect(page.getByRole("heading", { level: 1, name: "Create your account" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Your eligibility code" }),
+  ).toBeVisible();
   await expectSkipLinkFirst(page, "/onboarding");
   await expect(
     page.getByText("Demonstration product. Synthetic data. Not for clinical use."),
