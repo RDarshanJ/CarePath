@@ -6,12 +6,13 @@
   "functions": {
     "server.mjs": {
       "maxDuration": 60,
-      "includeFiles": [
-        "../../packages/fhir/node_modules/@medplum/definitions",
-        "../../node_modules/.pnpm/@medplum+definitions@*/node_modules/@medplum/definitions/{package.json,dist/cjs/index.cjs,dist/esm/index.mjs}",
-        "../../node_modules/.pnpm/@medplum+definitions@*/node_modules/@medplum/definitions/dist/fhir/r4/{profiles-types,profiles-resources}.json"
-      ]
+      "includeFiles": "../../{packages/fhir/node_modules/@medplum/definitions,node_modules/.pnpm/@medplum+definitions@*/node_modules/@medplum/definitions/{package.json,dist/cjs/index.cjs,dist/esm/index.mjs,dist/fhir/r4/profiles-types.json,dist/fhir/r4/profiles-resources.json}}"
     }
   },
-  "crons": [{ "path": "/internal/cron/jobs", "schedule": "17 6 * * *" }]
+  "crons": [
+    {
+      "path": "/internal/cron/jobs",
+      "schedule": "17 6 * * *"
+    }
+  ]
 }

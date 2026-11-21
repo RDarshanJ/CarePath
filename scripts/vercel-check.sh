@@ -85,7 +85,7 @@ check_api() {
   echo "==> trace the function files"
   local includes=()
   mapfile -t includes < <(node -e \
-    'for (const g of require("./apps/api/vercel.json").functions["server.mjs"].includeFiles) console.log(g)')
+    'for (const g of [].concat(require("./apps/api/vercel.json").functions["server.mjs"].includeFiles)) console.log(g)')
   node scripts/vercel-trace.mjs "$SCRATCH/repo" apps/api/server.mjs "$SCRATCH/fn" "${includes[@]}" \
     || fail "trace"
   if find "$SCRATCH/fn" -name '*.ts' ! -name '*.d.ts' | grep -q .; then
