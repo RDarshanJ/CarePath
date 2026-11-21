@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { DATA_HANDLING_RULES, delimit } from "../injection.js";
 import type { NoteDraftInputParsed, ProgressSummaryInputParsed } from "../inputs.js";
-import { OUTPUT_SCHEMAS, type GenerationKind } from "../schemas.js";
+import { OUTPUT_SCHEMAS, ProgressSummaryOutputV1_0, type GenerationKind } from "../schemas.js";
 import { sourceRecords } from "../sources.js";
 
 /**
@@ -30,11 +30,12 @@ export interface PromptDefinition<K extends GenerationKind = GenerationKind> {
   ): string;
 }
 
-const outputContract = (kind: GenerationKind) =>
+/** `schema` defaults to the current output schema; an older version passes the one it was written against. */
+const outputContract = (kind: GenerationKind, schema: z.ZodType = OUTPUT_SCHEMAS[kind]) =>
   [
     "Respond with exactly one JSON object and nothing else: no prose, no code fences.",
     "It must match this JSON Schema:",
-    JSON.stringify(z.toJSONSchema(OUTPUT_SCHEMAS[kind])),
+    JSON.stringify(z.toJSONSchema(schema)),
     "Statement ids are s1, s2, s3 ... in order, unique across the whole object.",
   ].join("\n");
 
@@ -58,7 +59,7 @@ const progressSummaryV1: PromptDefinition<"progress_summary"> = {
     "Do not diagnose, do not recommend treatment or exercise changes, do not predict risk, and do not give a confidence score.",
     "Put gaps in missingInformation, not in statements. Put anything the therapist should look at (high or rising pain, sessions stopped for discomfort) in itemsForReview.",
     DATA_HANDLING_RULES,
-    outputContract("progress_summary"),
+    outputContract("progress_summary", ProgressSummaryOutputV1_0),
   ].join("\n\n"),
   render(input) {
     return [
@@ -67,6 +68,24 @@ const progressSummaryV1: PromptDefinition<"progress_summary"> = {
       renderRecords(sourceRecords("progress_summary", input)),
     ].join("\n");
   },
+};
+
+const progressSummaryV1_1: PromptDefinition<"progress_summary"> = {
+  key: "progress_summary",
+  version: "1.1.0",
+  changeNote:
+    "summary may be empty when the window has no sessions, check-ins or published plan; the gaps go in missingInformation (checkpoint C3, A1).",
+  system: [
+    "You draft a clinician-facing progress summary for a physical therapist in a demonstration product with synthetic data.",
+    "The therapist reviews, edits and approves or rejects your draft; nothing you write reaches the patient or the record without that review.",
+    "Report only what the source records show: completed and missed activity, patient-reported pain and difficulty, what the patient wrote in messages and check-in notes, appointments and the current plan.",
+    "Do not diagnose, do not recommend treatment or exercise changes, do not predict risk, and do not give a confidence score.",
+    "Put gaps in missingInformation, not in statements. Put anything the therapist should look at (high or rising pain, sessions stopped for discomfort) in itemsForReview.",
+    "When the window has no sessions, no check-ins and no published care plan, leave summary empty rather than writing a statement without a source.",
+    DATA_HANDLING_RULES,
+    outputContract("progress_summary"),
+  ].join("\n\n"),
+  render: progressSummaryV1.render,
 };
 
 const noteDraftV1: PromptDefinition<"note_draft"> = {
@@ -92,7 +111,7 @@ const noteDraftV1: PromptDefinition<"note_draft"> = {
 };
 
 const REGISTRY: { [K in GenerationKind]: PromptDefinition<K>[] } = {
-  progress_summary: [progressSummaryV1],
+  progress_summary: [progressSummaryV1, progressSummaryV1_1],
   note_draft: [noteDraftV1],
 };
 

@@ -16,21 +16,34 @@ export type AIErrorCode =
   /** The provider cannot run (no key, no model, or an external provider given raw input). */
   | "not_configured";
 
+/**
+ * Usage a provider reported for an attempt that still failed (a reply that was not JSON, or was cut
+ * at the output limit). The pipeline adds it to the attempt's record, because those tokens were paid.
+ */
+export interface FailedAttemptUsage {
+  usage: { inputTokens: number; outputTokens: number } | null;
+  costMicroUsd: number | null;
+  costLabel: string;
+  model: string | null;
+}
+
 export class AIError extends Error {
   readonly code: AIErrorCode;
   readonly retryable: boolean;
   readonly retryAfterMs: number | null;
+  readonly attemptUsage: FailedAttemptUsage | null;
 
   constructor(
     code: AIErrorCode,
     message: string,
-    opts: { retryable?: boolean; retryAfterMs?: number } = {},
+    opts: { retryable?: boolean; retryAfterMs?: number; attemptUsage?: FailedAttemptUsage } = {},
   ) {
     super(message);
     this.name = "AIError";
     this.code = code;
     this.retryable = opts.retryable ?? (code === "timeout" || code === "invalid_output");
     this.retryAfterMs = opts.retryAfterMs ?? null;
+    this.attemptUsage = opts.attemptUsage ?? null;
   }
 }
 

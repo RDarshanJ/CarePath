@@ -80,9 +80,30 @@ export class AnthropicProvider implements LLMProvider {
     }
     const body = (await res.json()) as {
       model?: string;
+      stop_reason?: string | null;
       content?: { type: string; text?: string }[];
       usage?: { input_tokens?: number; output_tokens?: number };
     };
+    const usage =
+      typeof body.usage?.input_tokens === "number" && typeof body.usage?.output_tokens === "number"
+        ? { inputTokens: body.usage.input_tokens, outputTokens: body.usage.output_tokens }
+        : null;
+    const pricing = this.cfg.pricing;
+    const accounting = {
+      usage,
+      costMicroUsd: usage && pricing ? costMicroUsd(usage, pricing) : null,
+      costLabel: pricing ? `Configured price for ${this.cfg.model}` : PRICE_NOT_CONFIGURED_LABEL,
+      model: body.model ?? this.cfg.model,
+    };
+    // A reply cut at the output limit is not retried: the same prompt with the same limit would be
+    // cut again, at full cost each time (checkpoint C3, A4).
+    if (body.stop_reason === "max_tokens") {
+      throw new AIError(
+        "invalid_output",
+        `The model reply was truncated at the output limit of ${this.cfg.maxOutputTokens} tokens (stop_reason max_tokens); not retried.`,
+        { retryable: false, attemptUsage: accounting },
+      );
+    }
     const text = (body.content ?? [])
       .filter((b) => b.type === "text")
       .map((b) => b.text ?? "")
@@ -94,20 +115,11 @@ export class AnthropicProvider implements LLMProvider {
     try {
       output = JSON.parse(text);
     } catch {
-      throw new AIError("invalid_output", "The model did not return JSON.");
+      throw new AIError("invalid_output", "The model did not return JSON.", {
+        attemptUsage: accounting,
+      });
     }
-    const usage =
-      typeof body.usage?.input_tokens === "number" && typeof body.usage?.output_tokens === "number"
-        ? { inputTokens: body.usage.input_tokens, outputTokens: body.usage.output_tokens }
-        : null;
-    const pricing = this.cfg.pricing;
-    return {
-      output,
-      usage,
-      costMicroUsd: usage && pricing ? costMicroUsd(usage, pricing) : null,
-      costLabel: pricing ? `Configured price for ${this.cfg.model}` : PRICE_NOT_CONFIGURED_LABEL,
-      model: body.model ?? this.cfg.model,
-    };
+    return { output, ...accounting };
   }
 }
 

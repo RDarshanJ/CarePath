@@ -71,13 +71,32 @@ export const SummaryMissingInformation = z.strictObject({
   label: z.string().trim().min(1).max(200),
 });
 
-export const ProgressSummaryOutput = z.strictObject({
-  summary: z.array(Statement).min(1).max(4),
+const progressSummarySections = {
   reportedChanges: z.array(Statement).max(12),
   engagementObservations: z.array(Statement).max(12),
   missingInformation: z.array(SummaryMissingInformation).max(SummaryMissingItem.options.length),
   itemsForReview: z.array(Statement).max(12),
   notices: z.array(DataNotice).max(12),
+};
+
+/**
+ * Current schema (prompt `progress_summary@1.1.0`). `summary` may be empty: a window with no
+ * sessions, no check-ins and no published plan has nothing to summarise, and the gaps are listed in
+ * `missingInformation` instead (checkpoint C3, A1). The approval gate refuses an output with no
+ * statements at all (`empty_output`), so such a draft can only be rejected.
+ */
+export const ProgressSummaryOutput = z.strictObject({
+  summary: z.array(Statement).max(4),
+  ...progressSummarySections,
+});
+
+/**
+ * The schema `progress_summary@1.0.0` was written against (`summary` needs one statement). Kept
+ * only so that version's prompt text, and so its pinned fingerprint, stays exactly as registered.
+ */
+export const ProgressSummaryOutputV1_0 = z.strictObject({
+  summary: z.array(Statement).min(1).max(4),
+  ...progressSummarySections,
 });
 export type ProgressSummaryOutput = z.infer<typeof ProgressSummaryOutput>;
 

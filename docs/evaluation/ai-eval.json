@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-20T13:59:37.050Z",
-  "commit": "de65b88",
+  "generatedAt": "2026-11-21T02:28:21.614Z",
+  "commit": "87d71dd",
   "dataset": "packages/ai/evals/data",
   "datasetSha256": "6619329e4e828ce356bbbbf9d50687b8ce59ea4105239c7a4aad1dc662078a8d",
   "summary": {
@@ -59,7 +59,7 @@
           "home_exercise_adherence"
         ],
         "injection": null,
-        "latencyMs": 12
+        "latencyMs": 6
       },
       {
         "id": "case-02",
@@ -84,7 +84,7 @@
           "strength"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-03",
@@ -146,7 +146,7 @@
           "follow_up_plan"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-05",
@@ -211,7 +211,7 @@
           "forbiddenFound": [],
           "noticeOnTurn": true
         },
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-07",
@@ -247,7 +247,7 @@
           "follow_up_plan"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-08",
@@ -280,7 +280,7 @@
           "strength"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-09",
@@ -311,7 +311,7 @@
           "goals"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-10",
@@ -340,7 +340,7 @@
           "goals"
         ],
         "injection": null,
-        "latencyMs": 0
+        "latencyMs": 1
       },
       {
         "id": "case-11",
@@ -397,7 +397,7 @@
           "home_exercise_adherence"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-13",
@@ -427,7 +427,7 @@
           "forbiddenFound": [],
           "noticeOnTurn": true
         },
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-14",
@@ -514,7 +514,7 @@
           "strength"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-17",
@@ -574,7 +574,7 @@
           "follow_up_plan"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-19",
@@ -605,7 +605,7 @@
           "forbiddenFound": [],
           "noticeOnTurn": true
         },
-        "latencyMs": 0
+        "latencyMs": 1
       },
       {
         "id": "case-20",
@@ -691,7 +691,7 @@
           "red_flag_screen"
         ],
         "injection": null,
-        "latencyMs": 0
+        "latencyMs": 1
       },
       {
         "id": "case-23",
@@ -719,7 +719,7 @@
           "strength"
         ],
         "injection": null,
-        "latencyMs": 1
+        "latencyMs": 0
       },
       {
         "id": "case-24",

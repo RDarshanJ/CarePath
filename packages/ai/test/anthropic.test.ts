@@ -161,4 +161,83 @@ describe("Anthropic provider (fetch injected; no network)", () => {
       costMicroUsd: null,
     });
   });
+
+  it("a reply cut at max_tokens is invalid output naming truncation, and is not retried (C3 A4)", async () => {
+    const truncated = {
+      ...okBody('{"subjective": [{"id": "s1", "text": "Knee'),
+      stop_reason: "max_tokens",
+    };
+    const direct = (await new AnthropicProvider({
+      apiKey: "k",
+      model: "m",
+      maxOutputTokens: 512,
+      fetch: reply(200, truncated),
+    })
+      .generate(call())
+      .catch((e: unknown) => e)) as AIError;
+    expect([direct.code, direct.retryable]).toEqual(["invalid_output", false]);
+    expect(direct.message).toMatch(/truncated at the output limit of 512 tokens/);
+
+    const c = fixtureCase("case-90");
+    let calls = 0;
+    const fetchFn = (async () => {
+      calls += 1;
+      return new Response(JSON.stringify(truncated), { status: 200 });
+    }) as unknown as typeof fetch;
+    const rec = await generate({
+      kind: "note_draft",
+      input: noteInputFromCase(c),
+      provider: new AnthropicProvider({
+        apiKey: "k",
+        model: "m",
+        pricing: { inputUsdPerMTok: 3, outputUsdPerMTok: 15 },
+        fetch: fetchFn,
+      }),
+      consent: consentActive,
+      requester: { organizationId: c.encounter.organizationId, userId: requester.userId },
+      sleep: async () => {},
+    });
+    expect(calls).toBe(1);
+    expect(rec.status).toBe("failed");
+    expect(rec.output).toBeNull();
+    expect(rec.error?.code).toBe("invalid_output");
+    expect(rec.error?.message).toMatch(/truncated/);
+    expect(rec.calls).toHaveLength(1);
+    expect(rec.calls[0]).toMatchObject({
+      outcome: "invalid_output",
+      inputTokens: 2000,
+      outputTokens: 500,
+      costMicroUsd: 13_500,
+      backoffMs: null,
+    });
+    // The truncated attempt was paid for, so the totals include it.
+    expect([rec.inputTokens, rec.outputTokens, rec.costMicroUsd]).toEqual([2000, 500, 13_500]);
+    expect(rec.model).toBe("answered-model");
+  });
+
+  it("a reply that is not JSON is still retried, and each attempt's tokens are counted", async () => {
+    const c = fixtureCase("case-90");
+    let calls = 0;
+    const fetchFn = (async () => {
+      calls += 1;
+      return new Response(JSON.stringify({ ...okBody("Sure."), stop_reason: "end_turn" }), {
+        status: 200,
+      });
+    }) as unknown as typeof fetch;
+    const rec = await generate({
+      kind: "note_draft",
+      input: noteInputFromCase(c),
+      provider: new AnthropicProvider({ apiKey: "k", model: "m", fetch: fetchFn }),
+      consent: consentActive,
+      requester: { organizationId: c.encounter.organizationId, userId: requester.userId },
+      sleep: async () => {},
+    });
+    expect(calls).toBe(3);
+    expect(rec.calls.map((x) => x.outcome)).toEqual([
+      "invalid_output",
+      "invalid_output",
+      "invalid_output",
+    ]);
+    expect([rec.inputTokens, rec.outputTokens]).toEqual([6000, 1500]);
+  });
 });

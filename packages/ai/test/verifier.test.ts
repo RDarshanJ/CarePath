@@ -96,6 +96,44 @@ describe("evidence verifier", () => {
     expect(v.unsupportedRate).toBeCloseTo(7 / 9);
   });
 
+  it("with an allow-list, a resolved ref to a record outside it is unsupported with not_in_input (C3 A2)", async () => {
+    const out = output([
+      { text: "Pain 4/10.", sourceRefs: [ref("check_in", u(1), "painScore")] },
+      { text: "Knee is sore.", sourceRefs: [ref("message", u(4), "body")] },
+      {
+        text: "Both.",
+        sourceRefs: [ref("check_in", u(1), "painScore"), ref("message", u(4), "body")],
+      },
+      { text: "Another patient.", sourceRefs: [ref("check_in", u(2), "painScore")] },
+    ]);
+    // The prompt was built from the check-in only (any field of it); the message was not given.
+    const v = await verifyOutput("progress_summary", out, resolver, scope, {
+      allowedRecords: [{ type: "check_in", id: u(1) }],
+    });
+    expect(v.statements.map((s) => [s.status, s.reason])).toEqual([
+      ["supported", null],
+      ["unsupported", "not_in_input"],
+      ["unsupported", "not_in_input"],
+      // An unresolved ref is reported as such even when it is also outside the list.
+      ["unsupported", "unresolved_source_ref"],
+    ]);
+    expect(v.statements[1]!.refs[0]).toMatchObject({ status: "resolved", inInput: false });
+    expect(v.statements[0]!.refs[0]!.inInput).toBe(true);
+    expect(v.statements[1]!.label).toBe(UNSUPPORTED_LABEL);
+    expect(v.unsupportedCount).toBe(3);
+  });
+
+  it("without an allow-list, refs carry no inInput mark and verify as before", async () => {
+    const v = await verifyOutput(
+      "progress_summary",
+      output([{ text: "Knee is sore.", sourceRefs: [ref("message", u(4), "body")] }]),
+      resolver,
+      scope,
+    );
+    expect(v.statements[0]!.status).toBe("supported");
+    expect(v.statements[0]!.refs[0]).not.toHaveProperty("inInput");
+  });
+
   it("asks the resolver once, with distinct refs only", async () => {
     const spy: EvidenceResolver = { resolve: vi.fn(resolver.resolve) };
     const r = ref("check_in", u(1), "painScore");

@@ -37,6 +37,12 @@ describe("eval harness", () => {
     });
     expect(md).toContain("not a language model");
     expect(md).toContain("| Expected-fact recall | 100.0% (13 of 13) |");
+    // Checkpoint C3, 3.2: the three statements beside the table.
+    expect(md).toContain("True by construction");
+    expect(md).toContain("are not findings about draft quality");
+    expect(md).toContain("In-sample:");
+    expect(md).toContain("n = 1.");
+    expect(md).toContain("Progress summaries have no evaluation");
   });
 
   it("counts a failed generation as invalid and detects a followed injection", async () => {

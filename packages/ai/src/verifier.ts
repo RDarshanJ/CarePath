@@ -23,6 +23,11 @@ export interface ResolvedRef {
   status: RefResolution;
   /** The cited value when resolved, for the evidence panel. */
   value?: FieldValue;
+  /**
+   * Set only when the caller passed an allow-list: whether the cited record was one of the records
+   * the prompt was built from.
+   */
+  inInput?: boolean;
 }
 
 export interface EvidenceResolver {
@@ -32,19 +37,42 @@ export interface EvidenceResolver {
 
 export type StatementSupport = "supported" | "unsupported";
 
-export interface StatementVerdict {
+export type UnsupportedReason = "no_source_refs" | "unresolved_source_ref";
+/**
+ * `not_in_input`: every ref resolves, but at least one cites a record the generation was not given
+ * (checkpoint C3, A2). A model can name a real record of the patient it never saw; that is not
+ * evidence for what it wrote. Only possible when the caller passes `allowedRecords`.
+ */
+export type AllowListReason = "not_in_input";
+
+export interface StatementVerdict<R extends string = UnsupportedReason> {
   statementId: string;
   section: string;
   status: StatementSupport;
   /** Null when supported. */
-  reason: null | "no_source_refs" | "unresolved_source_ref";
+  reason: null | R;
   /** Shown beside an unsupported statement. */
   label: string | null;
   refs: ResolvedRef[];
 }
 
-export interface VerificationResult {
-  statements: StatementVerdict[];
+/** One record the prompt was built from. Matched on type and id; the resolver checks the field. */
+export interface AllowedRecord {
+  type: SourceRef["type"];
+  id: string;
+}
+
+export interface VerifyOptions {
+  /**
+   * The records the generation was built from (its stored `inputRefs`). When given, a ref that
+   * resolves but names a record outside this list makes its statement unsupported with reason
+   * `not_in_input`. When omitted (an older row with no input refs) verification is as before.
+   */
+  allowedRecords: readonly AllowedRecord[];
+}
+
+export interface VerificationResult<R extends string = UnsupportedReason> {
+  statements: StatementVerdict<R>[];
   statementCount: number;
   supportedCount: number;
   unsupportedCount: number;
@@ -54,12 +82,29 @@ export interface VerificationResult {
 
 const fullKey = (r: SourceRef) => `${r.type}:${r.id}:${r.field}`;
 
+const recordKey = (r: AllowedRecord) => `${r.type}:${r.id}`;
+
 export async function verifyOutput(
   kind: GenerationKind,
   output: ProgressSummaryOutput | SoapNoteDraftOutput,
   resolver: EvidenceResolver,
   scope: Scope,
-): Promise<VerificationResult> {
+): Promise<VerificationResult>;
+export async function verifyOutput(
+  kind: GenerationKind,
+  output: ProgressSummaryOutput | SoapNoteDraftOutput,
+  resolver: EvidenceResolver,
+  scope: Scope,
+  options: VerifyOptions,
+): Promise<VerificationResult<UnsupportedReason | AllowListReason>>;
+export async function verifyOutput(
+  kind: GenerationKind,
+  output: ProgressSummaryOutput | SoapNoteDraftOutput,
+  resolver: EvidenceResolver,
+  scope: Scope,
+  options?: VerifyOptions,
+): Promise<VerificationResult<UnsupportedReason | AllowListReason>> {
+  const allowed = options ? new Set(options.allowedRecords.map(recordKey)) : null;
   const items = listStatements(kind, output);
   const distinct = new Map<string, SourceRef>();
   for (const { statement } of items)
@@ -68,16 +113,23 @@ export async function verifyOutput(
   const resolved = refs.length ? await resolver.resolve(refs, scope) : [];
   if (resolved.length !== refs.length)
     throw new Error("resolver returned a different number of refs");
-  const byKey = new Map(resolved.map((r, i) => [fullKey(refs[i]!), r]));
+  const byKey = new Map(
+    resolved.map((r, i): [string, ResolvedRef] => [
+      fullKey(refs[i]!),
+      allowed ? { ...r, inInput: allowed.has(recordKey(refs[i]!)) } : r,
+    ]),
+  );
 
-  const statements: StatementVerdict[] = items.map(({ section, statement }) => {
+  const statements = items.map(({ section, statement }) => {
     const rs = statement.sourceRefs.map((r) => byKey.get(fullKey(r))!);
-    const reason =
+    const reason: UnsupportedReason | AllowListReason | null =
       rs.length === 0
         ? "no_source_refs"
         : rs.some((r) => r.status !== "resolved")
           ? "unresolved_source_ref"
-          : null;
+          : rs.some((r) => r.inInput === false)
+            ? "not_in_input"
+            : null;
     return {
       statementId: statement.id,
       section,
@@ -85,7 +137,7 @@ export async function verifyOutput(
       reason,
       label: reason ? UNSUPPORTED_LABEL : null,
       refs: rs,
-    };
+    } satisfies StatementVerdict<UnsupportedReason | AllowListReason>;
   });
   const unsupportedCount = statements.filter((s) => s.status === "unsupported").length;
   return {

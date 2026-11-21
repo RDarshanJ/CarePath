@@ -15,6 +15,7 @@ import {
   noteInputFromCase,
   progressInput,
   requester,
+  u,
 } from "./helpers.js";
 
 const noteCase = fixtureCase("case-90");
@@ -274,7 +275,7 @@ describe("pipeline: generation record", () => {
       providerLabel: DETERMINISTIC_PROVIDER_LABEL,
       model: null,
       promptKey: "progress_summary",
-      promptVersion: "1.0.0",
+      promptVersion: "1.1.0",
       inputTokens: 0,
       outputTokens: 0,
       costMicroUsd: 0,
@@ -332,5 +333,171 @@ describe("pipeline: generation record", () => {
     await expect(generate({ ...base, promptVersion: "1.0.0" })).resolves.toMatchObject({
       promptVersion: "1.0.0",
     });
+  });
+});
+
+describe("pipeline: progress summary of a window with no sessions, check-ins or plan (C3 A1)", () => {
+  const run = (input: ProgressSummaryInput) =>
+    generate({
+      kind: "progress_summary",
+      input,
+      provider: new DeterministicProvider(),
+      consent: consentActive,
+      requester,
+      resolver: createInMemoryResolver(
+        sourceRecords("progress_summary", ProgressSummaryInput.parse(input)),
+      ),
+      sleep: noSleep,
+    });
+  const empty = progressInput({
+    carePlan: null,
+    sessions: [],
+    checkIns: [],
+    messages: [],
+    appointments: [],
+  });
+
+  it("an empty window succeeds with no summary statements and lists every gap", async () => {
+    const rec = await run(empty);
+    expect(rec.status).toBe("succeeded");
+    expect(rec.promptVersion).toBe("1.1.0");
+    expect(rec.calls).toHaveLength(1);
+    expect(rec.output!.summary).toEqual([]);
+    expect(rec.output!.missingInformation.map((m) => m.item)).toEqual([
+      "no_check_ins_in_window",
+      "no_sessions_in_window",
+      "no_current_care_plan",
+      "no_upcoming_appointment",
+      "no_patient_messages_in_window",
+    ]);
+    expect(rec.verification?.statementCount).toBe(0);
+  });
+
+  it("a window with one patient message only succeeds with no summary statements", async () => {
+    const rec = await run({
+      ...empty,
+      messages: [
+        {
+          id: u(30),
+          senderRole: "patient",
+          body: "Can we move my next visit?",
+          createdAt: "2026-11-08T12:00:00.000Z",
+        },
+      ],
+    });
+    expect(rec.status).toBe("succeeded");
+    expect(rec.output!.summary).toEqual([]);
+    const items = rec.output!.missingInformation.map((m) => m.item);
+    expect(items).toEqual([
+      "no_check_ins_in_window",
+      "no_sessions_in_window",
+      "no_current_care_plan",
+      "no_upcoming_appointment",
+    ]);
+    expect(rec.unsupportedStatementCount).toBe(0);
+  });
+});
+
+describe("pipeline: evidence is limited to the records the prompt was built from (C3 A2)", () => {
+  it("a statement citing an in-scope record the provider was not given is unsupported, not_in_input", async () => {
+    const input = ProgressSummaryInput.parse(progressInput());
+    const outside = {
+      type: "check_in" as const,
+      id: u(99),
+      organizationId: input.scope.organizationId,
+      patientId: input.scope.patientId,
+      fields: { painScore: 8 },
+    };
+    const given = input.checkIns[0]!;
+    const provider = new ScriptedProvider([
+      {
+        kind: "ok",
+        output: {
+          summary: [
+            {
+              id: "s1",
+              text: "Pain 3/10 on the first check-in.",
+              sourceRefs: [{ type: "check_in", id: given.id, field: "painScore" }],
+            },
+            {
+              id: "s2",
+              text: "Pain 8/10 three weeks ago.",
+              sourceRefs: [{ type: "check_in", id: outside.id, field: "painScore" }],
+            },
+          ],
+          reportedChanges: [],
+          engagementObservations: [],
+          missingInformation: [],
+          itemsForReview: [],
+          notices: [],
+        },
+      },
+    ]);
+    const rec = await generate({
+      kind: "progress_summary",
+      input,
+      provider,
+      consent: consentActive,
+      requester,
+      // The resolver knows the outside record: it exists, for this patient, in this organization.
+      resolver: createInMemoryResolver([...sourceRecords("progress_summary", input), outside]),
+    });
+    expect(rec.status).toBe("succeeded");
+    const [s1, s2] = rec.verification!.statements;
+    expect([s1!.status, s1!.reason, s1!.refs[0]!.inInput]).toEqual(["supported", null, true]);
+    expect([s2!.status, s2!.reason]).toEqual(["unsupported", "not_in_input"]);
+    expect(s2!.refs[0]).toMatchObject({ status: "resolved", inInput: false });
+    expect(rec.unsupportedStatementCount).toBe(1);
+  });
+});
+
+describe("pipeline: a redaction token left after restore is invalid output (C3 A3)", () => {
+  it("an invented token fails every attempt and nothing is stored", async () => {
+    const out = draftSoapNote(NoteDraftInput.parse(noteInput));
+    const first = out.subjective[0]!;
+    const invented = {
+      ...out,
+      subjective: [{ ...first, text: `${first.text} Reported by [[NAME_9]].` }],
+    };
+    const provider = new ScriptedProvider([{ kind: "ok", output: invented }], true);
+    const rec = await generate({
+      kind: "note_draft",
+      input: noteInput,
+      provider,
+      consent: consentActive,
+      requester: noteRequester,
+      sleep: noSleep,
+    });
+    expect(rec.status).toBe("failed");
+    expect(rec.output).toBeNull();
+    expect(rec.error).toEqual({
+      code: "invalid_output",
+      message: "Output contains 1 redaction token(s) that match no redacted value.",
+    });
+    expect(rec.calls.map((c) => c.outcome)).toEqual([
+      "invalid_output",
+      "invalid_output",
+      "invalid_output",
+    ]);
+  });
+
+  it("a token the redactor issued is restored and the output is accepted", async () => {
+    const first = validNote.subjective[0]!;
+    const withToken = {
+      ...validNote,
+      subjective: [{ ...first, text: `${first.text} Reference [[ID_1]].` }],
+    };
+    const provider = new ScriptedProvider([{ kind: "ok", output: withToken }], true);
+    const rec = await generate({
+      kind: "note_draft",
+      input: noteInput,
+      provider,
+      consent: consentActive,
+      requester: noteRequester,
+      sleep: noSleep,
+    });
+    expect(rec.status).toBe("succeeded");
+    expect(rec.redaction.counts.ID).toBe(1);
+    expect(rec.output!.subjective[0]!.text).not.toContain("[[");
   });
 });

@@ -149,6 +149,25 @@ export function createRedactor(identifiers: Partial<KnownIdentifiers> = {}): Red
   };
 }
 
+const TOKEN_RE = /\[\[[A-Z]+_\d+\]\]/g;
+
+/**
+ * Every redaction-shaped token (`[[NAME_9]]`) in a string or in any string inside a JSON-like
+ * value, in order of appearance. Run on a model's output after `restore`: a token still there
+ * matches nothing the redactor issued (the model invented or altered it), and the pipeline treats
+ * the output as invalid rather than store it (checkpoint C3, A3).
+ */
+export function findRedactionTokens(value: unknown): string[] {
+  const found: string[] = [];
+  const walk = (v: unknown): void => {
+    if (typeof v === "string") found.push(...(v.match(TOKEN_RE) ?? []));
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v as Record<string, unknown>).forEach(walk);
+  };
+  walk(value);
+  return found;
+}
+
 /**
  * Canary check run on the final outbound payload: returns every known identifier still present.
  * The pipeline refuses to send when this is not empty.
