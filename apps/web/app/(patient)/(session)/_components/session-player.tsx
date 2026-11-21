@@ -443,9 +443,8 @@ export function SessionPlayer({ patientId, initial, clinic }: SessionPlayerProps
             <header className="flex flex-col gap-2">
               <ViewHeading>Session paused</ViewHeading>
               <p className="max-w-measure text-body">
-                Your place is saved: exercise {Math.min(currentIndex + 1, total)} of {total}
-                {current ? `, ${current.exercise.name}` : ""}. Nothing is lost if you close this
-                page.
+                Your place is saved{current ? ` at ${current.exercise.name}` : ""}. Nothing is lost
+                if you close this page.
               </p>
             </header>
             {bar(
