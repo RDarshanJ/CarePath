@@ -988,3 +988,28 @@ Deviations and notes:
 - `AIError` gained `attemptUsage` (not in the item list) so that a truncated reply, which is not retried, still has its tokens and cost recorded, as C3 1.1 requires of failed attempts.
 - The WP 5.1 lines in this file that C3 3.2 and 3.3 name (deviation 2 on the empty summary, "two rules were adjusted") are left for the orchestrator, as C3 section 6 assigns.
 
+
+### WP B-CR (contract batch: CR-6, CR-9, CR-10, CR-11, CR-12, CR-17)
+
+Worktree `/home/claude/wt/bcr`, branch `wp/bcr`, rebased onto `main` after D-WP-1, the C3 documents and WP 5.6a. `scripts/gate-wp-bcr.sh` (API 4034, web 3034, own database, includes `pnpm verify`) exit 0:
+
+```
+==> bcr_contract_batch database tests    Tests  6 passed (6)
+seed: integrity checks: 78 passed
+content-hash: 230b13e29af6443b636fb230b6f87d5a8c72b80f5131547626fa0602e65d3b38
+seed check: 78/78 integrity checks passed
+==> shared tests                          Tests  72 passed (72)
+==> bcr/contract-batch.test.ts            Tests  20 passed (20)
+==> m8-enumeration.test.ts                Tests  5 passed (5)
+openapi: valid OpenAPI 3.1.0, 82 operations, house rules pass
+==> Playwright bcr-search-privacy         2 passed (clinician directory, admin patients)
+pnpm verify: packages/fhir 101, packages/ai 114, packages/ui 227, packages/shared 72,
+  packages/db 84, apps/api 263 tests passed; e2e: 57 passed
+WP B-CR gate: PASSED
+(clean)
+```
+
+- Schema (one migration, `20261125000000_bcr_contract_batch`): `ReviewTaskEvent` (append-only by trigger, `seq` keeps order within one instant, checks on practitioner and note), `IdempotencyKey` (unique per organization, user, scope and key, with checks), `ReviewTask` unique on `(id, organizationId)`. `openapi.json` regenerated once (82 operations).
+- CR-6: stop with no rating stores no number and writes no observation; the rating follows as a check-in. CR-9: `priorityLevel` is high at stored priority 70 or more (`HIGH_PRIORITY_MIN`). CR-10: `ruleTotals` on both task lists. CR-11: new table rather than the audit log (audit has no notes, did not record assign, and has no key to the task); events on every task response. CR-12: `POST /patients/search`; `q` removed from `GET /patients`; clinician directory and admin patients keep the term in component state. CR-17: `Idempotency-Key` on book and reschedule, 24 hour window, advisory lock on the key, concurrency tests. Details are in `docs/decisions/contract-requests.md`.
+- Deviations: (1) Idempotency also covers reschedule. (2) The seed now writes assigned and closed events for seeded tasks, and the content checksum leaves out `ReviewTaskEvent.seq`. (3) `GET /patients` ignores an unknown `q` instead of answering 400. (4) Search state is component-local, not the layout-level store of DR-002 I (D-WP-13). (5) Existing tests and the `slice` and empty-queue e2e specs were updated for the new contracts (`ruleTotals`, search by POST). (6) A second concurrent run of the gate was started by mistake and stopped; the passing run is the single one.
+- Not done: `packages/ui` untouched; the review queue UI does not yet show the tag, chips or history (later UI packages).
