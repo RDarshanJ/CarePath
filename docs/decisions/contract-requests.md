@@ -226,8 +226,8 @@ Copy this block to the end of the file and fill every line.
 - Why: A clinic administrator was sent the full note text without `clinical.read` and without a `phi.read` event; `settings.manage` is not an accepted gate.
 - Owner (WP): WP 5.6b (items B1, B3)
 - Blocking: Yes, WP 5.3 and any administrator action from the audit viewer (WP 6.2).
-- Status: open
-- Answer: pending
+- Status: delivered (WP 5.6b, branch `wp/5.6b`)
+- Answer: Migration `20261126000000_phase5_c3_fixes` appends `note.mark_entered_in_error` to the `clinic_admin` role only; `permissions.ts` (shared vocabulary) and `apps/api/src/core/authz/permissions.ts` (role matrix) carry it, and the existing role test asserts the rows equal the map. The route admits `note.sign` or `note.mark_entered_in_error`; the handler allows the author or a holder of `note.mark_entered_in_error` and refuses anyone else with 403 `not_note_author` (a therapist who is not the author included). A caller without `clinical.read` gets the header with `versions: []` and `currentVersion: null`; no SOAP text is read or sent. Audit: author `purposeOfUse: treatment`, `detailCode: author`; permission holder `purposeOfUse: operations`, `detailCode: mark_entered_in_error_permission`. `canMarkEnteredInError` follows the same rule. No comparison with a role name remains in `modules/notes`. Tests: `apps/api/test/phase5/c3-fixes.test.ts` (B1), `ai.test.ts` (administrator path, no text), `packages/db/test/phase5-c3-fixes.test.ts` (grant).
 
 ### CR-19: Error code `encounter_already_documented`
 
@@ -238,5 +238,5 @@ Copy this block to the end of the file and fill every line.
 - Why: Two signed notes for one visit were possible, because each approved draft becomes its own note.
 - Owner (WP): WP 5.6b (item B4)
 - Blocking: Yes, WP 5.3 (the sign action must handle the 409).
-- Status: open
-- Answer: pending
+- Status: delivered (WP 5.6b, branch `wp/5.6b`)
+- Answer: `encounter_already_documented` (409, "This visit already has a signed note. Mark that note entered in error first.") in `errors.ts`. Partial unique index `ClinicalNote_one_signed_per_encounter_key` on `ClinicalNote("encounterId") WHERE status = 'signed' AND "encounterId" IS NOT NULL` (migration `20261126000000_phase5_c3_fixes`). `POST …/sign` checks for another signed note of the visit under the note lock and answers the 409; a unique violation on the index from a concurrent sign is mapped to the same code. Drafts per visit are not limited, and a note marked entered in error leaves the index, so a corrected note can be signed. Seed integrity check "at most one signed note per encounter". Tests: `apps/api/test/phase5/c3-fixes.test.ts` (B4), `packages/db/test/phase5-c3-fixes.test.ts`.
