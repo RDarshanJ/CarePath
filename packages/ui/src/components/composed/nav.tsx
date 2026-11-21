@@ -48,7 +48,8 @@ export function BottomTabBar({ items, label, linkAs: Link = "a", className }: Na
                   className="absolute inset-x-4 top-0 h-0.5 bg-selected-edge"
                 />
               ) : null}
-              <span className="relative">
+              {/* The badge sits on the icon but is read after the label: "Messages, 2 unread" (CD-508). */}
+              <span className="relative" aria-hidden="true">
                 <Icon name={it.icon} size={22} />
                 {typeof it.count === "number" ? (
                   <CountBadge
@@ -58,7 +59,13 @@ export function BottomTabBar({ items, label, linkAs: Link = "a", className }: Na
                   />
                 ) : null}
               </span>
-              <span>{it.label}</span>
+              {/* A long one-word label hyphenates at 320 px and 200 percent text instead of clipping. */}
+              <span className="max-w-full text-center hyphens-auto">{it.label}</span>
+              {typeof it.count === "number" && it.count > 0 ? (
+                <span className="sr-only">
+                  , {it.count} {it.countUnit ?? "new"}
+                </span>
+              ) : null}
             </Link>
           </li>
         ))}

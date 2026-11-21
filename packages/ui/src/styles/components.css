@@ -71,12 +71,14 @@
  *   staff        sticky page or record header at the top
  *   patient-app  bottom tab bar below 768 px
  *   patient-flow sticky action bar at the bottom of a form or the session player
+ *   staff-bar    staff bottom tab bar below 768 px
  */
 :root {
   --cp-sticky-top: 0px;
   --cp-sticky-bottom: 0px;
   --cp-sticky-staff-top: 7rem;
   --cp-sticky-patient-bottom: 6rem;
+  --cp-sticky-staff-bottom: 5rem;
 }
 html:has([data-sticky-layout~="staff"]) {
   --cp-sticky-top: var(--cp-sticky-staff-top);
@@ -84,6 +86,11 @@ html:has([data-sticky-layout~="staff"]) {
 html:has([data-sticky-layout~="patient-app"]),
 html:has([data-sticky-layout~="patient-flow"]) {
   --cp-sticky-bottom: var(--cp-sticky-patient-bottom);
+}
+@media (max-width: 767.98px) {
+  html:has([data-sticky-layout~="staff-bar"]) {
+    --cp-sticky-bottom: var(--cp-sticky-staff-bottom);
+  }
 }
 html {
   scroll-padding-top: var(--cp-sticky-top);

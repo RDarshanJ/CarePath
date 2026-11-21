@@ -36,7 +36,7 @@ export function Table({
       aria-busy={busy || undefined}
       tabIndex={0}
       className={cx(
-        "overflow-x-auto rounded-container border border-border bg-surface focus-visible:focus-ring",
+        "relative overflow-x-auto rounded-container border border-border bg-surface focus-visible:focus-ring",
         busy && "opacity-70",
         className,
       )}
