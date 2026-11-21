@@ -127,7 +127,7 @@ test("segmented control and toggle chips: one tab stop with arrows; Space toggle
   await slot.focus();
   await page.keyboard.press("Enter");
   await expect(
-    chips.getByRole("button", { name: "Friday, November 20, 9:30 AM, selected" }),
+    chips.getByRole("button", { name: "Friday, November 20, 9:30 AM selected" }),
   ).toContainText("Selected");
 });
 
